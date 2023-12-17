@@ -5,9 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name="author")
-public class Author{
+public class Author implements Serializable {
 
     @Id
     @Column(name="id", nullable=false)
@@ -31,4 +33,5 @@ public class Author{
     public void setName(String name) {
         this.name = name;
     }
+
 }

@@ -2,8 +2,10 @@ package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity(name="author_alias")
-public class AuthorAlias {
+public class AuthorAlias implements Serializable {
 
     @Id
     @Column(name="id", nullable=false)
@@ -15,4 +17,28 @@ public class AuthorAlias {
 
     @Column(name="alias")
     private String alias;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Author getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 }
