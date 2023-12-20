@@ -1,10 +1,9 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity(name="serie")
 public class Serie implements Serializable {
@@ -19,6 +18,8 @@ public class Serie implements Serializable {
     @Column(name="name")
     private String name;
 
+    @OneToMany(mappedBy="serie")
+    private List<Game> games;
     public Long getId() {
         return id;
     }
@@ -41,5 +42,9 @@ public class Serie implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Game> getGames() {
+        return games;
     }
 }

@@ -3,6 +3,7 @@ package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity(name="subgroup")
 public class Subgroup implements Serializable {
@@ -12,11 +13,14 @@ public class Subgroup implements Serializable {
     private Long id;
 
     @Column(name="subgroup_name")
-    private String subgroup_name;
+    private String subgroupName;
 
     @OneToOne(optional=false)
     @JoinColumn(name="group_id")
-    private MainGroup group;
+    private MainGroup mainGroup;
+
+    @OneToMany(mappedBy = "subgroup")
+    private List<SongSubgroup> songSubgroupList;
 
     public Long getId() {
         return id;
@@ -26,19 +30,27 @@ public class Subgroup implements Serializable {
         this.id = id;
     }
 
-    public String getSubgroup_name() {
-        return subgroup_name;
+    public String getSubgroupName() {
+        return subgroupName;
     }
 
-    public void setSubgroup_name(String subgroup_name) {
-        this.subgroup_name = subgroup_name;
+    public void setSubgroupName(String subgroupName) {
+        this.subgroupName = subgroupName;
     }
 
-    public MainGroup getGroup() {
-        return group;
+    public MainGroup getMainGroup() {
+        return mainGroup;
     }
 
-    public void setGroup(MainGroup group) {
-        this.group = group;
+    public void setMainGroup(MainGroup mainGroup) {
+        this.mainGroup = mainGroup;
+    }
+
+    public List<SongSubgroup> getSongSubgroupList() {
+        return songSubgroupList;
+    }
+
+    public void setSongSubgroupList(List<SongSubgroup> songSubgroupList) {
+        this.songSubgroupList = songSubgroupList;
     }
 }

@@ -3,6 +3,7 @@ package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity(name="song")
 public class Song implements Serializable {
@@ -27,6 +28,8 @@ public class Song implements Serializable {
     @Column(name="multi_concat")
     private MultiConcat multiConcat;
 
+    @OneToMany(mappedBy = "song")
+    private List<AuthorSong> authorSongList;
     public Long getId() {
         return id;
     }
@@ -73,5 +76,13 @@ public class Song implements Serializable {
 
     public void setMultiConcat(MultiConcat multiConcat) {
         this.multiConcat = multiConcat;
+    }
+
+    public List<AuthorSong> getAuthorSongList() {
+        return authorSongList;
+    }
+
+    public void setAuthorSongList(List<AuthorSong> authorSongList) {
+        this.authorSongList = authorSongList;
     }
 }

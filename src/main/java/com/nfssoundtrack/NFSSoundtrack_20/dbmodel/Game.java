@@ -3,6 +3,7 @@ package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity(name="game")
 public class Game implements Serializable {
@@ -31,23 +32,26 @@ public class Game implements Serializable {
     private String prefix;
 
     @Column(name="spotify_id")
-    private String spotify_id;
+    private String spotifyId;
 
     @Column(name="deezer_id")
-    private String deezer_id;
+    private String deezerId;
 
     @Column(name="tidal_id")
-    private String tidal_id;
+    private String tidalId;
 
     @Column(name="youtube_id")
-    private String youtube_id;
+    private String youtubeId;
 
     @Column(name="soundcloud_id")
-    private String soundcloud_id;
+    private String soundcloudId;
 
     @Enumerated(EnumType.STRING)
     @Column(name="game_status")
     private GameStatus gameStatus;
+
+    @OneToMany(mappedBy="game")
+    private List<MainGroup> mainGroups;
 
     public Long getId() {
         return id;
@@ -105,44 +109,44 @@ public class Game implements Serializable {
         this.prefix = prefix;
     }
 
-    public String getSpotify_id() {
-        return spotify_id;
+    public String getSpotifyId() {
+        return spotifyId;
     }
 
-    public void setSpotify_id(String spotify_id) {
-        this.spotify_id = spotify_id;
+    public void setSpotifyId(String spotifyId) {
+        this.spotifyId = spotifyId;
     }
 
-    public String getDeezer_id() {
-        return deezer_id;
+    public String getDeezerId() {
+        return deezerId;
     }
 
-    public void setDeezer_id(String deezer_id) {
-        this.deezer_id = deezer_id;
+    public void setDeezerId(String deezerId) {
+        this.deezerId = deezerId;
     }
 
-    public String getTidal_id() {
-        return tidal_id;
+    public String getTidalId() {
+        return tidalId;
     }
 
-    public void setTidal_id(String tidal_id) {
-        this.tidal_id = tidal_id;
+    public void setTidalId(String tidalId) {
+        this.tidalId = tidalId;
     }
 
-    public String getYoutube_id() {
-        return youtube_id;
+    public String getYoutubeId() {
+        return youtubeId;
     }
 
-    public void setYoutube_id(String youtube_id) {
-        this.youtube_id = youtube_id;
+    public void setYoutubeId(String youtubeId) {
+        this.youtubeId = youtubeId;
     }
 
-    public String getSoundcloud_id() {
-        return soundcloud_id;
+    public String getSoundcloudId() {
+        return soundcloudId;
     }
 
-    public void setSoundcloud_id(String soundcloud_id) {
-        this.soundcloud_id = soundcloud_id;
+    public void setSoundcloudId(String soundcloudId) {
+        this.soundcloudId = soundcloudId;
     }
 
     public GameStatus getGameStatus() {
@@ -151,5 +155,13 @@ public class Game implements Serializable {
 
     public void setGameStatus(GameStatus gameStatus) {
         this.gameStatus = gameStatus;
+    }
+
+    public List<MainGroup> getMainGroups() {
+        return mainGroups;
+    }
+
+    public void setMainGroups(List<MainGroup> mainGroups) {
+        this.mainGroups = mainGroups;
     }
 }

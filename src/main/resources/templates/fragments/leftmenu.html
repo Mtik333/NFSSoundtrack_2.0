@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="col-md-auto flex-nowrap">
+    <ul class="nav-item list-unstyled ps-0" th:each="serie: ${series}">
+        <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                th:attr="data-bs-target='#id'+${serie.id}" aria-expanded="false">
+            <span th:text="${serie.name}"></span>
+        </button>
+        <div class="collapse" th:attr="id='id'+${serie.id}" style="">
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                <li class="nav-item" th:each="game: ${serie.games}">
+                <a class="nav-link game" th:href="'/game/'+${game.id}"
+                   th:text="${game.gameTitle}"></a>
+                </li>
+            </ul>
+        </div>
+    </ul>
+</div>
+</html>

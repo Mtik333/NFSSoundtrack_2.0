@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="tabbable boxed parentTabs">
+    <ul class="nav nav-tabs gamegroup">
+        <li class="nav-item" th:each="gamegroup: ${gamegroups}">
+            <a class="nav-link gamegroup" th:href="@{'#gamegroupid'+${gamegroup.id}}"
+               th:attr="data-el_id='gamegroupid'+${gamegroup.id}"
+               data-toggle="tab" th:text="${gamegroup.groupName}"></a>
+            <!-- do split after id or something?
+            <ul class="nav nav-tabs visually-hidden subgroup">
+                <li class="nav-item" th:each="subgroup: ${gamegroup.subgroups}">
+                    <a class="nav-link" href="#" th:text="${subgroup.subgroupName}"></a>
+                </li>
+            </ul>
+            -->
+        </li>
+    </ul>
+    <th:block th:each="gamegroup: ${gamegroups}">
+        <ul class="nav nav-tabs subgroup visually-hidden"
+            th:attr="id='gamegroupid'+${gamegroup.id}, data-el_id='gamegroupid'+${gamegroup.id}">
+            <li class="nav-item" th:each="subgroup: ${gamegroup.subgroups}">
+                <a class="nav-link subgroup" th:attr="id='songSubgroup'+${subgroup.id}" href="" th:text="${subgroup.subgroupName}"></a>
+            </li>
+        </ul>
+    </th:block>
+    <table class="table" th:if="${songSubgroups!=null}">
+        <thead>
+        <tr>
+            <th scope="col">Country</th>
+            <th scope="col">Band</th>
+            <th scope="col">Song</th>
+            <th scope="col">Genre</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="songSubgroup : ${songSubgroups}" th:attr="data-el_id='songSubgroup'+${songSubgroup.id}">
+            <td>
+                <span th:text="${songSubgroup}"></span>
+                <span th:text="${songSubgroup.song.authorSongList}"></span>
+                <!-- <img th:src="${songSubgroup."-->
+            </td>
+            <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
+                <td th:text="${authorSong.authorAlias.alias}"></td>
+            </th:block>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<script th:inline="javascript">
+    $(document).ready(function() {
+        console.log("freeman");
+        var firstGameGroup = $("a.gamegroup:first")[0];
+        if (firstGameGroup!=null){
+            $(firstGameGroup).click();
+        }
+    });
+    $("a.gamegroup").click(function(e) {
+        console.log("jesus");
+        e.preventDefault();
+        $(".gamegroup.active").each(function(){
+            $(this).removeClass("active");
+        });
+        $(this).addClass("active");
+        var aId = $(this).attr('data-el_id');
+            $(document).find("ul.subgroup[data-el_id='"+aId+"']").each(function(){
+                 $(this).removeClass("visually-hidden");
+            });
+            $(document).find("ul.subgroup:not([data-el_id='"+aId+"'])").each(function(){
+                 $(this).addClass("visually-hidden");
+            });
+        $(this).removeClass("visually-hidden");
+        var div = $($(this).attr('href'))[0];
+        $(div).addClass("active");
+        $(div).removeClass("visually-hidden");
+        $(div).find("a").first().click();
+    });
+    $("a.subgroup").click(function(e) {
+        e.preventDefault();
+        $(".subgroup.active").each(function(){
+            $(this).removeClass("active");
+        });
+        $(this).addClass("active");
+        $(this).removeClass("visually-hidden");
+        var aId = $(this).attr('id');
+        $(document).find("tr[data-el_id='"+aId+"']").each(function(){
+             $(this).removeClass("visually-hidden");
+        });
+        $(document).find("tr:has(td):not([data-el_id="+aId+"])").each(function(){
+             $(this).addClass("visually-hidden");
+        });
+    });
+</script>
+</html>
