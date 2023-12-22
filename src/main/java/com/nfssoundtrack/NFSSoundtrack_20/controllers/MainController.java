@@ -8,6 +8,7 @@ import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -41,15 +43,15 @@ public class MainController {
     @RequestMapping(value="/")
     public String index(Model model){
         model.addAttribute("appName", appName);
-        model.addAttribute("series", serieRepository.findAll());
-        model.addAttribute("games", gameRepository.findAll());
+        model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
+        //model.addAttribute("games", gameRepository.findAll());
         return "index";
     }
 
     @RequestMapping(value="/{value}")
     public String topMenuEntry(Model model, @PathVariable String value, HttpServletResponse response) throws IOException {
-        model.addAttribute("series", serieRepository.findAll());
-        model.addAttribute("games", gameRepository.findAll());
+        model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
+        //model.addAttribute("games", gameRepository.findAll());
         model.addAttribute("htmlToInject",
                 contentRepository.findByContentShort(value).getContentData());
 //        response.sendRedirect("index");
@@ -67,18 +69,10 @@ public class MainController {
         }
         model.addAttribute("gamegroups", mainGroupRepository.findByGameId(Long.valueOf(gameshort)));
         model.addAttribute("songSubgroups", allSongs);
-        model.addAttribute("series", serieRepository.findAll());
-        model.addAttribute("games", gameRepository.findAll());
+        model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
+        //model.addAttribute("games", gameRepository.findAll());
         return "index";
     }
 
-    @GetMapping("/fragments")
-    public String getHome() {
-        return "fragments.html";
-    }
 
-    @GetMapping("/markup")
-    public String markupPage() {
-        return "markup.html";
-    }
 }

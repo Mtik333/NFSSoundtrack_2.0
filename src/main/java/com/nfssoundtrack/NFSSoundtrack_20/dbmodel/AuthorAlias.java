@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class AuthorAlias implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id", nullable=false)
     private Long id;
 

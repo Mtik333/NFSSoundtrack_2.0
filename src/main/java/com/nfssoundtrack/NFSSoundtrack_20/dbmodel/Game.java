@@ -6,9 +6,10 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity(name="game")
-public class Game implements Serializable {
+public class Game implements Serializable, Comparable<Game> {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
     private Long id;
 
@@ -163,5 +164,14 @@ public class Game implements Serializable {
 
     public void setMainGroups(List<MainGroup> mainGroups) {
         this.mainGroups = mainGroups;
+    }
+
+    @Override
+    public int compareTo(Game o) {
+        int i = getPosition().compareTo(o.getPosition());
+        if (i!=0) {
+            return -i;
+        }
+        return i;
     }
 }

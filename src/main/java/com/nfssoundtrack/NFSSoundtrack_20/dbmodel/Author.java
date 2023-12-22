@@ -1,22 +1,24 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name="author")
 public class Author implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id", nullable=false)
     private Long id;
 
     @Column(name="name")
     private String name;
+
+    @OneToMany(mappedBy="author")
+    private List<AuthorCountry> authorCountries;
 
     public Long getId() {
         return id;
@@ -34,4 +36,11 @@ public class Author implements Serializable {
         this.name = name;
     }
 
+    public List<AuthorCountry> getAuthorCountries() {
+        return authorCountries;
+    }
+
+    public void setAuthorCountries(List<AuthorCountry> authorCountries) {
+        this.authorCountries = authorCountries;
+    }
 }

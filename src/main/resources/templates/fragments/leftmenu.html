@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<div class="col-md-auto flex-nowrap">
-    <ul class="nav-item list-unstyled ps-0" th:each="serie: ${series}">
+<div class="col-xl-auto flex-nowrap list-group list-group-flush overflow-auto vh-100">
+    <input class="filter_games" maxlength="15" placeholder="Search games (type min. 3 chars)">
+    <ul class="nav-item list-group-item ps-0" th:each="serie: ${series}">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                 th:attr="data-bs-target='#id'+${serie.id}" aria-expanded="false">
             <span th:text="${serie.name}"></span>

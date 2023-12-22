@@ -9,6 +9,7 @@ import java.util.List;
 public class Song implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
     private Long id;
 
@@ -19,7 +20,7 @@ public class Song implements Serializable {
     private String officialDisplayTitle;
 
     @Column(name="src_id")
-    private String src_id;
+    private String srcId;
 
     @Column(name="info")
     private String info;
@@ -54,12 +55,12 @@ public class Song implements Serializable {
         this.officialDisplayTitle = officialDisplayTitle;
     }
 
-    public String getSrc_id() {
-        return src_id;
+    public String getSrcId() {
+        return srcId;
     }
 
-    public void setSrc_id(String src_id) {
-        this.src_id = src_id;
+    public void setSrcId(String srcId) {
+        this.srcId = srcId;
     }
 
     public String getInfo() {

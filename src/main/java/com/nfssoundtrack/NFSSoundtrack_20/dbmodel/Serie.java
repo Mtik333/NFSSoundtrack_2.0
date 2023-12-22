@@ -9,6 +9,7 @@ import java.util.List;
 public class Serie implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
     private Long id;
 

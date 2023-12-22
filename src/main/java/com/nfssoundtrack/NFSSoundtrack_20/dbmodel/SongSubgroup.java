@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class SongSubgroup implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
     private Long id;
 
@@ -28,16 +29,16 @@ public class SongSubgroup implements Serializable {
     private Remix remix;
 
     @Column(name="src_id")
-    private String src_id;
+    private String srcId;
 
     @Column(name="spotify_id")
     private String spotify_id;
 
     @Column(name="ingame_display_band")
-    private String ingame_display_band;
+    private String ingameDisplayBand;
 
     @Column(name="ingame_display_title")
-    private String ingame_display_title;
+    private String ingameDisplayTitle;
 
     public Long getId() {
         return id;
@@ -79,12 +80,12 @@ public class SongSubgroup implements Serializable {
         this.remix = remix;
     }
 
-    public String getSrc_id() {
-        return src_id;
+    public String getSrcId() {
+        return srcId;
     }
 
-    public void setSrc_id(String src_id) {
-        this.src_id = src_id;
+    public void setSrcId(String srcId) {
+        this.srcId = srcId;
     }
 
     public String getSpotify_id() {
@@ -95,19 +96,19 @@ public class SongSubgroup implements Serializable {
         this.spotify_id = spotify_id;
     }
 
-    public String getIngame_display_band() {
-        return ingame_display_band;
+    public String getIngameDisplayBand() {
+        return ingameDisplayBand;
     }
 
-    public void setIngame_display_band(String ingame_display_band) {
-        this.ingame_display_band = ingame_display_band;
+    public void setIngameDisplayBand(String ingameDisplayBand) {
+        this.ingameDisplayBand = ingameDisplayBand;
     }
 
-    public String getIngame_display_title() {
-        return ingame_display_title;
+    public String getIngameDisplayTitle() {
+        return ingameDisplayTitle;
     }
 
-    public void setIngame_display_title(String ingame_display_title) {
-        this.ingame_display_title = ingame_display_title;
+    public void setIngameDisplayTitle(String ingameDisplayTitle) {
+        this.ingameDisplayTitle = ingameDisplayTitle;
     }
 }

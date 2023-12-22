@@ -34,22 +34,44 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="songSubgroup : ${songSubgroups}" th:attr="data-el_id='songSubgroup'+${songSubgroup.id}">
+        <tr th:each="songSubgroup : ${songSubgroups}" th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id}">
             <td>
-                <span th:text="${songSubgroup}"></span>
-                <span th:text="${songSubgroup.song.authorSongList}"></span>
-                <!-- <img th:src="${songSubgroup."-->
+                <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
+                    <th:block th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
+                        <img th:src="${authorCountry.country.countryLink}">
+                    </th:block>
+                </th:block>
             </td>
             <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
-                <td th:text="${authorSong.authorAlias.alias}"></td>
+                <td th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></td>
             </th:block>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></td>
+            <td>Something</td>
+            <td>
+                <th:button data-bs-toggle="modal" data-bs-target="#videoModal" th:attr="data-tagVideo=${songSubgroup.srcId} ? ${songSubgroup.srcId} : ${songSubgroup.song.srcId}">
+                    <img th:src="@{/images/znakwodny.png}" width="25" height="25">
+                </th:button>
+            </td>
+
         </tr>
         </tbody>
     </table>
 
+</div>
+
+<div class="modal fade" id="videoModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="ratio ratio-16x9">
+                    <iframe src="" allow="autoplay;" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script th:inline="javascript">
     $(document).ready(function() {
@@ -58,6 +80,7 @@
         if (firstGameGroup!=null){
             $(firstGameGroup).click();
         }
+        autoPlayYouTubeModal();
     });
     $("a.gamegroup").click(function(e) {
         console.log("jesus");
@@ -94,5 +117,23 @@
              $(this).addClass("visually-hidden");
         });
     });
+
+function autoPlayYouTubeModal() {
+  var triggerOpen = $("body").find('[data-tagVideo]');
+  triggerOpen.click(function() {
+      var theModal = $(this).data("bs-target"),
+      videoSRC = $(this).attr("data-tagVideo"),
+      videoSRCauto = "https://www.youtube.com/embed/"+videoSRC + "?autoplay=1";
+      $(theModal + ' iframe').attr('src', videoSRCauto);
+      $(theModal + ' button.btn-close').click(function() {
+        $(theModal + ' iframe').attr('src', videoSRC);
+      });
+      $("#videoModal").click(function(ev){
+           if (ev.originalEvent.target.className!="modal-body"){
+            $(theModal + ' iframe').attr('src', videoSRC);
+          }
+      });
+  });
+}
 </script>
 </html>
