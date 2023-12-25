@@ -1,5 +1,6 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -19,6 +20,7 @@ public class Serie implements Serializable {
     @Column(name="name")
     private String name;
 
+    @JsonManagedReference
     @OneToMany(mappedBy="serie")
     private List<Game> games;
     public Long getId() {

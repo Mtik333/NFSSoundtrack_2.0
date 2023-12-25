@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="col-xl-auto flex-nowrap list-group list-group-flush overflow-auto vh-100">
+    <input class="filter_games" maxlength="15" placeholder="Search games (type min. 3 chars)">
+    <ul class="nav-item list-group-item ps-0" th:each="serie: ${series}">
+        <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
+                th:attr="data-bs-target='#id'+${serie.id}" aria-expanded="false">
+            <span th:text="${serie.name}"></span>
+        </button>
+        <div class="collapse" th:attr="id='id'+${serie.id}" style="">
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                <li class="nav-item" th:each="game: ${serie.games}">
+                    <div class="dropdown .container-fluid">
+                        <button class="btn btn-secondary dropdown-toggle w-100 text-start" type="button" id="dropdownMenuButton"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                th:text="${game.gameTitle}">
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="manage manage-groups dropdown-item" href="#" th:attr="data-gameId=${game.id}">Manage
+                                groups</a>
+                            <a class="manage manage-subgroups dropdown-item" href="#" th:attr="data-gameId=${game.id}">Manage
+                                subgroups</a>
+                            <a class="manage manage-songs dropdown-item" href="#" th:attr="data-gameId=${game.id}">Manage
+                                songs</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </ul>
+</div>
+</html>

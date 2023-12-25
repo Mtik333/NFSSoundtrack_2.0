@@ -1,5 +1,6 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -12,10 +13,12 @@ public class AuthorCountry implements Serializable {
     @Column(name="id",nullable=false)
     private Long id;
 
+    @JsonBackReference
     @OneToOne(optional=false)
     @JoinColumn(name="author_id")
     private Author author;
 
+    @JsonBackReference
     @OneToOne(optional=false)
     @JoinColumn(name="country_id")
     private Country country;

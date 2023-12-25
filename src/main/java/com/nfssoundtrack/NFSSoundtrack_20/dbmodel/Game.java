@@ -1,5 +1,6 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -51,6 +52,7 @@ public class Game implements Serializable, Comparable<Game> {
     @Column(name="game_status")
     private GameStatus gameStatus;
 
+    @JsonManagedReference
     @OneToMany(mappedBy="game")
     private List<MainGroup> mainGroups;
 

@@ -1,5 +1,6 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -29,6 +30,7 @@ public class Song implements Serializable {
     @Column(name="multi_concat")
     private MultiConcat multiConcat;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "song")
     private List<AuthorSong> authorSongList;
     public Long getId() {

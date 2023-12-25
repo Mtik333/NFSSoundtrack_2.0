@@ -1,5 +1,7 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -16,10 +18,12 @@ public class MainGroup implements Serializable {
     @Column(name="groupname")
     private String groupName;
 
+    @JsonBackReference
     @OneToOne(optional=false)
     @JoinColumn(name="game_id", referencedColumnName = "id")
     private Game game;
 
+    @JsonManagedReference
     @OneToMany(mappedBy="mainGroup")
     private List<Subgroup> subgroups;
     public Long getId() {

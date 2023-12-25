@@ -14,4 +14,6 @@ public interface GameRepository extends JpaRepository<Game,Integer> {
     @Cacheable("games")
     List<Game> findAll(Sort sort);
     Game findByGameShort(String gameShort);
+
+
 }

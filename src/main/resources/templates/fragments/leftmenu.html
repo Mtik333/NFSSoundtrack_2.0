@@ -10,8 +10,8 @@
         <div class="collapse" th:attr="id='id'+${serie.id}" style="">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                 <li class="nav-item" th:each="game: ${serie.games}">
-                <a class="nav-link game" th:href="'/game/'+${game.id}"
-                   th:text="${game.gameTitle}"></a>
+                        <a class="nav-link border-bottom game" th:href="'/game/'+${game.gameShort}"
+                        th:text="${game.gameTitle}"></a>
                 </li>
             </ul>
         </div>

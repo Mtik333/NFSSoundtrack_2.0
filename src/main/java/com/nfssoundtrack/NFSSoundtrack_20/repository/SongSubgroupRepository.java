@@ -1,7 +1,12 @@
 package com.nfssoundtrack.NFSSoundtrack_20.repository;
 
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface SongSubgroupRepository extends JpaRepository<SongSubgroup,Integer> {
+
+    List<SongSubgroup> findBySubgroupIdIn(List<Subgroup> subgroups);
 }
