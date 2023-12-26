@@ -5,8 +5,8 @@
     <ul class="nav nav-tabs gamegroup">
         <li class="nav-item" th:each="gamegroup: ${gamegroups}">
             <a class="nav-link gamegroup" th:href="@{'#gamegroupid'+${gamegroup.id}}"
-               th:attr="data-el_id='gamegroupid'+${gamegroup.id}"
-               data-toggle="tab" th:text="${gamegroup.groupName}"></a>
+                th:attr="data-el_id='gamegroupid'+${gamegroup.id}" data-toggle="tab"
+                th:text="${gamegroup.groupName}"></a>
             <!-- do split after id or something?
             <ul class="nav nav-tabs visually-hidden subgroup">
                 <li class="nav-item" th:each="subgroup: ${gamegroup.subgroups}">
@@ -19,23 +19,65 @@
     <th:block th:each="gamegroup: ${gamegroups}">
         <ul class="nav nav-tabs subgroup visually-hidden"
             th:attr="id='gamegroupid'+${gamegroup.id}, data-el_id='gamegroupid'+${gamegroup.id}">
+
             <li class="nav-item" th:each="subgroup: ${gamegroup.subgroups}">
-                <a class="nav-link subgroup" th:attr="id='songSubgroup'+${subgroup.id}, gameGroupTxt=${gamegroup.groupName}"
-                   href="" th:text="${subgroup.subgroupName}"></a>
+                <button class="nav-link subgroup"
+                    th:attr="id='songSubgroup'+${subgroup.id}, data-gameGroupTxt=${gamegroup.groupName}, data-subgroupTxt=${subgroup.subgroupName},data-group_id=${gamegroup.id}" href=""
+                    th:text="${subgroup.subgroupName}"></button>
+
             </li>
+
         </ul>
     </th:block>
-    <table class="table" th:if="${songSubgroups!=null}">
+    <table class="table table-hover" th:if="${songSubgroups!=null}">
         <thead>
-        <tr>
-            <th scope="col">Country</th>
-            <th scope="col">Band</th>
-            <th scope="col">Song</th>
-            <th scope="col">Genre</th>
-            <th scope="col">Actions</th>
-        </tr>
+            <tr>
+                <th scope="col">Country</th>
+                <th scope="col">Band</th>
+                <th scope="col">Song</th>
+                <th scope="col">Genre</th>
+                <th scope="col">Actions</th>
+            </tr>
         </thead>
         <tbody>
+            <th:block th:each="gamegroup: ${gamegroups}">
+                <th:block th:each="subgroup: ${gamegroup.subgroups}">
+                    <th:block th:if="${gamegroup.groupName != 'All'}">
+                        <tr class="subgroup-separator" th:attr="data-group_id=${gamegroup.id},data-el_id='songSubgroup'+${subgroup.id}">
+                            <td colspan="5" th:attr="data-el_id='songSubgroup'+${subgroup.id},data-group_id=${gamegroup.id}" th:text="${gamegroup.groupName} + ' - ' + ${subgroup.subgroupName}"></td>
+                        </tr>
+                        <tr th:each="songSubgroup : ${subgroup.songSubgroupList}"
+                            th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id}">
+                            <td>
+                                <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
+                                    <th:block
+                                        th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
+                                        <img th:src="${authorCountry.country.countryLink}">
+                                    </th:block>
+                                </th:block>
+                            </td>
+                            <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
+                                <td
+                                    th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} ">
+                                </td>
+                            </th:block>
+                            <td
+                                th:text="${songSubgroup.ingameDisplayTitle} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} ">
+                            </td>
+                            <td>Something</td>
+                            <td>
+                                <th:button data-bs-toggle="modal" data-bs-target="#videoModal"
+                                    th:attr="data-tagVideo=${songSubgroup.srcId} ? ${songSubgroup.srcId} : ${songSubgroup.song.srcId}">
+                                    <div class="play_icondiv">
+                                        <img class="play_icon img-responsive" th:src="@{/images/znakwodny.png}" width="25" height="25">
+                                    </div>
+                                </th:button>
+                            </td>
+                        </tr>
+                    </th:block>
+                </th:block>
+            </th:block>
+            <!--
             <tr th:each="songSubgroup : ${songSubgroups}" th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id}">
                 <td>
                     <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
@@ -55,12 +97,14 @@
                     </th:button>
                 </td>
             </tr>
+        -->
         </tbody>
     </table>
 
 </div>
 
-<div class="modal fade" id="videoModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+<div class="modal fade" id="videoModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="videoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -74,4 +118,5 @@
         </div>
     </div>
 </div>
+
 </html>

@@ -17,10 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/maingroup")
@@ -43,6 +40,9 @@ public class GroupController {
         ObjectMapper objectMapper = new ObjectMapper();
         Game game = gameRepository.findById(Integer.valueOf(gameId)).get();
         List<MainGroup> mainGroups = game.getMainGroups();
+        for (MainGroup mainGroup : mainGroups){
+            mainGroup.getSubgroups().sort(Comparator.comparing(Subgroup::getPosition));
+        }
         return objectMapper.writeValueAsString(mainGroups);
     }
 
@@ -57,8 +57,10 @@ public class GroupController {
         for (String subgroup : subgroups) {
             if (!subgroup.isEmpty()) {
                 Subgroup targetSubgroup = new Subgroup();
-                targetSubgroup.setSubgroupName(subgroup);
+                String[] subgroupNamePosition = subgroup.split("_POS_");
+                targetSubgroup.setSubgroupName(subgroupNamePosition[0]);
                 targetSubgroup.setMainGroup(mainGroup);
+                targetSubgroup.setPosition(Integer.valueOf(subgroupNamePosition[1]));
                 subgroupRepository.save(targetSubgroup);
             }
         }
@@ -99,13 +101,17 @@ public class GroupController {
                         String.valueOf(subgroup1.getId()))).findFirst();
                 if (subgroupOptional.isPresent()) {
                     String newSubgroupName = subgroup.substring(subgroup.indexOf("-UPDATE-")+8);
-                    subgroupOptional.get().setSubgroupName(newSubgroupName);
+                    String[] subgroupPosition = newSubgroupName.split("_POS_");
+                    subgroupOptional.get().setSubgroupName(subgroupPosition[0]);
+                    subgroupOptional.get().setPosition(Integer.valueOf(subgroupPosition[1]));
                     subgroupsToUpdate.add(subgroupOptional.get());
                 }
             } else {
                 Subgroup newSubgroup = new Subgroup();
-                newSubgroup.setSubgroupName(subgroup);
+                String[] subgroupNamePosition = subgroup.split("_POS_");
+                newSubgroup.setSubgroupName(subgroupNamePosition[0]);
                 newSubgroup.setMainGroup(mainGroup);
+                newSubgroup.setPosition(Integer.valueOf(subgroupNamePosition[1]));
                 subgroupRepository.save(newSubgroup);
             }
         }

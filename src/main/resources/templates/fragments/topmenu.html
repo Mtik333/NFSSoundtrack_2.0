@@ -3,31 +3,34 @@
 <nav class="navbar navbar-expand-xxl navbar-light bg-light w-100">
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" th:href="@{/home}">Home</a>
+            <button class="btn float-end" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+                <span data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</i>
+            </button>
+            <li class="nav-item nfs-top-item">
+                <a class="nav-link" id="nfs-top-home" th:href="@{/home}">Home</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/aboutus}">About us</a>
+            <li class="nav-item nfs-top-item">
+                <a class="nav-link" id="nfs-top-aboutus" th:href="@{/aboutus}">About us</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/donate}">Donate</a>
+            <li class="nav-item nfs-top-item">
+                <a class="nav-link" id="nfs-top-donate" th:href="@{/donate}">Donate</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item nfs-top-item">
                 <a class="nav-link" href="#">Privacy Policy & Cookies</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item nfs-top-item">
                 <a class="nav-link" href="#">About us</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item nfs-top-item">
                 <a class="nav-link" href="#">Advanced search</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item nfs-top-item">
                 <a class="nav-link" href="#">Preferences</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item nfs-top-item">
                 <a class="nav-link" th:href="@{/manage}">Manage</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item nfs-top-item">
                 <a class="nav-link disabled" href="#">Sing out</a>
             </li>
             <!--            <li class="nav-item dropdown">-->

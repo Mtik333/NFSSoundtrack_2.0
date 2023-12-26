@@ -18,6 +18,9 @@ public class Subgroup implements Serializable {
     @Column(name="subgroup_name")
     private String subgroupName;
 
+    @Column(name="position")
+    private Integer position;
+
     @JsonBackReference
     @OneToOne(optional=false)
     @JoinColumn(name="group_id")
@@ -49,6 +52,14 @@ public class Subgroup implements Serializable {
 
     public void setMainGroup(MainGroup mainGroup) {
         this.mainGroup = mainGroup;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 
     public List<SongSubgroup> getSongSubgroupList() {
