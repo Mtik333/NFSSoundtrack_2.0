@@ -1,19 +1,13 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <link rel="stylesheet" th:href="@{/css/own.css}">
+<th:block th:if="${songSubgroups!=null && !songSubgroups.isEmpty()}">
 <div class="tabbable boxed parentTabs">
     <ul class="nav nav-tabs gamegroup">
         <li class="nav-item" th:each="gamegroup: ${gamegroups}">
             <a class="nav-link gamegroup" th:href="@{'#gamegroupid'+${gamegroup.id}}"
                 th:attr="data-el_id='gamegroupid'+${gamegroup.id}" data-toggle="tab"
                 th:text="${gamegroup.groupName}"></a>
-            <!-- do split after id or something?
-            <ul class="nav nav-tabs visually-hidden subgroup">
-                <li class="nav-item" th:each="subgroup: ${gamegroup.subgroups}">
-                    <a class="nav-link" href="#" th:text="${subgroup.subgroupName}"></a>
-                </li>
-            </ul>
-            -->
         </li>
     </ul>
     <th:block th:each="gamegroup: ${gamegroups}">
@@ -22,14 +16,14 @@
 
             <li class="nav-item" th:each="subgroup: ${gamegroup.subgroups}">
                 <button class="nav-link subgroup"
-                    th:attr="id='songSubgroup'+${subgroup.id}, data-gameGroupTxt=${gamegroup.groupName}, data-subgroupTxt=${subgroup.subgroupName},data-group_id=${gamegroup.id}" href=""
-                    th:text="${subgroup.subgroupName}"></button>
+                    th:attr="id='songSubgroup'+${subgroup.id}, data-gameGroupTxt=${gamegroup.groupName}, data-subgroupTxt=${subgroup.subgroupName},data-group_id=${gamegroup.id}"
+                    href="" th:text="${subgroup.subgroupName}"></button>
 
             </li>
 
         </ul>
     </th:block>
-    <table class="table table-hover" th:if="${songSubgroups!=null}">
+    <table class="table table-hover">
         <thead>
             <tr>
                 <th scope="col">Country</th>
@@ -43,61 +37,72 @@
             <th:block th:each="gamegroup: ${gamegroups}">
                 <th:block th:each="subgroup: ${gamegroup.subgroups}">
                     <th:block th:if="${gamegroup.groupName != 'All'}">
-                        <tr class="subgroup-separator" th:attr="data-group_id=${gamegroup.id},data-el_id='songSubgroup'+${subgroup.id}">
-                            <td colspan="5" th:attr="data-el_id='songSubgroup'+${subgroup.id},data-group_id=${gamegroup.id}" th:text="${gamegroup.groupName} + ' - ' + ${subgroup.subgroupName}"></td>
+                        <tr class="subgroup-separator"
+                            th:attr="data-group_id=${gamegroup.id},data-el_id='songSubgroup'+${subgroup.id}">
+                            <td colspan="5"
+                                th:attr="data-el_id='songSubgroup'+${subgroup.id},data-group_id=${gamegroup.id}"
+                                th:text="${gamegroup.groupName} + ' - ' + ${subgroup.subgroupName}"></td>
                         </tr>
                         <tr th:each="songSubgroup : ${subgroup.songSubgroupList}"
                             th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id}">
-                            <td>
+                            <td class="countries">
+                                <!--
+                                    <th:block th:each="country : ${songSubgroup.song.countrySet}">
+                                        <img th:src="${country.countryLink}">
+                                    </th:block>
+                                -->
+                                
                                 <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
                                     <th:block
                                         th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
-                                        <img th:src="${authorCountry.country.countryLink}">
+                                        <img class="country-img" th:src="${authorCountry.country.countryLink}">
+                                    </th:block>
+                                </th:block>
+                                
+                            </td>
+                            <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
+                                <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
+                                    <td>
+                                        <a th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
+                                    </td>
+                                </th:block>
+                            </th:block>
+                            <td>
+                                <span th:text="${songSubgroup.ingameDisplayTitle} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
+                                <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
+                                            <span th:text="${iter.first ? '(feat. ' : ''}"></span><a th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
+                                    </th:block>
+                                <th:block th:if="${songSubgroup.remix.value=='YES'}">
+                                    <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
+                                            <span th:text="${iter.first ? '(' : ''}"></span><a th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ' Remix)' : ''}"></span>
                                     </th:block>
                                 </th:block>
                             </td>
-                            <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
-                                <td
-                                    th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} ">
-                                </td>
-                            </th:block>
-                            <td
-                                th:text="${songSubgroup.ingameDisplayTitle} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} ">
-                            </td>
-                            <td>Something</td>
                             <td>
-                                <th:button data-bs-toggle="modal" data-bs-target="#videoModal"
-                                    th:attr="data-tagVideo=${songSubgroup.srcId} ? ${songSubgroup.srcId} : ${songSubgroup.song.srcId}">
-                                    <div class="play_icondiv">
-                                        <img class="play_icon img-responsive" th:src="@{/images/znakwodny.png}" width="25" height="25">
-                                    </div>
-                                </th:button>
+                                <th:block th:each="songGenre,iter : ${songSubgroup.song.songGenreList}">
+                                        <a th:text="${songGenre.genre.genreName}"th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag" th:text="${!iter.last ? ', ' : ''}"></span>
+                                </th:block>
+                            </td>
+                            <td>
+                                <div class="play_icondiv">
+                                    <a name="sth">
+                                        <img class="play_icon img-responsive" data-bs-toggle="modal"
+                                            data-bs-target="#videoModal"
+                                            th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
+                                            th:src="@{/images/znakwodny.png}" width="25" height="25">
+                                        </img>
+                                    </a>
+                                    <th:block th:if="${songSubgroup.spotifyId != null}">
+                                        <a th:href="${songSubgroup.spotifyId}">
+                                            <img class="img-responsive" th:src="@{/images/spotify.png}">
+                                        </a>
+                                    </th:block>
+                                </div>
                             </td>
                         </tr>
                     </th:block>
                 </th:block>
             </th:block>
-            <!--
-            <tr th:each="songSubgroup : ${songSubgroups}" th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id}">
-                <td>
-                    <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
-                        <th:block th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
-                            <img th:src="${authorCountry.country.countryLink}">
-                        </th:block>
-                    </th:block>
-                </td>
-                <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
-                    <td th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></td>
-                </th:block>
-                <td th:text="${songSubgroup.ingameDisplayTitle} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></td>
-                <td>Something</td>
-                <td>
-                    <th:button data-bs-toggle="modal" data-bs-target="#videoModal" th:attr="data-tagVideo=${songSubgroup.srcId} ? ${songSubgroup.srcId} : ${songSubgroup.song.srcId}">
-                        <img th:src="@{/images/znakwodny.png}" width="25" height="25">
-                    </th:button>
-                </td>
-            </tr>
-        -->
         </tbody>
     </table>
 
@@ -105,18 +110,23 @@
 
 <div class="modal fade" id="videoModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="videoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="ratio ratio-16x9">
-                    <iframe src="" allow="autoplay;" allowfullscreen></iframe>
+                    <!--<div class="ratio ratio-16x9">-->
+                    <iframe src="" id="video" allow="autoplay;" allowscriptaccess="always" allowfullscreen></iframe>
+                    <!--</div>-->
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+</th:block>
+<th:block th:if="${songSubgroups==null || songSubgroups.isEmpty()}">
+<h2>Nothing to see here</h2>
+</th:block>
 </html>

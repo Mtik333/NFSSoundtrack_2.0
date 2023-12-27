@@ -17,13 +17,12 @@
             <img class="img-responsive" th:src="@{/images/nfs_logo.png}">
         </div>
         <div class="col-sm">
-            <img class="img-responsive float-end" src="https://www.facebook.com/images/fb_icon_325x325.png">
+            <img class="img-responsive float-end" th:src="@{/images/fb.png}">
         </div>
     </div>
 </header>
 <div class="container-fluid">
     <th:block th:insert="fragments/topmenu.html"></th:block>
-    <!--<div class="container" >-->
         <div class="row mx-auto">
             <th:block th:insert="fragments/leftmenu.html"></th:block>
                 <div class="col">
@@ -31,51 +30,6 @@
                     <div th:if="${gamegroups!=null}" th:replace="fragments/gamecontent.html"></div>
                 </div>
         </div>
-    <!--</div>-->
-    <!--check it one day
-    <table id="gowno" data-toggle="table" data-multiple-select-row="true" data-click-to-select="true">
-        <thead>
-          <tr>
-            <th data-checkbox="true"></th>
-            <th data-field="e1">Item ID</th>
-            <th data-field="e2">Item Name</th>
-            <th data-field="e3">Item Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td></td>
-            <td>1</td>
-            <td>Item 1</td>
-            <td>$1</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>2</td>
-            <td>Item 2</td>
-            <td>$2</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>2</td>
-            <td>Item 2</td>
-            <td>$2</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>2</td>
-            <td>Item 2</td>
-            <td>$2</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>2</td>
-            <td>Item 2</td>
-            <td>$2</td>
-          </tr>
-        </tbody>
-      </table>
-    -->
 </div>
 
 </body>
@@ -85,5 +39,4 @@ integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cD
 crossorigin="anonymous"></script>
 <script src="http://localhost:35729/livereload.js"></script>
 <script th:src="@{/js/main.js}"></script>
-<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
 </html>

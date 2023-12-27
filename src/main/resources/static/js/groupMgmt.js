@@ -15,23 +15,23 @@ $(document).ready(function () {
                 fullScopeOfEdit = JSON.parse(ooo);
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
-                var newGroupSpan = $('<h2><button data-gameId=' + gameId + ' id="new-group-' + gameId + '" class="new-group btn-success">New group</button></h2>');
+                divToAppend.append(successAlertHtml);
+                var newGroupSpan = $('<h2><button data-gameId=' + gameId + ' id="new-group-' + gameId + '" class="new-group btn btn-success">New group</button></h2>');
                 if (fullScopeOfEdit.length > 0) {
-                    var tableApp = $('<table class="table">');
+                    var tableApp = $('<table class="table-bordered">');
                     divToAppend.append(newGroupSpan);
                     divToAppend.append(tableApp);
                     for (let i = 0; i < fullScopeOfEdit.length; i++) {
                         var groupName = fullScopeOfEdit[i].groupName;
                         var groupId = fullScopeOfEdit[i].id;
-                        tableApp.append('<tr>');
-                        tableApp.append('<td class="w-75"><h3><span class="badge">' + groupName + '</span></h3></td>');
-                        tableApp.append('<td class="text-right"><button type="button" id="edit-group" data-groupId="' + fullScopeOfEdit[i].id + '" class="btn btn-warning">Edit</button></td>');
-                        tableApp.append('<td class="text-right"><button type="button" id="delete-group" data-groupId="' + fullScopeOfEdit[i].id + '" class="btn btn-danger">Delete</button></td>');
-                        tableApp.append('</tr>');
+                        var trElem = $('<tr>');
+                        trElem.append('<td class="w-75"><h4><span>' + groupName + '</span></h4></td>');
+                        trElem.append('<td class="text-right"><button type="button" id="edit-group" data-groupId="' + fullScopeOfEdit[i].id + '" class="btn btn-warning">Edit</button></td>');
+                        trElem.append('<td class="text-right"><button type="button" id="delete-group" data-groupId="' + fullScopeOfEdit[i].id + '" class="btn btn-danger">Delete</button></td>');
+                        tableApp.append(trElem);
                     }
                     divToAppend.append('</table>');
                 }
-                divToAppend.append(successAlertHtml);
                 console.log("e1");
             },
             error: function (ooo) {
@@ -52,10 +52,8 @@ $(document).ready(function () {
         divToAppend.empty();
         var formAppend = $('<div id="new-group">');
         divToAppend.append(formAppend);
-        formAppend.append('<div class="form-group">');
         formAppend.append('<label for="groupName">Group name</label>');
-        formAppend.append('<input type="text" class="form-control" id="groupName" placeholder="Give group a name">');
-        formAppend.append('<div id="div-subGroups" class="form-group">');
+        formAppend.append('<input type="text" class="form-control w-50" id="groupName" placeholder="Give group a name">');
         formAppend.append('<label for="subGroups">Subgroups</label>');
         var divWithCols = $('<div class="row"></div>');
         divWithCols.append('<div class="col-sm w-80"><input type="text" class="form-control subGroups" id="subGroups-0" data-subgroupPosition="1" placeholder="Subgroup name"></div>');
@@ -96,12 +94,22 @@ $(document).ready(function () {
         divToAppend.append(formAppend);
         formAppend.append('<div class="form-group">');
         formAppend.append('<label for="groupName">Group name</label>');
-        formAppend.append('<input type="text" class="form-control" id="groupName" value="' + groupToEdit.groupName + '">');
+        var groupNameInput = $('<input type="text" class="form-control w-80" id="groupName" value="' + groupToEdit.groupName + '">');
+        if (groupNameInput.val()=="All"){
+            groupNameInput.prop("disabled",true);
+        }
+        formAppend.append(groupNameInput);
         formAppend.append('<div id="div-subGroups" class="form-group">');
         formAppend.append('<label for="subGroups">Subgroups</label>');
         for (let i = 0; i < groupToEdit.subgroups.length; i++) {
-            var divWithCols = $('<div class="row"></div>');
-            divWithCols.append('<div class="col-sm w-80"><input type="text" class="form-control subGroups" id="subGroups-' + i + '" data-subGroupId="' + groupToEdit.subgroups[i].id + '" data-subgroupPosition="'+groupToEdit.subgroups[i].position+'" value="' + groupToEdit.subgroups[i].subgroupName + '"></div>');
+            var divWithCols = $('<div class="row">');
+            var subgroupInput = $('<input type="text" class="form-control subGroups" id="subGroups-' + i + '" data-subGroupId="' + groupToEdit.subgroups[i].id + '" data-subgroupPosition="'+groupToEdit.subgroups[i].position+'" value="' + groupToEdit.subgroups[i].subgroupName + '">');
+            var inputRowDiv = $('<div class="col-sm w-80">');
+            if (subgroupInput.val()=="All"){
+                subgroupInput.prop("disabled",true);
+            }
+            inputRowDiv.append(subgroupInput)
+            divWithCols.append(inputRowDiv);
             divWithCols.append('<div class="col-sm"><input type="text" class="group-position" value="'+groupToEdit.subgroups[i].position+'"><button id="add-subgroup" type="submit" data-subgroupPosition="'+groupToEdit.subgroups[i].position+'" class="btn btn-success">+</button><button type="button" id="delete-subgroup" data-subGroupId="' + groupToEdit.subgroups[i].id + '" class="btn btn-danger">X</button></div>');
             formAppend.append(divWithCols);
             //text-decoration-line-through
@@ -119,7 +127,9 @@ $(document).ready(function () {
     $(document).on('click', '#delete-subgroup', function (e) {
         var subgroupInput = $($(this).parent().parent()).find('input')[0];
         if ($(subgroupInput).attr('data-subgroupId')!=undefined){
-            $(subgroupInput).addClass('text-decoration-line-through');
+            if (subgroupInput.value!="All"){
+                $(subgroupInput).addClass('text-decoration-line-through');
+            }
         } else {
             subgroupInput.parentElement.parentElement.remove();
         }

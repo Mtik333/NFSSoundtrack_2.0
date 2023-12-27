@@ -14,7 +14,7 @@ public class AuthorAlias implements Serializable {
     private Long id;
 
     @JsonBackReference
-    @OneToOne(optional=false)
+    @OneToOne(optional=false,fetch = FetchType.LAZY)
     @JoinColumn(name="author_id")
     private Author author;
 

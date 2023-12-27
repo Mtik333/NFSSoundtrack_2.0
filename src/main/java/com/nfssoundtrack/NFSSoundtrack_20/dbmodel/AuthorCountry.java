@@ -14,12 +14,12 @@ public class AuthorCountry implements Serializable {
     private Long id;
 
     @JsonBackReference
-    @OneToOne(optional=false)
+    @OneToOne(optional=false,fetch = FetchType.LAZY)
     @JoinColumn(name="author_id")
     private Author author;
 
     @JsonBackReference
-    @OneToOne(optional=false)
+    @OneToOne(optional=false,fetch = FetchType.LAZY)
     @JoinColumn(name="country_id")
     private Country country;
 

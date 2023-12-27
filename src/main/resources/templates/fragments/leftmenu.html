@@ -3,7 +3,7 @@
 <div class="offcanvas offcanvas-start w-25" id="offcanvas" tabindex="-1" data-bs-keyboard="false"
     data-bs-backdrop="false">
     <div class="offcanvas-header">
-        <h6 class="offcanvas-title d-none d-sm-block" id="offcanvas">Menu</h6>
+        <h6 class="offcanvas-title d-none d-sm-block">Menu</h6>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body py-0 px-0">
@@ -25,87 +25,7 @@
                     </div>
                 </div>
             </th:block>
-            <!--
-            <div class="flex-shrink-0 p-3 bg-white w-100">
-                <ul class="list-unstyled ps-0">
-                    <th:block th:each="serie: ${series}">
-                        <li class="mb-1">
-                            <button class="btn btn-toggle align-items-center rounded collapsed"
-                                data-bs-toggle="collapse" th:attr="data-bs-target='#collapse-'+${serie.id}"
-                                aria-expanded="false" th:text="${serie.name}">
-                            </button>
-                            <div class="collapse" th:attr="id='collapse-'+${serie.id}" style="">
-                                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                                    <li class="border" th:each="game: ${serie.games}"><a href="#"
-                                            class="link-dark rounded" th:href="'/game/'+${game.gameShort}"
-                                            th:text="${game.gameTitle}"></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="border-top my-3"></li>
-                    </th:block>
-                </ul>
-            </div>-->
         </div>
-        <!--
-        <div class="container-fluid">
-            <div class="row flex-nowrap">
-                <div class="col-auto px-0">
-                    <div id="sidebar" class="collapse collapse-horizontal show border-end">
-                        <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
-                            <th:block th:each="serie: ${series}">
-                                <a href="#" class="nav-link dropdown-toggle text-truncate" id="dropdown" data-bs-toggle="collapse"
-                                aria-expanded="false" th:attr="data-bs-target='#id'+${serie.id}">
-                                <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline" th:text="${serie.name}"></span>
-                            </a>
-                            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdown" th:attr="id='id'+${serie.id}">
-                                <li class="dropdown-item" th:each="game: ${serie.games}">
-                                    <a class="nav-link border-bottom game" th:href="'/game/'+${game.gameShort}"
-                                        th:text="${game.gameTitle}"></a>
-                                </li>
-                            </ul>
-                            </th:block>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    -->
-        <!--
-        <input class="form-control filter_games" maxlength="15" placeholder="Search games (type min. 3 chars)">
-        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" th:each="serie: ${series}">
-            <a href="#" class="nav-link dropdown-toggle text-truncate" id="dropdown" data-bs-toggle="collapse"
-                aria-expanded="false" th:attr="data-bs-target='#id'+${serie.id}">
-                <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline" th:text="${serie.name}"></span>
-            </a>
-            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdown" th:attr="id='id'+${serie.id}">
-                <li class="dropdown-item" th:each="game: ${serie.games}">
-                    <a class="nav-link border-bottom game" th:href="'/game/'+${game.gameShort}"
-                        th:text="${game.gameTitle}"></a>
-                </li>
-            </ul>
-        </ul>
-    -->
     </div>
 </div>
-<!--
-<div class="col-xl-auto flex-nowrap list-group list-group-flush overflow-auto vh-100">
-    <input class="form-control filter_games" maxlength="15" placeholder="Search games (type min. 3 chars)">
-    <ul class="nav-item ps-0" th:each="serie: ${series}">
-        <button class="btn btn-toggle w-100 align-items-center rounded collapsed" data-bs-toggle="collapse"
-                th:attr="data-bs-target='#id'+${serie.id}" aria-expanded="false">
-            <span th:text="${serie.name}"></span>
-        </button>
-        <div class="collapse" th:attr="id='id'+${serie.id}">
-            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                <li class="nav-item" th:each="game: ${serie.games}">
-                        <a class="nav-link border-bottom game" th:href="'/game/'+${game.gameShort}"
-                        th:text="${game.gameTitle}"></a>
-                </li>
-            </ul>
-        </div>
-    </ul>
-</div>
--->
 </html>

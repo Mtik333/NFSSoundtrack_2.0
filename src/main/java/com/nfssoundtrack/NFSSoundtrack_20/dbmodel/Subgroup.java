@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name="subgroup")
+@NamedEntityGraph(name = "Subgroup.songSubgroupList", attributeNodes = @NamedAttributeNode("songSubgroupList"))
 public class Subgroup implements Serializable {
 
     @Id
@@ -22,13 +24,14 @@ public class Subgroup implements Serializable {
     private Integer position;
 
     @JsonBackReference
-    @OneToOne(optional=false)
+    @OneToOne(optional=false,fetch = FetchType.LAZY)
     @JoinColumn(name="group_id")
     private MainGroup mainGroup;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "subgroup")
-    private List<SongSubgroup> songSubgroupList;
+    @OneToMany(mappedBy = "subgroup",fetch = FetchType.LAZY)
+    @OrderBy("position ASC")
+    private List<SongSubgroup> songSubgroupList=new ArrayList<>();
 
     public Long getId() {
         return id;

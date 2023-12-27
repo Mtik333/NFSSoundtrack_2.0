@@ -19,7 +19,7 @@ public class SongSubgroup implements Serializable {
     private Song song;
 
     @JsonBackReference
-    @OneToOne(optional=false)
+    @OneToOne(optional=false,fetch = FetchType.LAZY)
     @JoinColumn(name="subgroup_id")
     private Subgroup subgroup;
 
@@ -35,7 +35,7 @@ public class SongSubgroup implements Serializable {
     private String srcId;
 
     @Column(name="spotify_id")
-    private String spotify_id;
+    private String spotifyId;
 
     @Column(name="ingame_display_band")
     private String ingameDisplayBand;
@@ -43,6 +43,11 @@ public class SongSubgroup implements Serializable {
     @Column(name="ingame_display_title")
     private String ingameDisplayTitle;
 
+    @Column(name="position")
+    private Long position;
+
+    @Column(name="lyrics")
+    private String lyrics;
     public Long getId() {
         return id;
     }
@@ -91,12 +96,12 @@ public class SongSubgroup implements Serializable {
         this.srcId = srcId;
     }
 
-    public String getSpotify_id() {
-        return spotify_id;
+    public String getSpotifyId() {
+        return spotifyId;
     }
 
-    public void setSpotify_id(String spotify_id) {
-        this.spotify_id = spotify_id;
+    public void setSpotifyId(String spotifyId) {
+        this.spotifyId = spotifyId;
     }
 
     public String getIngameDisplayBand() {
@@ -113,5 +118,21 @@ public class SongSubgroup implements Serializable {
 
     public void setIngameDisplayTitle(String ingameDisplayTitle) {
         this.ingameDisplayTitle = ingameDisplayTitle;
+    }
+
+    public Long getPosition() {
+        return position;
+    }
+
+    public void setPosition(Long position) {
+        this.position = position;
+    }
+
+    public String getLyrics() {
+        return lyrics;
+    }
+
+    public void setLyrics(String lyrics) {
+        this.lyrics = lyrics;
     }
 }

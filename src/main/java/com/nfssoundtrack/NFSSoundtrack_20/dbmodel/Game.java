@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name="game")
+@NamedEntityGraph(name = "Game.mainGroups", attributeNodes = @NamedAttributeNode(value = "mainGroups"))
 public class Game implements Serializable, Comparable<Game> {
 
     @Id
@@ -14,7 +16,7 @@ public class Game implements Serializable, Comparable<Game> {
     @Column(name="id")
     private Long id;
 
-    @OneToOne(optional=false)
+    @OneToOne(optional=false,fetch = FetchType.LAZY)
     @JoinColumn(name="series_id")
     private Serie serie;
 
@@ -53,8 +55,8 @@ public class Game implements Serializable, Comparable<Game> {
     private GameStatus gameStatus;
 
     @JsonManagedReference
-    @OneToMany(mappedBy="game")
-    private List<MainGroup> mainGroups;
+    @OneToMany(mappedBy = "game",fetch = FetchType.LAZY)
+    private List<MainGroup> mainGroups=new ArrayList<>();
 
     public Long getId() {
         return id;

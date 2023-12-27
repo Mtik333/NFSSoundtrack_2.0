@@ -8,6 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name="author")
+@NamedEntityGraph(name = "Author.authorCountries", attributeNodes = @NamedAttributeNode("authorCountries"))
 public class Author implements Serializable {
 
     @Id
@@ -19,7 +20,7 @@ public class Author implements Serializable {
     private String name;
 
     @JsonManagedReference
-    @OneToMany(mappedBy="author")
+    @OneToMany(mappedBy="author",fetch = FetchType.LAZY)
     private List<AuthorCountry> authorCountries;
 
     public Long getId() {

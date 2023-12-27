@@ -7,6 +7,18 @@ function ModifiedSubgroupSongDef(subgroup_id, song_id, state) {
     this.state = state;
 }
 
+// function ModifiedSubgroupSongDef(subgroup_id, song_id, state, id) {
+//     this.subgroup_id = subgroup_id;
+//     this.song_id = song_id;
+//     this.state = state;
+//     this.id=id;
+// }
+
+function ModifiedSubgroupSongPositionDef(songSubgroupId, position) {
+    this.songSubgroupId = songSubgroupId;
+    this.position = position;
+}
+
 $(document).ready(function () {
     $("#success-alert").hide();
     function getSubgroupsFromGame() {
@@ -19,9 +31,18 @@ $(document).ready(function () {
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
                 divToAppend.append(successAlertHtml);
-                divToAppend.append('<button id="updateSubgroupSongs" type="submit" class="btn btn-primary">Update subgroup</button>');
-                var dropdownDiv = $('<div id="selectSubgroup" class="dropdown">')
+                var rowDiv = $('<div class="row">');
+                var leftCellDiv = $('<div class="col">');
+                var rightCellDiv = $('<div class="col">');
+                divToAppend.append(rowDiv);
+                rowDiv.append(leftCellDiv);
+                rowDiv.append(rightCellDiv);
+                rightCellDiv.append('<button id="updateSubgroupSongs" type="submit" class="btn btn-primary">Update subgroup</button>');
+                rightCellDiv.append('<button id="updatePositionsInDb" type="submit" class="btn btn-primary">Update positions in DB</button>');
+                rightCellDiv.append('<button id="recounterPositions" type="submit" class="btn btn-primary">Recounter positions</button>');
+                var dropdownDiv = $('<div id="selectSubgroup" class="dropdown">');
                 dropdownDiv.append('<button class="btn btn-secondary dropdown-toggle" type="button" id="subgroupsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">All</button>');
+                leftCellDiv.append(dropdownDiv);
                 var tableToFill;
                 if (fullScopeOfEdit.length > 0) {
                     var dropdownMenuDiv = $('<div class="dropdown-menu" aria-labelledby="subgroupsDropdown">');
@@ -36,7 +57,6 @@ $(document).ready(function () {
                     }
                     dropdownDiv.append(dropdownMenuDiv);
                 }
-                divToAppend.append(dropdownDiv);
                 divToAppend.append(tableToFill);
                 $(divToAppend).find("a").first().click();
             }
@@ -47,9 +67,11 @@ $(document).ready(function () {
         var tableToFill = $('<table id="subgroups-table" class="table table-bordered table-hover">');
         tableToFill.append("<tbody>");
         for (let i = 0; i < songs.length; i++) {
-            var tr = $('<tr class="subgroupSong" data-songId="' + songs[i].song.id + '">');
+            var tr = $('<tr class="subgroupSong" data-songId="' + songs[i].song.id + '" data-songSubgroupId="' + songs[i].id + '">');
             var checkboxTd = $('<td class="col-md-1">');
             checkboxTd.append('<input class="form-check-input songSubgroupRow" type="checkbox" value="EXISTS">');
+            var positionTd = $('<td class="col-md-1">');
+            positionTd.append('<input class="form-control songSubgroupPosition" type="text" value="' + songs[i].position + '">');
             var songDisplay = "";
             if (songs[i].ingameDisplayBand != null) {
                 songDisplay += songs[i].ingameDisplayBand;
@@ -65,6 +87,7 @@ $(document).ready(function () {
             var textTd = $('<td>');
             textTd.append(songDisplay);
             tr.append(checkboxTd);
+            tr.append(positionTd);
             tr.append(textTd);
             tableToFill.append(tr);
         }
@@ -75,15 +98,19 @@ $(document).ready(function () {
         getSubgroupsFromGame();
     });
 
-    $(document).on('click', 'tr.subgroupSong', function(e) {
+    $(document).on('click', 'tr.subgroupSong', function (e) {
         var checkboxToChange = $(this).find("td:first").find("input");
-        checkboxToChange.prop('checked', !checkboxToChange.prop('checked'));
-        checkboxToChange.trigger('change');
+        if (e.target.checked != undefined) {
+            //checkboxToChange.trigger('change');
+        } else {
+            checkboxToChange.prop('checked', !checkboxToChange.prop('checked'));
+            checkboxToChange.trigger('change');
+        }
     });
 
     $(document).on('click', 'a.subgroupItem', function (e) {
         $("#subgroupsDropdown").text($(this).text());
-        $("#subgroups-table").find("input").each(function () {
+        $("#subgroups-table").find("input:first").each(function () {
             $(this).prop('checked', false);
             $(this).val('');
         });
@@ -101,14 +128,28 @@ $(document).ready(function () {
         }
         currentSubgroupId = subgroupId;
         console.log("e");
+        $("#subgroups-table").find("tr").each(function (index) {
+            var inputStuffToReset = $(this).find("input");
+            $(inputStuffToReset[0]).prop('checked', false);
+            $(inputStuffToReset[0]).val('');
+            $(inputStuffToReset[1]).val("1000000");
+        });
         for (let i = 0; i < subgroupSongs.length; i++) {
             var songId = subgroupSongs[i].song.id;
             var songToMark = $("#subgroups-table").find('tr[data-songId="' + songId + '"]').first();
-            var inputToMark = songToMark.find("input").first()
-            inputToMark.prop('checked', true);
-            inputToMark.val('EXISTS');
+            songToMark.attr("data-songSubgroupId", subgroupSongs[i].id);
+            var inputToMark = songToMark.find("input")
+            $(inputToMark[0]).prop('checked', true);
+            $(inputToMark[0]).val('EXISTS');
+            $(inputToMark[1]).val(subgroupSongs[i].position);
         };
         console.log("e");
+        if ($(this).text() == "(All) from group [All]") {
+            $("#updateSubgroupSongs").prop('disabled', true);
+        } else {
+            $("#updateSubgroupSongs").prop('disabled', false);
+        }
+        sortTable();
     });
 
     $(document).on('change', '.songSubgroupRow', function (e) {
@@ -158,10 +199,11 @@ $(document).ready(function () {
             success: function (ooo) {
                 console.log("eee");
                 $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500);
+                    $('#success-alert').slideUp(500, function () {
+                        getSubgroupsFromGame();
+                    });
                 });
-                modifiedSubgroupSongArray.length=0;
-                getSubgroupsFromGame();
+                modifiedSubgroupSongArray.length = 0;
             }, error: function (ooo) {
                 console.log("e2");
             },
@@ -170,4 +212,64 @@ $(document).ready(function () {
             }
         });
     });
+
+    $(document).on('click', '#recounterPositions', function (e) {
+        $("#subgroups-table").find("tr").filter(function(index){
+            var cps = $($(this).find("input")[0]).prop('checked')
+            return $($(this).find("input")[0]).prop('checked')==true;
+        }).each(function (index) {
+            $($(this).find("input")[1]).val((index + 1) * 10);
+        });
+        sortTable();
+    });
+
+    $(document).on('click', '#updatePositionsInDb', function (e) {
+        var arrayOfModifiedSubgroupSongPositionDef = new Array();
+        $("#subgroups-table").find("tr").each(function (index) {
+            var isRowChecked = $($(this).find("input")[0]).prop('checked');
+            if (isRowChecked) {
+                var rowPositionValue = $($(this).find("input")[1]).val();
+                var songSubgroupId = $(this).attr("data-songSubgroupId");
+                var myPositionChange = new ModifiedSubgroupSongPositionDef(songSubgroupId, rowPositionValue);
+                arrayOfModifiedSubgroupSongPositionDef.push(myPositionChange);
+            }
+        });
+        $.ajax({
+            async: false,
+            type: "PUT",
+            data: JSON.stringify(arrayOfModifiedSubgroupSongPositionDef),
+            contentType: 'application/json; charset=utf-8',
+            url: "/songSubgroup/put/" + currentSubgroupId,
+            success: function (ooo) {
+                console.log("eee");
+                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
+                    $('#success-alert').slideUp(500, function () {
+                        getSubgroupsFromGame();
+                    });
+                });
+            }, error: function (ooo) {
+                console.log("e2");
+            },
+            done: function (ooo) {
+                console.log("e3");
+            }
+        });
+
+    });
+
+    $(document).on('focusout', '.songSubgroupPosition', sortTable);
+
+    function sortTable(){
+        var $tbody = $('#subgroups-table tbody');
+        $("#subgroups-table").find('tr').sort(function (a, b) {
+            var tda = parseInt($($(a).find("input")[1]).val()); // target order attribute
+            var tdb = parseInt($($(b).find("input")[1]).val()); // target order attribute
+            // if a < b return 1
+            return tda > tdb ? 1
+                // else if a > b return -1
+                : tda < tdb ? -1
+                    // else they are equal - return 0    
+                    : 0;
+        }).appendTo($tbody);
+    }
 });

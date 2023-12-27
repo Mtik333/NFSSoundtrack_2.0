@@ -15,12 +15,12 @@ public class AuthorSong implements Serializable {
     private Long id;
 
     @JsonBackReference
-    @OneToOne(optional=false)
+    @OneToOne(optional=false,fetch = FetchType.LAZY)
     @JoinColumn(name="alias_id")
     private AuthorAlias authorAlias;
 
     @JsonBackReference
-    @OneToOne(optional=false)
+    @OneToOne(optional=false,fetch = FetchType.LAZY)
     @JoinColumn(name="song_id")
     private Song song;
 

@@ -14,13 +14,36 @@ public class SongGenre implements Serializable{
         private Long id;
 
         @JsonBackReference
-        @OneToOne(optional=false)
+        @OneToOne(optional=false,fetch = FetchType.LAZY)
         @JoinColumn(name="song_id")
         private Song song;
 
         @JsonBackReference
-        @OneToOne(optional=false)
+        @OneToOne(optional=false,fetch = FetchType.LAZY)
         @JoinColumn(name="genre_id")
         private Genre genre;
 
-    }
+        public Long getId() {
+                return id;
+        }
+
+        public void setId(Long id) {
+                this.id = id;
+        }
+
+        public Song getSong() {
+                return song;
+        }
+
+        public void setSong(Song song) {
+                this.song = song;
+        }
+
+        public Genre getGenre() {
+                return genre;
+        }
+
+        public void setGenre(Genre genre) {
+                this.genre = genre;
+        }
+}

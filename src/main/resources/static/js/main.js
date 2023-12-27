@@ -1,11 +1,25 @@
 $(document).ready(function () {
 
+    /*$(document).find("span.display-text").each(function(e){
+        $(this).text().trim();
+    })*/
+    var currentGame = window.location.href.replace(document.location.origin,"");
+    $(document).find("a[href='"+currentGame+"']").each(function(e){
+        $(this).addClass("active");
+        $(this).parent().parent().parent().parent().find("button").click();
+    })
+    $(document).find("td.countries").each(function(){
+        $(this).find('.country-img:nth-child(n+2)').remove();
+    });
+    var activeSubgroups;
+    var baseVideoSrc;
     if (window.location.href.indexOf("/home") > -1) {
         $("#nfs-top-home").parent().addClass("nfs-top-item-active");
     }
 
     $('.play_icon').mouseover(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
+        baseVideoSrc=$(this).attr("data-tagVideo");
     }).mouseout(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
     });
@@ -55,6 +69,7 @@ $(document).ready(function () {
         $(div).addClass('active');
         $(div).removeClass('visually-hidden');
         $(div).find("button").first().click();
+        activeSubgroups=1;
     });
     $(document).on('click', 'button.subgroup', function (e) {
         //handling clicking on subgroup
@@ -86,6 +101,7 @@ $(document).ready(function () {
                     });
                 }
             }
+            activeSubgroups=1;
         } else {
             var aId = $(this).attr('id');
             var allSubgroup = $(this).parent().parent().find("button[data-subgroupTxt='All']").first();
@@ -102,6 +118,7 @@ $(document).ready(function () {
                     $(this).addClass('visually-hidden');
                     //first we hide all rows
                 });
+                activeSubgroups--;
                 //DODAC GROUP ID DO TYCH SEPARATOROW
             }
             if ($(this).hasClass("active")) {
@@ -109,42 +126,21 @@ $(document).ready(function () {
                 $(document).find('tr:has(td)[data-el_id="' + aId + '"]').each(function () {
                     $(this).addClass('visually-hidden');
                 });
+                activeSubgroups--;
             } else {
                 $(this).addClass('active');
                 $(document).find('tr:has(td)[data-el_id="' + aId + '"]').each(function () {
                     $(this).removeClass('visually-hidden');
                 });
+                activeSubgroups++
+            }          
+            if (activeSubgroups==0){
+                var allSubgroup = $(this).parent().parent().find("button[data-subgroupTxt='All']").first();
+                $(allSubgroup).click();
+                activeSubgroups==1;
+                return;
             }
         }
-
-
-        /*
-                $('.subgroup.active').each(function () {
-                    $(this).removeClass('active');
-                    //we again remove active mark from any active subgroup
-                });
-                $(this).addClass('active');
-                $(this).removeClass('visually-hidden');
-                if (e.target.textContent != "All"){
-                    console.log('zonk');
-                    $(document).find('tr:has(td)').each(function () {
-                        $(this).addClass('visually-hidden');
-                        //first we hide all rows
-                    });
-                    $(e.target.parentElement.parentElement).find("button").each(function () {
-                        //then for each subgroup we remove this hidden class
-                        var aId = $(this).attr('id');
-                        $(document).find('tr[data-el_id="' + aId + '"]').each(function () {
-                            $(this).removeClass('visually-hidden');
-                        });
-                        var aText = $(this).text();
-                        //and we append the subgroup separator so one can know which song belongs to what subgroup
-                        $('<tr><td colspan="5">' + aText + '</td></tr>').insertBefore(
-                            $(document).find('tr[data-el_id="' + aId + '"]').first()
-                        );
-                    });
-                }
-        */
         if ($(e.target).text() == "All" && $(e.target).attr("data-gameGroupTxt") == "All") {
             $(this).addClass('active');
         }
@@ -179,6 +175,19 @@ $(document).ready(function () {
         }
     });
 
+    $('#videoModal').on('shown.bs.modal', function (e) {
+        console.log("japierdole");
+        // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
+        $("#video").attr('src',baseVideoSrc + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0");
+    })
+
+    $('#videoModal').on('hide.bs.modal', function (e) {
+        // a poor man's stop video
+        console.log("japierdole2");
+        $("#video").attr('src',baseVideoSrc); 
+    }) 
+
+    /*
     function autoPlayYouTubeModal() {
         var triggerOpen = $('body').find('[data-tagVideo]');
         triggerOpen.click(function () {
@@ -191,12 +200,16 @@ $(document).ready(function () {
                 $(theModal + ' iframe').attr('src', videoSRC);
             });
             $('#videoModal').click(function (ev) {
-                if (ev.originalEvent.target.className != "modal-body") {
+                var clickTarget = ev.originalEvent.target.className;
+                if (clickTarget == "modal-header"){
+                    return;
+                } if (clickTarget != "modal-body") {
                     $(theModal + ' iframe').attr('src', videoSRC);
-                }
+                } 
             });
         });
     }
+    */
 
     //when loading list of songs, we want to trigger main group by default
     console.log("freeman");
@@ -205,5 +218,4 @@ $(document).ready(function () {
         $(firstGameGroup).first().click();
         //we have to hit first subgroup in main group to have stuff displayed
     }
-    autoPlayYouTubeModal();
 });

@@ -49,7 +49,7 @@ public class SubgroupController {
     @PutMapping(value = "/put/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String putSubgroup(@PathVariable("subgroupId") String subgroupId, @RequestBody String formData) throws JsonProcessingException {
         System.out.println("???");
-        Subgroup subgroup = subgroupRepository.getReferenceById(Integer.valueOf(subgroupId));
+        Subgroup subgroup = subgroupRepository.findById(Integer.valueOf(subgroupId)).get();
         List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
         List<String> songsToAssign = new ArrayList<>();
         List<String> songsToDetach = new ArrayList<>();
@@ -70,12 +70,22 @@ public class SubgroupController {
                 songSubgroupRepository.delete(subgroupOptional.get());
             }
         }
+        int position=10+(10*songsToDetach.size());
         for (String song : songsToAssign) {
+            position+=10;
             Song song1 = songRepository.findById(Integer.valueOf(song)).get();
+            List<SongSubgroup> existingSubgroups = songSubgroupRepository.findBySong(song1);
+            SongSubgroup originalSongSubgroup = existingSubgroups.stream().filter(songSubgroup -> songSubgroup.getSubgroup()
+                    .getSubgroupName().equals("All")).findFirst().get();
             SongSubgroup songSubgroup = new SongSubgroup();
             songSubgroup.setSubgroup(subgroup);
             songSubgroup.setSong(song1);
-            songSubgroup.setInstrumental(Instrumental.N);
+            songSubgroup.setSpotifyId(originalSongSubgroup.getSpotifyId());
+            songSubgroup.setInstrumental(originalSongSubgroup.getInstrumental());
+            songSubgroup.setPosition(Long.valueOf(position));
+            songSubgroup.setLyrics(originalSongSubgroup.getLyrics());
+            songSubgroup.setRemix(originalSongSubgroup.getRemix());
+            songSubgroup.setSrcId(originalSongSubgroup.getSrcId());
             songSubgroupRepository.save(songSubgroup);
         }
         return new ObjectMapper().writeValueAsString("OK");

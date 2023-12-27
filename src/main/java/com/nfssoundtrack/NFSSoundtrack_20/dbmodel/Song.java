@@ -4,9 +4,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name="song")
+@NamedEntityGraph(name = "Song.authorSongList", attributeNodes = @NamedAttributeNode("authorSongList"))
 public class Song implements Serializable {
 
     @Id
@@ -30,9 +34,19 @@ public class Song implements Serializable {
     @Column(name="multi_concat")
     private MultiConcat multiConcat;
 
+    @Column(name="lyrics")
+    private String lyrics;
+
     @JsonManagedReference
-    @OneToMany(mappedBy = "song")
-    private List<AuthorSong> authorSongList;
+    @OneToMany(mappedBy = "song",fetch = FetchType.LAZY)
+    private List<AuthorSong> authorSongList=new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "song",fetch = FetchType.LAZY)
+    private List<SongGenre> songGenreList=new ArrayList<>();
+
+    @Transient
+    private Set<Country> countrySet = new HashSet<>();
     public Long getId() {
         return id;
     }
@@ -87,5 +101,35 @@ public class Song implements Serializable {
 
     public void setAuthorSongList(List<AuthorSong> authorSongList) {
         this.authorSongList = authorSongList;
+    }
+
+    public String getLyrics() {
+        return lyrics;
+    }
+
+    public void setLyrics(String lyrics) {
+        this.lyrics = lyrics;
+    }
+
+    public List<SongGenre> getSongGenreList() {
+        return songGenreList;
+    }
+
+    public void setSongGenreList(List<SongGenre> songGenreList) {
+        this.songGenreList = songGenreList;
+    }
+
+    public Set<Country> getCountrySet() {
+        Set<Country> filteredCountries = new HashSet<>();
+        for (AuthorSong authorSong : getAuthorSongList()){
+            for (AuthorCountry authorCountry : authorSong.getAuthorAlias().getAuthor().getAuthorCountries()){
+                filteredCountries.add(authorCountry.getCountry());
+            }
+        }
+        return countrySet;
+    }
+
+    public void setCountrySet(Set<Country> countrySet) {
+        this.countrySet = countrySet;
     }
 }

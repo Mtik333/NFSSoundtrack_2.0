@@ -1,15 +1,16 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
 public enum Instrumental {
-    Y('Y'),N('N');
+    YES("YES"),NO("NO");
 
-    public char asChar(){
-        return asChar;
+    public String value(){
+        return value;
     }
 
-    private final char asChar;
+    private final String value;
 
-    Instrumental(char asChar){
-        this.asChar=asChar;
+    Instrumental(String value){
+        this.value=value;
     }
+
 }
