@@ -7,13 +7,6 @@ function ModifiedSubgroupSongDef(subgroup_id, song_id, state) {
     this.state = state;
 }
 
-// function ModifiedSubgroupSongDef(subgroup_id, song_id, state, id) {
-//     this.subgroup_id = subgroup_id;
-//     this.song_id = song_id;
-//     this.state = state;
-//     this.id=id;
-// }
-
 function ModifiedSubgroupSongPositionDef(songSubgroupId, position) {
     this.songSubgroupId = songSubgroupId;
     this.position = position;
@@ -64,7 +57,7 @@ $(document).ready(function () {
     }
 
     function displayAllSongs(songs, dropdownDiv) {
-        var tableToFill = $('<table id="subgroups-table" class="table table-bordered table-hover">');
+        var tableToFill = $('<table id="subgroups-table" class="table table-bordered table-hover table-striped">');
         tableToFill.append("<tbody>");
         for (let i = 0; i < songs.length; i++) {
             var tr = $('<tr class="subgroupSong" data-songId="' + songs[i].song.id + '" data-songSubgroupId="' + songs[i].id + '">');

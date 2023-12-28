@@ -41,8 +41,9 @@ public class MainController {
         //model.addAttribute("series", serieRepository.findAll());
         //serieRepository.findByIdNotNull();
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
+//        model.addAttribute("songSubgroups",null);
 //        model.addAttribute("games", gameRepository.findAll());
-        return "index";
+        return "redirect:/content/home";
     }
 
     @RequestMapping(value = "/manage")
@@ -53,14 +54,30 @@ public class MainController {
         return "manage";
     }
 
-    @RequestMapping(value = "/{value}")
+    @RequestMapping(value = "/login")
+    public String login(Model model) {
+        model.addAttribute("appName", appName);
+        model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
+        model.addAttribute("games", gameRepository.findAll());
+        model.addAttribute("login", true);
+        return "login";
+    }
+
+    @RequestMapping(value = "/loginMe")
+    public String loginMe(Model model) {
+        model.addAttribute("appName", appName);
+        model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
+        model.addAttribute("games", gameRepository.findAll());
+        model.addAttribute("login", true);
+        return "login";
+    }
+    @RequestMapping(value = "/content/{value}")
     public String topMenuEntry(Model model, @PathVariable("value") String value, HttpServletResponse response) throws IOException {
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
         //model.addAttribute("games", gameRepository.findAll());
-        if (!value.isEmpty() && !"manage".equals(value)) {
-            model.addAttribute("htmlToInject",
+        model.addAttribute("htmlToInject",
                     contentRepository.findByContentShort(value).getContentData());
-        }
+        model.addAttribute("songSubgroups",null);
 //        response.sendRedirect("index");
         return "index";
     }

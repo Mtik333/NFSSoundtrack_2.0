@@ -63,173 +63,348 @@ public class Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (args.length>0) {
-            try {
-                FileInputStream stream = new FileInputStream("D:\\Mateusza dane\\temp_db_dump\\gameid9.xlsx");
-                XSSFWorkbook excelWookBook = new XSSFWorkbook(stream);
-                XSSFSheet mySheet = excelWookBook.getSheet("Arkusz1");
-                Set<Row> filteredRows = new HashSet<>();
-                Game game = null;
-                MainGroup mainGroup = null;
-                Subgroup subgroup = null;
-                MainGroup tempGroup = null;
-                Subgroup tempSubgroup = null;
-                for (Row row : mySheet) {
-                    if (row.getRowNum() == 0) {
-                        continue;
-                    }
-                    Long id = (long) row.getCell(0).getNumericCellValue();
-                    Long position = (long) row.getCell(1).getNumericCellValue();
-                    String band = row.getCell(3).getStringCellValue();
-                    Long country_id = (long) row.getCell(4).getNumericCellValue();
-                    Long game_id = (long) row.getCell(5).getNumericCellValue();
-                    String title = row.getCell(6).getStringCellValue();
-                    String itunes_embed = null;
-                    if (row.getCell(7) != null) {
-                        itunes_embed = row.getCell(7).getStringCellValue();
-                    }
-                    String src_id = row.getCell(9).toString();
-                    String info = null;
-                    if (row.getCell(10) != null) {
-                        info = row.getCell(10).getStringCellValue();
-                    }
-                    String genre = null;
-                    if (row.getCell(14) != null) {
-                        genre = row.getCell(14).getStringCellValue();
-                    }
-                    String lyrics = null;
-                    if (row.getCell(15) != null) {
-                        lyrics = row.getCell(15).toString();
-                    }
-                    if (game == null) {
-                        game = gameRepository.findById(game_id.intValue()).get();
-                        mainGroup = game.getMainGroups().stream().filter(mainGroup1 ->
-                                mainGroup1.getGroupName().equals("All")).findFirst().get();
-                        subgroup = mainGroup.getSubgroups().stream().filter(subgroup1 ->
-                                subgroup1.getSubgroupName().equals("All")).findFirst().get();
-                    }
-                    if (band.equals("Somebody") || band.equals("Somebodies")) {
-                        band = band + "game_id" + game_id;
-                    }
-                    if (band.equals("unknown")) {
-                        if (tempGroup == null) {
-                            tempGroup = new MainGroup();
-                            tempGroup.setGame(game);
-                            tempGroup.setGroupName("Custom");
-                            tempGroup = mainGroupRepository.saveAndFlush(tempGroup);
+        if (args.length > 0) {
+            Row currentRow=null;
+            if (args[0].equals("SingleGame")) {
+                try {
+                    FileInputStream stream = new FileInputStream("D:\\Mateusza dane\\temp_db_dump\\gameid9.xlsx");
+                    XSSFWorkbook excelWookBook = new XSSFWorkbook(stream);
+                    XSSFSheet mySheet = excelWookBook.getSheet("Arkusz1");
+                    Set<Row> filteredRows = new HashSet<>();
+                    Game game = null;
+                    MainGroup mainGroup = null;
+                    Subgroup subgroup = null;
+                    MainGroup tempGroup = null;
+                    Subgroup tempSubgroup = null;
+                    for (Row row : mySheet) {
+                        if (row.getRowNum() == 0) {
+                            continue;
+                        }
+                        Long id = (long) row.getCell(0).getNumericCellValue();
+                        Long position = (long) row.getCell(1).getNumericCellValue();
+                        String band = row.getCell(3).getStringCellValue();
+                        Long country_id = (long) row.getCell(4).getNumericCellValue();
+                        Long game_id = (long) row.getCell(5).getNumericCellValue();
+                        String title = row.getCell(6).getStringCellValue();
+                        String itunes_embed = null;
+                        if (row.getCell(7) != null) {
+                            itunes_embed = row.getCell(7).getStringCellValue();
+                        }
+                        String src_id = row.getCell(9).toString();
+                        String info = null;
+                        if (row.getCell(10) != null) {
+                            info = row.getCell(10).getStringCellValue();
+                        }
+                        String genre = null;
+                        if (row.getCell(14) != null) {
+                            genre = row.getCell(14).getStringCellValue();
+                        }
+                        String lyrics = null;
+                        if (row.getCell(15) != null) {
+                            lyrics = row.getCell(15).toString();
+                        }
+                        if (game == null) {
+                            game = gameRepository.findById(game_id.intValue()).get();
+                            mainGroup = game.getMainGroups().stream().filter(mainGroup1 ->
+                                    mainGroup1.getGroupName().equals("All")).findFirst().get();
+                            subgroup = mainGroup.getSubgroups().stream().filter(subgroup1 ->
+                                    subgroup1.getSubgroupName().equals("All")).findFirst().get();
+                        }
+                        if (band.equals("Somebody") || band.equals("Somebodies")) {
+                            band = band + "game_id" + game_id;
+                        }
+                        if (band.equals("unknown")) {
+                            if (tempGroup == null) {
+                                tempGroup = new MainGroup();
+                                tempGroup.setGame(game);
+                                tempGroup.setGroupName("Custom");
+                                tempGroup = mainGroupRepository.saveAndFlush(tempGroup);
+                                tempSubgroup = new Subgroup();
+                                tempSubgroup.setPosition(1);
+                                tempSubgroup.setSubgroupName("All");
+                                tempSubgroup.setMainGroup(tempGroup);
+                                tempSubgroup = subgroupRepository.saveAndFlush(tempSubgroup);
+                            }
                             tempSubgroup = new Subgroup();
-                            tempSubgroup.setPosition(1);
-                            tempSubgroup.setSubgroupName("All");
+                            tempSubgroup.setPosition(Math.toIntExact(position) * 10);
+                            tempSubgroup.setSubgroupName(title);
                             tempSubgroup.setMainGroup(tempGroup);
                             tempSubgroup = subgroupRepository.saveAndFlush(tempSubgroup);
-                        }
-                        tempSubgroup = new Subgroup();
-                        tempSubgroup.setPosition(Math.toIntExact(position) * 10);
-                        tempSubgroup.setSubgroupName(title);
-                        tempSubgroup.setMainGroup(tempGroup);
-                        tempSubgroup = subgroupRepository.saveAndFlush(tempSubgroup);
-                    } else {
-                        Author existingBand = authorRepository.findByName(band);
-                        if (existingBand == null) {
-                            Author newBand = new Author();
-                            newBand.setName(band);
-                            existingBand = authorRepository.saveAndFlush(newBand);
-                            if (country_id != 0) {
-                                Country country = countryRepository.findById(country_id.intValue()).get();
-                                AuthorCountry authorCountry = new AuthorCountry();
-                                authorCountry.setCountry(country);
-                                authorCountry.setAuthor(existingBand);
-                                authorCountryRepository.saveAndFlush(authorCountry);
+                        } else {
+                            Author existingBand = authorRepository.findByName(band);
+                            if (existingBand == null) {
+                                Author newBand = new Author();
+                                newBand.setName(band);
+                                existingBand = authorRepository.saveAndFlush(newBand);
+                                if (country_id != 0) {
+                                    Country country = countryRepository.findById(country_id.intValue()).get();
+                                    AuthorCountry authorCountry = new AuthorCountry();
+                                    authorCountry.setCountry(country);
+                                    authorCountry.setAuthor(existingBand);
+                                    authorCountryRepository.saveAndFlush(authorCountry);
+                                }
                             }
-                        }
-                        AuthorAlias authorAlias = authorAliasRepository.findByAlias(band);
-                        if (authorAlias == null) {
-                            AuthorAlias authorAlias1 = new AuthorAlias();
-                            authorAlias1.setAlias(band);
-                            authorAlias1.setAuthor(existingBand);
-                            authorAlias = authorAliasRepository.saveAndFlush(authorAlias1);
-                        }
-                        Song mySong = null;
-                        List<Song> alreadyExistingSongs = songRepository.findByOfficialDisplayTitleAndOfficialDisplayBand(band, title);
-                        if (alreadyExistingSongs.isEmpty()) {
-                            mySong = new Song();
+                            AuthorAlias authorAlias = authorAliasRepository.findByAlias(band);
+                            if (authorAlias == null) {
+                                AuthorAlias authorAlias1 = new AuthorAlias();
+                                authorAlias1.setAlias(band);
+                                authorAlias1.setAuthor(existingBand);
+                                authorAlias = authorAliasRepository.saveAndFlush(authorAlias1);
+                            }
+                            Song mySong = null;
+                            List<Song> alreadyExistingSongs = songRepository.findByOfficialDisplayTitleAndOfficialDisplayBand(band, title);
+                            if (alreadyExistingSongs.isEmpty()) {
+                                mySong = new Song();
 //                            mySong.setId(id);
-                            mySong.setOfficialDisplayBand(band);
-                            mySong.setOfficialDisplayTitle(title);
-                            mySong.setSrcId(src_id);
-                            mySong.setInfo(info);
-                            mySong.setLyrics(lyrics);
-                            mySong = songRepository.saveAndFlush(mySong);
-                        } else {
-                            mySong = alreadyExistingSongs.get(0);
-                        }
-                        if (genre != null && !genre.isEmpty()) {
-                            Genre myGenre = genreRepository.findByGenreName(genre);
-                            if (myGenre == null) {
-                                myGenre = new Genre();
-                                myGenre.setGenreName(genre);
-                                genreRepository.saveAndFlush(myGenre);
+                                mySong.setOfficialDisplayBand(band);
+                                mySong.setOfficialDisplayTitle(title);
+                                mySong.setSrcId(src_id);
+                                mySong.setInfo(info);
+                                mySong.setLyrics(lyrics);
+                                mySong = songRepository.saveAndFlush(mySong);
+                            } else {
+                                mySong = alreadyExistingSongs.get(0);
                             }
-                            SongGenre songGenre = songGenreRepository.findBySong(mySong);
-                            if (songGenre == null) {
-                                songGenre = new SongGenre();
-                                songGenre.setGenre(myGenre);
-                                songGenre.setSong(mySong);
-                                songGenreRepository.saveAndFlush(songGenre);
+                            if (genre != null && !genre.isEmpty()) {
+                                Genre myGenre = genreRepository.findByGenreName(genre);
+                                if (myGenre == null) {
+                                    myGenre = new Genre();
+                                    myGenre.setGenreName(genre);
+                                    genreRepository.saveAndFlush(myGenre);
+                                }
+                                SongGenre songGenre = songGenreRepository.findBySong(mySong);
+                                if (songGenre == null) {
+                                    songGenre = new SongGenre();
+                                    songGenre.setGenre(myGenre);
+                                    songGenre.setSong(mySong);
+                                    songGenreRepository.saveAndFlush(songGenre);
+                                }
+                            }
+                            AuthorSong authorSong = authorSongRepository.findByAuthorAliasAndSong(authorAlias, mySong);
+                            if (authorSong == null) {
+                                authorSong = new AuthorSong();
+                                authorSong.setSong(mySong);
+                                authorSong.setAuthorAlias(authorAlias);
+                                authorSong.setRole(Role.COMPOSER);
+                                authorSongRepository.save(authorSong);
+                            }
+                            SongSubgroup songSubgroup = new SongSubgroup();
+                            songSubgroup.setSong(mySong);
+                            if (title.contains("Instrumental")) {
+                                songSubgroup.setInstrumental(Instrumental.YES);
+                            } else {
+                                songSubgroup.setInstrumental(Instrumental.NO);
+                            }
+                            if (title.contains("Remix")) {
+                                songSubgroup.setRemix(Remix.YES);
+                            } else {
+                                songSubgroup.setRemix(Remix.NO);
+                            }
+                            songSubgroup.setSrcId(src_id);
+                            songSubgroup.setPosition(position * 10);
+                            songSubgroup.setLyrics(lyrics);
+                            if (itunes_embed != null && !itunes_embed.isEmpty()) {
+                                int indexOfSpotify = itunes_embed.indexOf("spotify:track");
+                                if (indexOfSpotify > -1) {
+                                    String spotifyThing = itunes_embed.substring(indexOfSpotify, indexOfSpotify + 36);
+                                    songSubgroup.setSpotifyId(spotifyThing);
+                                }
+                            }
+                            songSubgroup.setSubgroup(subgroup);
+                            songSubgroup = songSubgroupRepository.saveAndFlush(songSubgroup);
+                            if (tempSubgroup != null) {
+                                SongSubgroup tempSongSubgroup = new SongSubgroup();
+                                tempSongSubgroup.setRemix(songSubgroup.getRemix());
+                                tempSongSubgroup.setInstrumental(songSubgroup.getInstrumental());
+                                tempSongSubgroup.setSrcId(songSubgroup.getSrcId());
+                                tempSongSubgroup.setPosition(songSubgroup.getPosition());
+                                tempSongSubgroup.setLyrics(songSubgroup.getLyrics());
+                                tempSongSubgroup.setSubgroup(tempSubgroup);
+                                tempSongSubgroup.setSong(songSubgroup.getSong());
+                                tempSongSubgroup.setSpotifyId(songSubgroup.getSpotifyId());
+                                songSubgroupRepository.saveAndFlush(tempSongSubgroup);
                             }
                         }
-                        AuthorSong authorSong = authorSongRepository.findByAuthorAliasAndSong(authorAlias, mySong);
-                        if (authorSong == null) {
-                            authorSong = new AuthorSong();
-                            authorSong.setSong(mySong);
-                            authorSong.setAuthorAlias(authorAlias);
-                            authorSong.setRole(Role.COMPOSER);
-                            authorSongRepository.save(authorSong);
-                        }
-                        SongSubgroup songSubgroup = new SongSubgroup();
-                        songSubgroup.setSong(mySong);
-                        if (title.contains("Instrumental")) {
-                            songSubgroup.setInstrumental(Instrumental.YES);
-                        } else {
-                            songSubgroup.setInstrumental(Instrumental.NO);
-                        }
-                        if (title.contains("Remix")) {
-                            songSubgroup.setRemix(Remix.YES);
-                        } else {
-                            songSubgroup.setRemix(Remix.NO);
-                        }
-                        songSubgroup.setSrcId(src_id);
-                        songSubgroup.setPosition(position * 10);
-                        songSubgroup.setLyrics(lyrics);
-                        if (itunes_embed != null && !itunes_embed.isEmpty()) {
-                            int indexOfSpotify = itunes_embed.indexOf("spotify:track");
-                            if (indexOfSpotify > -1) {
-                                String spotifyThing = itunes_embed.substring(indexOfSpotify, indexOfSpotify + 36);
-                                songSubgroup.setSpotifyId(spotifyThing);
-                            }
-                        }
-                        songSubgroup.setSubgroup(subgroup);
-                        songSubgroup = songSubgroupRepository.saveAndFlush(songSubgroup);
-                        if (tempSubgroup != null) {
-                            SongSubgroup tempSongSubgroup = new SongSubgroup();
-                            tempSongSubgroup.setRemix(songSubgroup.getRemix());
-                            tempSongSubgroup.setInstrumental(songSubgroup.getInstrumental());
-                            tempSongSubgroup.setSrcId(songSubgroup.getSrcId());
-                            tempSongSubgroup.setPosition(songSubgroup.getPosition());
-                            tempSongSubgroup.setLyrics(songSubgroup.getLyrics());
-                            tempSongSubgroup.setSubgroup(tempSubgroup);
-                            tempSongSubgroup.setSong(songSubgroup.getSong());
-                            tempSongSubgroup.setSpotifyId(songSubgroup.getSpotifyId());
-                            songSubgroupRepository.saveAndFlush(tempSongSubgroup);
-                        }
+                        System.out.println("???");
                     }
-                    System.out.println("???");
+                } catch (Throwable throwable) {
+                    System.out.println("AAAAAAAAAAAAAA- " + throwable.getMessage());
+                    throwable.printStackTrace();
                 }
-            } catch (Throwable throwable) {
-                System.out.println("AAAAAAAAAAAAAA- " + throwable.getMessage());
-                throwable.printStackTrace();
-            }
+            } else if (args[0].equals("AllGames")) {
+                try {
+                    FileInputStream stream = new FileInputStream("D:\\Mateusza dane\\temp_db_dump\\game_all.xlsx");
+                    XSSFWorkbook excelWookBook = new XSSFWorkbook(stream);
+                    XSSFSheet mySheet = excelWookBook.getSheet("Arkusz1");
+                    Set<Row> filteredRows = new HashSet<>();
+                    int gameTraversedNow = 0;
+                    Game game = null;
+                    MainGroup mainGroup = null;
+                    Subgroup subgroup = null;
+                    MainGroup tempGroup = null;
+                    Subgroup tempSubgroup = null;
+                    for (Row row : mySheet) {
+                        if (row.getRowNum() == 0) {
+                            continue;
+                        }
+                        currentRow=row;
+                        Long id = (long) row.getCell(0).getNumericCellValue();
+                        Long position = (long) row.getCell(1).getNumericCellValue();
+                        String band = row.getCell(3).toString().trim();
+                        Long country_id = (long) row.getCell(4).getNumericCellValue();
+                        Long game_id = (long) row.getCell(5).getNumericCellValue();
+                        String title = row.getCell(6).toString().trim();
+                        String itunes_embed = null;
+                        if (row.getCell(7) != null) {
+                            itunes_embed = row.getCell(7).getStringCellValue().trim();
+                        }
+                        String src_id = row.getCell(9).toString().trim();
+                        String info = null;
+                        if (row.getCell(10) != null) {
+                            info = row.getCell(10).getStringCellValue().trim();
+                        }
+                        String genre = null;
+                        if (row.getCell(14) != null) {
+                            genre = row.getCell(14).getStringCellValue().trim();
+                        }
+                        String lyrics = null;
+                        if (row.getCell(15) != null) {
+                            lyrics = row.getCell(15).toString().trim();
+                        }
+                        if (Math.toIntExact(game_id) != gameTraversedNow) {
+                            game = gameRepository.findById(game_id.intValue()).get();
+                            mainGroup = game.getMainGroups().stream().filter(mainGroup1 ->
+                                    mainGroup1.getGroupName().equals("All")).findFirst().get();
+                            subgroup = mainGroup.getSubgroups().stream().filter(subgroup1 ->
+                                    subgroup1.getSubgroupName().equals("All")).findFirst().get();
+                            gameTraversedNow = Math.toIntExact(game_id);
+                            tempGroup=null;
+                            tempSubgroup=null;
+                        }
+                        if (band.equals("Somebody") || band.equals("Somebodies")) {
+                            band = band + "game_id" + game_id;
+                        }
+                        if (band.equals("unknown")) {
+                            if (tempGroup == null) {
+                                tempGroup = new MainGroup();
+                                tempGroup.setGame(game);
+                                tempGroup.setGroupName("Custom");
+                                tempGroup = mainGroupRepository.saveAndFlush(tempGroup);
+                                tempSubgroup = new Subgroup();
+                                tempSubgroup.setPosition(1);
+                                tempSubgroup.setSubgroupName("All");
+                                tempSubgroup.setMainGroup(tempGroup);
+                                tempSubgroup = subgroupRepository.saveAndFlush(tempSubgroup);
+                            }
+                            tempSubgroup = new Subgroup();
+                            tempSubgroup.setPosition(Math.toIntExact(position) * 10);
+                            tempSubgroup.setSubgroupName(title);
+                            tempSubgroup.setMainGroup(tempGroup);
+                            tempSubgroup = subgroupRepository.saveAndFlush(tempSubgroup);
+                        } else {
+                            Author existingBand = authorRepository.findByName(band);
+                            if (existingBand == null) {
+                                Author newBand = new Author();
+                                newBand.setName(band);
+                                existingBand = authorRepository.saveAndFlush(newBand);
+                                if (country_id != 0) {
+                                    Country country = countryRepository.findById(country_id.intValue()).get();
+                                    AuthorCountry authorCountry = new AuthorCountry();
+                                    authorCountry.setCountry(country);
+                                    authorCountry.setAuthor(existingBand);
+                                    authorCountryRepository.saveAndFlush(authorCountry);
+                                }
+                            }
+                            AuthorAlias authorAlias = authorAliasRepository.findByAlias(band);
+                            if (authorAlias == null) {
+                                AuthorAlias authorAlias1 = new AuthorAlias();
+                                authorAlias1.setAlias(band);
+                                authorAlias1.setAuthor(existingBand);
+                                authorAlias = authorAliasRepository.saveAndFlush(authorAlias1);
+                            }
+                            Song mySong = null;
+                            List<Song> alreadyExistingSongs = songRepository.findByOfficialDisplayTitleAndOfficialDisplayBand(band, title);
+                            if (alreadyExistingSongs.isEmpty()) {
+                                mySong = new Song();
+//                            mySong.setId(id);
+                                mySong.setOfficialDisplayBand(band);
+                                mySong.setOfficialDisplayTitle(title);
+                                mySong.setSrcId(src_id);
+                                mySong.setInfo(info);
+                                mySong.setLyrics(lyrics);
+                                mySong = songRepository.saveAndFlush(mySong);
+                            } else {
+                                mySong = alreadyExistingSongs.get(0);
+                            }
+                            if (genre != null && !genre.isEmpty()) {
+                                Genre myGenre = genreRepository.findByGenreName(genre);
+                                if (myGenre == null) {
+                                    myGenre = new Genre();
+                                    myGenre.setGenreName(genre);
+                                    genreRepository.saveAndFlush(myGenre);
+                                }
+                                SongGenre songGenre = songGenreRepository.findBySong(mySong);
+                                if (songGenre == null) {
+                                    songGenre = new SongGenre();
+                                    songGenre.setGenre(myGenre);
+                                    songGenre.setSong(mySong);
+                                    songGenreRepository.saveAndFlush(songGenre);
+                                }
+                            }
+                            AuthorSong authorSong = authorSongRepository.findByAuthorAliasAndSong(authorAlias, mySong);
+                            if (authorSong == null) {
+                                authorSong = new AuthorSong();
+                                authorSong.setSong(mySong);
+                                authorSong.setAuthorAlias(authorAlias);
+                                authorSong.setRole(Role.COMPOSER);
+                                authorSongRepository.save(authorSong);
+                            }
+                            SongSubgroup songSubgroup = new SongSubgroup();
+                            songSubgroup.setSong(mySong);
+                            if (title.contains("Instrumental")) {
+                                songSubgroup.setInstrumental(Instrumental.YES);
+                            } else {
+                                songSubgroup.setInstrumental(Instrumental.NO);
+                            }
+                            if (title.contains("Remix")) {
+                                songSubgroup.setRemix(Remix.YES);
+                            } else {
+                                songSubgroup.setRemix(Remix.NO);
+                            }
+                            songSubgroup.setSrcId(src_id);
+                            songSubgroup.setPosition(position * 10);
+                            songSubgroup.setLyrics(lyrics);
+                            if (itunes_embed != null && !itunes_embed.isEmpty()) {
+                                int indexOfSpotify = itunes_embed.indexOf("spotify:track");
+                                if (indexOfSpotify > -1) {
+                                    String spotifyThing = itunes_embed.substring(indexOfSpotify, indexOfSpotify + 36);
+                                    songSubgroup.setSpotifyId(spotifyThing);
+                                }
+                            }
+                            songSubgroup.setSubgroup(subgroup);
+                            songSubgroup = songSubgroupRepository.saveAndFlush(songSubgroup);
+                            if (tempSubgroup != null) {
+                                SongSubgroup tempSongSubgroup = new SongSubgroup();
+                                tempSongSubgroup.setRemix(songSubgroup.getRemix());
+                                tempSongSubgroup.setInstrumental(songSubgroup.getInstrumental());
+                                tempSongSubgroup.setSrcId(songSubgroup.getSrcId());
+                                tempSongSubgroup.setPosition(songSubgroup.getPosition());
+                                tempSongSubgroup.setLyrics(songSubgroup.getLyrics());
+                                tempSongSubgroup.setSubgroup(tempSubgroup);
+                                tempSongSubgroup.setSong(songSubgroup.getSong());
+                                tempSongSubgroup.setSpotifyId(songSubgroup.getSpotifyId());
+                                songSubgroupRepository.saveAndFlush(tempSongSubgroup);
+                            }
+                        }
+                        System.out.println("???");
+                    }
+                } catch (Throwable throwable) {
+                    System.out.println("row " + currentRow);
+                    System.out.println("AAAAAAAAAAAAAA- " + throwable.getMessage());
+                    throwable.printStackTrace();
+                }
 //        System.exit(0);
+            }
         }
     }
 /*

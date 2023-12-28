@@ -102,4 +102,5 @@ public class SubgroupController {
         }
         return objectMapper.writeValueAsString(subgroups);
     }
+
 }

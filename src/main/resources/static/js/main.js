@@ -1,14 +1,18 @@
 $(document).ready(function () {
-
+    $("#filter_games_menu").val("");
     /*$(document).find("span.display-text").each(function(e){
         $(this).text().trim();
     })*/
-    var currentGame = window.location.href.replace(document.location.origin,"");
-    $(document).find("a[href='"+currentGame+"']").each(function(e){
-        $(this).addClass("active");
-        $(this).parent().parent().parent().parent().find("button").click();
+    var currentGame = window.location.href.replace(document.location.origin, "");
+    $(document).find("a[href='" + currentGame + "']").each(function (e) {
+        if (!$(this).hasClass("nav-link")) {
+            $(this).addClass("active");
+            $(this).parent().parent().parent().parent().find("button").click();
+        } else {
+            $(this).parent().addClass("nfs-top-item-active");
+        }
     })
-    $(document).find("td.countries").each(function(){
+    $(document).find("td.countries").each(function () {
         $(this).find('.country-img:nth-child(n+2)').remove();
     });
     var activeSubgroups;
@@ -19,26 +23,27 @@ $(document).ready(function () {
 
     $('.play_icon').mouseover(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
-        baseVideoSrc=$(this).attr("data-tagVideo");
+        baseVideoSrc = $(this).attr("data-tagVideo");
     }).mouseout(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
     });
 
     $(document).find("div.accordion-collapse").each(function () {
         $(this).on('shown.bs.collapse', function () {
-            console.log($(this).offset());
-            var currentScroll = $('div.offcanvas-body').scrollTop();
-            var origTop = $('div.offcanvas-body').offset().top;
-            var thisTop = $(this).offset().top;
-            if (currentScroll > 0) {
-                var scrollTop = currentScroll + thisTop - origTop - $(this).parent().children().first().height();
-            } else {
-                var scrollTop = thisTop - origTop - $(this).parent().children().first().height();
+            if ($("#filter_games_menu").val() > 3) {
+                console.log($(this).offset());
+                var currentScroll = $('div.offcanvas-body').scrollTop();
+                var origTop = $('div.offcanvas-body').offset().top;
+                var thisTop = $(this).offset().top;
+                if (currentScroll > 0) {
+                    var scrollTop = currentScroll + thisTop - origTop - $(this).parent().children().first().height();
+                } else {
+                    var scrollTop = thisTop - origTop - $(this).parent().children().first().height();
+                }
+                $('div.offcanvas-body').animate({
+                    scrollTop: scrollTop
+                }, 500);
             }
-            $('div.offcanvas-body').animate({
-                scrollTop: scrollTop
-            }, 500);
-
         });
     });
     // $(document).on('click', 'button.gamegroup-button', function (e) { 
@@ -46,6 +51,69 @@ $(document).ready(function () {
     //         scrollTop: $(this).offset().top
     //     }, 1000);
     // });
+
+    $("#filter_games_menu").on("keyup", function () {
+        var searchValue = $(this).val().toLowerCase();
+        if (searchValue.length > 3) {
+            $(document).find("button.gamegroup-button").filter(function () {
+                var divId = $(this).attr("data-bs-target");
+                if ($(this).text().toLowerCase() > -1 && !$(divId).hasClass("show")) {
+                    $(this).click();
+                } else {
+                    var allA = $(divId).find("a");
+                    var somethingFound = false;
+                    for (let i = 0; i < allA.length; i++) {
+                        if ($(allA[i]).text().toLowerCase().indexOf(searchValue) > -1) {
+                            somethingFound = true;
+                            $(allA[i]).show();
+                        } else {
+                            $(allA[i]).hide();
+                        }
+                    }
+                    if (somethingFound) {
+                        if (!$(divId).is(":visible")){
+                            $(divId).parent().show();
+                        }
+                        if (!$(divId).hasClass("show")){
+                            $(this).click();
+                            $(this).removeClass("collapsed");
+                        }
+                    } else {
+                        $(divId).parent().hide();
+                        $(divId).removeClass("show");
+                    }
+                }
+            });
+        } else {
+            $(document).find("button.gamegroup-button").filter(function () {
+                $(this).collapse('hide');
+                var divId = $(this).attr("data-bs-target");
+                $(divId).find("a").filter(function () {
+                    $(this).show();
+                });
+                var divId = $(this).attr("data-bs-target");
+                $(divId).parent().show();
+                $(divId).collapse('hide');
+            })
+        }
+    });
+
+    $("#filter_songs").on("keyup", function () {
+        var searchValue = $(this).val().toLowerCase();
+        if (searchValue.length > 3) {
+            $("#game_stuff").find("tr:has(td):not(.subgroup-separator)").filter(function () {
+                if ($(this).text().toLowerCase().indexOf(searchValue) > -1) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        } else {
+            $("#game_stuff").find("tr:has(td)").filter(function () {
+                $(this).show();
+            });
+        }
+    });
 
     $(document).on('click', 'a.gamegroup', function (e) {
         console.log("jesus");
@@ -69,7 +137,7 @@ $(document).ready(function () {
         $(div).addClass('active');
         $(div).removeClass('visually-hidden');
         $(div).find("button").first().click();
-        activeSubgroups=1;
+        activeSubgroups = 1;
     });
     $(document).on('click', 'button.subgroup', function (e) {
         //handling clicking on subgroup
@@ -101,7 +169,7 @@ $(document).ready(function () {
                     });
                 }
             }
-            activeSubgroups=1;
+            activeSubgroups = 1;
         } else {
             var aId = $(this).attr('id');
             var allSubgroup = $(this).parent().parent().find("button[data-subgroupTxt='All']").first();
@@ -133,11 +201,11 @@ $(document).ready(function () {
                     $(this).removeClass('visually-hidden');
                 });
                 activeSubgroups++
-            }          
-            if (activeSubgroups==0){
+            }
+            if (activeSubgroups == 0) {
                 var allSubgroup = $(this).parent().parent().find("button[data-subgroupTxt='All']").first();
                 $(allSubgroup).click();
-                activeSubgroups==1;
+                activeSubgroups == 1;
                 return;
             }
         }
@@ -178,14 +246,14 @@ $(document).ready(function () {
     $('#videoModal').on('shown.bs.modal', function (e) {
         console.log("japierdole");
         // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
-        $("#video").attr('src',baseVideoSrc + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0");
+        $("#video").attr('src', baseVideoSrc + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0");
     })
 
     $('#videoModal').on('hide.bs.modal', function (e) {
         // a poor man's stop video
         console.log("japierdole2");
-        $("#video").attr('src',baseVideoSrc); 
-    }) 
+        $("#video").attr('src', baseVideoSrc);
+    })
 
     /*
     function autoPlayYouTubeModal() {

@@ -2,15 +2,13 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Instrumental;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SongSubgroupRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SubgroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -42,5 +40,12 @@ public class SongSubgroupController {
             songSubgroupRepository.save(songSubgroup);
         }
         return new ObjectMapper().writeValueAsString("OK");
+    }
+
+    @GetMapping(value = "/readSongSubgroup/{songSubgroup}")
+    public @ResponseBody String readAllSubgroupManage(Model model, @PathVariable("songSubgroup") String gameId) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(gameId)).get();
+        return objectMapper.writeValueAsString(songSubgroup);
     }
 }

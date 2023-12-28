@@ -54,3 +54,24 @@ input.form-control {
 td.display-text {
     font-size: 0;
 }
+.play_icon:hover{
+    cursor: pointer;
+}
+.info_button{
+    cursor: pointer;
+}
+.note_button{
+    cursor: pointer;
+}
+.table-striped > tbody > tr:not(.subgroup-separator):nth-of-type(2n+1){
+    --bs-table-bg-type: var(--bs-table-striped-bg);
+}
+.my_padding {
+    background: #d1e2ff;
+}
+#filter_songs{
+    border-bottom: 1px solid #8ba2b5;
+}
+.table_link{
+text-decoration: none;
+}

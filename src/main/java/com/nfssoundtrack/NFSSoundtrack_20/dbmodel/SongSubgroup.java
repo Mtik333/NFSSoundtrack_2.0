@@ -46,6 +46,7 @@ public class SongSubgroup implements Serializable {
     @Column(name="position")
     private Long position;
 
+    @Basic(fetch = FetchType.LAZY)
     @Column(name="lyrics")
     private String lyrics;
     public Long getId() {

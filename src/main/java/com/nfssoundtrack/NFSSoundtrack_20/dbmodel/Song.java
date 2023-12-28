@@ -34,6 +34,7 @@ public class Song implements Serializable {
     @Column(name="multi_concat")
     private MultiConcat multiConcat;
 
+    @Basic(fetch = FetchType.LAZY)
     @Column(name="lyrics")
     private String lyrics;
 
@@ -45,8 +46,6 @@ public class Song implements Serializable {
     @OneToMany(mappedBy = "song",fetch = FetchType.LAZY)
     private List<SongGenre> songGenreList=new ArrayList<>();
 
-    @Transient
-    private Set<Country> countrySet = new HashSet<>();
     public Long getId() {
         return id;
     }
@@ -119,17 +118,4 @@ public class Song implements Serializable {
         this.songGenreList = songGenreList;
     }
 
-    public Set<Country> getCountrySet() {
-        Set<Country> filteredCountries = new HashSet<>();
-        for (AuthorSong authorSong : getAuthorSongList()){
-            for (AuthorCountry authorCountry : authorSong.getAuthorAlias().getAuthor().getAuthorCountries()){
-                filteredCountries.add(authorCountry.getCountry());
-            }
-        }
-        return countrySet;
-    }
-
-    public void setCountrySet(Set<Country> countrySet) {
-        this.countrySet = countrySet;
-    }
 }
