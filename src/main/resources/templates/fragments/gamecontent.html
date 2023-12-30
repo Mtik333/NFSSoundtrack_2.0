@@ -2,8 +2,28 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <link rel="stylesheet" th:href="@{/css/own.css}">
 <th:block th:if="${songSubgroups!=null && !songSubgroups.isEmpty()}">
-    <div class="form-group">
-        <span id="playlist_init" class="p-3 bg-info" style="cursor:pointer;">Switch to playlist</span>
+    <div class="form-group pb-3 pt-3">
+        <span id="playlist_init" class="nfs-top-item" style="cursor:pointer;">Launch playlist mode</span>
+        <th:block th:if="${game.spotifyId!=null && game.spotifyId!=''}">
+            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal"
+            data-bs-target="#spotifyModal" id="spotifyLink"
+            th:attr="data-tagVideo=${game.spotifyId}">Launch Spotify playlist</span>
+        </th:block>
+        <th:block th:if="${game.tidalId!=null && game.tidalId!=''}">
+            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal"
+            data-bs-target="#tidalModal" id="tidalLink"
+            th:attr="data-tagVideo=${game.tidalId}">Launch Tidal playlist</span>
+        </th:block>
+        <th:block th:if="${game.deezerId!=null && game.deezerId!=''}">
+            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal"
+            data-bs-target="#deezerModal" id="deezerLink"
+            th:attr="data-tagVideo=${game.deezerId}">Launch Deezer playlist</span>
+        </th:block>
+        <th:block th:if="${game.soundcloudId!=null && game.soundcloudId!=''}">
+            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal"
+            data-bs-target="#soundcloudModal" id="soundcloudLink"
+            th:attr="data-tagVideo=${game.soundcloudId}">Launch SoundCloud playlist</span>
+        </th:block>
     </div>
     <div class="form-group">
         <span>
@@ -106,7 +126,7 @@
                                 <td>
                                     <th:block th:each="songGenre,iter : ${songSubgroup.song.songGenreList}">
                                         <a class="table_link" th:text="${songGenre.genre.genreName}"
-                                            th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                            th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                             th:text="${!iter.last ? ', ' : ''}"></span>
                                     </th:block>
                                 </td>
@@ -117,6 +137,7 @@
                                             th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                                             th:src="@{/images/znakwodny.png}" width="25" height="25">
                                         </img>
+                                        <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
                                         <th:block th:if="${songSubgroup.spotifyId != null}">
                                             <a th:href="${songSubgroup.spotifyId}">
                                                 <img class="img-responsive" th:src="@{/images/spotify.png}">
@@ -126,15 +147,9 @@
                                 </td>
                                 <td>
                                     <th:block th:if="${songSubgroup.song.info!=null && songSubgroup.song.info!=''}">
-
-                                        <span data-bs-toggle="tooltip" data-bs-placement="left"
-                                            th:title="${songSubgroup.song.info}" data-bs-delay='{"show":100,"hide":3000}'>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="red"
-                                                class="bi bi-exclamation" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.553.553 0 0 1-1.1 0z" />
-                                            </svg>
-                                        </span>
+<a data-toggle="tooltip" th:title="${songSubgroup.song.info}">
+    <img th:src="@{/images/warn1.png}">
+</a>
                                     </th:block>
                                 </td>
                             </tr>
@@ -148,16 +163,104 @@
 
     <div class="modal fade" id="videoModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="videoModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" id="showLyrics" class="btn btn-light">Lyrics</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="ratio ratio-16x9">
+                                <iframe src="" id="video" allow="autoplay;" allowscriptaccess="always"
+                                    allowfullscreen></iframe>
+                            </div>
+                        </div>
+                        <div class="overflow-scroll" style="display: none;">
+                            <div id="lyricsCollapse">
+                                Brings his election<br /><br />Brings his election<br /><br /><br /><br />Brings his election<br /><br />Brings his election<br /><br />Brings his election<br /><br />Brings his election<br /><br /><br /><br />Brings his election<br /><br /><br /><br />Metrolike<br /><br />Metrolike<br /><br />Metrolike<br /><br />Metrolike<br /><br /><br /><br />Metrolike<br /><br />Metrolike<br /><br />Metrolike<br /><br />Metrolike
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="spotifyModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="" id="spotify-ext" class="btn btn-light text-success">Launch in Spotify</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="ratio ratio-16x9">
+                                <iframe src="" id="spotifyVideo" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="soundcloudModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="ratio ratio-16x9">
-                        <!--<div class="ratio ratio-16x9">-->
-                        <iframe src="" id="video" allow="autoplay;" allowscriptaccess="always" allowfullscreen></iframe>
-                        <!--</div>-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="ratio ratio-16x9">
+                                <iframe src="" id="soundcloudVideo" width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="tidalModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="" id="tidal-ext" target="_blank" class="btn btn-light text-dark">Launch in Tidal</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="ratio ratio-16x9">
+                                <iframe src="" id="tidalVideo" allowfullscreen="allowfullscreen" frameborder="0" ></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deezerModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="" id="deezer-ext" class="btn btn-light text-muted">Launch in Deezer</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="ratio ratio-16x9">
+                                <iframe title="deezer-widget" src="" id="deezerVideo" frameborder="0" allowtransparency="true" allow="encrypted-media; clipboard-write"></iframe>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -165,7 +268,7 @@
     </div>
 </th:block>
 <th:block th:if="${songSubgroups!=null && songSubgroups.isEmpty()}">
-    <h2>No songs found, that's quite odd. Would you like to report it?</h2>
+    <h2>No songs found, that's quite odd. Would you like to report it? Click the "Report problem" button from the top menu to proceed</h2>
 </th:block>
 
 </html>

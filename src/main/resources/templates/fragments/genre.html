@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/css/own.css}">
+<h3 th:text="'Songs classified with genre ' + ${genre?.genreName}"></h3>
+<table class="table table-hover table-striped">
+<thead>
+<th scope="col">Band</th>
+<th scope="col">Title</th>
+<th scope="col">Subgroup</th>
+<th scope="col">Group</th>
+<th scope="col">Game</th>
+</thead>
+<tbody>
+    <tr th:each="songSubgroup, iStat : ${genrePage?.content}">
+        <td th:text="${songSubgroup.song.officialDisplayBand}"></td>
+        <td th:text="${songSubgroup.song.officialDisplayTitle}"></td>
+        <td th:text="${songSubgroup.subgroup.subgroupName}"></td>
+        <td th:text="${songSubgroup.subgroup.mainGroup.groupName}"></td>
+        <td><a class="table_link" th:text="${songSubgroup.subgroup.mainGroup.game.displayTitle}"
+            th:href="'/game/'+${songSubgroup.subgroup.mainGroup.game.gameShort}"></a></td>
+    </tr>
+</tbody>
+</table>
+<div th:if="${genrePage.totalPages > 0}" class="pagination"
+    th:each="pageNumber : ${pageNumbers}">
+    <a th:href="@{/read(size=${genrePage.size}, page=${pageNumber})}"
+        th:text=${pageNumber}
+        th:class="${pageNumber==genrePage.number + 1} ? active"></a>
+</div>
+</html>

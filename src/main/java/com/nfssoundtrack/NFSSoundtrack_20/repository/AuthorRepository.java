@@ -11,6 +11,7 @@ public interface AuthorRepository extends JpaRepository<Author,Integer> {
 
     Author findByName(String name);
 
+    List<Author> findByNameContains(String name);
     List<Author> findAll();
 
     @EntityGraph(value="Author.authorCountries")

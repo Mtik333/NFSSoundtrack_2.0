@@ -22,44 +22,23 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-
-//    @Autowired
-//    private MyBasicAuthenticationEntryPoint authenticationEntryPoint;
-
-//    @Autowired
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth
-//                .inMemoryAuthentication()
-//                .withUser("admin1")
-//                .password("{noop}admin1")
-//                .roles("ADMIN");
-//    }
     @Bean
     public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .cors().and().csrf().disable()
+                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.disable())
+                .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/manage", "/manage#", "/maingroup/**", "/songSubgroup/**", "/subgroup/**")
                         .hasRole("ADMIN"))
                 .authorizeHttpRequests((requests) -> requests
                                 .requestMatchers("/*", "/content/*", "/css/*", "/js/*", "/images/*",
-                                        "/fragments/*", "/game/*", "/author/*", "/genre/*").permitAll()
+                                        "/fragments/**", "/game/**", "/author/**", "/genre/**").permitAll()
                 )
-//                .httpBasic(httpSecurityHttpBasicConfigurer ->
-//                        httpSecurityHttpBasicConfigurer.authenticationEntryPoint(authenticationEntryPoint)
-//                )
                 .formLogin((form) -> form
                         .loginPage("/login")
                                 .failureUrl("/content/donate")
                                 .defaultSuccessUrl("/manage", true)
-                //.successForwardUrl("/manage")
-//                        .loginProcessingUrl("/perform_login")
-//                        .successForwardUrl("/login_success_handler")
-//                        .defaultSuccessUrl("/login_success_handler", true)
-//                        .failureForwardUrl("/login?error=true")
-//                .permitAll()
-//                )
                 )
                 .logout((logout) -> logout
                 .invalidateHttpSession(true)

@@ -17,13 +17,15 @@ $(document).ready(function () {
     });
     var activeSubgroups;
     var baseVideoSrc;
+    var lyricsToDisplay;
     if (window.location.href.indexOf("/home") > -1) {
         $("#nfs-top-home").parent().addClass("nfs-top-item-active");
     }
 
     $('.play_icon').mouseover(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
-        baseVideoSrc = $(this).attr("data-tagVideo");
+        baseVideoSrc = $(this).attr("data-tagVideo")+ "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
+        lyricsToDisplay = $(this).next().val();
     }).mouseout(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
     });
@@ -112,6 +114,34 @@ $(document).ready(function () {
             $("#game_stuff").find("tr:has(td)").filter(function () {
                 $(this).show();
             });
+        }
+    });
+
+    $(document).on('click', '#showLyrics', function (e) {
+
+    });
+
+    $(document).on('click', '#showLyrics', function (e) {
+        var divWithLyrics = $("#lyricsCollapse");
+        var divContainer = divWithLyrics.parent();
+        var videoContainer = divContainer.prev();
+        var iframeContainer = videoContainer.children().first();
+        if ($(divContainer).hasClass("col-md-6")){
+            $(divContainer).removeAttr("style");
+            $(divContainer).removeClass("col-md-6");
+            $(divContainer).css("display", "none");
+            videoContainer.removeClass("col-md-6");
+            videoContainer.addClass("col-md-12");
+            $(divContainer).css("display", none);
+            divWithLyrics.empty();
+        } else {
+            $(divContainer).removeAttr("style");
+            $(divContainer).addClass("col-md-6");
+            videoContainer.addClass("col-md-6");
+            videoContainer.removeClass("col-md-12");
+            $(divContainer).css("max-height", iframeContainer.height());
+            $(divContainer).css("overflow-y", "auto");
+            divWithLyrics.append(lyricsToDisplay);
         }
     });
 
@@ -243,16 +273,53 @@ $(document).ready(function () {
         }
     });
 
-    $('#videoModal').on('shown.bs.modal', function (e) {
-        console.log("japierdole");
+    $('#videoModal').on('show.bs.modal', function (e) {
         // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
-        $("#video").attr('src', baseVideoSrc + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0");
+        $("#video").attr('src', baseVideoSrc);
     })
 
     $('#videoModal').on('hide.bs.modal', function (e) {
-        // a poor man's stop video
-        console.log("japierdole2");
-        $("#video").attr('src', baseVideoSrc);
+        $("#video").attr('src', '');
+    })
+
+    $('#spotifyModal').on('show.bs.modal', function (e) {    
+        // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
+        $("#spotifyVideo").attr('src', "https://open.spotify.com/embed/playlist/"+$("#spotifyLink").attr('data-tagVideo'));
+        $("#spotify-ext").attr('href', "spotify:playlist:"+$("#spotifyLink").attr('data-tagVideo'));
+    })
+
+    $('#spotifyModal').on('hide.bs.modal', function (e) {
+        $("#spotifyVideo").attr('src', '');
+    })
+
+    $('#soundcloudModal').on('show.bs.modal', function (e) {    
+        // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
+        $("#soundcloudVideo").attr('src', "https://w.soundcloud.com/player/?url=https%253A//api.soundcloud.com/playlists/"+$("#soundcloudLink").attr('data-tagVideo')
+        +"&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true");
+    })
+
+    $('#soundcloudModal').on('hide.bs.modal', function (e) {
+        $("#spotifyVideo").attr('src', '');
+    })
+
+    $('#tidalModal').on('show.bs.modal', function (e) {    
+        // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
+        $("#tidalVideo").attr('src', "https://embed.tidal.com/playlists/"+$("#tidalLink").attr('data-tagVideo'));
+        $("#tidal-ext").attr('href', "https://listen.tidal.com/playlist/"+$("#tidalLink").attr('data-tagVideo'));
+    })
+
+    $('#tidalModal').on('hide.bs.modal', function (e) {
+        $("#tidalVideo").attr('src', '');
+    })
+
+    $('#deezerModal').on('show.bs.modal', function (e) {    
+        // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
+        $("#deezerVideo").attr('src', "https://widget.deezer.com/widget/auto/playlist/"+$("#deezerLink").attr('data-tagVideo'));
+        $("#deezer-ext").attr('href', "deezer://www.deezer.com/playlist/"+$("#deezerLink").attr('data-tagVideo'));
+    })
+
+    $('#deezerModal').on('hide.bs.modal', function (e) {
+        $("#deezerVideo").attr('src', '');
     })
 
     /*

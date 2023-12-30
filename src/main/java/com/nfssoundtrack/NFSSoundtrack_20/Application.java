@@ -152,7 +152,7 @@ public class Application implements CommandLineRunner {
                                 authorAlias = authorAliasRepository.saveAndFlush(authorAlias1);
                             }
                             Song mySong = null;
-                            List<Song> alreadyExistingSongs = songRepository.findByOfficialDisplayTitleAndOfficialDisplayBand(band, title);
+                            List<Song> alreadyExistingSongs = songRepository.findByOfficialDisplayBandAndOfficialDisplayTitle(band, title);
                             if (alreadyExistingSongs.isEmpty()) {
                                 mySong = new Song();
 //                            mySong.setId(id);
@@ -323,7 +323,7 @@ public class Application implements CommandLineRunner {
                                 authorAlias = authorAliasRepository.saveAndFlush(authorAlias1);
                             }
                             Song mySong = null;
-                            List<Song> alreadyExistingSongs = songRepository.findByOfficialDisplayTitleAndOfficialDisplayBand(band, title);
+                            List<Song> alreadyExistingSongs = songRepository.findByOfficialDisplayBandAndOfficialDisplayTitle(band, title);
                             if (alreadyExistingSongs.isEmpty()) {
                                 mySong = new Song();
 //                            mySong.setId(id);

@@ -42,10 +42,11 @@ public class SongSubgroupController {
         return new ObjectMapper().writeValueAsString("OK");
     }
 
-    @GetMapping(value = "/readSongSubgroup/{songSubgroup}")
+    @GetMapping(value = "/read/{songSubgroup}")
     public @ResponseBody String readAllSubgroupManage(Model model, @PathVariable("songSubgroup") String gameId) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(gameId)).get();
+        //songSubgroup.getLyrics();
         return objectMapper.writeValueAsString(songSubgroup);
     }
 }

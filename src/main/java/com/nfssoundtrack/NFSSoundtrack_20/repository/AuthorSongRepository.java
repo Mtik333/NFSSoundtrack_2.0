@@ -2,10 +2,14 @@ package com.nfssoundtrack.NFSSoundtrack_20.repository;
 
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorAlias;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorSong;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Role;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 public interface AuthorSongRepository extends JpaRepository<AuthorSong,Integer> {
 
+    List<AuthorSong> findByAuthorAlias(AuthorAlias authorAlias);
+    List<AuthorSong> findByAuthorAliasAndRole(AuthorAlias authorAlias, Role role);
     AuthorSong findByAuthorAliasAndSong(AuthorAlias authorAlias, Song song);
 }

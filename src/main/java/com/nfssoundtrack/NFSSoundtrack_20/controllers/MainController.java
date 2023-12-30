@@ -43,12 +43,16 @@ public class MainController {
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
 //        model.addAttribute("songSubgroups",null);
 //        model.addAttribute("games", gameRepository.findAll());
+        model.addAttribute("author",null);
+        model.addAttribute("genre",null);
         return "redirect:/content/home";
     }
 
     @RequestMapping(value = "/manage")
     public String manage(Model model) {
         model.addAttribute("appName", appName);
+        model.addAttribute("author",null);
+        model.addAttribute("genre",null);
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
         model.addAttribute("games", gameRepository.findAll());
         return "manage";
@@ -60,6 +64,8 @@ public class MainController {
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
         model.addAttribute("games", gameRepository.findAll());
         model.addAttribute("login", true);
+        model.addAttribute("author",null);
+        model.addAttribute("genre",null);
         return "login";
     }
 
@@ -69,6 +75,8 @@ public class MainController {
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
         model.addAttribute("games", gameRepository.findAll());
         model.addAttribute("login", true);
+        model.addAttribute("author",null);
+        model.addAttribute("genre",null);
         return "login";
     }
     @RequestMapping(value = "/content/{value}")
@@ -78,6 +86,8 @@ public class MainController {
         model.addAttribute("htmlToInject",
                     contentRepository.findByContentShort(value).getContentData());
         model.addAttribute("songSubgroups",null);
+        model.addAttribute("author",null);
+        model.addAttribute("genre",null);
 //        response.sendRedirect("index");
         return "index";
     }
@@ -92,8 +102,11 @@ public class MainController {
             }
         }
         model.addAttribute("endpoint", "/game/"+gameshort);
+        model.addAttribute("game", game);
         model.addAttribute("gamegroups", game.getMainGroups());
         model.addAttribute("songSubgroups", allSongs);
+        model.addAttribute("author",null);
+        model.addAttribute("genre",null);
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
         //model.addAttribute("games", gameRepository.findAll());
         return "index";

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/css/own.css}">
+<h2 th:text="'Info about ' + ${author?.name}"></h2>
+<hr>
+<h3>All aliases</h3>
+<th:block th:each="singleAlias,iter : ${allAliases}">
+    <h5 th:text="${singleAlias.alias}"></h5>
+    <span th:remove="tag" th:text="${!iter.last ? ', ' : ''}"></span>
+</th:block>
+<h3>Associated countries</h3>
+<th:block th:each="authorCountry : ${author?.authorCountries}">
+    <img class="country-img" th:src="${authorCountry.country.countryLink}">
+</th:block>
+<h3>Songs written as Composer</h3>
+<th:block th:each="mapEntry : ${songsAsComposer}">
+    <h5 th:text="'Alias: ' + ${mapEntry.key}"></h5>
+    <th:block th:each="songSubgroup : ${mapEntry.value}">
+        <span
+            th:text="${songSubgroup.song.officialDisplayBand} + ' - ' + ${songSubgroup.song.officialDisplayTitle}"></span>
+        <div class="vr"></div>
+        <span>Associated genres:</span>
+        <th:block th:each="songGenre,iter : ${songSubgroup.song.songGenreList}">
+            <a class="table_link" th:text="${songGenre.genre.genreName}"
+                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                th:text="${!iter.last ? ', ' : ''}"></span>
+        </th:block>
+        <div class="vr"></div>
+        <span th:text="'Instrumental used? ' + ${songSubgroup.instrumental}"></span>
+        <div class="vr"></div>
+        <br>
+        <span>Used in games</span>
+        <table class="table table-hover table-striped">
+            <thead>
+                <th scope="col">Subgroup</th>
+                <th scope="col">Group</th>
+                <th scope="col">Game</th>
+            </thead>
+            <tbody>
+                <tr th:each="subgroup : ${songSubgroup.subgroup}">
+                    <td th:text=${subgroup.subgroupName}></td>
+                    <td th:text=${subgroup.mainGroup.groupName}></td>
+                    <td><a class="table_link" th:text="${subgroup.mainGroup.game.displayTitle}"
+                        th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+    </th:block>
+</th:block>
+<h3>Songs written as Subcomposer</h3>
+<h3>Songs remixed</h3>
+<h3>Songs "feat."</h3>
+
+</html>
