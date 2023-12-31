@@ -155,3 +155,10 @@ td.display-text {
 .scrollable-child {
   overflow-y: auto;
 }
+
+.playlist_play_it{
+    background: url("../images/znakwodny.png");
+}
+.playlist_disable_song{
+    background: url("../images/trashcan2.png");
+}

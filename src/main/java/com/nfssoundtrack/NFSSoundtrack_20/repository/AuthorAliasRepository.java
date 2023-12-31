@@ -11,4 +11,6 @@ public interface AuthorAliasRepository extends JpaRepository<AuthorAlias,Integer
 
     List<AuthorAlias> findByAuthor(Author author);
     AuthorAlias findByAlias(String alias);
+
+    List<AuthorAlias> findByAliasContains(String alias);
 }

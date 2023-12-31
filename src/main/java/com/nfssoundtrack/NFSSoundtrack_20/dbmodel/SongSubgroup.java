@@ -37,6 +37,18 @@ public class SongSubgroup implements Serializable {
     @Column(name="spotify_id")
     private String spotifyId;
 
+    @Column(name="deezer_id")
+    private String deezerId;
+
+    @Column(name="itunes_link")
+    private String itunesLink;
+
+    @Column(name="tidal_link")
+    private String tidalLink;
+
+    @Column(name="soundcloud_link")
+    private String soundcloudLink;
+
     @Column(name="ingame_display_band")
     private String ingameDisplayBand;
 
@@ -49,6 +61,9 @@ public class SongSubgroup implements Serializable {
     @Basic(fetch = FetchType.LAZY)
     @Column(name="lyrics")
     private String lyrics;
+
+    @Column(name="feat_title")
+    private Long featTitle;
     public Long getId() {
         return id;
     }
@@ -135,5 +150,45 @@ public class SongSubgroup implements Serializable {
 
     public void setLyrics(String lyrics) {
         this.lyrics = lyrics;
+    }
+
+    public String getDeezerId() {
+        return deezerId;
+    }
+
+    public void setDeezerId(String deezerId) {
+        this.deezerId = deezerId;
+    }
+
+    public String getItunesLink() {
+        return itunesLink;
+    }
+
+    public void setItunesLink(String itunesLink) {
+        this.itunesLink = itunesLink;
+    }
+
+    public String getTidalLink() {
+        return tidalLink;
+    }
+
+    public void setTidalLink(String tidalLink) {
+        this.tidalLink = tidalLink;
+    }
+
+    public String getSoundcloudLink() {
+        return soundcloudLink;
+    }
+
+    public void setSoundcloudLink(String soundcloudLink) {
+        this.soundcloudLink = soundcloudLink;
+    }
+
+    public Long getFeatTitle() {
+        return featTitle;
+    }
+
+    public void setFeatTitle(Long featTitle) {
+        this.featTitle = featTitle;
     }
 }

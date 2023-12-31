@@ -109,9 +109,12 @@ public class ArtistController {
         return "index";
     }
 
-    @GetMapping(value = "/aliasName/{input}")
-    public @ResponseBody String readAliases(Model model, @PathVariable("input") String input) throws JsonProcessingException {
+    @GetMapping(value="/authorAlias/{input}")
+    public @ResponseBody String readAliasesFromArtist(Model model, @PathVariable("input") String input) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
+        if (input.isEmpty()){
+            return objectMapper.writeValueAsString("[]");
+        }
         SimpleModule simpleModule = new SimpleModule();
         AuthorSong authorSong = authorSongRepository.findById(Integer.valueOf(input)).get();
         Author author = authorSong.getAuthorAlias().getAuthor();
@@ -122,6 +125,35 @@ public class ArtistController {
         return result;
     }
 
+
+    @GetMapping(value = "/aliasName/{input}")
+    public @ResponseBody String readAliases(Model model, @PathVariable("input") String input) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (input.isEmpty()){
+            return objectMapper.writeValueAsString("[]");
+        }
+//        SimpleModule simpleModule = new SimpleModule();
+//        AuthorSong authorSong = authorSongRepository.findById(Integer.valueOf(input)).get();
+//        Author author = authorSong.getAuthorAlias().getAuthor();
+//        List<AuthorAlias> authorAliases = authorAliasRepository.findByAuthor(author);
+//        simpleModule.addSerializer(AuthorAlias.class, new AuthorAliasSerializer(AuthorAlias.class));
+//        objectMapper.registerModule(simpleModule);
+//        String result = objectMapper.writeValueAsString(authorAliases);
+//        return result;
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(AuthorAlias.class, new AuthorAliasSerializer(AuthorAlias.class));
+        objectMapper.registerModule(simpleModule);
+        if (input.length() <= 3) {
+            AuthorAlias authorList = authorAliasRepository.findByAlias(input);
+            String result = objectMapper.writeValueAsString(Collections.singleton(authorList));
+            return result;
+        } else {
+            List<AuthorAlias> authorList = authorAliasRepository.findByAliasContains(input);
+            String result = objectMapper.writeValueAsString(authorList);
+            return result;
+        }
+    }
+
     @GetMapping(value = "/authorName/{input}")
     public @ResponseBody String readSpecialArtists(Model model, @PathVariable("input") String input) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -130,7 +162,7 @@ public class ArtistController {
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
             Author authorList = authorRepository.findByName(input);
-            String result = objectMapper.writeValueAsString(authorList);
+            String result = objectMapper.writeValueAsString(Collections.singleton(authorList));
             return result;
         } else {
             List<Author> authorList = authorRepository.findByNameContains(input);

@@ -232,7 +232,7 @@ $(document).ready(function () {
             type: "PUT",
             data: JSON.stringify(arrayOfModifiedSubgroupSongPositionDef),
             contentType: 'application/json; charset=utf-8',
-            url: "/songSubgroup/put/" + currentSubgroupId,
+            url: "/songSubgroup/positions/" + currentSubgroupId,
             success: function (ooo) {
                 console.log("eee");
                 $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {

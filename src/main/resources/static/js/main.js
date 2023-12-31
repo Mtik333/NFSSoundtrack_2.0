@@ -1,3 +1,4 @@
+var current_id = 0;
 $(document).ready(function () {
     $("#filter_games_menu").val("");
     /*$(document).find("span.display-text").each(function(e){
@@ -24,15 +25,28 @@ $(document).ready(function () {
 
     $('.play_icon').mouseover(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
-        baseVideoSrc = $(this).attr("data-tagVideo")+ "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
-        lyricsToDisplay = $(this).next().val();
+        baseVideoSrc = $(this).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
+        $("#lyricsCollapse").empty()
+        var lyricsTxt = $(this).next().text();
+        if (lyricsTxt == "null") {
+            $("#showLyrics").text("Lyrics not found");
+            $("#showLyrics").prop("disabled", true);
+        } else if (lyricsTxt == "0.0") {
+            $("#showLyrics").text("This is instrumental, no lyrics");
+            $("#showLyrics").prop("disabled", true);
+        } else {
+            $("#lyricsCollapse").append(lyricsTxt);
+            $("#showLyrics").prop("disabled", false);
+        }
     }).mouseout(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
     });
 
     $(document).find("div.accordion-collapse").each(function () {
         $(this).on('shown.bs.collapse', function () {
-            if ($("#filter_games_menu").val() > 3) {
+
+            //i think i should fix this somehow
+            if ($("#filter_games_menu").val() == "" || $("#filter_games_menu").val().length < 3) {
                 console.log($(this).offset());
                 var currentScroll = $('div.offcanvas-body').scrollTop();
                 var origTop = $('div.offcanvas-body').offset().top;
@@ -59,54 +73,100 @@ $(document).ready(function () {
         if (searchValue.length > 3) {
             $(document).find("button.gamegroup-button").filter(function () {
                 var divId = $(this).attr("data-bs-target");
-                if ($(this).text().toLowerCase() > -1 && !$(divId).hasClass("show")) {
+                if ($(divId).hasClass("show")) {
                     $(this).click();
+                    //actually should listen to event of collapsing this shit and then show all filtered stuff
+                }
+            });
+            setTimeout(function () {
+                funcToShowOnlyFilteredGames(searchValue);
+            }, 400);
+        } else {
+            var buttonToClick;
+            var divToShow;
+            $(document).find("button.gamegroup-button").filter(function () {
+                var divId = $(this).attr("data-bs-target");
+                if ($(divId).find("a.active").length > 0) {
+                    $(divId).find("a").filter(function () {
+                        $(this).show();
+                    });
+                    $(divId).parent().show();
+                    $(divId).collapse('show');
                 } else {
-                    var allA = $(divId).find("a");
-                    var somethingFound = false;
-                    for (let i = 0; i < allA.length; i++) {
-                        if ($(allA[i]).text().toLowerCase().indexOf(searchValue) > -1) {
-                            somethingFound = true;
-                            $(allA[i]).show();
-                        } else {
-                            $(allA[i]).hide();
-                        }
-                    }
-                    if (somethingFound) {
-                        if (!$(divId).is(":visible")){
-                            $(divId).parent().show();
-                        }
-                        if (!$(divId).hasClass("show")){
-                            $(this).click();
-                            $(this).removeClass("collapsed");
-                        }
-                    } else {
-                        $(divId).parent().hide();
-                        $(divId).removeClass("show");
+                    $(this).collapse('hide');
+                    $(divId).find("a").filter(function () {
+                        $(this).show();
+                    });
+                    $(divId).parent().show();
+                    $(divId).collapse('hide');
+                    if ($(divId).find("a.active").length > 0) {
+                        buttonToClick = $(this);
+                        divToShow = divId;
                     }
                 }
             });
-        } else {
-            $(document).find("button.gamegroup-button").filter(function () {
-                $(this).collapse('hide');
-                var divId = $(this).attr("data-bs-target");
-                $(divId).find("a").filter(function () {
-                    $(this).show();
-                });
-                var divId = $(this).attr("data-bs-target");
-                $(divId).parent().show();
-                $(divId).collapse('hide');
-            })
+            if (divToShow != undefined) {
+                $($(this).attr("data-bs-target")).parent().show();
+                if ($(divToShow).hasClass("collapsed")) {
+                    buttonToClick.click();
+                }
+                //$(this).show();
+            }
+
         }
     });
+
+
+    function funcToShowOnlyFilteredGames(searchValue) {
+        $(document).find("button.gamegroup-button").filter(function () {
+            var divId = $(this).attr("data-bs-target");
+            if ($(this).text().toLowerCase() > -1 && !$(divId).hasClass("show")) {
+                $(this).click();
+            } else {
+                var allA = $(divId).find("a");
+                var somethingFound = false;
+                for (let i = 0; i < allA.length; i++) {
+                    if ($(allA[i]).text().toLowerCase().indexOf(searchValue) > -1) {
+                        somethingFound = true;
+                        $(allA[i]).show();
+                    } else {
+                        $(allA[i]).hide();
+                    }
+                }
+                if (somethingFound) {
+                    // if ($(divId).find("a.active").length > 0) {
+                    //     $(divId).parent().show();
+                    //     $(this).removeClass("collapsed");
+                    //     console.log("???");
+                    // } else {
+                    if (!$(divId).is(":visible")) {
+                        $(divId).parent().show();
+                    }
+                    if (!$(divId).hasClass("show")) {
+                        $(this).click();
+                        $(this).removeClass("collapsed");
+                    }
+                    // }
+                } else {
+                    $(divId).parent().hide();
+                    $(divId).removeClass("show");
+                }
+            }
+        });
+    }
 
     $("#filter_songs").on("keyup", function () {
         var searchValue = $(this).val().toLowerCase();
         if (searchValue.length > 3) {
             $("#game_stuff").find("tr:has(td):not(.subgroup-separator)").filter(function () {
-                if ($(this).text().toLowerCase().indexOf(searchValue) > -1) {
+                if ($(this).find("td.band").text().toLowerCase().indexOf(searchValue) > -1
+                    || $(this).find("td.songtitle").text().toLowerCase().indexOf(searchValue) > -1) {
                     $(this).show();
-                } else {
+                }
+                // if ($(this).text().toLowerCase().indexOf(searchValue) > -1) {
+                //     $(this).show();
+                // } 
+                else {
                     $(this).hide();
                 }
             });
@@ -118,15 +178,11 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#showLyrics', function (e) {
-
-    });
-
-    $(document).on('click', '#showLyrics', function (e) {
         var divWithLyrics = $("#lyricsCollapse");
         var divContainer = divWithLyrics.parent();
         var videoContainer = divContainer.prev();
         var iframeContainer = videoContainer.children().first();
-        if ($(divContainer).hasClass("col-md-6")){
+        if ($(divContainer).hasClass("col-md-6")) {
             $(divContainer).removeAttr("style");
             $(divContainer).removeClass("col-md-6");
             $(divContainer).css("display", "none");
@@ -282,69 +338,45 @@ $(document).ready(function () {
         $("#video").attr('src', '');
     })
 
-    $('#spotifyModal').on('show.bs.modal', function (e) {    
+    $('#spotifyModal').on('show.bs.modal', function (e) {
         // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
-        $("#spotifyVideo").attr('src', "https://open.spotify.com/embed/playlist/"+$("#spotifyLink").attr('data-tagVideo'));
-        $("#spotify-ext").attr('href', "spotify:playlist:"+$("#spotifyLink").attr('data-tagVideo'));
+        $("#spotifyVideo").attr('src', "https://open.spotify.com/embed/playlist/" + $("#spotifyLink").attr('data-tagVideo'));
+        $("#spotify-ext").attr('href', "spotify:playlist:" + $("#spotifyLink").attr('data-tagVideo'));
     })
 
     $('#spotifyModal').on('hide.bs.modal', function (e) {
         $("#spotifyVideo").attr('src', '');
     })
 
-    $('#soundcloudModal').on('show.bs.modal', function (e) {    
+    $('#soundcloudModal').on('show.bs.modal', function (e) {
         // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
-        $("#soundcloudVideo").attr('src', "https://w.soundcloud.com/player/?url=https%253A//api.soundcloud.com/playlists/"+$("#soundcloudLink").attr('data-tagVideo')
-        +"&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true");
+        $("#soundcloudVideo").attr('src', "https://w.soundcloud.com/player/?url=https%253A//api.soundcloud.com/playlists/" + $("#soundcloudLink").attr('data-tagVideo')
+            + "&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true");
     })
 
     $('#soundcloudModal').on('hide.bs.modal', function (e) {
         $("#spotifyVideo").attr('src', '');
     })
 
-    $('#tidalModal').on('show.bs.modal', function (e) {    
+    $('#tidalModal').on('show.bs.modal', function (e) {
         // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
-        $("#tidalVideo").attr('src', "https://embed.tidal.com/playlists/"+$("#tidalLink").attr('data-tagVideo'));
-        $("#tidal-ext").attr('href', "https://listen.tidal.com/playlist/"+$("#tidalLink").attr('data-tagVideo'));
+        $("#tidalVideo").attr('src', "https://embed.tidal.com/playlists/" + $("#tidalLink").attr('data-tagVideo'));
+        $("#tidal-ext").attr('href', "https://listen.tidal.com/playlist/" + $("#tidalLink").attr('data-tagVideo'));
     })
 
     $('#tidalModal').on('hide.bs.modal', function (e) {
         $("#tidalVideo").attr('src', '');
     })
 
-    $('#deezerModal').on('show.bs.modal', function (e) {    
+    $('#deezerModal').on('show.bs.modal', function (e) {
         // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
-        $("#deezerVideo").attr('src', "https://widget.deezer.com/widget/auto/playlist/"+$("#deezerLink").attr('data-tagVideo'));
-        $("#deezer-ext").attr('href', "deezer://www.deezer.com/playlist/"+$("#deezerLink").attr('data-tagVideo'));
+        $("#deezerVideo").attr('src', "https://widget.deezer.com/widget/auto/playlist/" + $("#deezerLink").attr('data-tagVideo'));
+        $("#deezer-ext").attr('href', "deezer://www.deezer.com/playlist/" + $("#deezerLink").attr('data-tagVideo'));
     })
 
     $('#deezerModal').on('hide.bs.modal', function (e) {
         $("#deezerVideo").attr('src', '');
     })
-
-    /*
-    function autoPlayYouTubeModal() {
-        var triggerOpen = $('body').find('[data-tagVideo]');
-        triggerOpen.click(function () {
-            var theModal = $(this).data('bs-target'),
-                videoSRC = $(this).attr('data-tagVideo'),
-                videoSRCauto = 'https://www.youtube.com/embed/' + videoSRC + '?autoplay=1';
-            $('body').css('overflow', 'inherit');
-            $(theModal + ' iframe').attr('src', videoSRCauto);
-            $(theModal + ' button.btn-close').click(function () {
-                $(theModal + ' iframe').attr('src', videoSRC);
-            });
-            $('#videoModal').click(function (ev) {
-                var clickTarget = ev.originalEvent.target.className;
-                if (clickTarget == "modal-header"){
-                    return;
-                } if (clickTarget != "modal-body") {
-                    $(theModal + ' iframe').attr('src', videoSRC);
-                } 
-            });
-        });
-    }
-    */
 
     //when loading list of songs, we want to trigger main group by default
     console.log("freeman");
@@ -353,4 +385,98 @@ $(document).ready(function () {
         $(firstGameGroup).first().click();
         //we have to hit first subgroup in main group to have stuff displayed
     }
+
+    $('#disqusModal').on('show.bs.modal', function (e) {
+        if ($("#disqus_thread").children().length == 0) {
+            var script = document.createElement('script');
+            script.innerHTML = "(function () {  var d = document, s = d.createElement('script'); s.src = 'https://nfssoundtrack.disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date());(d.head || d.body).appendChild(s);})();";
+            var noscript = document.createElement('noscript');
+            noscript.innerHTML = 'Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>';
+            $(this).append(script);
+            $(this).append(noscript);
+        }
+    });
+
+    $('#playlistModeModal').on('show.bs.modal', function (e) {
+        initPlayer(0);
+    });
+
+    $('#playlistModeModal').on('hide.bs.modal', function (e) {
+        disablePlayer();
+    });
+    //this is some youtube player stuff below
+
+    function disablePlayer() {
+        $('#playlistModePlayer').html('');
+        $('#playlist_progress').empty();
+    }
+
+    function initPlayer(changeId) {
+        disablePlayer();
+        if (changeId >= 0) {
+            current_id = parseInt(changeId);
+        }
+        $("#game_stuff").find("tr:visible:not(.subgroup-separator)").each(function () {
+            var bandText = $(this).find("td.band").html();
+            var titleText = $(this).find("td.songtitle").html();
+            var youtubePlayIcon = $(this).find("img.play_icon");
+            if (youtubePlayIcon.length>0) {
+                var youtubeLink = youtubePlayIcon.attr("data-tagvideo")
+                    .replace("https://www.youtube.com/embed/", "");
+                var liElem = $('<li rel="' + youtubeLink + '"></li>');
+                liElem.append('<span class="playlist_play_it"><img width="25" height="25" src="/images/znakwodny.png"></span>');
+                liElem.append("<span>" + bandText + " - " + titleText + "</span>")
+                liElem.append('<span class="playlist_disable_song"><img width="25" height="25" src="/images/thrashcan2.png"></span>');
+                $("#playlist_progress").append(liElem);
+            }
+        })
+
+        var data_song = [];
+        i = 0;
+        $('#playlist_progress li').each(function () {
+            data_song[i] = $(this).attr("rel");
+            i++;
+        });
+        if (current_id >= i) {
+            current_id = 0;
+        }
+        if ($('#playlist_progress li:nth-child(' + (current_id + 1) + ')').hasClass("disabled")) {
+            initPlayer(current_id + 1);
+        } else {
+            $('#playlistModePlayer').html('<iframe id="player" type="text/html" src="https://www.youtube.com/embed/' + data_song[current_id] + '?enablejsapi=1&autoplay=1&autohide=0&theme=light&wmode=transparent" frameborder="0"></iframe>');
+            function onPlayerReady(event) {
+                event.target.playVideo();
+            }
+            function onPlayerStateChange(event) {
+                if (event.data === 0) {
+                    initPlayer(current_id + 1);
+                }
+            }
+            var player = new YT.Player('player', {
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+            var el = $('#playlist_progress li:nth-child(' + (current_id + 1) + ')');
+            var p = $('#playlist_progress');
+            $('#playlist_progress').animate({
+                scrollTop: p.scrollTop() + el.position().top - (p.height() / 2) + (el.height() / 2)
+            }, 300);
+            $('#playlist_progress li').removeClass("current");
+            $('#playlist_progress li:nth-child(' + (current_id + 1) + ')').addClass("current");
+        }
+    }
+    $(document).on("click", "#playlist_progress li:not(.current,.disabled) span.play_it", function () {
+        initPlayer(this.parentNode.id);
+    })
+
+
+    $(document).on("click", "#playlist_progress li .disable_song", function () {
+        if ($(this).parent().hasClass("disabled")) {
+            $(this).parent().removeClass("disabled");
+        } else {
+            $(this).parent().addClass("disabled");
+        }
+    });
 });

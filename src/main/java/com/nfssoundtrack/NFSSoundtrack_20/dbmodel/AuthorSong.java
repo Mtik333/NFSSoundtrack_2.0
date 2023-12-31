@@ -29,6 +29,11 @@ public class AuthorSong implements Serializable {
     @Column(name="role")
     private Role role;
 
+    @Column(name="remix_concat")
+    private String remixConcat;
+
+    @Column(name="feat_concat")
+    private String featConcat;
     public Long getId() {
         return id;
     }
@@ -59,5 +64,21 @@ public class AuthorSong implements Serializable {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getRemixConcat() {
+        return remixConcat;
+    }
+
+    public void setRemixConcat(String remixConcat) {
+        this.remixConcat = remixConcat;
+    }
+
+    public String getFeatConcat() {
+        return featConcat;
+    }
+
+    public void setFeatConcat(String featConcat) {
+        this.featConcat = featConcat;
     }
 }

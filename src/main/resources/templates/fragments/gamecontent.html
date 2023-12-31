@@ -3,31 +3,29 @@
 <link rel="stylesheet" th:href="@{/css/own.css}">
 <th:block th:if="${songSubgroups!=null && !songSubgroups.isEmpty()}">
     <div class="form-group pb-3 pt-3">
-        <span id="playlist_init" class="nfs-top-item" style="cursor:pointer;">Launch playlist mode</span>
+        <span id="playlist_init" class="nfs-top-item p-3" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#playlistModeModal">Launch playlist mode</span>
         <th:block th:if="${game.spotifyId!=null && game.spotifyId!=''}">
-            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal"
-            data-bs-target="#spotifyModal" id="spotifyLink"
-            th:attr="data-tagVideo=${game.spotifyId}">Launch Spotify playlist</span>
+            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#spotifyModal"
+                id="spotifyLink" th:attr="data-tagVideo=${game.spotifyId}">Launch Spotify playlist</span>
         </th:block>
         <th:block th:if="${game.tidalId!=null && game.tidalId!=''}">
-            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal"
-            data-bs-target="#tidalModal" id="tidalLink"
-            th:attr="data-tagVideo=${game.tidalId}">Launch Tidal playlist</span>
+            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#tidalModal"
+                id="tidalLink" th:attr="data-tagVideo=${game.tidalId}">Launch Tidal playlist</span>
         </th:block>
         <th:block th:if="${game.deezerId!=null && game.deezerId!=''}">
-            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal"
-            data-bs-target="#deezerModal" id="deezerLink"
-            th:attr="data-tagVideo=${game.deezerId}">Launch Deezer playlist</span>
+            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#deezerModal"
+                id="deezerLink" th:attr="data-tagVideo=${game.deezerId}">Launch Deezer playlist</span>
         </th:block>
         <th:block th:if="${game.soundcloudId!=null && game.soundcloudId!=''}">
             <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal"
-            data-bs-target="#soundcloudModal" id="soundcloudLink"
-            th:attr="data-tagVideo=${game.soundcloudId}">Launch SoundCloud playlist</span>
+                data-bs-target="#soundcloudModal" id="soundcloudLink"
+                th:attr="data-tagVideo=${game.soundcloudId}">Launch SoundCloud playlist</span>
         </th:block>
+        <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#disqusModal" id="disqusLink">Show Disqus comments</span>
     </div>
     <div class="form-group">
         <span>
-            <input id="filter_songs" maxlength="15" class="p-2" style="width: 100%"
+            <input id="filter_songs" maxlength="15" class="p-2 mb-2" style="width: 100%"
                 placeholder="Type minimum 3 characters to filter songs by author, song title or genre">
         </span>
     </div>
@@ -97,15 +95,15 @@
                                 <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
                                     <th:block
                                         th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
-                                        <td>
+                                        <td class="band">
                                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                                                 th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
                                         </td>
                                     </th:block>
                                 </th:block>
-                                <td>
+                                <td class="songtitle">
                                     <span
-                                        th:text="${songSubgroup.ingameDisplayTitle} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
+                                        th:text="${songSubgroup.ingameDisplayTitle!=null} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
                                     <th:block
                                         th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
                                         <span th:text="${iter.first ? '(feat. ' : ''}"></span><a
@@ -118,8 +116,10 @@
                                             th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
                                             <span th:text="${iter.first ? '(' : ''}"></span><a
                                                 th:href="'/author/'+${authorSong.authorAlias.id}"
-                                                th:text="${authorSong.authorAlias.alias}"></a><span
-                                                th:text="${iter.last ? ' Remix)' : ''}"></span>
+                                                th:text="${authorSong.authorAlias.alias}"></a>
+                                            <span
+                                                th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
+                                            <span th:text="${iter.last ? ' Remix)' : ''}"></span>
                                         </th:block>
                                     </th:block>
                                 </td>
@@ -147,9 +147,9 @@
                                 </td>
                                 <td>
                                     <th:block th:if="${songSubgroup.song.info!=null && songSubgroup.song.info!=''}">
-<a data-toggle="tooltip" th:title="${songSubgroup.song.info}">
-    <img th:src="@{/images/warn1.png}">
-</a>
+                                        <a data-toggle="tooltip" th:title="${songSubgroup.song.info}">
+                                            <img th:src="@{/images/warn1.png}">
+                                        </a>
                                     </th:block>
                                 </td>
                             </tr>
@@ -179,7 +179,6 @@
                         </div>
                         <div class="overflow-scroll" style="display: none;">
                             <div id="lyricsCollapse">
-                                Brings his election<br /><br />Brings his election<br /><br /><br /><br />Brings his election<br /><br />Brings his election<br /><br />Brings his election<br /><br />Brings his election<br /><br /><br /><br />Brings his election<br /><br /><br /><br />Metrolike<br /><br />Metrolike<br /><br />Metrolike<br /><br />Metrolike<br /><br /><br /><br />Metrolike<br /><br />Metrolike<br /><br />Metrolike<br /><br />Metrolike
                             </div>
                         </div>
                     </div>
@@ -199,7 +198,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="ratio ratio-16x9">
-                                <iframe src="" id="spotifyVideo" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                                <iframe src="" id="spotifyVideo" frameborder="0" allowtransparency="true"
+                                    allow="encrypted-media"></iframe>
                             </div>
                         </div>
                     </div>
@@ -208,7 +208,8 @@
         </div>
     </div>
 
-    <div class="modal fade" id="soundcloudModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="soundcloudModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
+        aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -218,7 +219,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="ratio ratio-16x9">
-                                <iframe src="" id="soundcloudVideo" width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay"></iframe>
+                                <iframe src="" id="soundcloudVideo" width="100%" height="300" scrolling="no"
+                                    frameborder="no" allow="autoplay"></iframe>
                             </div>
                         </div>
                     </div>
@@ -238,7 +240,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="ratio ratio-16x9">
-                                <iframe src="" id="tidalVideo" allowfullscreen="allowfullscreen" frameborder="0" ></iframe>
+                                <iframe src="" id="tidalVideo" allowfullscreen="allowfullscreen"
+                                    frameborder="0"></iframe>
                             </div>
                         </div>
                     </div>
@@ -258,7 +261,68 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="ratio ratio-16x9">
-                                <iframe title="deezer-widget" src="" id="deezerVideo" frameborder="0" allowtransparency="true" allow="encrypted-media; clipboard-write"></iframe>
+                                <iframe title="deezer-widget" src="" id="deezerVideo" frameborder="0"
+                                    allowtransparency="true" allow="encrypted-media; clipboard-write"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="playlistModeModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div id="playlistModePlayer" class="ratio ratio-16x9">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <ul id="playlist_progress"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="disqusModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="disqus_thread">
+                                <!-- <script>
+                                    /**
+                                    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+                                    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+                                    /*
+                                    var disqus_config = function () {
+                                    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+                                    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+                                    };
+                                    */
+                                    (function () { // DON'T EDIT BELOW THIS LINE
+                                        var d = document, s = d.createElement('script');
+                                        s.src = 'https://nfssoundtrack.disqus.com/embed.js';
+                                        s.setAttribute('data-timestamp', +new Date());
+                                        (d.head || d.body).appendChild(s);
+                                    })();
+                                </script>
+                                <noscript>Please enable JavaScript to view the <a
+                                        href="https://disqus.com/?ref_noscript">comments powered by
+                                        Disqus.</a></noscript> -->
                             </div>
                         </div>
                     </div>
@@ -268,7 +332,8 @@
     </div>
 </th:block>
 <th:block th:if="${songSubgroups!=null && songSubgroups.isEmpty()}">
-    <h2>No songs found, that's quite odd. Would you like to report it? Click the "Report problem" button from the top menu to proceed</h2>
+    <h2>No songs found, that's quite odd. Would you like to report it? Click the "Report problem" button from the top
+        menu to proceed</h2>
 </th:block>
 
 </html>
