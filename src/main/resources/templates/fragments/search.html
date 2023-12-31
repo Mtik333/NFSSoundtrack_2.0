@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/css/own.css}">
+<h2 th:text="'Search results for phrase: ' + ${searchPhrase}"></h2>
+<hr>
+<h3>All found authors / aliases</h3>
+<th:block th:each="authorAlias : ${authorAliases}">
+    <th:block th:if="${authorAlias.author.name == authorAlias.alias}">
+        <a class="table_link" th:href="'/author/'+${authorAlias.author.id}" th:text="${authorAlias.author.name}"></a><br>
+    </th:block>
+    <th:block th:if="${authorAlias.author.name != authorAlias.alias}">
+        <span th:text="${authorAlias.alias}+' (alias of: '"></span>
+        <a class="table_link" th:href="'/author/'+${authorAlias.author.id}" th:text="${authorAlias.author.name}"></a><br>
+    </th:block>
+</th:block>
+<hr>
+<h3>All found song titles</h3>
+<th:block th:each="song : ${songTitleList}">
+    <th:block th:each="authorSong,iter : ${song.authorSongList}">
+        <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
+            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                th:text="${authorSong.authorAlias.alias} "></a>
+            -
+            <span th:text="${song.officialDisplayTitle}"></span>
+        </th:block>
+    </th:block>
+    <th:block th:each="authorSong,iter : ${song.authorSongList.?[role.value=='FEAT']}">
+        <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
+            th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a><span
+            th:text="${iter.last ? ')' : ''}"></span>
+    </th:block>
+    <th:block th:each="authorSong,iter : ${song.authorSongList.?[role.value=='REMIX']}">
+        <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+            th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a>
+        <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
+        <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+    </th:block>
+    <br>
+</th:block>
+<hr>
+<h3>All found lyrics with this phrase</h3>
+<th:block th:each="song : ${songTitleList}">
+    <th:block th:each="authorSong,iter : ${song.authorSongList}">
+        <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
+            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                th:text="${authorSong.authorAlias.alias} "></a>
+            -
+            <span th:text="${song.officialDisplayTitle}"></span>
+        </th:block>
+    </th:block>
+    <th:block th:each="authorSong,iter : ${song.authorSongList.?[role.value=='FEAT']}">
+        <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
+            th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a><span
+            th:text="${iter.last ? ')' : ''}"></span>
+    </th:block>
+    <th:block th:each="authorSong,iter : ${song.authorSongList.?[role.value=='REMIX']}">
+        <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+            th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a>
+        <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
+        <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+    </th:block>
+    <br>
+</th:block>

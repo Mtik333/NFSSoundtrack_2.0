@@ -1,5 +1,6 @@
 var current_id = 0;
 $(document).ready(function () {
+    $("#searchStuff").tooltip({'trigger':'focus', 'title': 'Use quotation marks to search for entire phrase'});
     $("#filter_games_menu").val("");
     /*$(document).find("span.display-text").each(function(e){
         $(this).text().trim();
@@ -23,12 +24,29 @@ $(document).ready(function () {
         $("#nfs-top-home").parent().addClass("nfs-top-item-active");
     }
 
+    $("#filter_games_menu").on("click", function () {
+        $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
+        baseVideoSrc = $(this).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
+        $("#lyricsCollapse").empty()
+        var lyricsTxt = $(this).next().text();
+        if (lyricsTxt == "null" || lyricsTxt == "") {
+            $("#showLyrics").text("Lyrics not found");
+            $("#showLyrics").prop("disabled", true);
+        } else if (lyricsTxt == "0.0") {
+            $("#showLyrics").text("This is instrumental, no lyrics");
+            $("#showLyrics").prop("disabled", true);
+        } else {
+            $("#lyricsCollapse").append(lyricsTxt);
+            $("#showLyrics").prop("disabled", false);
+        }
+    });
+
     $('.play_icon').mouseover(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
         baseVideoSrc = $(this).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
         $("#lyricsCollapse").empty()
         var lyricsTxt = $(this).next().text();
-        if (lyricsTxt == "null") {
+        if (lyricsTxt == "null" || lyricsTxt == "") {
             $("#showLyrics").text("Lyrics not found");
             $("#showLyrics").prop("disabled", true);
         } else if (lyricsTxt == "0.0") {
@@ -401,46 +419,62 @@ $(document).ready(function () {
         initPlayer(0);
     });
 
+    $('#playlistModeModal').on('shown.bs.modal', function (e) {
+        var divWithVideo = $("#playlistModePlayer");
+        var divContainer = divWithVideo.parent();
+        var playlistContainer = divContainer.next();
+        var iframeContainer = divWithVideo.children().first();
+        $(playlistContainer).css("max-height", iframeContainer.height());
+        $(playlistContainer).css("overflow-y", "auto");
+    });
     $('#playlistModeModal').on('hide.bs.modal', function (e) {
-        disablePlayer();
+        disablePlayer(true);
     });
     //this is some youtube player stuff below
 
-    function disablePlayer() {
+    function disablePlayer(cleanDiv) {
         $('#playlistModePlayer').html('');
-        $('#playlist_progress').empty();
+        if (cleanDiv) {
+            $('#playlist_progress').empty();
+        }
     }
 
     function initPlayer(changeId) {
-        disablePlayer();
+        disablePlayer(false);
+        // var tbody = $('#playlistModePlayer').append("<tbody>");
         if (changeId >= 0) {
             current_id = parseInt(changeId);
         }
-        $("#game_stuff").find("tr:visible:not(.subgroup-separator)").each(function () {
-            var bandText = $(this).find("td.band").html();
-            var titleText = $(this).find("td.songtitle").html();
-            var youtubePlayIcon = $(this).find("img.play_icon");
-            if (youtubePlayIcon.length>0) {
-                var youtubeLink = youtubePlayIcon.attr("data-tagvideo")
-                    .replace("https://www.youtube.com/embed/", "");
-                var liElem = $('<li rel="' + youtubeLink + '"></li>');
-                liElem.append('<span class="playlist_play_it"><img width="25" height="25" src="/images/znakwodny.png"></span>');
-                liElem.append("<span>" + bandText + " - " + titleText + "</span>")
-                liElem.append('<span class="playlist_disable_song"><img width="25" height="25" src="/images/thrashcan2.png"></span>');
-                $("#playlist_progress").append(liElem);
-            }
-        })
-
+        var localI = 0;
+        if ($('#playlist_progress').is(":empty")) {
+            $("#game_stuff").find("tr:visible:not(.subgroup-separator)").each(function () {
+                var bandText = $(this).find("td.band").html();
+                var titleText = $(this).find("td.songtitle").html();
+                bandText = $.trim(bandText).replaceAll("\n", "").replaceAll("<span>", "").replaceAll("</span>", "").replaceAll("> ", ">");
+                titleText = $.trim(titleText).replaceAll("\n", "").replaceAll("<span>", "").replaceAll("</span>", "").replaceAll("> ", ">");
+                var youtubePlayIcon = $(this).find("img.play_icon");
+                if (youtubePlayIcon.length > 0) {
+                    var youtubeLink = youtubePlayIcon.attr("data-tagvideo")
+                        .replace("https://www.youtube.com/embed/", "");
+                    var trElem = $('<tr id="' + localI + '" rel="' + youtubeLink + '"></tr>');
+                    trElem.append('<td class="playlist_play_it"><img width="25" height="25" src="/images/znakwodny.png" style="background-color: transparent"></td>');
+                    trElem.append('<td class="playlist_row">' + bandText + ' - ' + titleText + '</td>');
+                    trElem.append('<td class="playlist_disable_song"><img width="25" height="25" src="/images/trashcan3.png" style="background-color: transparent"></td>');
+                    $("#playlist_progress").append(trElem);
+                    localI++;
+                }
+            })
+        }
         var data_song = [];
         i = 0;
-        $('#playlist_progress li').each(function () {
+        $('#playlist_progress tr').each(function () {
             data_song[i] = $(this).attr("rel");
             i++;
         });
         if (current_id >= i) {
             current_id = 0;
         }
-        if ($('#playlist_progress li:nth-child(' + (current_id + 1) + ')').hasClass("disabled")) {
+        if ($('#playlist_progress tr:nth-child(' + (current_id + 1) + ')').hasClass("disabled")) {
             initPlayer(current_id + 1);
         } else {
             $('#playlistModePlayer').html('<iframe id="player" type="text/html" src="https://www.youtube.com/embed/' + data_song[current_id] + '?enablejsapi=1&autoplay=1&autohide=0&theme=light&wmode=transparent" frameborder="0"></iframe>');
@@ -458,21 +492,30 @@ $(document).ready(function () {
                     'onStateChange': onPlayerStateChange
                 }
             });
-            var el = $('#playlist_progress li:nth-child(' + (current_id + 1) + ')');
+            var el = $('#playlist_progress tr:nth-child(' + (current_id + 1) + ')');
             var p = $('#playlist_progress');
             $('#playlist_progress').animate({
                 scrollTop: p.scrollTop() + el.position().top - (p.height() / 2) + (el.height() / 2)
             }, 300);
-            $('#playlist_progress li').removeClass("current");
-            $('#playlist_progress li:nth-child(' + (current_id + 1) + ')').addClass("current");
+            var previousTr = $('#playlist_progress tr');
+            previousTr.removeClass("current");
+            previousTr.find("td.playlist_disable_song").show();
+            previousTr.find("td.playlist_play_it").show();
+            previousTr.find("td.playlist_row").attr("colspan", 1);
+            var currentTr = $('#playlist_progress tr:nth-child(' + (current_id + 1) + ')');
+            currentTr.addClass("current");
+            currentTr.find("td.playlist_disable_song").hide();
+            currentTr.find("td.playlist_play_it").hide();
+            currentTr.find("td.playlist_row").attr("colspan", 3);
         }
     }
-    $(document).on("click", "#playlist_progress li:not(.current,.disabled) span.play_it", function () {
-        initPlayer(this.parentNode.id);
+    $(document).on("click", "td.playlist_play_it", function () {
+        if (!$(this).parent().hasClass("disabled")) {
+            initPlayer(this.parentNode.id);
+        }
     })
 
-
-    $(document).on("click", "#playlist_progress li .disable_song", function () {
+    $(document).on("click", "td.playlist_disable_song", function () {
         if ($(this).parent().hasClass("disabled")) {
             $(this).parent().removeClass("disabled");
         } else {

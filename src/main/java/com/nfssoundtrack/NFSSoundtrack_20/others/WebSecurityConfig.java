@@ -33,7 +33,7 @@ public class WebSecurityConfig {
                         .hasRole("ADMIN"))
                 .authorizeHttpRequests((requests) -> requests
                                 .requestMatchers("/*", "/content/*", "/css/*", "/js/*", "/images/*",
-                                        "/fragments/**", "/game/**", "/author/**", "/genre/**").permitAll()
+                                        "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**").permitAll()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")

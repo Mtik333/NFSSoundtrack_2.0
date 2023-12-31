@@ -41,65 +41,53 @@ public class ArtistController {
 
     @Autowired
     private SongSubgroupRepository songSubgroupRepository;
-    //    @GetMapping(value = "/readAll")
-//    public @ResponseBody String readAllSubgroupManage(Model model) throws JsonProcessingException {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        SimpleModule simpleModule = new SimpleModule();
-//        simpleModule.addSerializer(Author.class, new ArtistSerializer(Author.class));
-//        List<Author> authorList = authorRepository.findAll();
-//        objectMapper.registerModule(simpleModule);
-//        String result = objectMapper.writeValueAsString(authorList);
-//        return result;
-//    }
+
     @GetMapping(value = "/{authorId}")
     public String author(Model model, @PathVariable("authorId") String authorId) {
         Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
         List<AuthorAlias> allAliases = authorAliasRepository.findByAuthor(author);
         authorSongRepository.findByAuthorAlias(allAliases.get(0));
-        Map<String,List<SongSubgroup>> songsAsComposer2 = new HashMap<>();
-        Map<String,List<AuthorSong>> songsAsComposer = new HashMap<>();
-        Map<String,List<AuthorSong>> songsAsSubcomposer = new HashMap<>();
-        Map<String,List<AuthorSong>> songsAsFeat = new HashMap<>();
-        Map<String,List<AuthorSong>> songsRemixed = new HashMap<>();
+        Map<String,List<SongSubgroup>> songsAsComposer = new HashMap<>();
+        Map<String,List<SongSubgroup>> songsAsSubcomposer = new HashMap<>();
+        Map<String,List<SongSubgroup>> songsAsFeat = new HashMap<>();
+        Map<String,List<SongSubgroup>> songsRemixed = new HashMap<>();
         for (AuthorAlias authorAlias : allAliases){
            List<AuthorSong> allAuthorSongs = authorSongRepository.findByAuthorAlias(authorAlias);
            for (AuthorSong authorSong : allAuthorSongs){
+               List<SongSubgroup> songSubgroupList = songSubgroupRepository.findBySong(authorSong.getSong());
                if (Role.COMPOSER.equals(authorSong.getRole())){
-                   List<SongSubgroup> songSubgroupList = songSubgroupRepository.findBySong(authorSong.getSong());
                    if (songsAsComposer.get(authorAlias.getAlias())==null){
-                       songsAsComposer.put(authorAlias.getAlias(), new ArrayList<>(List.of(authorSong)));
-                       songsAsComposer2.put(authorAlias.getAlias(), new ArrayList<>(songSubgroupList));
+                       songsAsComposer.put(authorAlias.getAlias(), new ArrayList<>(songSubgroupList));
                    } else {
-                       songsAsComposer.get(authorAlias.getAlias()).add(authorSong);
-                       songsAsComposer2.get(authorAlias.getAlias()).addAll(songSubgroupList);
+                       songsAsComposer.get(authorAlias.getAlias()).addAll(songSubgroupList);
                    }
                }
                if (Role.SUBCOMPOSER.equals(authorSong.getRole())){
                    if (songsAsSubcomposer.get(authorAlias.getAlias())==null){
-                       songsAsSubcomposer.put(authorAlias.getAlias(),new ArrayList<>(List.of(authorSong)));
+                       songsAsSubcomposer.put(authorAlias.getAlias(), new ArrayList<>(songSubgroupList));
                    } else {
-                       songsAsSubcomposer.get(authorAlias.getAlias()).add(authorSong);
+                       songsAsSubcomposer.get(authorAlias.getAlias()).addAll(songSubgroupList);
                    }
                }
                if (Role.FEAT.equals(authorSong.getRole())){
                    if (songsAsFeat.get(authorAlias.getAlias())==null){
-                       songsAsFeat.put(authorAlias.getAlias(), new ArrayList<>(List.of(authorSong)));
+                       songsAsFeat.put(authorAlias.getAlias(), new ArrayList<>(songSubgroupList));
                    } else {
-                       songsAsFeat.get(authorAlias.getAlias()).add(authorSong);
+                       songsAsFeat.get(authorAlias.getAlias()).addAll(songSubgroupList);
                    }
                }
                if (Role.REMIX.equals(authorSong.getRole())){
                    if (songsRemixed.get(authorAlias.getAlias())==null){
-                       songsRemixed.put(authorAlias.getAlias(), new ArrayList<>(List.of(authorSong)));
+                       songsRemixed.put(authorAlias.getAlias(), new ArrayList<>(songSubgroupList));
                    } else {
-                       songsRemixed.get(authorAlias.getAlias()).add(authorSong);
+                       songsRemixed.get(authorAlias.getAlias()).addAll(songSubgroupList);
                    }
                }
            }
         }
         model.addAttribute("author", author);
         model.addAttribute("genre", null);
-        model.addAttribute("songsAsComposer", songsAsComposer2);
+        model.addAttribute("songsAsComposer", songsAsComposer);
         model.addAttribute("songsAsSubcomposer", songsAsSubcomposer);
         model.addAttribute("songsAsFeat", songsAsFeat);
         model.addAttribute("songsRemixed", songsRemixed);

@@ -14,5 +14,13 @@ public interface SongRepository extends JpaRepository<Song,Integer> {
     @EntityGraph(value="Song.authorSongList")
     List<Song> findByIdNotNull();
 
+    List<Song> findByLyrics(String lyrics);
+
+    List<Song> findByLyricsContains(String lyrics);
+
+    List<Song> findByOfficialDisplayTitle(String officialDisplayTitle);
+
+    List<Song> findByOfficialDisplayTitleContains(String officialDisplayTitle);
+
     List<Song> findByOfficialDisplayBandAndOfficialDisplayTitle(String officialDisplayBand, String officialDisplayTitle);
 }

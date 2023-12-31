@@ -3,28 +3,71 @@
 <link rel="stylesheet" th:href="@{/css/own.css}">
 <h3 th:text="'Songs classified with genre ' + ${genre?.genreName}"></h3>
 <table class="table table-hover table-striped">
-<thead>
-<th scope="col">Band</th>
-<th scope="col">Title</th>
-<th scope="col">Subgroup</th>
-<th scope="col">Group</th>
-<th scope="col">Game</th>
-</thead>
-<tbody>
-    <tr th:each="songSubgroup, iStat : ${genrePage?.content}">
-        <td th:text="${songSubgroup.song.officialDisplayBand}"></td>
-        <td th:text="${songSubgroup.song.officialDisplayTitle}"></td>
-        <td th:text="${songSubgroup.subgroup.subgroupName}"></td>
-        <td th:text="${songSubgroup.subgroup.mainGroup.groupName}"></td>
-        <td><a class="table_link" th:text="${songSubgroup.subgroup.mainGroup.game.displayTitle}"
-            th:href="'/game/'+${songSubgroup.subgroup.mainGroup.game.gameShort}"></a></td>
-    </tr>
-</tbody>
+    <thead>
+        <th scope="col">Band</th>
+        <th scope="col">Title</th>
+        <th scope="col">Subgroup</th>
+        <th scope="col">Group</th>
+        <th scope="col">Game</th>
+    </thead>
+    <tbody>
+        <tr th:each="songSubgroup : ${genrePage?.content}"
+            th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id}">
+            <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
+                <th:block
+                    th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
+                    <td class="band">
+                        <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                            th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
+                    </td>
+                </th:block>
+            </th:block>
+            <td class="songtitle">
+                <span
+                    th:text="${songSubgroup.ingameDisplayTitle!=null} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
+                <th:block
+                    th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
+                    <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
+                        th:href="'/author/'+${authorSong.authorAlias.id}"
+                        th:text="${authorSong.authorAlias.alias}"></a><span
+                        th:text="${iter.last ? ')' : ''}"></span>
+                </th:block>
+                <th:block th:if="${songSubgroup.remix.value=='YES'}">
+                    <th:block
+                        th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
+                        <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+                            th:href="'/author/'+${authorSong.authorAlias.id}"
+                            th:text="${authorSong.authorAlias.alias}"></a>
+                        <span
+                            th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
+                        <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+                    </th:block>
+                </th:block>
+            </td>
+            <td th:text="${songSubgroup.subgroup.subgroupName}"></td>
+            <td th:text="${songSubgroup.subgroup.mainGroup.groupName}"></td>
+            <td><a class="table_link" th:text="${songSubgroup.subgroup.mainGroup.game.displayTitle}"
+                    th:href="'/game/'+${songSubgroup.subgroup.mainGroup.game.gameShort}"></a></td>
+        </tr>
+        <!-- <tr th:each="songSubgroup, iStat : ${genrePage?.content}">
+            <td th:text="${songSubgroup.song.officialDisplayBand}"></td>
+            <td th:text="${songSubgroup.song.officialDisplayTitle}"></td>
+            <td th:text="${songSubgroup.subgroup.subgroupName}"></td>
+            <td th:text="${songSubgroup.subgroup.mainGroup.groupName}"></td>
+            <td><a class="table_link" th:text="${songSubgroup.subgroup.mainGroup.game.displayTitle}"
+                    th:href="'/game/'+${songSubgroup.subgroup.mainGroup.game.gameShort}"></a></td>
+        </tr> -->
+    </tbody>
 </table>
-<div th:if="${genrePage.totalPages > 0}" class="pagination"
-    th:each="pageNumber : ${pageNumbers}">
-    <a th:href="@{/read/(${genre.id})/(size=${genrePage.size}, page=${pageNumber})}"
-        th:text=${pageNumber}
-        th:class="${pageNumber==genrePage.number + 1} ? active"></a>
-</div>
+
+<nav th:if="${genrePage.totalPages > 0}" class="pagination" style="overflow-x: auto">
+    <ul class="pagination">
+        <li class="page-item" th:each="pageNumber : ${pageNumbers}">
+            <a th:href="@{/genre/read/{genreid}(genreid=${genre.id},size=${genrePage.size}, page=${pageNumber})}"
+                th:text=${pageNumber}
+                th:attr="class=${pageNumber==genrePage.number + 1} ? 'active page-link' : page-link"></a>
+        </li>
+    </ul>
+    </nav>
+
 </html>

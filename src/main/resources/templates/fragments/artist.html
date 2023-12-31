@@ -49,7 +49,111 @@
     </th:block>
 </th:block>
 <h3>Songs written as Subcomposer</h3>
+<th:block th:each="mapEntry : ${songsAsSubcomposer}">
+    <h5 th:text="'Alias: ' + ${mapEntry.key}"></h5>
+    <th:block th:each="songSubgroup : ${mapEntry.value}">
+        <span
+            th:text="${songSubgroup.song.officialDisplayBand} + ' - ' + ${songSubgroup.song.officialDisplayTitle}"></span>
+        <div class="vr"></div>
+        <span>Associated genres:</span>
+        <th:block th:each="songGenre,iter : ${songSubgroup.song.songGenreList}">
+            <a class="table_link" th:text="${songGenre.genre.genreName}"
+                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                th:text="${!iter.last ? ', ' : ''}"></span>
+        </th:block>
+        <div class="vr"></div>
+        <span th:text="'Instrumental used? ' + ${songSubgroup.instrumental}"></span>
+        <div class="vr"></div>
+        <br>
+        <span>Used in games</span>
+        <table class="table table-hover table-striped">
+            <thead>
+                <th scope="col">Subgroup</th>
+                <th scope="col">Group</th>
+                <th scope="col">Game</th>
+            </thead>
+            <tbody>
+                <tr th:each="subgroup : ${songSubgroup.subgroup}">
+                    <td th:text=${subgroup.subgroupName}></td>
+                    <td th:text=${subgroup.mainGroup.groupName}></td>
+                    <td><a class="table_link" th:text="${subgroup.mainGroup.game.displayTitle}"
+                        th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+    </th:block>
+</th:block>
 <h3>Songs remixed</h3>
+<th:block th:each="mapEntry : ${songsAsFeat}">
+    <h5 th:text="'Alias: ' + ${mapEntry.key}"></h5>
+    <th:block th:each="songSubgroup : ${mapEntry.value}">
+        <span
+            th:text="${songSubgroup.song.officialDisplayBand} + ' - ' + ${songSubgroup.song.officialDisplayTitle}"></span>
+        <div class="vr"></div>
+        <span>Associated genres:</span>
+        <th:block th:each="songGenre,iter : ${songSubgroup.song.songGenreList}">
+            <a class="table_link" th:text="${songGenre.genre.genreName}"
+                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                th:text="${!iter.last ? ', ' : ''}"></span>
+        </th:block>
+        <div class="vr"></div>
+        <span th:text="'Instrumental used? ' + ${songSubgroup.instrumental}"></span>
+        <div class="vr"></div>
+        <br>
+        <span>Used in games</span>
+        <table class="table table-hover table-striped">
+            <thead>
+                <th scope="col">Subgroup</th>
+                <th scope="col">Group</th>
+                <th scope="col">Game</th>
+            </thead>
+            <tbody>
+                <tr th:each="subgroup : ${songSubgroup.subgroup}">
+                    <td th:text=${subgroup.subgroupName}></td>
+                    <td th:text=${subgroup.mainGroup.groupName}></td>
+                    <td><a class="table_link" th:text="${subgroup.mainGroup.game.displayTitle}"
+                        th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+    </th:block>
+</th:block>
 <h3>Songs "feat."</h3>
-
+<th:block th:each="mapEntry : ${songsRemixed}">
+    <h5 th:text="'Alias: ' + ${mapEntry.key}"></h5>
+    <th:block th:each="songSubgroup : ${mapEntry.value}">
+        <span
+            th:text="${songSubgroup.song.officialDisplayBand} + ' - ' + ${songSubgroup.song.officialDisplayTitle}"></span>
+        <div class="vr"></div>
+        <span>Associated genres:</span>
+        <th:block th:each="songGenre,iter : ${songSubgroup.song.songGenreList}">
+            <a class="table_link" th:text="${songGenre.genre.genreName}"
+                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                th:text="${!iter.last ? ', ' : ''}"></span>
+        </th:block>
+        <div class="vr"></div>
+        <span th:text="'Instrumental used? ' + ${songSubgroup.instrumental}"></span>
+        <div class="vr"></div>
+        <br>
+        <span>Used in games</span>
+        <table class="table table-hover table-striped">
+            <thead>
+                <th scope="col">Subgroup</th>
+                <th scope="col">Group</th>
+                <th scope="col">Game</th>
+            </thead>
+            <tbody>
+                <tr th:each="subgroup : ${songSubgroup.subgroup}">
+                    <td th:text=${subgroup.subgroupName}></td>
+                    <td th:text=${subgroup.mainGroup.groupName}></td>
+                    <td><a class="table_link" th:text="${subgroup.mainGroup.game.displayTitle}"
+                        th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+    </th:block>
+</th:block>
 </html>

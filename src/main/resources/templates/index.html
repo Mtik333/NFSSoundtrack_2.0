@@ -33,14 +33,15 @@
         </div>
     </header>
     <div class="container-fluid">
-        <th:block th:insert="fragments/topmenu.html"></th:block>
+        <th:block th:insert="~{fragments/topmenu.html}"></th:block>
         <div class="row mx-auto">
-            <th:block th:insert="fragments/leftmenu.html"></th:block>
+            <th:block th:insert="~{fragments/leftmenu.html}"></th:block>
             <div class="col">
-                <div th:replace="fragments/topmenuentry.html"></div>
-                <div th:if="${gamegroups!=null}" th:replace="fragments/gamecontent.html"></div>
-                <div th:if="${author!=null}" th:include="fragments/artist.html"></div>
-                <div th:if="${genre!=null}" th:include="fragments/genre.html"></div>
+                <div th:replace="~{fragments/topmenuentry.html}"></div>
+                <div th:if="${gamegroups!=null}" th:replace="~{fragments/gamecontent.html}"></div>
+                <div th:if="${author!=null}" th:insert="~{fragments/artist.html}"></div>
+                <div th:if="${genre!=null}" th:insert="~{fragments/genre.html}"></div>
+                <div th:if="${search!=null}" th:insert="~{fragments/search.html}"></div>
             </div>
         </div>
     </div>

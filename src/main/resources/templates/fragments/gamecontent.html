@@ -3,7 +3,8 @@
 <link rel="stylesheet" th:href="@{/css/own.css}">
 <th:block th:if="${songSubgroups!=null && !songSubgroups.isEmpty()}">
     <div class="form-group pb-3 pt-3">
-        <span id="playlist_init" class="nfs-top-item p-3" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#playlistModeModal">Launch playlist mode</span>
+        <span id="playlist_init" class="nfs-top-item p-3" style="cursor:pointer;" data-bs-toggle="modal"
+            data-bs-target="#playlistModeModal">Launch playlist mode</span>
         <th:block th:if="${game.spotifyId!=null && game.spotifyId!=''}">
             <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#spotifyModal"
                 id="spotifyLink" th:attr="data-tagVideo=${game.spotifyId}">Launch Spotify playlist</span>
@@ -21,7 +22,8 @@
                 data-bs-target="#soundcloudModal" id="soundcloudLink"
                 th:attr="data-tagVideo=${game.soundcloudId}">Launch SoundCloud playlist</span>
         </th:block>
-        <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#disqusModal" id="disqusLink">Show Disqus comments</span>
+        <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#disqusModal"
+            id="disqusLink">Show Disqus comments</span>
     </div>
     <div class="form-group">
         <span>
@@ -106,7 +108,7 @@
                                         th:text="${songSubgroup.ingameDisplayTitle!=null} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
                                     <th:block
                                         th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
-                                        <span th:text="${iter.first ? '(feat. ' : ''}"></span><a
+                                        <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
                                             th:href="'/author/'+${authorSong.authorAlias.id}"
                                             th:text="${authorSong.authorAlias.alias}"></a><span
                                             th:text="${iter.last ? ')' : ''}"></span>
@@ -114,7 +116,7 @@
                                     <th:block th:if="${songSubgroup.remix.value=='YES'}">
                                         <th:block
                                             th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
-                                            <span th:text="${iter.first ? '(' : ''}"></span><a
+                                            <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
                                                 th:href="'/author/'+${authorSong.authorAlias.id}"
                                                 th:text="${authorSong.authorAlias.alias}"></a>
                                             <span
@@ -139,8 +141,21 @@
                                         </img>
                                         <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
                                         <th:block th:if="${songSubgroup.spotifyId != null}">
-                                            <a th:href="${songSubgroup.spotifyId}">
-                                                <img class="img-responsive" th:src="@{/images/spotify.png}">
+                                            <a th:href="${songSubgroup.spotifyId}" style="text-decoration:none;">
+                                                <img class="img-responsive" th:src="@{/images/spotify.png}" width="25"
+                                                    height="25">
+                                            </a>
+                                        </th:block>
+                                        <th:block th:if="${songSubgroup.deezerId != null}">
+                                            <a th:href="${songSubgroup.deezerId}" style="text-decoration:none;">
+                                                <img class="img-responsive" th:src="@{/images/deezer.png}" width="25"
+                                                    height="25">
+                                            </a>
+                                        </th:block>
+                                        <th:block th:if="${songSubgroup.itunesLink != null}">
+                                            <a th:href="${songSubgroup.itunesLink}" style="text-decoration:none;">
+                                                <img class="img-responsive" th:src="@{/images/itunes2.png}" width="25"
+                                                    height="25">
                                             </a>
                                         </th:block>
                                     </div>
@@ -276,6 +291,7 @@
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
+                    <h3>Playlist mode</h3>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -285,7 +301,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <ul id="playlist_progress"></ul>
+                            <table class="table table-bordered table-hover table-sm" id="playlist_progress"></table>
                         </div>
                     </div>
                 </div>

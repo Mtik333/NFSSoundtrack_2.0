@@ -155,10 +155,25 @@ td.display-text {
 .scrollable-child {
   overflow-y: auto;
 }
+body #playlist_progress tr.current {
+  background: #fbffc0 !important;
+}
+body #playlist_progress tr.disabled {
+  opacity: 0.35;
+}
+td.playlist_row > a.table_link{
+    background-color: transparent;
+    text-decoration: none;
+    color: rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));
+}
+td.playlist_play_it{
+    cursor: pointer;
+}
+td.playlist_disable_song{
+    cursor: pointer;
+}
+#flexSwitchCheckDefault{
+    margin-top: .75rem !important;
+}
 
-.playlist_play_it{
-    background: url("../images/znakwodny.png");
-}
-.playlist_disable_song{
-    background: url("../images/trashcan2.png");
-}
+

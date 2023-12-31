@@ -8,7 +8,7 @@
     </div>
     <div class="offcanvas-body py-0 px-0">
         <div class="accordion" id="accordionExample">
-            <input class="form-control" id="filter_games_menu" maxlength="15" placeholder="Search games (type min. 3 chars)" style="width: 100%">
+            <input class="form-control mt-2 mb-3" id="filter_games_menu" maxlength="15" placeholder="Search games (type min. 3 chars)" style="width: 100%">
             <th:block th:each="serie: ${series}">
                 <div class="accordion-item">
                     <h2 class="accordion-header" th:attr="id='heading-'+${serie.id}">
@@ -18,7 +18,7 @@
                         </button>
                     </h2>
                     <div class="accordion-collapse collapse list-group" th:attr="id='collapse-'+${serie.id}" data-bs-parent="#accordionExample">
-                            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small serie_class">
+                            <ul class="btn-toggle-nav list-unstyled fw-normal mb-0 small serie_class">
                                 <li th:each="game: ${serie.games}">
                                     <a href="#" class="list-group-item list-group-item-action game_class" th:href="'/game/'+${game.gameShort}" th:text="${game.gameTitle}"></a>
                                 </li>

@@ -1,51 +1,56 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<nav class="navbar navbar-expand-xxl navbar-light bg-light w-100">
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <button class="btn float-end nfs-top-item" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+<nav class="navbar navbar-expand-xxl navbar-light bg-light">
+    <div class="collapse navbar-collapse d-flex" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto d-inline ml-2">
+            <button class="btn nfs-top-item d-inline p-1" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"
+                role="button">
                 <span data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</span>
             </button>
-            <li class="nav-item nfs-top-item">
-                <a class="nav-link" id="nfs-top-home" th:href="@{/content/home}">Home</a>
+            <li class="btn nav-item nfs-top-item d-inline p-1">
+                <a class="nav-link d-inline p-1" id="nfs-top-home" th:href="@{/content/home}">Home</a>
             </li>
-            <li class="nav-item nfs-top-item">
-                <a class="nav-link" id="nfs-top-aboutus" th:href="@{/content/aboutus}">About us</a>
+            <li class="btn nav-item nfs-top-item d-inline p-1">
+                <a class="nav-link d-inline p-1" id="nfs-top-aboutus" th:href="@{/content/aboutus}">About us</a>
             </li>
-            <li class="nav-item nfs-top-item">
-                <a class="nav-link" id="nfs-top-donate" th:href="@{/content/donate}">Donate</a>
+            <li class="btn nav-item nfs-top-item d-inline p-1">
+                <a class="nav-link d-inline p-1" id="nfs-top-donate" th:href="@{/content/donate}">Donate</a>
             </li>
-            <li class="nav-item nfs-top-item">
-                <a class="nav-link" th:href="@{/content/cookies}">Privacy Policy & Cookies</a>
+            <li class="btn nav-item nfs-top-item d-inline p-1">
+                <a class="nav-link d-inline p-1" th:href="@{/content/cookies}">Privacy Policy</a>
             </li>
-            <li class="nav-item">
-                <div class="form-check form-switch pl-2 pt-2">
-                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-                <label class="form-check-label nfs-top-item" for="flexSwitchCheckDefault">Night mode</label>
-            </div>
+            <li class="btn nav-item d-inline p-1">
+                <div class="pl-2 pt-2 d-inline">
+                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                    <label class="form-check-label nfs-top-item d-inline" for="flexSwitchCheckDefault">Night
+                        mode</label>
+                </div>
             </li>
-            <li class="nav-item nfs-top-item">
-                <a class="nav-link" href="#">Advanced search</a>
+            <li class="btn nav-item nfs-top-item d-inline p-1">
+                <a class="nav-link d-inline p-1" href="#">Advanced search</a>
             </li>
-            <li class="nav-item nfs-top-item">
-                <a class="nav-link" href="#">Preferences</a>
+            <li class="btn nav-item nfs-top-item d-inline p-1">
+                <a class="nav-link d-inline p-1" href="#">Preferences</a>
             </li>
             <th:block sec:authorize="isAuthenticated()">
-                <li class="nav-item nfs-top-item">
-                    <a class="nav-link" th:href="@{/manage}">Manage</a>
+                <li class="btn nav-item nfs-top-item d-inline p-1">
+                    <a class="nav-link d-inline p-1" th:href="@{/manage}">Manage</a>
                 </li>
-                <li class="nav-item nfs-top-item">
-                    <a class="nav-link disabled" th:href="@{/logout}" href="#">Sign out</a>
+                <li class="btn nav-item nfs-top-item d-inline p-1">
+                    <a class="nav-link d-inline p-1 disabled" th:href="@{/logout}" href="#">Sign out</a>
                 </li>
             </th:block>
-            <li class="nav-item nfs-top-item">
-                <a class="nav-link" href="#">Report problem</a>
+            <li class="btn nav-item nfs-top-item d-inline p-1">
+                <a class="nav-link d-inline p-1" href="#">Report problem</a>
+            </li>
+            <li class="btn d-inline p-1">
+                <form th:action="@{/search/basic}" method="get" class="d-inline p-1">
+                    <input class="form-control me-2 d-inline" name="searchData" id="searchStuff" type="search" placeholder="Search" aria-label="Search"></input>
+                    <button class="btn btn-outline-success nav-item nfs-top-item" type="submit">Search</button>
+                </form>
             </li>
         </ul>
-        <form class="d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
     </div>
 </nav>
+
 </html>
