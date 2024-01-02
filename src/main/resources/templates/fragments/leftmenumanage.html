@@ -2,9 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <div class="col-xl-auto flex-nowrap list-group list-group-flush overflow-auto vh-100">
     <input class="filter_games" maxlength="15" placeholder="Search games (type min. 3 chars)">
+    <button id="manage-countries" type="submit" class="btn btn-primary mt-2">Manage countries</button>
+    <button id="reposition-series" type="submit" class="btn btn-primary mt-2">Manage series</button>
+    <button id="manage-artists" type="submit" class="btn btn-primary mt-2">Manage artists</button>
     <ul class="nav-item list-group-item ps-0" th:each="serie: ${series}">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
-                th:attr="data-bs-target='#id'+${serie.id}" aria-expanded="false">
+            th:attr="data-bs-target='#id'+${serie.id}" aria-expanded="false">
             <span th:text="${serie.name}"></span>
         </button>
         <div class="collapse" th:attr="id='id'+${serie.id}" style="">
@@ -12,17 +15,22 @@
                 <li class="nav-item" th:each="game: ${serie.games}">
                     <div class="dropdown .container-fluid">
                         <button class="btn dropdown-toggle w-90 text-start" type="button" id="dropdownMenuButton"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                th:text="${game.gameTitle}">
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                            th:text="${game.gameTitle}">
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="manage reposition-series dropdown-item" href="#" th:attr="data-gameId=${game.id}">Reposition series</a>
-                            <a class="manage reposition-games dropdown-item" href="#" th:attr="data-gameId=${game.id}">Reposition games in serie</a>
-                            <a class="manage edit-series dropdown-item" href="#" th:attr="data-gameId=${game.id}">Edit serie</a>
-                            <a class="manage edit-game dropdown-item" href="#" th:attr="data-gameId=${game.id}">Edit game</a>
-                            <a class="manage manage-groups dropdown-item" href="#" th:attr="data-gameId=${game.id}">Manage groups</a>
-                            <a class="manage manage-subgroups dropdown-item" href="#" th:attr="data-gameId=${game.id}">Manage subgroups</a>
-                            <a class="manage manage-songs dropdown-item" href="#" th:attr="data-gameId=${game.id}">Manage songs</a>
+                            <a class="manage manage-groups dropdown-item" href="#"
+                                th:attr="data-gameId=${game.id}">Manage groups</a>
+                            <a class="manage manage-subgroups dropdown-item" href="#"
+                                th:attr="data-gameId=${game.id}">Manage subgroups</a>
+                            <a class="manage manage-songs dropdown-item" href="#"
+                                th:attr="data-gameId=${game.id}">Manage songs</a>
+                            <a class="manage reposition-games dropdown-item" href="#"
+                                th:attr="data-gameId=${game.id}">Reposition games in serie</a>
+                            <a class="manage edit-series dropdown-item" href="#" th:attr="data-gameId=${game.id}">Edit
+                                serie</a>
+                            <a class="manage edit-game dropdown-item" href="#" th:attr="data-gameId=${game.id}">Edit
+                                game</a>
                         </div>
                     </div>
                 </li>
@@ -30,4 +38,5 @@
         </div>
     </ul>
 </div>
+
 </html>

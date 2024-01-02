@@ -2,33 +2,36 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <link rel="stylesheet" th:href="@{/css/own.css}">
 <th:block th:if="${songSubgroups!=null && !songSubgroups.isEmpty()}">
-    <div class="form-group pb-3 pt-3">
-        <span id="playlist_init" class="nfs-top-item p-3" style="cursor:pointer;" data-bs-toggle="modal"
-            data-bs-target="#playlistModeModal">Launch playlist mode</span>
+    <div class="form-group pb-2 pt-2">
+        <span id="playlist_init" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+            data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
         <th:block th:if="${game.spotifyId!=null && game.spotifyId!=''}">
-            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#spotifyModal"
-                id="spotifyLink" th:attr="data-tagVideo=${game.spotifyId}">Launch Spotify playlist</span>
+            <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+                data-bs-target="#spotifyModal" id="spotifyLink" th:attr="data-tagVideo=${game.spotifyId}"
+                th:text="#{launchSpotify}"></span>
         </th:block>
         <th:block th:if="${game.tidalId!=null && game.tidalId!=''}">
-            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#tidalModal"
-                id="tidalLink" th:attr="data-tagVideo=${game.tidalId}">Launch Tidal playlist</span>
+            <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+                data-bs-target="#tidalModal" id="tidalLink" th:attr="data-tagVideo=${game.tidalId}"
+                th:text="#{launchTidal}"></span>
         </th:block>
         <th:block th:if="${game.deezerId!=null && game.deezerId!=''}">
-            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#deezerModal"
-                id="deezerLink" th:attr="data-tagVideo=${game.deezerId}">Launch Deezer playlist</span>
+            <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+                data-bs-target="#deezerModal" id="deezerLink" th:attr="data-tagVideo=${game.deezerId}"
+                th:text="#{launchDeezer}"></span>
         </th:block>
         <th:block th:if="${game.soundcloudId!=null && game.soundcloudId!=''}">
-            <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal"
-                data-bs-target="#soundcloudModal" id="soundcloudLink"
-                th:attr="data-tagVideo=${game.soundcloudId}">Launch SoundCloud playlist</span>
+            <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+                data-bs-target="#soundcloudModal" id="soundcloudLink" th:attr="data-tagVideo=${game.soundcloudId}"
+                th:text="#{launchSoundcloud}"></span>
         </th:block>
-        <span class="p-3 nfs-top-item" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#disqusModal"
-            id="disqusLink">Show Disqus comments</span>
+        <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+            data-bs-target="#disqusModal" id="disqusLink" th:text="#{showDisqus}"></span>
     </div>
     <div class="form-group">
         <span>
             <input id="filter_songs" maxlength="15" class="p-2 mb-2" style="width: 100%"
-                placeholder="Type minimum 3 characters to filter songs by author, song title or genre">
+                th:placeholder="#{filterSongs}">
         </span>
     </div>
     <div class="tabbable boxed parentTabs">
@@ -56,11 +59,11 @@
             <thead>
                 <tr>
                     <th scope="col"></th>
-                    <th scope="col">Country</th>
-                    <th scope="col">Band</th>
-                    <th scope="col">Song</th>
-                    <th scope="col">Genre</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col" th:text="#{country}"></th>
+                    <th scope="col" th:text="#{band}"></th>
+                    <th scope="col" th:text="#{song}"></th>
+                    <th scope="col" th:text="#{genre}"></th>
+                    <th scope="col" th:text="#{actions}"></th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -94,15 +97,34 @@
                                     </th:block>
 
                                 </td>
-                                <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
-                                    <th:block
-                                        th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
-                                        <td class="band">
+                                <td class="band">
+                                    <!-- <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
+                                        <th:block th:if="${authorSong.role.value=='COMPOSER'}">
+                                            <a class="table_link"
+                                                th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                                                th:text="${songSubgroup.ingameDisplayBand!=null} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
+                                        </th:block>
+                                        <th:block
+                                            th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
+                                            <span
+                                                th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
                                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                                                th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
-                                        </td>
+                                                th:text="${authorSong.authorAlias.alias}"></a>
+                                        </th:block>
+                                    </th:block> -->
+                                    <th:block
+                                        th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='COMPOSER']}">
+                                        <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                                            th:text="${songSubgroup.ingameDisplayBand!=null} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
                                     </th:block>
-                                </th:block>
+                                    <th:block
+                                        th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
+                                        <span
+                                            th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                                        <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                                            th:text="${authorSong.authorAlias.alias}"></a>
+                                    </th:block>
+                                </td>
                                 <td class="songtitle">
                                     <span
                                         th:text="${songSubgroup.ingameDisplayTitle!=null} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
@@ -181,7 +203,9 @@
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" id="showLyrics" class="btn btn-light">Lyrics</button>
+                    <button type="button" id="showLyrics" class="btn btn-outline-info"
+                        th:attr="data-lyricsMissing=#{lyricsMissing},data-instrumental=#{thisIsInstrumental}"
+                        th:text="#{lyrics}"></button>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -206,7 +230,7 @@
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <a href="" id="spotify-ext" class="btn btn-light text-success">Launch in Spotify</a>
+                    <a href="" id="spotify-ext" class="btn btn-outline-info" th:text="#{launchInSpotify}"></a>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -248,7 +272,8 @@
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <a href="" id="tidal-ext" target="_blank" class="btn btn-light text-dark">Launch in Tidal</a>
+                    <a href="" id="tidal-ext" target="_blank" class="btn btn-outline-info"
+                        th:text="#{launchInTidal}"></a>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -269,7 +294,7 @@
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <a href="" id="deezer-ext" class="btn btn-light text-muted">Launch in Deezer</a>
+                    <a href="" id="deezer-ext" class="btn btn-outline-info" th:text="#{launchInDeezer}"></a>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -291,7 +316,7 @@
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Playlist mode</h3>
+                    <h3 th:text="#{playlistMode}"></h3>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

@@ -6,11 +6,13 @@
 <h3>All found authors / aliases</h3>
 <th:block th:each="authorAlias : ${authorAliases}">
     <th:block th:if="${authorAlias.author.name == authorAlias.alias}">
-        <a class="table_link" th:href="'/author/'+${authorAlias.author.id}" th:text="${authorAlias.author.name}"></a><br>
+        <a class="table_link" th:href="'/author/'+${authorAlias.author.id}"
+            th:text="${authorAlias.author.name}"></a><br>
     </th:block>
     <th:block th:if="${authorAlias.author.name != authorAlias.alias}">
         <span th:text="${authorAlias.alias}+' (alias of: '"></span>
-        <a class="table_link" th:href="'/author/'+${authorAlias.author.id}" th:text="${authorAlias.author.name}"></a><br>
+        <a class="table_link" th:href="'/author/'+${authorAlias.author.id}"
+            th:text="${authorAlias.author.name}"></a><br>
     </th:block>
 </th:block>
 <hr>

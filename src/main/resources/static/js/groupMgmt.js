@@ -72,8 +72,8 @@ $(document).ready(function () {
         var divWithCols = $('<div class="row"></div>');
         var targetId = $(e.target).attr('data-subgroupPosition');
         targetId++;
-        divWithCols.append('<div class="col-sm w-80"><input type="text" class="form-control subGroups" id="subGroups-' + targetId + '" data-subgroupPosition="'+targetId+'" placeholder="Subgroup name"></div>');
-        divWithCols.append('<div class="col-sm"><input type="text" value="'+targetId+'" readonly></input><button id="add-subgroup" data-subgroupPosition="'+targetId+'" type="submit" class="btn btn-success">+</button><button id="delete-subgroup" type="submit" class="btn btn-danger">X</button></div>');
+        divWithCols.append('<div class="col-sm w-80"><input type="text" class="form-control subGroups" id="subGroups-' + targetId + '" data-subgroupPosition="' + targetId + '" placeholder="Subgroup name"></div>');
+        divWithCols.append('<div class="col-sm"><input type="text" value="' + targetId + '" readonly></input><button id="add-subgroup" data-subgroupPosition="' + targetId + '" type="submit" class="btn btn-success">+</button><button id="delete-subgroup" type="submit" class="btn btn-danger">X</button></div>');
         $(divWithCols).insertAfter(e.target.parentElement.parentElement);
 
     });
@@ -90,32 +90,32 @@ $(document).ready(function () {
         console.log(e);
         var divToAppend = $('#nfs-content');
         divToAppend.empty();
-        var formAppend = $('<div id="content-edit-group" data-groupId="'+groupToEdit.id+'">');
+        var formAppend = $('<div id="content-edit-group" data-groupId="' + groupToEdit.id + '">');
         divToAppend.append(formAppend);
         formAppend.append('<div class="form-group">');
         formAppend.append('<label for="groupName">Group name</label>');
         var groupNameInput = $('<input type="text" class="form-control w-80" id="groupName" value="' + groupToEdit.groupName + '">');
-        if (groupNameInput.val()=="All"){
-            groupNameInput.prop("disabled",true);
+        if (groupNameInput.val() == "All") {
+            groupNameInput.prop("disabled", true);
         }
         formAppend.append(groupNameInput);
         formAppend.append('<div id="div-subGroups" class="form-group">');
         formAppend.append('<label for="subGroups">Subgroups</label>');
         for (let i = 0; i < groupToEdit.subgroups.length; i++) {
             var divWithCols = $('<div class="row">');
-            var subgroupInput = $('<input type="text" class="form-control subGroups" id="subGroups-' + i + '" data-subGroupId="' + groupToEdit.subgroups[i].id + '" data-subgroupPosition="'+groupToEdit.subgroups[i].position+'" value="' + groupToEdit.subgroups[i].subgroupName + '">');
+            var subgroupInput = $('<input type="text" class="form-control subGroups" id="subGroups-' + i + '" data-subGroupId="' + groupToEdit.subgroups[i].id + '" data-subgroupPosition="' + groupToEdit.subgroups[i].position + '" value="' + groupToEdit.subgroups[i].subgroupName + '">');
             var inputRowDiv = $('<div class="col-sm w-80">');
-            if (subgroupInput.val()=="All"){
-                subgroupInput.prop("disabled",true);
+            if (subgroupInput.val() == "All") {
+                subgroupInput.prop("disabled", true);
             }
             inputRowDiv.append(subgroupInput)
             divWithCols.append(inputRowDiv);
-            divWithCols.append('<div class="col-sm"><input type="text" class="group-position" value="'+groupToEdit.subgroups[i].position+'"><button id="add-subgroup" type="submit" data-subgroupPosition="'+groupToEdit.subgroups[i].position+'" class="btn btn-success">+</button><button type="button" id="delete-subgroup" data-subGroupId="' + groupToEdit.subgroups[i].id + '" class="btn btn-danger">X</button></div>');
+            divWithCols.append('<div class="col-sm"><input type="text" class="group-position" value="' + groupToEdit.subgroups[i].position + '"><button id="add-subgroup" type="submit" data-subgroupPosition="' + groupToEdit.subgroups[i].position + '" class="btn btn-success">+</button><button type="button" id="delete-subgroup" data-subGroupId="' + groupToEdit.subgroups[i].id + '" class="btn btn-danger">X</button></div>');
             formAppend.append(divWithCols);
             //text-decoration-line-through
         }
         formAppend.append('<div class="form-group">');
-        formAppend.append('<button id="update-subgroups" data-groupId="'+groupToEdit.id+'" type="submit" class="btn btn-primary">Submit</button>');
+        formAppend.append('<button id="update-subgroups" data-groupId="' + groupToEdit.id + '" type="submit" class="btn btn-primary">Submit</button>');
         formAppend.append('<button id="cancel-group" type="submit" class="btn btn-primary">Cancel</button>');
         divToAppend.append(successAlertHtml);
     });
@@ -126,8 +126,8 @@ $(document).ready(function () {
 
     $(document).on('click', '#delete-subgroup', function (e) {
         var subgroupInput = $($(this).parent().parent()).find('input')[0];
-        if ($(subgroupInput).attr('data-subgroupId')!=undefined){
-            if (subgroupInput.value!="All"){
+        if ($(subgroupInput).attr('data-subgroupId') != undefined) {
+            if (subgroupInput.value != "All") {
                 $(subgroupInput).addClass('text-decoration-line-through');
             }
         } else {
@@ -137,7 +137,7 @@ $(document).ready(function () {
 
     $(document).on('click', '#submit-group', function (e) {
         var subgroups = $("#new-group").find('input.subGroups').map(function (idx, elem) {
-            return $(elem).val()+"_POS_"+$(elem).attr("data-subgroupPosition");
+            return $(elem).val() + "_POS_" + $(elem).attr("data-subgroupPosition");
         }).get();
         var formData = {
             groupName: $('#groupName').val(),
@@ -173,12 +173,12 @@ $(document).ready(function () {
     $(document).on('click', '#update-subgroups', function (e) {
         var groupId = $(this).attr('data-groupId');
         var subgroups = $('#content-edit-group').find('input.subGroups').map(function (idx, elem) {
-            var returnVal = $(elem).val()+"_POS_"+$(elem).attr("data-subgroupPosition");
-            if ($(elem).attr('data-subgroupId')!=undefined){
-                if ($(elem).hasClass('text-decoration-line-through')){
-                    return $(elem).attr('data-subgroupId')+"-DELETE-"+"_POS_"+$(elem).attr("data-subgroupPosition");
+            var returnVal = $(elem).val() + "_POS_" + $(elem).attr("data-subgroupPosition");
+            if ($(elem).attr('data-subgroupId') != undefined) {
+                if ($(elem).hasClass('text-decoration-line-through')) {
+                    return $(elem).attr('data-subgroupId') + "-DELETE-" + "_POS_" + $(elem).attr("data-subgroupPosition");
                 } else {
-                    return $(elem).attr('data-subgroupId')+"-UPDATE-"+returnVal+"_POS_"+$(elem).attr("data-subgroupPosition");
+                    return $(elem).attr('data-subgroupId') + "-UPDATE-" + returnVal + "_POS_" + $(elem).attr("data-subgroupPosition");
                 }
             }
             else return returnVal;

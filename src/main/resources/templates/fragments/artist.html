@@ -1,12 +1,12 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <link rel="stylesheet" th:href="@{/css/own.css}">
-<h2 th:text="'Info about ' + ${author?.name}"></h2>
+<h2 th:text="#{infoAbout}+' '+${author?.name}"></h2>
 <hr>
 <h3>All aliases</h3>
 <th:block th:each="singleAlias,iter : ${allAliases}">
-    <h5 th:text="${singleAlias.alias}"></h5>
-    <span th:remove="tag" th:text="${!iter.last ? ', ' : ''}"></span>
+    <h5 class="d-inline" th:text="${singleAlias.alias}"></h5><span th:remove="tag"
+        th:text="${!iter.last ? ', ' : ''}"></span>
 </th:block>
 <h3>Associated countries</h3>
 <th:block th:each="authorCountry : ${author?.authorCountries}">
@@ -41,7 +41,7 @@
                     <td th:text=${subgroup.subgroupName}></td>
                     <td th:text=${subgroup.mainGroup.groupName}></td>
                     <td><a class="table_link" th:text="${subgroup.mainGroup.game.displayTitle}"
-                        th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
+                            th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
                 </tr>
             </tbody>
         </table>
@@ -77,7 +77,7 @@
                     <td th:text=${subgroup.subgroupName}></td>
                     <td th:text=${subgroup.mainGroup.groupName}></td>
                     <td><a class="table_link" th:text="${subgroup.mainGroup.game.displayTitle}"
-                        th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
+                            th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
                 </tr>
             </tbody>
         </table>
@@ -113,7 +113,7 @@
                     <td th:text=${subgroup.subgroupName}></td>
                     <td th:text=${subgroup.mainGroup.groupName}></td>
                     <td><a class="table_link" th:text="${subgroup.mainGroup.game.displayTitle}"
-                        th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
+                            th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
                 </tr>
             </tbody>
         </table>
@@ -149,11 +149,12 @@
                     <td th:text=${subgroup.subgroupName}></td>
                     <td th:text=${subgroup.mainGroup.groupName}></td>
                     <td><a class="table_link" th:text="${subgroup.mainGroup.game.displayTitle}"
-                        th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
+                            th:href="'/game/'+${subgroup.mainGroup.game.gameShort}"></a></td>
                 </tr>
             </tbody>
         </table>
         <br>
     </th:block>
 </th:block>
+
 </html>

@@ -7,6 +7,7 @@ import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @Controller
 
-public class MainController {
+public class MainController implements ErrorController {
 
     @Value("${spring.application.name}")
     String appName;
@@ -103,6 +104,7 @@ public class MainController {
         }
         model.addAttribute("endpoint", "/game/"+gameshort);
         model.addAttribute("game", game);
+        model.addAttribute("appName", game.getDisplayTitle() + " soundtrack at NFSSoundtrack.com");
         model.addAttribute("gamegroups", game.getMainGroups());
         model.addAttribute("songSubgroups", allSongs);
         model.addAttribute("author",null);
@@ -112,4 +114,14 @@ public class MainController {
         return "index";
     }
 
+    @RequestMapping("/error")
+    public String handleError(Model model) {
+        //do something like logging
+        model.addAttribute("appName", "Error NFSSoundtrack.com");
+        //List<Serie> series = serieRepository.findAll();
+        //model.addAttribute("series", serieRepository.findAll());
+        //serieRepository.findByIdNotNull();
+        model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
+        return "error";
+    }
 }

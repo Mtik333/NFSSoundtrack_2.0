@@ -15,12 +15,18 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig {
+public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -33,7 +39,8 @@ public class WebSecurityConfig {
                         .hasRole("ADMIN"))
                 .authorizeHttpRequests((requests) -> requests
                                 .requestMatchers("/*", "/content/*", "/css/*", "/js/*", "/images/*",
-                                        "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**").permitAll()
+                                        "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
+                                        "/serie/**", "/country/**", "/gamedb/**").permitAll()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
@@ -65,6 +72,24 @@ public class WebSecurityConfig {
         return new InMemoryUserDetailsManager(admin, user1);
     }
 
+    @Bean
+    public LocaleResolver localeResolver() {
+        SessionLocaleResolver slr = new SessionLocaleResolver();
+        slr.setDefaultLocale(Locale.US);
+        return slr;
+    }
+
+    @Bean
+    public LocaleChangeInterceptor localeChangeInterceptor() {
+        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+        lci.setParamName("lang");
+        return lci;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(localeChangeInterceptor());
+    }
 //    @Bean
 //    CorsConfigurationSource corsConfigurationSource() {
 //        CorsConfiguration configuration = new CorsConfiguration();

@@ -207,9 +207,9 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#recounterPositions', function (e) {
-        $("#subgroups-table").find("tr").filter(function(index){
+        $("#subgroups-table").find("tr").filter(function (index) {
             var cps = $($(this).find("input")[0]).prop('checked')
-            return $($(this).find("input")[0]).prop('checked')==true;
+            return $($(this).find("input")[0]).prop('checked') == true;
         }).each(function (index) {
             $($(this).find("input")[1]).val((index + 1) * 10);
         });
@@ -252,7 +252,7 @@ $(document).ready(function () {
 
     $(document).on('focusout', '.songSubgroupPosition', sortTable);
 
-    function sortTable(){
+    function sortTable() {
         var $tbody = $('#subgroups-table tbody');
         $("#subgroups-table").find('tr').sort(function (a, b) {
             var tda = parseInt($($(a).find("input")[1]).val()); // target order attribute

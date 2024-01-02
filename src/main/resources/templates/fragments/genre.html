@@ -1,21 +1,20 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <link rel="stylesheet" th:href="@{/css/own.css}">
-<h3 th:text="'Songs classified with genre ' + ${genre?.genreName}"></h3>
+<h3 th:text="#{songsWithGenre}+' '+${genre?.genreName}"></h3>
 <table class="table table-hover table-striped">
     <thead>
-        <th scope="col">Band</th>
-        <th scope="col">Title</th>
-        <th scope="col">Subgroup</th>
-        <th scope="col">Group</th>
-        <th scope="col">Game</th>
+        <th scope="col" th:text="#{band}"></th>
+        <th scope="col" th:text="#{song}"></th>
+        <th scope="col" th:text="#{subgroup}"></th>
+        <th scope="col" th:text="#{group}"></th>
+        <th scope="col" th:text="#{game}"></th>
     </thead>
     <tbody>
         <tr th:each="songSubgroup : ${genrePage?.content}"
             th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id}">
             <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
-                <th:block
-                    th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
+                <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
                     <td class="band">
                         <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                             th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
@@ -25,21 +24,17 @@
             <td class="songtitle">
                 <span
                     th:text="${songSubgroup.ingameDisplayTitle!=null} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
-                <th:block
-                    th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
+                <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
                     <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
                         th:href="'/author/'+${authorSong.authorAlias.id}"
-                        th:text="${authorSong.authorAlias.alias}"></a><span
-                        th:text="${iter.last ? ')' : ''}"></span>
+                        th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
                 </th:block>
                 <th:block th:if="${songSubgroup.remix.value=='YES'}">
-                    <th:block
-                        th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
+                    <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
                         <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
                             th:href="'/author/'+${authorSong.authorAlias.id}"
                             th:text="${authorSong.authorAlias.alias}"></a>
-                        <span
-                            th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
+                        <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
                         <span th:text="${iter.last ? ' Remix)' : ''}"></span>
                     </th:block>
                 </th:block>
@@ -68,6 +63,6 @@
                 th:attr="class=${pageNumber==genrePage.number + 1} ? 'active page-link' : page-link"></a>
         </li>
     </ul>
-    </nav>
+</nav>
 
 </html>

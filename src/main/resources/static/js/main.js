@@ -1,7 +1,15 @@
 var current_id = 0;
+
 $(document).ready(function () {
-    $("#searchStuff").tooltip({'trigger':'focus', 'title': 'Use quotation marks to search for entire phrase'});
+
+    $("#searchStuff").tooltip({ 'trigger': 'focus', 'title': $("#searchStuff").attr("data-tooltip") });
     $("#filter_games_menu").val("");
+    $("#flexSwitchCheckDefault").change(function (e) {
+        localStorage.setItem("dark-mode", $(this).prop("checked"));
+        changeStuffForDarkMode();
+    });
+
+
     /*$(document).find("span.display-text").each(function(e){
         $(this).text().trim();
     })*/
@@ -24,38 +32,38 @@ $(document).ready(function () {
         $("#nfs-top-home").parent().addClass("nfs-top-item-active");
     }
 
-    $("#filter_games_menu").on("click", function () {
-        $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
-        baseVideoSrc = $(this).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
-        $("#lyricsCollapse").empty()
-        var lyricsTxt = $(this).next().text();
-        if (lyricsTxt == "null" || lyricsTxt == "") {
-            $("#showLyrics").text("Lyrics not found");
-            $("#showLyrics").prop("disabled", true);
-        } else if (lyricsTxt == "0.0") {
-            $("#showLyrics").text("This is instrumental, no lyrics");
-            $("#showLyrics").prop("disabled", true);
-        } else {
-            $("#lyricsCollapse").append(lyricsTxt);
-            $("#showLyrics").prop("disabled", false);
-        }
-    });
+    // $(".play_icon").on("click", function () {
+    //     $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
+    //     baseVideoSrc = $(this).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
+    //     $("#lyricsCollapse").empty()
+    //     var lyricsTxt = $(this).next().text();
+    //     if (lyricsTxt == "null" || lyricsTxt == "") {
+    //         $("#showLyrics").text("Lyrics not found");
+    //         $("#showLyrics").prop("disabled", true);
+    //     } else if (lyricsTxt == "0.0") {
+    //         $("#showLyrics").text("This is instrumental, no lyrics");
+    //         $("#showLyrics").prop("disabled", true);
+    //     } else {
+    //         $("#lyricsCollapse").append(lyricsTxt);
+    //         $("#showLyrics").prop("disabled", false);
+    //     }
+    // });
 
     $('.play_icon').mouseover(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
-        baseVideoSrc = $(this).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
-        $("#lyricsCollapse").empty()
-        var lyricsTxt = $(this).next().text();
-        if (lyricsTxt == "null" || lyricsTxt == "") {
-            $("#showLyrics").text("Lyrics not found");
-            $("#showLyrics").prop("disabled", true);
-        } else if (lyricsTxt == "0.0") {
-            $("#showLyrics").text("This is instrumental, no lyrics");
-            $("#showLyrics").prop("disabled", true);
-        } else {
-            $("#lyricsCollapse").append(lyricsTxt);
-            $("#showLyrics").prop("disabled", false);
-        }
+        // baseVideoSrc = $(this).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
+        // $("#lyricsCollapse").empty()
+        // var lyricsTxt = $(this).next().text();
+        // if (lyricsTxt == "null" || lyricsTxt == "") {
+        //     $("#showLyrics").text("Lyrics not found");
+        //     $("#showLyrics").prop("disabled", true);
+        // } else if (lyricsTxt == "0.0") {
+        //     $("#showLyrics").text("This is instrumental, no lyrics");
+        //     $("#showLyrics").prop("disabled", true);
+        // } else {
+        //     $("#lyricsCollapse").append(lyricsTxt);
+        //     $("#showLyrics").prop("disabled", false);
+        // }
     }).mouseout(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
     });
@@ -349,6 +357,21 @@ $(document).ready(function () {
 
     $('#videoModal').on('show.bs.modal', function (e) {
         // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
+        var myImgSource = e.relatedTarget;
+        $(myImgSource).attr("src", $(myImgSource).attr("src").replace("znakwodny2", "znakwodny"));
+        baseVideoSrc = $(myImgSource).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
+        $("#lyricsCollapse").empty()
+        var lyricsTxt = $(myImgSource).next().text();
+        if (lyricsTxt == "null" || lyricsTxt == "") {
+            $("#showLyrics").text($("#showLyrics").attr("data-lyricsMissing"));
+            $("#showLyrics").prop("disabled", true);
+        } else if (lyricsTxt == "0.0") {
+            $("#showLyrics").text($("#showLyrics").attr("data-instrumental"));
+            $("#showLyrics").prop("disabled", true);
+        } else {
+            $("#lyricsCollapse").append(lyricsTxt);
+            $("#showLyrics").prop("disabled", false);
+        }
         $("#video").attr('src', baseVideoSrc);
     })
 

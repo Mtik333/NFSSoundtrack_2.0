@@ -1,56 +1,92 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<nav class="navbar navbar-expand-xxl navbar-light bg-light">
+<nav id="topNavbar" class="navbar navbar-expand-xxl navbar-light bg-light">
     <div class="collapse navbar-collapse d-flex" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto d-inline ml-2">
             <button class="btn nfs-top-item d-inline p-1" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"
                 role="button">
-                <span data-bs-toggle="offcanvas" data-bs-target="#offcanvas">Menu</span>
+                <span data-bs-toggle="offcanvas" data-bs-target="#offcanvas" th:text="#{menu}"></span>
             </button>
-            <li class="btn nav-item nfs-top-item d-inline p-1">
-                <a class="nav-link d-inline p-1" id="nfs-top-home" th:href="@{/content/home}">Home</a>
+            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+                <a class="nav-link d-inline p-1" id="nfs-top-home" th:href="@{/content/home}" th:text="#{home}"></a>
             </li>
-            <li class="btn nav-item nfs-top-item d-inline p-1">
-                <a class="nav-link d-inline p-1" id="nfs-top-aboutus" th:href="@{/content/aboutus}">About us</a>
+            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+                <a class="nav-link d-inline p-1" id="nfs-top-aboutus" th:href="@{/content/aboutus}"
+                    th:text="#{about}"></a>
             </li>
-            <li class="btn nav-item nfs-top-item d-inline p-1">
-                <a class="nav-link d-inline p-1" id="nfs-top-donate" th:href="@{/content/donate}">Donate</a>
+            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+                <a class="nav-link d-inline p-1" id="nfs-top-donate" th:href="@{/content/donate}"
+                    th:text="#{donate}"></a>
             </li>
-            <li class="btn nav-item nfs-top-item d-inline p-1">
-                <a class="nav-link d-inline p-1" th:href="@{/content/cookies}">Privacy Policy</a>
+            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+                <a class="nav-link d-inline p-1" th:href="@{/content/cookies}" th:text="#{privacy}"></a>
             </li>
-            <li class="btn nav-item d-inline p-1">
+            <li class="btn nav-item d-inline-block p-1">
                 <div class="pl-2 pt-2 d-inline">
                     <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-                    <label class="form-check-label nfs-top-item d-inline" for="flexSwitchCheckDefault">Night
-                        mode</label>
+                    <label class="form-check-label nfs-top-item d-inline" for="flexSwitchCheckDefault"
+                        th:text="#{night}"></label>
                 </div>
             </li>
-            <li class="btn nav-item nfs-top-item d-inline p-1">
-                <a class="nav-link d-inline p-1" href="#">Advanced search</a>
+            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+                <a class="nav-link d-inline p-1" href="#" th:text="#{advancedSearch}"></a>
             </li>
-            <li class="btn nav-item nfs-top-item d-inline p-1">
-                <a class="nav-link d-inline p-1" href="#">Preferences</a>
+            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+                <a class="nav-link d-inline p-1" href="#" data-bs-toggle="modal" data-bs-target="#preferencesModal"
+                    th:text="#{preferences}"></a>
             </li>
             <th:block sec:authorize="isAuthenticated()">
-                <li class="btn nav-item nfs-top-item d-inline p-1">
+                <li class="btn nav-item nfs-top-item d-inline-block p-1">
                     <a class="nav-link d-inline p-1" th:href="@{/manage}">Manage</a>
                 </li>
-                <li class="btn nav-item nfs-top-item d-inline p-1">
+                <li class="btn nav-item nfs-top-item d-inline-block p-1">
                     <a class="nav-link d-inline p-1 disabled" th:href="@{/logout}" href="#">Sign out</a>
                 </li>
             </th:block>
-            <li class="btn nav-item nfs-top-item d-inline p-1">
-                <a class="nav-link d-inline p-1" href="#">Report problem</a>
+            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+                <a class="nav-link d-inline p-1" href="#" th:text="#{problem}"></a>
             </li>
-            <li class="btn d-inline p-1">
+            <li class="btn d-inline-block p-1">
                 <form th:action="@{/search/basic}" method="get" class="d-inline p-1">
-                    <input class="form-control me-2 d-inline" name="searchData" id="searchStuff" type="search" placeholder="Search" aria-label="Search"></input>
-                    <button class="btn btn-outline-success nav-item nfs-top-item" type="submit">Search</button>
+                    <input class="form-control me-2 d-inline" name="searchData" id="searchStuff" type="search"
+                        th:attr="data-tooltip=#{searchTooltip}" th:placeholder="#{search}"></input>
+                    <button class="btn btn-outline-success nav-item nfs-top-item" type="submit"
+                        th:text="#{search}"></button>
                 </form>
             </li>
         </ul>
     </div>
 </nav>
+<script>
+    changeStuffForDarkMode();
+    $("#flexSwitchCheckDefault").prop("checked", localStorage.getItem("dark-mode"));
+</script>
+<div class="modal fade" id="preferencesModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 th:text="#{preferences}"></h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="lang-select">Select language</label>
+                    </div>
+                    <div class="col-md-9">
+                        <select class="form-select" id="lang-select" aria-label="Set language">
+                            <option selected value="en">English</option>
+                            <option value="jp">Japanese</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    Disable automatic scrolling of menu (default no)
+                    Width of expandable menu: (default 25%)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </html>

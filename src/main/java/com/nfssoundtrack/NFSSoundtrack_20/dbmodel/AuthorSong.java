@@ -34,6 +34,9 @@ public class AuthorSong implements Serializable {
 
     @Column(name="feat_concat")
     private String featConcat;
+
+    @Column(name="subcomposer_concat")
+    private String subcomposerConcat;
     public Long getId() {
         return id;
     }
@@ -80,5 +83,13 @@ public class AuthorSong implements Serializable {
 
     public void setFeatConcat(String featConcat) {
         this.featConcat = featConcat;
+    }
+
+    public String getSubcomposerConcat() {
+        return subcomposerConcat;
+    }
+
+    public void setSubcomposerConcat(String subcomposerConcat) {
+        this.subcomposerConcat = subcomposerConcat;
     }
 }
