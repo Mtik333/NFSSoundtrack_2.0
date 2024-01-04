@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<link rel="stylesheet" th:href="@{/css/own.css}">
+<link rel="stylesheet" th:href="@{/css/own.css}" type="text/css">
 <h3 th:text="#{songsWithGenre}+' '+${genre?.genreName}"></h3>
 <th:block th:if="${#lists.size(songSubgroupList)>=50 and readFull!=null}">
     <h5 th:text="#{listOfSongsOver50}"></h5>
@@ -122,5 +122,5 @@ aria-hidden="true">
     </div>
 </div>
 </div>
-<script th:src="@{/js/genre.js}"></script>
+<script th:src="@{/js/genre.js}" type="application/javascript"></script>
 </html>

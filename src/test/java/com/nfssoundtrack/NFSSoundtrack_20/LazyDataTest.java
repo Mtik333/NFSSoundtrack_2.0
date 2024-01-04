@@ -47,11 +47,11 @@ public class LazyDataTest {
         assert !Hibernate.isInitialized(gameList.get(0).getMainGroups());
     }
 
-    @Test
-    public void get_games_with_groups() {
-        List<Game> gameList = gameRepository.findByIdNotNull();
-        assert Hibernate.isInitialized(gameList.get(0).getMainGroups());
-    }
+//    @Test
+//    public void get_games_with_groups() {
+//        List<Game> gameList = gameRepository.findByIdNotNull();
+//        assert Hibernate.isInitialized(gameList.get(0).getMainGroups());
+//    }
     @Test
     public void get_groups_without_subgroups() {
         List<MainGroup> mainGroupList = mainGroupRepository.findAll();

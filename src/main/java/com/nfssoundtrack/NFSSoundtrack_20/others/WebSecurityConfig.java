@@ -38,7 +38,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/manage", "/manage#", "/maingroup/**", "/songSubgroup/**", "/subgroup/**")
                         .hasRole("ADMIN"))
                 .authorizeHttpRequests((requests) -> requests
-                                .requestMatchers("/*", "/content/*", "/css/*", "/js/*", "/images/*",
+                                .requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
                                         "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
                                         "/serie/**", "/country/**", "/gamedb/**", "/custom/**").permitAll()
                 )
