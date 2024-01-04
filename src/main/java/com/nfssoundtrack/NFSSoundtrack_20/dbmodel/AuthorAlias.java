@@ -1,25 +1,24 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
 
-@Entity(name="author_alias")
+@Entity(name = "author_alias")
 public class AuthorAlias implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable=false)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @JsonManagedReference
-    @OneToOne(optional=false)
-    @JoinColumn(name="author_id")
+    @OneToOne(optional = false)
+    @JoinColumn(name = "author_id")
     private Author author;
 
-    @Column(name="alias")
+    @Column(name = "alias")
     private String alias;
 
     public Long getId() {

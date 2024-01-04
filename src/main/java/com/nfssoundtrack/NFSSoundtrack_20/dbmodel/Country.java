@@ -4,18 +4,18 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 
-@Entity(name="country")
+@Entity(name = "country")
 public class Country implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(name="countryname")
+    @Column(name = "countryname")
     private String countryName;
 
-    @Column(name="countrylink")
+    @Column(name = "countrylink")
     private String countryLink;
 
     public Long getId() {

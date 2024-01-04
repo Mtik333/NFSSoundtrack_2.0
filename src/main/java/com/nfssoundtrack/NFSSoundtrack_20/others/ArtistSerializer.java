@@ -15,8 +15,8 @@ public class ArtistSerializer extends StdSerializer<Author> {
     @Override
     public void serialize(Author author, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeNumberField("value",author.getId());
-        jsonGenerator.writeStringField("label",author.getName());
+        jsonGenerator.writeNumberField("value", author.getId());
+        jsonGenerator.writeStringField("label", author.getName());
         jsonGenerator.writeEndObject();
     }
 }

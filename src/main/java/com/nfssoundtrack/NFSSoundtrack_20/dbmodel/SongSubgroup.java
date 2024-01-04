@@ -5,68 +5,69 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 
-@Entity(name="song_subgroup")
+@Entity(name = "song_subgroup")
 public class SongSubgroup implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
     //@JsonBackReference
-    @OneToOne(optional=false)
-    @JoinColumn(name="song_id")
+    @OneToOne(optional = false)
+    @JoinColumn(name = "song_id")
     private Song song;
 
     @JsonBackReference
-    @OneToOne(optional=false,fetch = FetchType.LAZY)
-    @JoinColumn(name="subgroup_id")
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "subgroup_id")
     private Subgroup subgroup;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="instrumental")
+    @Column(name = "instrumental")
     private Instrumental instrumental;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="remix")
+    @Column(name = "remix")
     private Remix remix;
 
-    @Column(name="src_id")
+    @Column(name = "src_id")
     private String srcId;
 
-    @Column(name="spotify_id")
+    @Column(name = "spotify_id")
     private String spotifyId;
 
-    @Column(name="deezer_id")
+    @Column(name = "deezer_id")
     private String deezerId;
 
-    @Column(name="itunes_link")
+    @Column(name = "itunes_link")
     private String itunesLink;
 
-    @Column(name="tidal_link")
+    @Column(name = "tidal_link")
     private String tidalLink;
 
-    @Column(name="soundcloud_link")
+    @Column(name = "soundcloud_link")
     private String soundcloudLink;
 
-    @Column(name="ingame_display_band")
+    @Column(name = "ingame_display_band")
     private String ingameDisplayBand;
 
-    @Column(name="ingame_display_title")
+    @Column(name = "ingame_display_title")
     private String ingameDisplayTitle;
 
-    @Column(name="position")
+    @Column(name = "position")
     private Long position;
 
     @Basic(fetch = FetchType.LAZY)
-    @Column(name="lyrics")
+    @Column(name = "lyrics")
     private String lyrics;
 
-    @Column(name="info")
+    @Column(name = "info")
     private String info;
 
-    @Column(name="feat_title")
+    @Column(name = "feat_title")
     private Long featTitle;
+
     public Long getId() {
         return id;
     }
@@ -194,6 +195,7 @@ public class SongSubgroup implements Serializable {
     public void setInfo(String info) {
         this.info = info;
     }
+
     public Long getFeatTitle() {
         return featTitle;
     }

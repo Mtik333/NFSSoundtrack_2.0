@@ -5,43 +5,41 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-@Entity(name="song")
+@Entity(name = "song")
 @NamedEntityGraph(name = "Song.authorSongList", attributeNodes = @NamedAttributeNode("authorSongList"))
 public class Song implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(name="officialdisplayband")
+    @Column(name = "officialdisplayband")
     private String officialDisplayBand;
 
-    @Column(name="officialdisplaytitle")
+    @Column(name = "officialdisplaytitle")
     private String officialDisplayTitle;
 
-    @Column(name="src_id")
+    @Column(name = "src_id")
     private String srcId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="multi_concat")
+    @Column(name = "multi_concat")
     private MultiConcat multiConcat;
 
     @Basic(fetch = FetchType.LAZY)
-    @Column(name="lyrics")
+    @Column(name = "lyrics")
     private String lyrics;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "song",fetch = FetchType.LAZY)
-    private List<AuthorSong> authorSongList=new ArrayList<>();
+    @OneToMany(mappedBy = "song", fetch = FetchType.LAZY)
+    private List<AuthorSong> authorSongList = new ArrayList<>();
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "song",fetch = FetchType.LAZY)
-    private List<SongGenre> songGenreList=new ArrayList<>();
+    @OneToMany(mappedBy = "song", fetch = FetchType.LAZY)
+    private List<SongGenre> songGenreList = new ArrayList<>();
 
     public Long getId() {
         return id;

@@ -7,7 +7,7 @@ import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Serie;
 
 import java.io.IOException;
 
-public class SerieSerializer  extends StdSerializer<Serie> {
+public class SerieSerializer extends StdSerializer<Serie> {
 
 
     public SerieSerializer(Class<Serie> t) {
@@ -17,9 +17,9 @@ public class SerieSerializer  extends StdSerializer<Serie> {
     @Override
     public void serialize(Serie serie, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeNumberField("id",serie.getId());
-        jsonGenerator.writeNumberField("position",serie.getPosition());
-        jsonGenerator.writeStringField("name",serie.getName());
+        jsonGenerator.writeNumberField("id", serie.getId());
+        jsonGenerator.writeNumberField("position", serie.getPosition());
+        jsonGenerator.writeStringField("name", serie.getName());
         jsonGenerator.writeEndObject();
     }
 }

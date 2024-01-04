@@ -1,7 +1,6 @@
 package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.*;
@@ -11,7 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -97,7 +99,7 @@ public class SongSubgroupController {
                         Author persistedAuthor = authorSong.getAuthorAlias().getAuthor();
                         if (persistedAuthor.equals(author)) {
                             AuthorAlias persistedAuthorAlias = authorSong.getAuthorAlias();
-                            if (!persistedAuthorAlias.equals(composerAlias)){
+                            if (!persistedAuthorAlias.equals(composerAlias)) {
                                 authorSong.setAuthorAlias(composerAlias);
                                 authorSongRepository.save(authorSong);
                             }
@@ -157,7 +159,7 @@ public class SongSubgroupController {
             } else {
                 songSubgroup.setSrcId(null);
             }
-            if (subcomposer){
+            if (subcomposer) {
                 List<String> comingSubcomposers = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerSelect")).collect(Collectors.toList());
                 Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerConcatInput")).collect(Collectors.toList()).iterator();
                 for (String comingFeat : comingSubcomposers) {
@@ -260,7 +262,8 @@ public class SongSubgroupController {
             }
             if (role.equals(Role.FEAT)) {
                 authorSong.setFeatConcat(concatValue);
-            } if (role.equals(Role.SUBCOMPOSER)){
+            }
+            if (role.equals(Role.SUBCOMPOSER)) {
                 authorSong.setSubcomposerConcat(concatValue);
             }
             authorSongRepository.save(authorSong);
@@ -284,7 +287,8 @@ public class SongSubgroupController {
         }
         if (role.equals(Role.FEAT)) {
             authorSong.setFeatConcat(concatValue);
-        } if (role.equals(Role.SUBCOMPOSER)){
+        }
+        if (role.equals(Role.SUBCOMPOSER)) {
             authorSong.setSubcomposerConcat(concatValue);
         }
         authorSongRepository.save(authorSong);

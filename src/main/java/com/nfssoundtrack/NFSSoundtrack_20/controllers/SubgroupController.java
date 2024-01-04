@@ -70,9 +70,9 @@ public class SubgroupController {
                 songSubgroupRepository.delete(subgroupOptional.get());
             }
         }
-        int position=10+(10*songsToDetach.size());
+        int position = 10 + (10 * songsToDetach.size());
         for (String song : songsToAssign) {
-            position+=10;
+            position += 10;
             Song song1 = songRepository.findById(Integer.valueOf(song)).get();
             List<SongSubgroup> existingSubgroups = songSubgroupRepository.findBySong(song1);
             SongSubgroup originalSongSubgroup = existingSubgroups.stream().filter(songSubgroup ->

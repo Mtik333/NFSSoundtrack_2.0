@@ -12,7 +12,6 @@ import com.nfssoundtrack.NFSSoundtrack_20.repository.SongSubgroupRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SubgroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -40,11 +39,11 @@ public class GroupController {
         ObjectMapper objectMapper = new ObjectMapper();
         Game game = gameRepository.findById(Integer.valueOf(gameId)).get();
         List<MainGroup> mainGroups = game.getMainGroups();
-        for (MainGroup mainGroup : mainGroups){
+        for (MainGroup mainGroup : mainGroups) {
             List<Subgroup> subgroups = mainGroup.getSubgroups();
-            for (Subgroup subgroup : subgroups){
+            for (Subgroup subgroup : subgroups) {
                 List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
-                for (SongSubgroup songSubgroup : songSubgroupList){
+                for (SongSubgroup songSubgroup : songSubgroupList) {
                     songSubgroup.getSong();
                     break;
                 }
@@ -105,12 +104,12 @@ public class GroupController {
                 Optional<Subgroup> subgroupOptional = subgroups.stream().filter(subgroup1 -> subgroupId.equals(
                         String.valueOf(subgroup1.getId()))).findFirst();
                 subgroupOptional.ifPresent(subgroupsToDelete::add);
-            } else if (subgroup.contains("-UPDATE-")){
+            } else if (subgroup.contains("-UPDATE-")) {
                 String subgroupId = subgroup.substring(0, subgroup.indexOf("-UPDATE-"));
                 Optional<Subgroup> subgroupOptional = subgroups.stream().filter(subgroup1 -> subgroupId.equals(
                         String.valueOf(subgroup1.getId()))).findFirst();
                 if (subgroupOptional.isPresent()) {
-                    String newSubgroupName = subgroup.substring(subgroup.indexOf("-UPDATE-")+8);
+                    String newSubgroupName = subgroup.substring(subgroup.indexOf("-UPDATE-") + 8);
                     String[] subgroupPosition = newSubgroupName.split("_POS_");
                     subgroupOptional.get().setSubgroupName(subgroupPosition[0]);
                     subgroupOptional.get().setPosition(Integer.valueOf(subgroupPosition[1]));
@@ -125,7 +124,7 @@ public class GroupController {
                 subgroupRepository.save(newSubgroup);
             }
         }
-        for (Subgroup subgroup : subgroupsToUpdate){
+        for (Subgroup subgroup : subgroupsToUpdate) {
             subgroupRepository.save(subgroup);
         }
         for (Subgroup subgroup : subgroupsToDelete) {

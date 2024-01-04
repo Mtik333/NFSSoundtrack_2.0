@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/author")
@@ -47,22 +50,22 @@ public class ArtistController {
         Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
         List<AuthorAlias> allAliases = authorAliasRepository.findByAuthor(author);
         authorSongRepository.findByAuthorAlias(allAliases.get(0));
-        Map<String,Map<Song,List<SongSubgroup>>> songsAsComposer = new HashMap<>();
-        Map<String,Map<Song,List<SongSubgroup>>> songsAsSubcomposer = new HashMap<>();
-        Map<String,Map<Song,List<SongSubgroup>>> songsAsFeat = new HashMap<>();
-        Map<String,Map<Song,List<SongSubgroup>>> songsRemixed = new HashMap<>();
-        for (AuthorAlias authorAlias : allAliases){
-           List<AuthorSong> allAuthorSongs = authorSongRepository.findByAuthorAlias(authorAlias);
-           for (AuthorSong authorSong : allAuthorSongs){
-               fillMapForArtistDisplay(authorAlias,authorSong,Role.COMPOSER,songsAsComposer);
-               fillMapForArtistDisplay(authorAlias,authorSong,Role.SUBCOMPOSER,songsAsSubcomposer);
-               fillMapForArtistDisplay(authorAlias,authorSong,Role.REMIX,songsAsFeat);
-               fillMapForArtistDisplay(authorAlias,authorSong,Role.FEAT,songsRemixed);
-           }
+        Map<String, Map<Song, List<SongSubgroup>>> songsAsComposer = new HashMap<>();
+        Map<String, Map<Song, List<SongSubgroup>>> songsAsSubcomposer = new HashMap<>();
+        Map<String, Map<Song, List<SongSubgroup>>> songsAsFeat = new HashMap<>();
+        Map<String, Map<Song, List<SongSubgroup>>> songsRemixed = new HashMap<>();
+        for (AuthorAlias authorAlias : allAliases) {
+            List<AuthorSong> allAuthorSongs = authorSongRepository.findByAuthorAlias(authorAlias);
+            for (AuthorSong authorSong : allAuthorSongs) {
+                fillMapForArtistDisplay(authorAlias, authorSong, Role.COMPOSER, songsAsComposer);
+                fillMapForArtistDisplay(authorAlias, authorSong, Role.SUBCOMPOSER, songsAsSubcomposer);
+                fillMapForArtistDisplay(authorAlias, authorSong, Role.REMIX, songsAsFeat);
+                fillMapForArtistDisplay(authorAlias, authorSong, Role.FEAT, songsRemixed);
+            }
         }
         model.addAttribute("author", author);
         model.addAttribute("genre", null);
-        model.addAttribute("customPlaylist",null);
+        model.addAttribute("customPlaylist", null);
         model.addAttribute("songsAsComposer", songsAsComposer);
         model.addAttribute("songsAsSubcomposer", songsAsSubcomposer);
         model.addAttribute("songsAsFeat", songsAsFeat);
@@ -74,16 +77,16 @@ public class ArtistController {
     }
 
     private void fillMapForArtistDisplay(AuthorAlias authorAlias, AuthorSong authorSong, Role role,
-                         Map<String,Map<Song,List<SongSubgroup>>> songsAsComposer){
+                                         Map<String, Map<Song, List<SongSubgroup>>> songsAsComposer) {
         List<SongSubgroup> songSubgroupList = songSubgroupRepository.findBySong(authorSong.getSong());
-        if (role.equals(authorSong.getRole())){
-            if (songsAsComposer.get(authorAlias.getAlias())==null){
-                Map<Song,List<SongSubgroup>> songsPerSubgroup = new HashMap<>();
+        if (role.equals(authorSong.getRole())) {
+            if (songsAsComposer.get(authorAlias.getAlias()) == null) {
+                Map<Song, List<SongSubgroup>> songsPerSubgroup = new HashMap<>();
                 songsPerSubgroup.put(authorSong.getSong(), songSubgroupList);
                 songsAsComposer.put(authorAlias.getAlias(), songsPerSubgroup);
             } else {
-                Map<Song,List<SongSubgroup>> songsPerSubgroup = songsAsComposer.get(authorAlias.getAlias());
-                if (songsPerSubgroup.get(authorSong.getSong())!=null){
+                Map<Song, List<SongSubgroup>> songsPerSubgroup = songsAsComposer.get(authorAlias.getAlias());
+                if (songsPerSubgroup.get(authorSong.getSong()) != null) {
                     songsPerSubgroup.get(authorSong.getSong()).addAll(songSubgroupList);
                 } else {
                     songsPerSubgroup.put(authorSong.getSong(), songSubgroupList);
@@ -93,10 +96,10 @@ public class ArtistController {
         }
     }
 
-    @GetMapping(value="/authorAlias/{input}")
+    @GetMapping(value = "/authorAlias/{input}")
     public @ResponseBody String readAliasesFromArtist(Model model, @PathVariable("input") String input) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        if (input.isEmpty()){
+        if (input.isEmpty()) {
             return objectMapper.writeValueAsString("[]");
         }
         SimpleModule simpleModule = new SimpleModule();
@@ -113,7 +116,7 @@ public class ArtistController {
     @GetMapping(value = "/aliasName/{input}")
     public @ResponseBody String readAliases(Model model, @PathVariable("input") String input) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        if (input.isEmpty()){
+        if (input.isEmpty()) {
             return objectMapper.writeValueAsString("[]");
         }
 //        SimpleModule simpleModule = new SimpleModule();

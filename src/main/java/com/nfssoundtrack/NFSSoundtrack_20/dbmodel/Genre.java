@@ -4,15 +4,15 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 
-@Entity(name="genre")
+@Entity(name = "genre")
 public class Genre implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(name="genre_name")
+    @Column(name = "genre_name")
     private String genreName;
 
     public Long getId() {

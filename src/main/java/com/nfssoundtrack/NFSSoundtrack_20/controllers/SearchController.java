@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -33,29 +32,29 @@ public class SearchController {
 
     @Autowired
     private AuthorAliasRepository authorAliasRepository;
+
     @GetMapping(value = "/basic")
     public String searchStuff(Model model, @RequestParam("searchData") String searchData) {
         List<AuthorAlias> authorAliases = new ArrayList<>();
         List<Song> songTitleList = new ArrayList<>();
         List<Song> songLyricsList = new ArrayList<>();
         boolean search = false;
-        if (searchData.isEmpty()){
+        if (searchData.isEmpty()) {
             System.out.println("well...");
-        }
-        else if (searchData.length()<=3){
+        } else if (searchData.length() <= 3) {
             //treat as exact input
             AuthorAlias authorAlias = authorAliasRepository.findByAlias(searchData.trim());
-            if (authorAlias!=null){
+            if (authorAlias != null) {
                 authorAliases.add(authorAlias);
             }
             songTitleList = songRepository.findByOfficialDisplayTitle(searchData.trim());
             songLyricsList = songRepository.findByLyrics(searchData.trim());
         } else {
             boolean fullPhraseSearch = searchData.contains("\"");
-            if (fullPhraseSearch){
-                searchData = searchData.replaceAll("\"","");
+            if (fullPhraseSearch) {
+                searchData = searchData.replaceAll("\"", "");
                 AuthorAlias authorAlias = authorAliasRepository.findByAlias(searchData.trim());
-                if (authorAlias!=null){
+                if (authorAlias != null) {
                     authorAliases.add(authorAlias);
                 }
                 songTitleList = songRepository.findByOfficialDisplayTitle(searchData.trim());
@@ -68,14 +67,14 @@ public class SearchController {
         }
         model.addAttribute("appName", appName);
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
-        model.addAttribute("songSubgroups",null);
-        model.addAttribute("author",null);
-        model.addAttribute("authorAliases",authorAliases);
-        model.addAttribute("songTitleList",songTitleList);
-        model.addAttribute("songLyricsList",songLyricsList);
-        model.addAttribute("search",true);
-        model.addAttribute("customPlaylist",null);
-        model.addAttribute("searchPhrase",searchData);
+        model.addAttribute("songSubgroups", null);
+        model.addAttribute("author", null);
+        model.addAttribute("authorAliases", authorAliases);
+        model.addAttribute("songTitleList", songTitleList);
+        model.addAttribute("songLyricsList", songLyricsList);
+        model.addAttribute("search", true);
+        model.addAttribute("customPlaylist", null);
+        model.addAttribute("searchPhrase", searchData);
         return "index";
     }
 }

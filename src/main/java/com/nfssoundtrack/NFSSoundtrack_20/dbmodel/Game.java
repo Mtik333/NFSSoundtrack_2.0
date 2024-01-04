@@ -7,56 +7,56 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name="game")
+@Entity(name = "game")
 @NamedEntityGraph(name = "Game.mainGroups", attributeNodes = @NamedAttributeNode(value = "mainGroups"))
 public class Game implements Serializable, Comparable<Game> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
-    @OneToOne(optional=false,fetch = FetchType.LAZY)
-    @JoinColumn(name="series_id")
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "series_id")
     private Serie serie;
 
-    @Column(name="position")
+    @Column(name = "position")
     private Long position;
 
-    @Column(name="gametitle")
+    @Column(name = "gametitle")
     private String gameTitle;
 
-    @Column(name="displaytitle")
+    @Column(name = "displaytitle")
     private String displayTitle;
 
-    @Column(name="gameshort")
+    @Column(name = "gameshort")
     private String gameShort;
 
-    @Column(name="prefix")
+    @Column(name = "prefix")
     private String prefix;
 
-    @Column(name="spotify_id")
+    @Column(name = "spotify_id")
     private String spotifyId;
 
-    @Column(name="deezer_id")
+    @Column(name = "deezer_id")
     private String deezerId;
 
-    @Column(name="tidal_id")
+    @Column(name = "tidal_id")
     private String tidalId;
 
-    @Column(name="youtube_id")
+    @Column(name = "youtube_id")
     private String youtubeId;
 
-    @Column(name="soundcloud_id")
+    @Column(name = "soundcloud_id")
     private String soundcloudId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="game_status")
+    @Column(name = "game_status")
     private GameStatus gameStatus;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "game",fetch = FetchType.LAZY)
-    private List<MainGroup> mainGroups=new ArrayList<>();
+    @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
+    private List<MainGroup> mainGroups = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -173,7 +173,7 @@ public class Game implements Serializable, Comparable<Game> {
     @Override
     public int compareTo(Game o) {
         int i = getPosition().compareTo(o.getPosition());
-        if (i!=0) {
+        if (i != 0) {
             return -i;
         }
         return i;

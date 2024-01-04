@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface SongGenreRepository extends JpaRepository<SongGenre,Integer> {
+public interface SongGenreRepository extends JpaRepository<SongGenre, Integer> {
 
     SongGenre findBySong(Song id);
 

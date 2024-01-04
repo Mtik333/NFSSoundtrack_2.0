@@ -26,6 +26,9 @@ $(document).ready(function () {
     $("#flexSwitchCheckDefault").change(function (e) {
         localStorage.setItem("dark-mode", $(this).prop("checked"));
         changeStuffForDarkMode();
+        if (DISQUS != undefined){
+            DISQUS.reset({reload:true});
+        }
     });
 
     $("#nightModeSwitch").click(function (e) {

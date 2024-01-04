@@ -1,6 +1,5 @@
 package com.nfssoundtrack.NFSSoundtrack_20.others;
 
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+
 @Service
 public class GenreService {
 

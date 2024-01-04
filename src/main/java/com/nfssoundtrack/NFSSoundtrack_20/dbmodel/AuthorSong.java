@@ -7,36 +7,37 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 
-@Entity(name="author_song")
+@Entity(name = "author_song")
 public class AuthorSong implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
     @JsonManagedReference
-    @OneToOne(optional=false)
-    @JoinColumn(name="alias_id")
+    @OneToOne(optional = false)
+    @JoinColumn(name = "alias_id")
     private AuthorAlias authorAlias;
 
     @JsonBackReference
-    @OneToOne(optional=false)
-    @JoinColumn(name="song_id")
+    @OneToOne(optional = false)
+    @JoinColumn(name = "song_id")
     private Song song;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="role")
+    @Column(name = "role")
     private Role role;
 
-    @Column(name="remix_concat")
+    @Column(name = "remix_concat")
     private String remixConcat;
 
-    @Column(name="feat_concat")
+    @Column(name = "feat_concat")
     private String featConcat;
 
-    @Column(name="subcomposer_concat")
+    @Column(name = "subcomposer_concat")
     private String subcomposerConcat;
+
     public Long getId() {
         return id;
     }

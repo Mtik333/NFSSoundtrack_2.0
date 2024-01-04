@@ -2,15 +2,15 @@ package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
 public enum Remix {
 
-    YES("YES"),NO("NO");
+    YES("YES"), NO("NO");
 
-    public String value(){
+    public String value() {
         return value;
     }
 
     private final String value;
 
-    Remix(String value){
-        this.value=value;
+    Remix(String value) {
+        this.value = value;
     }
 }

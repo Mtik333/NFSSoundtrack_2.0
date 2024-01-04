@@ -16,8 +16,8 @@ public class AuthorAliasSerializer extends StdSerializer<AuthorAlias> {
     @Override
     public void serialize(AuthorAlias authorAlias, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeNumberField("value",authorAlias.getId());
-        jsonGenerator.writeStringField("label",authorAlias.getAlias());
+        jsonGenerator.writeNumberField("value", authorAlias.getId());
+        jsonGenerator.writeStringField("label", authorAlias.getAlias());
         jsonGenerator.writeEndObject();
     }
 }

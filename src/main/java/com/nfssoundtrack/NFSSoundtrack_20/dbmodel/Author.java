@@ -7,20 +7,20 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity
-@Table(name="author")
+@Table(name = "author")
 @NamedEntityGraph(name = "Author.authorCountries", attributeNodes = @NamedAttributeNode("authorCountries"))
 public class Author implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable=false)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
 
     @JsonManagedReference
-    @OneToMany(mappedBy="author",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
     private List<AuthorCountry> authorCountries;
 
     public Long getId() {

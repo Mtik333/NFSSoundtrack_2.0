@@ -193,6 +193,11 @@ html[data-bs-theme="dark"] body #playlist_progress tr.current {
   background: #504E1E !important;
 }
 
+html[data-bs-theme="dark"] #filter_songs {
+  border-bottom: 1px solid #8ba2b5;
+  background-color: #39426F;
+  color: #fff;
+}
 td.playlist_play_it {
   cursor: pointer;
 }
@@ -228,4 +233,7 @@ td.playlist_disable_song {
   bottom:0;
   right:20px;
   display: none;
+}
+:root {
+color-scheme: unset;
 }

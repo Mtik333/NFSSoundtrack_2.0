@@ -8,30 +8,30 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name="subgroup")
+@Entity(name = "subgroup")
 @NamedEntityGraph(name = "Subgroup.songSubgroupList", attributeNodes = @NamedAttributeNode("songSubgroupList"))
 public class Subgroup implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(name="subgroup_name")
+    @Column(name = "subgroup_name")
     private String subgroupName;
 
-    @Column(name="position")
+    @Column(name = "position")
     private Integer position;
 
     @JsonBackReference
-    @OneToOne(optional=false,fetch = FetchType.LAZY)
-    @JoinColumn(name="group_id")
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
     private MainGroup mainGroup;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "subgroup",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "subgroup", fetch = FetchType.LAZY)
     @OrderBy("position ASC")
-    private List<SongSubgroup> songSubgroupList=new ArrayList<>();
+    private List<SongSubgroup> songSubgroupList = new ArrayList<>();
 
     public Long getId() {
         return id;

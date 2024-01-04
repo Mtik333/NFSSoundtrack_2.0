@@ -1,28 +1,27 @@
 package com.nfssoundtrack.NFSSoundtrack_20.repository;
 
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Serie;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface GameRepository extends JpaRepository<Game,Integer> {
+public interface GameRepository extends JpaRepository<Game, Integer> {
 
 //    @Cacheable("games")
 //    List<Game> findAll(Sort sort);
 
-    @EntityGraph(value="Game.mainGroups")
+    @EntityGraph(value = "Game.mainGroups")
     Game findByGameShort(String gameShort);
 
     @Override
-    @EntityGraph(value="Game.mainGroups")
+    @EntityGraph(value = "Game.mainGroups")
     Optional<Game> findById(Integer integer);
 
-    @EntityGraph(value="Game.mainGroups")
+    @EntityGraph(value = "Game.mainGroups")
     List<Game> findAll();
 
-    @EntityGraph(value="Game.mainGroups")
+    @EntityGraph(value = "Game.mainGroups")
     List<Game> findByIdNotNull();
 }

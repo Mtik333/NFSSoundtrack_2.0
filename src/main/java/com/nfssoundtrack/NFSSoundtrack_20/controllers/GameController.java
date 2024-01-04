@@ -29,7 +29,7 @@ public class GameController {
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String saveNewGame(@RequestBody String formData) throws JsonProcessingException {
-        Map<?,?> gameProps = new ObjectMapper().readValue(formData, Map.class);
+        Map<?, ?> gameProps = new ObjectMapper().readValue(formData, Map.class);
         String serieId = (String) gameProps.get("serieId");
         Serie currentSerie = serieRepository.findById(Integer.valueOf(serieId)).get();
         String gameTitle = (String) gameProps.get("gameTitle");
@@ -45,24 +45,24 @@ public class GameController {
         newGame.setSerie(currentSerie);
         newGame.setGameTitle(gameTitle);
         newGame.setGameShort(gameShort);
-        if (!"null".equals(gamePrefix) && !gamePrefix.equals("undefined")){
+        if (!"null".equals(gamePrefix) && !gamePrefix.equals("undefined")) {
             newGame.setPrefix(gamePrefix);
         }
-        newGame.setDisplayTitle((newGame.getPrefix()+" "+newGame.getGameTitle()).trim());
+        newGame.setDisplayTitle((newGame.getPrefix() + " " + newGame.getGameTitle()).trim());
         newGame.setGameStatus(gameStatus);
-        if (!"".equals(spotifyId) && !spotifyId.equals("undefined")){
+        if (!"".equals(spotifyId) && !spotifyId.equals("undefined")) {
             newGame.setSpotifyId(spotifyId);
         }
-        if (!"".equals(deezerId) && !deezerId.equals("undefined")){
+        if (!"".equals(deezerId) && !deezerId.equals("undefined")) {
             newGame.setDeezerId(deezerId);
         }
-        if (!"".equals(tidalId) && !tidalId.equals("undefined")){
+        if (!"".equals(tidalId) && !tidalId.equals("undefined")) {
             newGame.setTidalId(tidalId);
         }
-        if (!"".equals(youtubeId) && !youtubeId.equals("undefined")){
+        if (!"".equals(youtubeId) && !youtubeId.equals("undefined")) {
             newGame.setYoutubeId(youtubeId);
         }
-        if (!"".equals(soundcloudId) && !soundcloudId.equals("undefined")){
+        if (!"".equals(soundcloudId) && !soundcloudId.equals("undefined")) {
             newGame.setSoundcloudId(soundcloudId);
         }
         newGame.setPosition(10000L);

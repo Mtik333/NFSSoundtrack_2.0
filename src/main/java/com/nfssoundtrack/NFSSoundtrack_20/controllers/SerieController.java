@@ -3,8 +3,8 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
-import com.nfssoundtrack.NFSSoundtrack_20.others.ArtistSerializer;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Serie;
 import com.nfssoundtrack.NFSSoundtrack_20.others.GameSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.others.SerieSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,7 @@ public class SerieController {
 
     @Autowired
     GameRepository gameRepository;
+
     @GetMapping(value = "/readAll")
     public @ResponseBody String readSeries(Model model) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -41,7 +41,7 @@ public class SerieController {
     }
 
     @GetMapping(value = "/read/{serieId}")
-    public @ResponseBody String readGamesFromSerie(@PathVariable("serieId") String serieId,Model model) throws JsonProcessingException {
+    public @ResponseBody String readGamesFromSerie(@PathVariable("serieId") String serieId, Model model) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(Game.class, new GameSerializer(Game.class));
@@ -68,7 +68,7 @@ public class SerieController {
     @PutMapping(value = "/updateGames", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String putGamesPositions(@RequestBody String formData) throws JsonProcessingException {
         System.out.println("???");
-        Map<?,?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
+        Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
         String serieId = (String) objectMapper.get("serieId");
         String serieName = (String) objectMapper.get("serieName");
         List<?> arrayOfGames = (List<?>) objectMapper.get("arrayOfGames");

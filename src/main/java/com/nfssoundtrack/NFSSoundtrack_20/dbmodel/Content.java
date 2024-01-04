@@ -5,30 +5,30 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name="content")
+@Table(name = "content")
 public class Content implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable=false)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name="method")
+    @Column(name = "method")
     private Long position;
 
-    @Column(name="pos")
+    @Column(name = "pos")
     private Long pos;
 
-    @Column(name="visibility")
+    @Column(name = "visibility")
     private Long visibility;
 
-    @Column(name="content_title")
+    @Column(name = "content_title")
     private String contentTitle;
 
-    @Column(name="content_short")
+    @Column(name = "content_short")
     private String contentShort;
 
-    @Column(name="content_data")
+    @Column(name = "content_data")
     private String contentData;
 
     public Long getId() {

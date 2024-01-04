@@ -8,27 +8,28 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name="maingroup")
+@Entity(name = "maingroup")
 @NamedEntityGraph(name = "MainGroup.subgroups", attributeNodes = @NamedAttributeNode("subgroups"))
 public class MainGroup implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(name="groupname")
+    @Column(name = "groupname")
     private String groupName;
 
     @JsonBackReference
-    @OneToOne(optional=false,fetch = FetchType.LAZY)
-    @JoinColumn(name="game_id")
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_id")
     private Game game;
 
     @JsonManagedReference
     @OrderBy("position ASC")
-    @OneToMany(mappedBy = "mainGroup",fetch = FetchType.LAZY)
-    private List<Subgroup> subgroups=new ArrayList<>();
+    @OneToMany(mappedBy = "mainGroup", fetch = FetchType.LAZY)
+    private List<Subgroup> subgroups = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
