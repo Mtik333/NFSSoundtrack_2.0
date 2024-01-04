@@ -26,6 +26,7 @@ public class MainGroup implements Serializable {
     private Game game;
 
     @JsonManagedReference
+    @OrderBy("position ASC")
     @OneToMany(mappedBy = "mainGroup",fetch = FetchType.LAZY)
     private List<Subgroup> subgroups=new ArrayList<>();
     public Long getId() {

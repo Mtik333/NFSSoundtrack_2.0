@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/css/own.css}">
+<th:block th:if="${customPlaylist!=null && !customPlaylist.isEmpty()}">
+    <h3 th:text="#{customPlaylist}"></h3>
+    <div class="form-group pb-2 pt-2">
+        <span id="playlist_init" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+            data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
+    </div>
+    <div class="form-group">
+        <span>
+            <input id="filter_songs" maxlength="15" class="p-2 mb-2" style="width: 100%"
+                th:placeholder="#{filterSongs}">
+        </span>
+    </div>
+    <div class="tabbable boxed parentTabs">
+        <table id="game_stuff" class="table table-hover table-striped playlist_table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col" th:text="#{country}"></th>
+                    <th scope="col" th:text="#{band}"></th>
+                    <th scope="col" th:text="#{song}"></th>
+                    <th scope="col" th:text="#{genre}"></th>
+                    <th scope="col" th:text="#{actions}"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr th:each="songSubgroup : ${customPlaylist}"
+                    th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
+                    <td class="info_button">
+                        <!-- <img class="img-responsive add-to-custom-playlist" th:src="@{/images/plus.png}"> -->
+                        <img class="img-responsive" th:src="@{/images/info.png}">
+                    </td>
+                    <td class="countries">
+                        <!--
+                                    <th:block th:each="country : ${songSubgroup.song.countrySet}">
+                                        <img th:src="${country.countryLink}">
+                                    </th:block>
+                                -->
+
+                        <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
+                            <th:block th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
+                                <img class="country-img" th:src="${authorCountry.country.countryLink}">
+                            </th:block>
+                        </th:block>
+
+                    </td>
+                    <td class="band">
+                        <th:block
+                            th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='COMPOSER']}">
+                            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                                th:text="${songSubgroup.ingameDisplayBand!=null} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
+                        </th:block>
+                        <th:block
+                            th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
+                            <span
+                                th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                                th:text="${authorSong.authorAlias.alias}"></a>
+                        </th:block>
+                    </td>
+                    <td class="songtitle">
+                        <span
+                            th:text="${songSubgroup.ingameDisplayTitle!=null} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
+                        <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
+                            <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
+                                th:href="'/author/'+${authorSong.authorAlias.id}"
+                                th:text="${authorSong.authorAlias.alias}"></a><span
+                                th:text="${iter.last ? ')' : ''}"></span>
+                        </th:block>
+                        <th:block th:if="${songSubgroup.remix.value=='YES'}">
+                            <th:block
+                                th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
+                                <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+                                    th:href="'/author/'+${authorSong.authorAlias.id}"
+                                    th:text="${authorSong.authorAlias.alias}"></a>
+                                <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
+                                <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+                            </th:block>
+                        </th:block>
+                    </td>
+                    <td>
+                        <th:block th:each="songGenre,iter : ${songSubgroup.song.songGenreList}">
+                            <a class="table_link" th:text="${songGenre.genre.genreName}"
+                                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:text="${!iter.last ? ', ' : ''}"></span>
+                        </th:block>
+                    </td>
+                    <td>
+                        <div class="play_icondiv">
+                            <img class="play_icon img-responsive" data-bs-toggle="modal" data-bs-target="#videoModal"
+                                th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
+                                th:src="@{/images/znakwodny.png}" width="25" height="25">
+                            </img>
+                            <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
+                            <th:block th:if="${songSubgroup.spotifyId != null}">
+                                <a th:href="${songSubgroup.spotifyId}" style="text-decoration:none;">
+                                    <img class="img-responsive" th:src="@{/images/spotify.png}" width="25" height="25">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songSubgroup.deezerId != null}">
+                                <a th:href="${songSubgroup.deezerId}" style="text-decoration:none;">
+                                    <img class="img-responsive" th:src="@{/images/deezer.png}" width="25" height="25">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songSubgroup.itunesLink != null}">
+                                <a th:href="${songSubgroup.itunesLink}" style="text-decoration:none;">
+                                    <img class="img-responsive" th:src="@{/images/itunes2.png}" width="25" height="25">
+                                </a>
+                            </th:block>
+                        </div>
+                    </td>
+                    <td>
+                        <th:block th:if="${songSubgroup.info!=null && songSubgroup.info!=''}">
+                            <a data-toggle="tooltip" th:title="${songSubgroup.info}">
+                                <img th:src="@{/images/warn1.png}">
+                            </a>
+                        </th:block>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal fade" id="videoModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="videoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" id="showLyrics" class="btn btn-outline-info"
+                        th:attr="data-lyricsMissing=#{lyricsMissing},data-instrumental=#{thisIsInstrumental}"
+                        th:text="#{lyrics}"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="ratio ratio-16x9">
+                                <iframe src="" id="video" allow="autoplay;" allowscriptaccess="always"
+                                    allowfullscreen></iframe>
+                            </div>
+                        </div>
+                        <div class="overflow-scroll" style="display: none;">
+                            <div id="lyricsCollapse">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="playlistModeModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 th:text="#{playlistMode}"></h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div id="playlistModePlayer" class="ratio ratio-16x9">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-bordered table-hover table-sm" id="playlist_progress"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<!-- <div class="error-container" aria-hidden="true">
+    <div id="errorThing" class="alert alert-success fade show" role="alert">
+        <span th:text="#{addedToCustomPlaylist}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div> -->
+<th:block th:if="${customPlaylist?.isEmpty()}">
+    <h3>No songs found in "cache" - did you really add any song to the custom playlist? If not, then just go to some games and stuff that you'll see here. Otherwise, well, maybe you should report this as a problem?</h3>
+</th:block>
+</html>

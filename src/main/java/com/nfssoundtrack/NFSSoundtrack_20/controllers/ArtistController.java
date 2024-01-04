@@ -47,54 +47,50 @@ public class ArtistController {
         Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
         List<AuthorAlias> allAliases = authorAliasRepository.findByAuthor(author);
         authorSongRepository.findByAuthorAlias(allAliases.get(0));
-        Map<String,List<SongSubgroup>> songsAsComposer = new HashMap<>();
-        Map<String,List<SongSubgroup>> songsAsSubcomposer = new HashMap<>();
-        Map<String,List<SongSubgroup>> songsAsFeat = new HashMap<>();
-        Map<String,List<SongSubgroup>> songsRemixed = new HashMap<>();
+        Map<String,Map<Song,List<SongSubgroup>>> songsAsComposer = new HashMap<>();
+        Map<String,Map<Song,List<SongSubgroup>>> songsAsSubcomposer = new HashMap<>();
+        Map<String,Map<Song,List<SongSubgroup>>> songsAsFeat = new HashMap<>();
+        Map<String,Map<Song,List<SongSubgroup>>> songsRemixed = new HashMap<>();
         for (AuthorAlias authorAlias : allAliases){
            List<AuthorSong> allAuthorSongs = authorSongRepository.findByAuthorAlias(authorAlias);
            for (AuthorSong authorSong : allAuthorSongs){
-               List<SongSubgroup> songSubgroupList = songSubgroupRepository.findBySong(authorSong.getSong());
-               if (Role.COMPOSER.equals(authorSong.getRole())){
-                   if (songsAsComposer.get(authorAlias.getAlias())==null){
-                       songsAsComposer.put(authorAlias.getAlias(), new ArrayList<>(songSubgroupList));
-                   } else {
-                       songsAsComposer.get(authorAlias.getAlias()).addAll(songSubgroupList);
-                   }
-               }
-               if (Role.SUBCOMPOSER.equals(authorSong.getRole())){
-                   if (songsAsSubcomposer.get(authorAlias.getAlias())==null){
-                       songsAsSubcomposer.put(authorAlias.getAlias(), new ArrayList<>(songSubgroupList));
-                   } else {
-                       songsAsSubcomposer.get(authorAlias.getAlias()).addAll(songSubgroupList);
-                   }
-               }
-               if (Role.FEAT.equals(authorSong.getRole())){
-                   if (songsAsFeat.get(authorAlias.getAlias())==null){
-                       songsAsFeat.put(authorAlias.getAlias(), new ArrayList<>(songSubgroupList));
-                   } else {
-                       songsAsFeat.get(authorAlias.getAlias()).addAll(songSubgroupList);
-                   }
-               }
-               if (Role.REMIX.equals(authorSong.getRole())){
-                   if (songsRemixed.get(authorAlias.getAlias())==null){
-                       songsRemixed.put(authorAlias.getAlias(), new ArrayList<>(songSubgroupList));
-                   } else {
-                       songsRemixed.get(authorAlias.getAlias()).addAll(songSubgroupList);
-                   }
-               }
+               fillMapForArtistDisplay(authorAlias,authorSong,Role.COMPOSER,songsAsComposer);
+               fillMapForArtistDisplay(authorAlias,authorSong,Role.SUBCOMPOSER,songsAsSubcomposer);
+               fillMapForArtistDisplay(authorAlias,authorSong,Role.REMIX,songsAsFeat);
+               fillMapForArtistDisplay(authorAlias,authorSong,Role.FEAT,songsRemixed);
            }
         }
         model.addAttribute("author", author);
         model.addAttribute("genre", null);
+        model.addAttribute("customPlaylist",null);
         model.addAttribute("songsAsComposer", songsAsComposer);
         model.addAttribute("songsAsSubcomposer", songsAsSubcomposer);
         model.addAttribute("songsAsFeat", songsAsFeat);
         model.addAttribute("songsRemixed", songsRemixed);
         model.addAttribute("allAliases", allAliases);
-        model.addAttribute("appName", appName);
+        model.addAttribute("appName", author.getName() + " - " + appName);
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
         return "index";
+    }
+
+    private void fillMapForArtistDisplay(AuthorAlias authorAlias, AuthorSong authorSong, Role role,
+                         Map<String,Map<Song,List<SongSubgroup>>> songsAsComposer){
+        List<SongSubgroup> songSubgroupList = songSubgroupRepository.findBySong(authorSong.getSong());
+        if (role.equals(authorSong.getRole())){
+            if (songsAsComposer.get(authorAlias.getAlias())==null){
+                Map<Song,List<SongSubgroup>> songsPerSubgroup = new HashMap<>();
+                songsPerSubgroup.put(authorSong.getSong(), songSubgroupList);
+                songsAsComposer.put(authorAlias.getAlias(), songsPerSubgroup);
+            } else {
+                Map<Song,List<SongSubgroup>> songsPerSubgroup = songsAsComposer.get(authorAlias.getAlias());
+                if (songsPerSubgroup.get(authorSong.getSong())!=null){
+                    songsPerSubgroup.get(authorSong.getSong()).addAll(songSubgroupList);
+                } else {
+                    songsPerSubgroup.put(authorSong.getSong(), songSubgroupList);
+                }
+                songsAsComposer.put(authorAlias.getAlias(), songsPerSubgroup);
+            }
+        }
     }
 
     @GetMapping(value="/authorAlias/{input}")

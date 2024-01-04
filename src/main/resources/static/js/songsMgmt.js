@@ -45,9 +45,16 @@ $(document).ready(function () {
                 leftCellDiv.append(dropdownDiv);
                 rightCellDiv.append(newGroupSpan);
                 var tableToFill;
+                var allSongSubgroups = new Array();
+                for (let i = 0; i < fullScopeOfEdit.length; i++) {
+                    var group = fullScopeOfEdit[i];
+                    for (let j = 0; j < group.subgroups.length; j++) {
+                        allSongSubgroups = allSongSubgroups.concat(fullScopeOfEdit[i].subgroups[j].songSubgroupList)
+                    }
+                }
                 if (fullScopeOfEdit.length > 0) {
                     var dropdownMenuDiv = $('<div class="dropdown-menu" aria-labelledby="subgroupsDropdown">');
-                    tableToFill = displayAllSongs(fullScopeOfEdit[0].subgroups[0].songSubgroupList, dropdownDiv);
+                    tableToFill = displayAllSongs(allSongSubgroups, dropdownDiv);
                     for (let i = 0; i < fullScopeOfEdit.length; i++) {
                         var group = fullScopeOfEdit[i];
                         var groupName = fullScopeOfEdit[i].groupName;
@@ -70,7 +77,7 @@ $(document).ready(function () {
         var tableToFill = $('<table id="songs-table" class="table table-bordered table-hover table-striped">');
         tableToFill.append("<tbody>");
         for (let i = 0; i < songs.length; i++) {
-            var tr = $('<tr class="song" data-songId="' + songs[i].song.id + '" data-songSubgroupId="' + songs[i].id + '">');
+            var tr = $('<tr class="song" data-songId="' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '">');
             var songDisplay = "";
             if (songs[i].ingameDisplayBand != null) {
                 songDisplay += songs[i].ingameDisplayBand;
@@ -86,9 +93,9 @@ $(document).ready(function () {
             var textTd = $('<td>');
             textTd.append(songDisplay);
             tr.append(textTd);
-            tr.append('<td class="text-right"><button type="button" id="edit-song-' + songs[i].song.id + '" data-songSubgroupId="' + songs[i].id + '" class="btn btn-warning edit-song">Edit (in subgroup)</button></td>');
-            tr.append('<td class="text-right"><button type="button" id="edit-song-globally-' + songs[i].song.id + '" data-songSubgroupId="' + songs[i].id + '" class="btn btn-warning edit-song">Edit globally</button></td>');
-            tr.append('<td class="text-right"><button type="button" id="delete-song-' + songs[i].song.id + '" data-songSubgroupId="' + songs[i].id + '" class="btn btn-danger delete-song">Delete</button></td>');
+            tr.append('<td class="text-right"><button type="button" id="edit-song-' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-warning edit-song">Edit (in subgroup)</button></td>');
+            tr.append('<td class="text-right"><button type="button" id="edit-song-globally-' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-warning edit-song">Edit globally</button></td>');
+            tr.append('<td class="text-right"><button type="button" id="delete-song-' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-danger delete-song">Delete</button></td>');
             tableToFill.append(tr);
         }
         return tableToFill;
@@ -314,8 +321,10 @@ $(document).ready(function () {
         });
         for (let i = 0; i < subgroupSongs.length; i++) {
             var songId = subgroupSongs[i].song.id;
-            var songToMark = $("#songs-table").find('tr[data-songId="' + songId + '"]').first();
+            var songToMark = $("#songs-table").find('tr[data-songId="' + songId + '"][data-songsubgroupid="'+subgroupSongs[i].id+'"]').first();
             songToMark.attr("data-songSubgroupId", subgroupSongs[i].id);
+            
+
             songToMark.removeClass("visually-hidden");
         };
         console.log("e");
@@ -658,6 +667,19 @@ $(document).ready(function () {
             $(this).next().hide();
         }
 
+    });
+
+    $(document).on('focusout', '#ingameSrcId', function (e) {
+        var typedSrcId = $(this).val();
+        var indexOfMark = typedSrcId.indexOf("?v=");
+        if (indexOfMark>-1){
+            $(this).val(typedSrcId.substring(indexOfMark+3,indexOfMark+14));
+        } else {
+            var indexOfTuDotBe = typedSrcId.indexOf(".be");
+            if (indexOfTuDotBe>-1){
+                $(this).val(typedSrcId.substring(indexOfTuDotBe+4,indexOfTuDotBe+15));
+            }
+        }
     });
 
     $(document).on('click', '#save-song', function (e) {

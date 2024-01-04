@@ -74,6 +74,7 @@ public class SearchController {
         model.addAttribute("songTitleList",songTitleList);
         model.addAttribute("songLyricsList",songLyricsList);
         model.addAttribute("search",true);
+        model.addAttribute("customPlaylist",null);
         model.addAttribute("searchPhrase",searchData);
         return "index";
     }

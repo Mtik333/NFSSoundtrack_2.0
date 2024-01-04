@@ -21,7 +21,7 @@ public class AuthorSong implements Serializable {
     private AuthorAlias authorAlias;
 
     @JsonBackReference
-    @OneToOne(optional=false,fetch = FetchType.LAZY)
+    @OneToOne(optional=false)
     @JoinColumn(name="song_id")
     private Song song;
 

@@ -55,7 +55,7 @@
 
             </ul>
         </th:block>
-        <table id="game_stuff" class="table table-hover table-striped">
+        <table id="game_stuff" class="table table-hover table-striped playlist_table">
             <thead>
                 <tr>
                     <th scope="col"></th>
@@ -78,8 +78,9 @@
                                     th:text="${gamegroup.groupName} + ' - ' + ${subgroup.subgroupName}"></td>
                             </tr>
                             <tr th:each="songSubgroup : ${subgroup.songSubgroupList}"
-                                th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id}">
+                                th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
                                 <td class="info_button">
+                                    <img class="img-responsive add-to-custom-playlist" th:src="@{/images/plus.png}">
                                     <img class="img-responsive" th:src="@{/images/info.png}">
                                 </td>
                                 <td class="countries">
@@ -156,11 +157,13 @@
                                 </td>
                                 <td>
                                     <div class="play_icondiv">
-                                        <img class="play_icon img-responsive" data-bs-toggle="modal"
-                                            data-bs-target="#videoModal"
-                                            th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
-                                            th:src="@{/images/znakwodny.png}" width="25" height="25">
-                                        </img>
+                                        <th:block th:if="${songSubgroup.srcId!=null or songSubgroup.song.srcId!=null}">
+                                            <img class="play_icon img-responsive" data-bs-toggle="modal"
+                                                data-bs-target="#videoModal"
+                                                th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
+                                                th:src="@{/images/znakwodny.png}" width="25" height="25">
+                                            </img>
+                                        </th:block>
                                         <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
                                         <th:block th:if="${songSubgroup.spotifyId != null}">
                                             <a th:href="${songSubgroup.spotifyId}" style="text-decoration:none;">
@@ -183,8 +186,8 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <th:block th:if="${songSubgroup.song.info!=null && songSubgroup.song.info!=''}">
-                                        <a data-toggle="tooltip" th:title="${songSubgroup.song.info}">
+                                    <th:block th:if="${songSubgroup.info!=null && songSubgroup.info!=''}">
+                                        <a data-toggle="tooltip" data-placement="left" th:title="${songSubgroup.info}">
                                             <img th:src="@{/images/warn1.png}">
                                         </a>
                                     </th:block>
@@ -376,5 +379,16 @@
     <h2>No songs found, that's quite odd. Would you like to report it? Click the "Report problem" button from the top
         menu to proceed</h2>
 </th:block>
-
+<div class="error-container" aria-hidden="true">
+    <div id="successThing" class="alert alert-success fade show" role="alert">
+        <span th:text="#{addedToCustomPlaylist}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+<div class="success-container" aria-hidden="true">
+    <div id="errorThing" class="alert alert-danger fade show" role="alert">
+        <span th:text="'Nothing to play!'"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
 </html>

@@ -36,10 +36,17 @@ $(document).ready(function () {
                 var dropdownDiv = $('<div id="selectSubgroup" class="dropdown">');
                 dropdownDiv.append('<button class="btn btn-secondary dropdown-toggle" type="button" id="subgroupsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">All</button>');
                 leftCellDiv.append(dropdownDiv);
+                var allSongSubgroups = new Array();
+                for (let i = 0; i < fullScopeOfEdit.length; i++) {
+                    var group = fullScopeOfEdit[i];
+                    for (let j = 0; j < group.subgroups.length; j++) {
+                        allSongSubgroups = allSongSubgroups.concat(fullScopeOfEdit[i].subgroups[j].songSubgroupList)
+                    }
+                }
                 var tableToFill;
                 if (fullScopeOfEdit.length > 0) {
                     var dropdownMenuDiv = $('<div class="dropdown-menu" aria-labelledby="subgroupsDropdown">');
-                    tableToFill = displayAllSongs(fullScopeOfEdit[0].subgroups[0].songSubgroupList, dropdownDiv);
+                    tableToFill = displayAllSongs(allSongSubgroups, dropdownDiv);
                     for (let i = 0; i < fullScopeOfEdit.length; i++) {
                         var group = fullScopeOfEdit[i];
                         var groupName = fullScopeOfEdit[i].groupName;

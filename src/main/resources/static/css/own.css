@@ -201,6 +201,31 @@ td.playlist_disable_song {
   cursor: pointer;
 }
 
-#flexSwitchCheckDefault {
-  margin-top: .75rem !important;
+#genreTable thead tr th:after {
+	position: relative;
+	right: -3px;
+}
+
+#genreTable thead tr th.sort-asc:after {
+	content: "\25b4";
+}
+
+#genreTable thead tr th.sort-desc:after {
+	content: "\25be";
+}
+#nightModeSwitch{
+  text-decoration: none;
+}
+
+.error-container{
+  position:fixed;
+  bottom:0;
+  right:20px;
+  display: none;
+}
+.success-container{
+  position:fixed;
+  bottom:0;
+  right:20px;
+  display: none;
 }

@@ -27,9 +27,6 @@ public class Song implements Serializable {
     @Column(name="src_id")
     private String srcId;
 
-    @Column(name="info")
-    private String info;
-
     @Enumerated(EnumType.STRING)
     @Column(name="multi_concat")
     private MultiConcat multiConcat;
@@ -76,14 +73,6 @@ public class Song implements Serializable {
 
     public void setSrcId(String srcId) {
         this.srcId = srcId;
-    }
-
-    public String getInfo() {
-        return info;
-    }
-
-    public void setInfo(String info) {
-        this.info = info;
     }
 
     public MultiConcat getMultiConcat() {

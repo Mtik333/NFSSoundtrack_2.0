@@ -15,7 +15,7 @@
 <body>
     <script>
         function changeStuffForDarkMode() {
-            if (localStorage.getItem("dark-mode")) {
+            if (localStorage.getItem("dark-mode")=="true") {
                 $(document).find("html").attr("data-bs-theme", "dark");
                 $(document).find("#topNavbar").addClass("navbar-dark");
                 $(document).find("#topNavbar").addClass("bg-dark");
@@ -60,6 +60,7 @@
                 <div th:if="${author!=null}" th:insert="~{fragments/artist.html}"></div>
                 <div th:if="${genre!=null}" th:insert="~{fragments/genre.html}"></div>
                 <div th:if="${search!=null}" th:insert="~{fragments/search.html}"></div>
+                <div th:if="${customPlaylist!=null}" th:insert="~{fragments/customPlaylist.html}"></div>
             </div>
         </div>
     </div>

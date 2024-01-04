@@ -40,7 +40,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests((requests) -> requests
                                 .requestMatchers("/*", "/content/*", "/css/*", "/js/*", "/images/*",
                                         "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
-                                        "/serie/**", "/country/**", "/gamedb/**").permitAll()
+                                        "/serie/**", "/country/**", "/gamedb/**", "/custom/**").permitAll()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")

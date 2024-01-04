@@ -2,26 +2,56 @@ var current_id = 0;
 
 $(document).ready(function () {
 
+    var newWidth = localStorage.getItem("expandable-width");
+    if (newWidth != undefined) {
+        $("#offcanvas").removeClass("w-25");
+        $("#offcanvas").removeClass("w-35");
+        $("#offcanvas").removeClass("w-50");
+        $("#offcanvas").addClass("w-" + newWidth);
+    } else {
+        $("#offcanvas").removeClass("w-25");
+        $("#offcanvas").removeClass("w-35");
+        $("#offcanvas").removeClass("w-50");
+        $("#offcanvas").addClass("w-25");
+    }
+    if (localStorage.getItem("custom-playlist") != undefined) {
+        var customPlaylistArrayTrigger = JSON.parse(localStorage.getItem("custom-playlist"));
+        var jsonEdArrayTrigger = JSON.stringify(customPlaylistArrayTrigger)
+        localStorage.setItem("custom-playlist", jsonEdArrayTrigger);
+        $("#playlistContent").val(jsonEdArrayTrigger);
+    }
     $("#searchStuff").tooltip({ 'trigger': 'focus', 'title': $("#searchStuff").attr("data-tooltip") });
     $("#filter_games_menu").val("");
+    $('[data-toggle="tooltip"]').tooltip();
     $("#flexSwitchCheckDefault").change(function (e) {
         localStorage.setItem("dark-mode", $(this).prop("checked"));
         changeStuffForDarkMode();
     });
 
-
+    $("#nightModeSwitch").click(function (e) {
+        e.preventDefault();
+        localStorage.setItem("dark-mode", !$(this).prev().prop("checked"));
+        $(this).prev().click();
+    });
     /*$(document).find("span.display-text").each(function(e){
         $(this).text().trim();
     })*/
     var currentGame = window.location.href.replace(document.location.origin, "");
-    $(document).find("a[href='" + currentGame + "']").each(function (e) {
-        if (!$(this).hasClass("nav-link")) {
-            $(this).addClass("active");
-            $(this).parent().parent().parent().parent().find("button").click();
-        } else {
-            $(this).parent().addClass("nfs-top-item-active");
-        }
-    })
+    if (currentGame.indexOf("custom/playlist") > -1) {
+        $("#customPlaylistSubmit").parent().parent().addClass("nfs-top-item-active");
+    } else {
+        $(document).find("a[href='" + currentGame + "']").each(function (e) {
+            if (!$(this).hasClass("nav-link")) {
+                if ($(this).hasClass("genreLink")) {
+                    return;
+                }
+                $(this).addClass("active");
+                $(this).parent().parent().parent().parent().find("button").click();
+            } else {
+                $(this).parent().addClass("nfs-top-item-active");
+            }
+        });
+    }
     $(document).find("td.countries").each(function () {
         $(this).find('.country-img:nth-child(n+2)').remove();
     });
@@ -70,21 +100,23 @@ $(document).ready(function () {
 
     $(document).find("div.accordion-collapse").each(function () {
         $(this).on('shown.bs.collapse', function () {
-
-            //i think i should fix this somehow
-            if ($("#filter_games_menu").val() == "" || $("#filter_games_menu").val().length < 3) {
-                console.log($(this).offset());
-                var currentScroll = $('div.offcanvas-body').scrollTop();
-                var origTop = $('div.offcanvas-body').offset().top;
-                var thisTop = $(this).offset().top;
-                if (currentScroll > 0) {
-                    var scrollTop = currentScroll + thisTop - origTop - $(this).parent().children().first().height();
-                } else {
-                    var scrollTop = thisTop - origTop - $(this).parent().children().first().height();
+            var unscrollableMenu = localStorage.getItem("scrolling-stuff");
+            if (!unscrollableMenu) {
+                //i think i should fix this somehow
+                if ($("#filter_games_menu").val() == "" || $("#filter_games_menu").val().length < 3) {
+                    console.log($(this).offset());
+                    var currentScroll = $('div.offcanvas-body').scrollTop();
+                    var origTop = $('div.offcanvas-body').offset().top;
+                    var thisTop = $(this).offset().top;
+                    if (currentScroll > 0) {
+                        var scrollTop = currentScroll + thisTop - origTop - $(this).parent().children().first().height();
+                    } else {
+                        var scrollTop = thisTop - origTop - $(this).parent().children().first().height();
+                    }
+                    $('div.offcanvas-body').animate({
+                        scrollTop: scrollTop
+                    }, 500);
                 }
-                $('div.offcanvas-body').animate({
-                    scrollTop: scrollTop
-                }, 500);
             }
         });
     });
@@ -470,7 +502,7 @@ $(document).ready(function () {
         }
         var localI = 0;
         if ($('#playlist_progress').is(":empty")) {
-            $("#game_stuff").find("tr:visible:not(.subgroup-separator)").each(function () {
+            $("table.playlist_table").find("tr:visible:not(.subgroup-separator):not(.visually-hidden)").each(function () {
                 var bandText = $(this).find("td.band").html();
                 var titleText = $(this).find("td.songtitle").html();
                 bandText = $.trim(bandText).replaceAll("\n", "").replaceAll("<span>", "").replaceAll("</span>", "").replaceAll("> ", ">");
@@ -486,7 +518,15 @@ $(document).ready(function () {
                     $("#playlist_progress").append(trElem);
                     localI++;
                 }
-            })
+            });
+        }
+        if (localI==0){
+            //show modal that there is nothing to play
+            $("#errorThing").parent().fadeIn(500, function () {
+                setTimeout(function () {
+                    $("#errorThing").parent().fadeOut(500);
+                }, 3000);
+            });
         }
         var data_song = [];
         i = 0;
@@ -545,4 +585,27 @@ $(document).ready(function () {
             $(this).parent().addClass("disabled");
         }
     });
+
+    $(document).on("click", "img.add-to-custom-playlist", function () {
+        var customPlaylistArray = localStorage.getItem("custom-playlist");
+        if (customPlaylistArray == undefined) {
+            customPlaylistArray = new Array();
+        }
+        else if (customPlaylistArray != undefined) {
+            customPlaylistArray = JSON.parse(customPlaylistArray);
+        }
+        var relatedTr = $(this).parent().parent();
+        var songSubgroupId = $(relatedTr).attr("data-songSubgroup-id");
+        customPlaylistArray.push(songSubgroupId);
+        var jsonEdArray = JSON.stringify(customPlaylistArray)
+        localStorage.setItem("custom-playlist", jsonEdArray);
+        $("#playlistContent").val(jsonEdArray);
+        var parentDiv = $("#disqusModal").parent();
+        $("#successThing").parent().fadeIn(500, function () {
+            setTimeout(function () {
+                $("#successThing").parent().fadeOut(500);
+            }, 3000);
+        });
+    });
+
 });

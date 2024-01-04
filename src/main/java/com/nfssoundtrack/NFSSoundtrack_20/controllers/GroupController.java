@@ -95,6 +95,7 @@ public class GroupController {
         MainGroup mainGroup = mainGroupRepository.findById(Integer.valueOf(groupId)).get();
         List<Subgroup> subgroups = mainGroup.getSubgroups();
         HashMap<?, ?> objectMapper = new ObjectMapper().readValue(formData, HashMap.class);
+        mainGroup.setGroupName(String.valueOf(objectMapper.get("groupName")));
         List<String> updatedSubgroups = (List<String>) objectMapper.get("subgroupsNames");
         List<Subgroup> subgroupsToDelete = new ArrayList<>();
         List<Subgroup> subgroupsToUpdate = new ArrayList<>();
@@ -133,6 +134,7 @@ public class GroupController {
         }
         subgroupRepository.deleteAllInBatch(subgroupsToDelete);
         ObjectMapper objectMapper2 = new ObjectMapper();
-        return objectMapper2.writeValueAsString(mainGroupRepository.getReferenceById(Math.toIntExact(mainGroup.getId())));
+        mainGroup = mainGroupRepository.save(mainGroup);
+        return objectMapper2.writeValueAsString(mainGroup);
     }
 }

@@ -23,12 +23,11 @@
             </li>
             <li class="btn nav-item d-inline-block p-1">
                 <div class="pl-2 pt-2 d-inline">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-                    <label class="form-check-label nfs-top-item d-inline" for="flexSwitchCheckDefault"
-                        th:text="#{night}"></label>
+                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"></input>
+                    <a class="nav-link d-inline p-1" id="nightModeSwitch" href="#" th:text="#{night}"></a>
                 </div>
             </li>
-            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+            <li class="btn nav-item nfs-top-item d-inline-block p-1" data-toggle="tooltip" data-placement="top" title="Work in progress">
                 <a class="nav-link d-inline p-1" href="#" th:text="#{advancedSearch}"></a>
             </li>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
@@ -44,13 +43,20 @@
                 </li>
             </th:block>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
-                <a class="nav-link d-inline p-1" href="#" th:text="#{problem}"></a>
+                <form th:action="@{/custom/playlist}" method="post" class="d-inline p-1">
+                    <input class="form-control" id="playlistContent" type="hidden" name="customPlaylist"></input>
+                    <button id="customPlaylistSubmit" type="submit" class="nav-link d-inline-block p-1"
+                        th:text="'Custom playlist'"></button>
+                </form>
+            </li>
+            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+                <a class="nav-link d-inline p-1" href="#" th:text="#{problem}" data-toggle="tooltip" data-placement="top" title="Work in progress"></a>
             </li>
             <li class="btn d-inline-block p-1">
-                <form th:action="@{/search/basic}" method="get" class="d-inline p-1">
+                <form th:action="@{/search/basic}" method="get" class="d-inline p-1" style="display:flex !important; justify-content:center;align-items:center">
                     <input class="form-control me-2 d-inline" name="searchData" id="searchStuff" type="search"
-                        th:attr="data-tooltip=#{searchTooltip}" th:placeholder="#{search}"></input>
-                    <button class="btn btn-outline-success nav-item nfs-top-item" type="submit"
+                        th:attr="data-tooltip=#{searchTooltip}" th:placeholder="#{search}"></input><button
+                        class="btn btn-outline-success nav-item nfs-top-item" type="submit"
                         th:text="#{search}"></button>
                 </form>
             </li>
@@ -59,7 +65,7 @@
 </nav>
 <script>
     changeStuffForDarkMode();
-    $("#flexSwitchCheckDefault").prop("checked", localStorage.getItem("dark-mode"));
+    $("#flexSwitchCheckDefault").prop("checked", localStorage.getItem("dark-mode")=="true");
 </script>
 <div class="modal fade" id="preferencesModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -70,10 +76,10 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label for="lang-select">Select language</label>
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-md-6">
                         <select class="form-select" id="lang-select" aria-label="Set language">
                             <option selected value="en">English</option>
                             <option value="jp">Japanese</option>
@@ -81,12 +87,47 @@
                     </div>
                 </div>
                 <div class="row">
-                    Disable automatic scrolling of menu (default no)
-                    Width of expandable menu: (default 25%)
+                    <div class="col-md-6">
+                        <label for="scrolling-stuff">Disable automatic scrolling of menu</label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="scrolling-stuff">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="expandable-width">Width of expandable menu</label>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" id="expandable-width" aria-label="Set language">
+                            <option selected value="25">25%</option>
+                            <option value="35">35%</option>
+                            <option value="50">50%</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row p-3">
+                    <button type="button" class="btn btn-success" id="save-preferences" data-bs-dismiss="modal"
+                        aria-label="Save preferences">Save preferences</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+    $(document).on("click", "#save-preferences", function () {
+        localStorage.setItem("expandable-width", $("#expandable-width").val());
+        localStorage.setItem("scrolling-stuff", $("#scrolling-stuff").prop("checked"));
+        var langAlreadyThere = window.location.toString().indexOf("?lang") > -1;
+        if (langAlreadyThere) {
+            window.location.search = "?lang=" + $("#lang-select").val();
+        } else {
+            window.location = window.location + "?lang=" + $("#lang-select").val();
+        }
+    });
+</script>
 
 </html>

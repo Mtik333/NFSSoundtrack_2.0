@@ -75,8 +75,9 @@ public class SubgroupController {
             position+=10;
             Song song1 = songRepository.findById(Integer.valueOf(song)).get();
             List<SongSubgroup> existingSubgroups = songSubgroupRepository.findBySong(song1);
-            SongSubgroup originalSongSubgroup = existingSubgroups.stream().filter(songSubgroup -> songSubgroup.getSubgroup()
-                    .getSubgroupName().equals("All")).findFirst().get();
+            SongSubgroup originalSongSubgroup = existingSubgroups.stream().filter(songSubgroup ->
+                            songSubgroup.getSubgroup().getMainGroup().getGame().equals(subgroup.getMainGroup().getGame()))
+                    .findFirst().get();
             SongSubgroup songSubgroup = new SongSubgroup();
             songSubgroup.setSubgroup(subgroup);
             songSubgroup.setSong(song1);

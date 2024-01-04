@@ -62,6 +62,9 @@ public class SongSubgroup implements Serializable {
     @Column(name="lyrics")
     private String lyrics;
 
+    @Column(name="info")
+    private String info;
+
     @Column(name="feat_title")
     private Long featTitle;
     public Long getId() {
@@ -184,6 +187,13 @@ public class SongSubgroup implements Serializable {
         this.soundcloudLink = soundcloudLink;
     }
 
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
     public Long getFeatTitle() {
         return featTitle;
     }

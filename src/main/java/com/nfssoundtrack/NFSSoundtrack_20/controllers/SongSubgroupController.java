@@ -62,6 +62,7 @@ public class SongSubgroupController {
             String tidalink = (String) objectMapper.get("tidal");
             String ingameBand = (String) objectMapper.get("ingameBand");
             String ingameTitle = (String) objectMapper.get("ingameTitle");
+            String ingameSrcId = (String) objectMapper.get("ingameSrcId");
             String lyrics = (String) objectMapper.get("lyrics");
             boolean instrumental = (boolean) objectMapper.get("instrumental");
             boolean feat = (boolean) objectMapper.get("feat");
@@ -128,18 +129,33 @@ public class SongSubgroupController {
             }
             if (!spotifyLink.equals("null") && !spotifyLink.equals("undefined")) {
                 songSubgroup.setSpotifyId(spotifyLink);
+            } else {
+                songSubgroup.setSpotifyId(null);
             }
             if (!itunesLink.equals("null") && !itunesLink.equals("undefined")) {
                 songSubgroup.setItunesLink(itunesLink);
+            } else {
+                songSubgroup.setItunesLink(null);
             }
             if (!soundcloudLink.equals("null") && !soundcloudLink.equals("undefined")) {
                 songSubgroup.setSoundcloudLink(soundcloudLink);
+            } else {
+                songSubgroup.setSoundcloudLink(null);
             }
             if (!deezerLink.equals("null") && !deezerLink.equals("undefined")) {
                 songSubgroup.setDeezerId(deezerLink);
+            } else {
+                songSubgroup.setDeezerId(null);
             }
             if (!tidalink.equals("null") && !tidalink.equals("undefined")) {
                 songSubgroup.setTidalLink(tidalink);
+            } else {
+                songSubgroup.setTidalLink(null);
+            }
+            if (!ingameSrcId.equals("null") && !ingameSrcId.equals("undefined")) {
+                songSubgroup.setSrcId(ingameSrcId);
+            } else {
+                songSubgroup.setSrcId(null);
             }
             if (subcomposer){
                 List<String> comingSubcomposers = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerSelect")).collect(Collectors.toList());
