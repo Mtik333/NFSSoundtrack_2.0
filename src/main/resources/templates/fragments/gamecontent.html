@@ -78,10 +78,12 @@
                                     th:text="${gamegroup.groupName} + ' - ' + ${subgroup.subgroupName}"></td>
                             </tr>
                             <tr th:each="songSubgroup : ${subgroup.songSubgroupList}"
-                                th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
+                                th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
                                 <td class="info_button">
                                     <img class="img-responsive add-to-custom-playlist" th:src="@{/images/plus.png}">
-                                    <img class="img-responsive" th:src="@{/images/info.png}">
+                                    <img class="img-responsive info-about-song" th:src="@{/images/info.png}">
+                                    <!-- data-bs-toggle="modal" data-bs-target="#infoSongModal"  -->
+                                    
                                 </td>
                                 <td class="countries">
                                     <!--
@@ -99,20 +101,6 @@
 
                                 </td>
                                 <td class="band">
-                                    <!-- <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
-                                        <th:block th:if="${authorSong.role.value=='COMPOSER'}">
-                                            <a class="table_link"
-                                                th:href="'/author/'+${authorSong.authorAlias.author.id}"
-                                                th:text="${songSubgroup.ingameDisplayBand!=null} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
-                                        </th:block>
-                                        <th:block
-                                            th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
-                                            <span
-                                                th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
-                                            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                                                th:text="${authorSong.authorAlias.alias}"></a>
-                                        </th:block>
-                                    </th:block> -->
                                     <th:block
                                         th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='COMPOSER']}">
                                         <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
@@ -131,10 +119,10 @@
                                         th:text="${songSubgroup.ingameDisplayTitle!=null} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
                                     <th:block
                                         th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
-                                        <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
-                                            th:href="'/author/'+${authorSong.authorAlias.id}"
-                                            th:text="${authorSong.authorAlias.alias}"></a><span
-                                            th:text="${iter.last ? ')' : ''}"></span>
+                                        <span th:text="${iter.first ? '(feat. ' : ''}"></span>
+                                        <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                                            th:text="${authorSong.authorAlias.alias}"></a>
+                                            <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span><span th:text="${iter.last ? ')' : ''}"></span>
                                     </th:block>
                                     <th:block th:if="${songSubgroup.remix.value=='YES'}">
                                         <th:block
@@ -185,7 +173,7 @@
                                         </th:block>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="w-5">
                                     <th:block th:if="${songSubgroup.info!=null && songSubgroup.info!=''}">
                                         <a data-toggle="tooltip" data-placement="left" th:title="${songSubgroup.info}">
                                             <img th:src="@{/images/warn1.png}">
@@ -347,26 +335,6 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div id="disqus_thread">
-                                <!-- <script>
-                                    /**
-                                    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-                                    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
-                                    /*
-                                    var disqus_config = function () {
-                                    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-                                    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-                                    };
-                                    */
-                                    (function () { // DON'T EDIT BELOW THIS LINE
-                                        var d = document, s = d.createElement('script');
-                                        s.src = 'https://nfssoundtrack.disqus.com/embed.js';
-                                        s.setAttribute('data-timestamp', +new Date());
-                                        (d.head || d.body).appendChild(s);
-                                    })();
-                                </script>
-                                <noscript>Please enable JavaScript to view the <a
-                                        href="https://disqus.com/?ref_noscript">comments powered by
-                                        Disqus.</a></noscript> -->
                             </div>
                         </div>
                     </div>
@@ -374,6 +342,61 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="infoSongModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="" id="getAllUsages" class="btn btn-outline-info"
+                        th:text="'Find all usages of this song'"></a>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <span id="officialArtist"><b>Official artist:</b></span>
+                        </div>
+                        <div class="col-md-6">
+                            <span id="officialTitle"><b>Official title:</b> </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <span id="composers">Composers: </span><br>
+                            <!--place for a hrefs-->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <span id="subcomposers">Subcomposers: </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <span id="remixers">Remixed by: </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <span id="featArtists">Featuring: </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <span>External links</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <span>Spotify img, Deezer img etc.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </th:block>
 <th:block th:if="${songSubgroups!=null && songSubgroups.isEmpty()}">
     <h2>No songs found, that's quite odd. Would you like to report it? Click the "Report problem" button from the top
@@ -391,4 +414,5 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 </div>
+
 </html>

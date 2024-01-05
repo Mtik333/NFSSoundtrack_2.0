@@ -23,7 +23,7 @@
     </thead>
     <tbody>
         <tr th:each="songSubgroup, iter1 : ${songSubgroupList}"
-            th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id}">
+            th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id}">
             <td th:text="${iter1.count}"></td>
             <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
                 <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">

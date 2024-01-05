@@ -74,10 +74,6 @@ td.display-text {
   cursor: pointer;
 }
 
-.info_button {
-  cursor: pointer;
-}
-
 .note_button {
   cursor: pointer;
 }
@@ -218,6 +214,33 @@ td.playlist_disable_song {
 #genreTable thead tr th.sort-desc:after {
 	content: "\25be";
 }
+
+#customPlaylistStuff thead tr th:after {
+	position: relative;
+	right: -3px;
+}
+
+#customPlaylistStuff thead tr th.sort-asc:after {
+	content: "\25b4";
+}
+
+#customPlaylistStuff thead tr th.sort-desc:after {
+	content: "\25be";
+}
+
+#songTable thead tr th:after {
+	position: relative;
+	right: -3px;
+}
+
+#songTable thead tr th.sort-asc:after {
+	content: "\25b4";
+}
+
+#songTable thead tr th.sort-desc:after {
+	content: "\25be";
+}
+
 #nightModeSwitch{
   text-decoration: none;
 }
@@ -236,4 +259,12 @@ td.playlist_disable_song {
 }
 :root {
 color-scheme: unset;
+}
+
+img.info-about-song {
+  cursor: pointer;
+}
+
+img.add-to-custom-playlist {
+  cursor: pointer;
 }

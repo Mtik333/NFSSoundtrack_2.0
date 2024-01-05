@@ -29,12 +29,13 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.disable())
                 .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/manage", "/manage#", "/maingroup/**", "/songSubgroup/**", "/subgroup/**")
-                        .hasRole("ADMIN"))
+                        .requestMatchers("/manage/manage", "/manage/manage#", "/maingroup/**", "/songSubgroup/**", "/subgroup/**")
+                        .hasAuthority("ADMIN"))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
                                 "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
-                                "/serie/**", "/country/**", "/gamedb/**", "/custom/**", "/favicon.ico").permitAll()
+                                "/serie/**", "/country/**", "/gamedb/**", "/custom/**", "/song/**",
+                                "/songinfo/**","/favicon.ico").permitAll()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")

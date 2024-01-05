@@ -24,7 +24,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/author")
-public class ArtistController {
+public class ArtistController extends BaseControllerWIthErrorHandling {
     @Value("${spring.application.name}")
     String appName;
     @Autowired

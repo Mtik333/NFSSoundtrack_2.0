@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/css/own.css}" type="text/css">
+<h3 th:text="'Usages of song: '+${songToCheck?.officialDisplayBand}+' - '+${songToCheck?.officialDisplayTitle}"></h3>
+<!-- <div class="form-group pb-2 pt-2">
+    <span id="playlist_init" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+        data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
+        </div> -->
+<table id="songTable" class="table table-hover table-striped playlist_table">
+    <thead>
+        <th scope="col" th:text="#{id}"></th>
+        <th scope="col" th:text="#{remix}"></th>
+        <th scope="col" th:text="#{instrumental}"></th>
+        <th scope="col" th:text="#{subgroup}"></th>
+        <th scope="col" th:text="#{group}"></th>
+        <th scope="col" th:text="#{game}"></th>
+        <th scope="col" class="no-sort" th:text="#{actions}"></th>
+    </thead>
+    <tbody>
+        <tr th:each="songSubgroup, iter1 : ${songUsages}"
+            th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id}">
+            <td th:text="${iter1.count}"></td>
+            <td th:text="${songSubgroup.remix.value}"></td>
+            <td th:text="${songSubgroup.instrumental.value}"></td>
+            <td th:text="${songSubgroup.subgroup.subgroupName}"></td>
+            <td th:text="${songSubgroup.subgroup.mainGroup.groupName}"></td>
+            <td><a class="table_link" th:text="${songSubgroup.subgroup.mainGroup.game.displayTitle}"
+                    th:href="'/game/'+${songSubgroup.subgroup.mainGroup.game.gameShort}"></a></td>
+            <td>
+                <div class="play_icondiv">
+                    <img class="play_icon img-responsive" data-bs-toggle="modal" data-bs-target="#videoModal"
+                        th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
+                        th:src="@{/images/znakwodny.png}" width="25" height="25">
+                    </img>
+                    <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
+                    <th:block th:if="${songSubgroup.spotifyId != null}">
+                        <a th:href="${songSubgroup.spotifyId}" style="text-decoration:none;">
+                            <img class="img-responsive" th:src="@{/images/spotify.png}" width="25" height="25">
+                        </a>
+                    </th:block>
+                    <th:block th:if="${songSubgroup.deezerId != null}">
+                        <a th:href="${songSubgroup.deezerId}" style="text-decoration:none;">
+                            <img class="img-responsive" th:src="@{/images/deezer.png}" width="25" height="25">
+                        </a>
+                    </th:block>
+                    <th:block th:if="${songSubgroup.itunesLink != null}">
+                        <a th:href="${songSubgroup.itunesLink}" style="text-decoration:none;">
+                            <img class="img-responsive" th:src="@{/images/itunes2.png}" width="25" height="25">
+                        </a>
+                    </th:block>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+<!-- <div class="modal fade" id="playlistModeModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 th:text="#{playlistMode}"></h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="playlistModePlayer" class="ratio ratio-16x9">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-bordered table-hover table-sm" id="playlist_progress"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+<script th:src="@{/js/song.js}" type="application/javascript"></script>
+
+</html>

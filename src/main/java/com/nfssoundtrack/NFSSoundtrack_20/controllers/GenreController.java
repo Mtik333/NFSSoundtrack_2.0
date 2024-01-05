@@ -24,7 +24,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping(path = "/genre")
-public class GenreController {
+public class GenreController extends BaseControllerWIthErrorHandling{
 
     @Value("${spring.application.name}")
     String appName;

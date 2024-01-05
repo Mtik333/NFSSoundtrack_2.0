@@ -2,14 +2,11 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.MainGroup;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.ContentRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.SongSubgroupRepository;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
+import com.nfssoundtrack.NFSSoundtrack_20.others.AuthorAliasSerializer;
+import com.nfssoundtrack.NFSSoundtrack_20.others.SongSerializer;
+import com.nfssoundtrack.NFSSoundtrack_20.repository.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +27,7 @@ import java.util.List;
 
 @Controller
 
-public class WebsiteViewsController implements ErrorController {
+public class WebsiteViewsController extends BaseControllerWIthErrorHandling {
 
     @Value("${spring.application.name}")
     String appName;
@@ -47,6 +44,9 @@ public class WebsiteViewsController implements ErrorController {
     @Autowired
     private SongSubgroupRepository songSubgroupRepository;
 
+    @Autowired
+    private SongRepository songRepository;
+
     @RequestMapping(value = "/")
     public String mainPage(Model model) {
         model.addAttribute("appName", appName);
@@ -56,13 +56,13 @@ public class WebsiteViewsController implements ErrorController {
         return "redirect:/content/home";
     }
 
-    @RequestMapping(value = "/manage")
+    @RequestMapping(value = "/manage/manage")
     public String manage(Model model) {
         model.addAttribute("appName", appName);
         model.addAttribute("author", null);
         model.addAttribute("genre", null);
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
-        model.addAttribute("games", gameRepository.findAll());
+//        model.addAttribute("games", gameRepository.findAll());
         return "manage";
     }
 
@@ -70,7 +70,7 @@ public class WebsiteViewsController implements ErrorController {
     public String login(Model model) {
         model.addAttribute("appName", appName);
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
-        model.addAttribute("games", gameRepository.findAll());
+//        model.addAttribute("games", gameRepository.findAll());
         model.addAttribute("login", true);
         model.addAttribute("author", null);
         model.addAttribute("genre", null);
@@ -133,27 +133,57 @@ public class WebsiteViewsController implements ErrorController {
         model.addAttribute("genre", null);
         model.addAttribute("search", null);
         model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
-        model.addAttribute("games", gameRepository.findAll());
+//        model.addAttribute("games", gameRepository.findAll());
         model.addAttribute("customPlaylist", songSubgroupList);
         return "index";
     }
 
-    @RequestMapping(value = "/{otherval}")
-    public String nonExistingPagee(Model model, @PathVariable("otherval") String otherval) throws Exception {
-        throw new Exception("Tried to access non-existing page: " + otherval);
+//    @RequestMapping(value = "/{otherval}")
+//    public String nonExistingPagee(Model model, @PathVariable("otherval") String otherval) throws Exception {
+////        throw new Exception("Tried to access non-existing page: " + otherval);
+//        return "redirect:/content/home";
+//    }
+
+    @RequestMapping(value = "/songInfo/{songId}")
+    public @ResponseBody String provideSongModalInfo(Model model, @PathVariable("songId") String songId) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Song song = songRepository.findById(Integer.valueOf(songId)).get();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(Song.class, new SongSerializer(Song.class));
+        objectMapper.registerModule(simpleModule);
+        String result = objectMapper.writeValueAsString(song);
+        return result;
     }
 
-    @ExceptionHandler
-    @ResponseBody
-    public ModelAndView handleException(HttpServletRequest req, Exception ex) {
-//        logger.error("Request: " + req.getRequestURL() + " raised " + ex);
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("exception", ex);
-        mav.addObject("stacktrace", ex.getStackTrace());
-        mav.addObject("url", req.getRequestURL());
-        mav.setViewName("error");
-        mav.addObject("appName", "Error NFSSoundtrack.com");
-        mav.addObject("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
-        return mav;
+    @RequestMapping(value = "/song/{songId}")
+    public String provideSongInfo(Model model, @PathVariable("songId") String songId) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Song song = songRepository.findById(Integer.valueOf(songId)).get();
+        List<SongSubgroup> usages = songSubgroupRepository.findBySong(song);
+        model.addAttribute("appName", "Custom playlist - NFSSoundtrack.com");
+        model.addAttribute("gamegroups", null);
+        model.addAttribute("author", null);
+        model.addAttribute("genre", null);
+        model.addAttribute("search", null);
+        model.addAttribute("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
+//        model.addAttribute("games", gameRepository.findAll());
+        model.addAttribute("customPlaylist", null);
+        model.addAttribute("songToCheck", song);
+        model.addAttribute("songUsages", usages);
+        return "index";
     }
+
+//    @ExceptionHandler
+//    @ResponseBody
+//    public ModelAndView handleException(HttpServletRequest req, Exception ex) {
+////        logger.error("Request: " + req.getRequestURL() + " raised " + ex);
+//        ModelAndView mav = new ModelAndView();
+//        mav.addObject("exception", ex);
+//        mav.addObject("stacktrace", ex.getStackTrace());
+//        mav.addObject("url", req.getRequestURL());
+//        mav.setViewName("error");
+//        mav.addObject("appName", "Error NFSSoundtrack.com");
+//        mav.addObject("series", serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position")));
+//        return mav;
+//    }
 }

@@ -428,8 +428,8 @@ $(document).ready(function () {
             var featSelectHiddenNext = $('<input type="hidden" id="featSelectHidden-' + i + '" value="' + officialArtistName + '"/>');
             featInputColDivNext.append(featSelectNext);
             featInputColDivNext.append(featSelectHiddenNext);
-            featButtonColDivNext.append('<button id="add-feat-"' + i + '" type="submit" class="btn btn-primary add-feat">+</button>');
-            featButtonColDivNext.append('<button id="delete-feat-"' + i + '" type="submit" class="btn btn-danger delete-feat">-</button>');
+            featButtonColDivNext.append('<button id="add-feat-' + i + '" type="submit" class="btn btn-primary add-feat">+</button>');
+            featButtonColDivNext.append('<button id="delete-feat-' + i + '" type="submit" class="btn btn-danger delete-feat">-</button>');
             featRowDivNext.append(featInputColDivNext);
             featRowDivNext.append(featButtonColDivNext);
             if (authorSong != undefined) {
@@ -584,7 +584,7 @@ $(document).ready(function () {
         generateFeatDiv(null, null, divCol, null, null, null, ++thisId, thisId, "");
         var divNewCol = $('<div class="col"></div>');
         var featConcatInput = $('<input type="text" class="form-control" id="featConcatInput-' + thisId + '"/>');
-        divNewCol.append('<label for="remixConcatInput-' + thisId + '">Feat. concat string</label>');
+        divNewCol.append('<label for="featConcatInput-' + thisId + '">Feat. concat string</label>');
         divNewCol.append(featConcatInput);
         divNewCol.insertBefore(col);
     });
@@ -714,6 +714,10 @@ $(document).ready(function () {
                 } else {
                     songToSave[featInput.id] = "NEW-" + $(featInput).val();
                 }
+                var concatInput = $("#featConcatInput-" + i);
+                if (concatInput.length > 0) {
+                    songToSave[concatInput.attr("id")] = $(concatInput).val();
+                }
             }
         }
         var remixes = $("#remixer").find("input.remix-select");
@@ -729,7 +733,7 @@ $(document).ready(function () {
                         songToSave[remixInput.id] = $(remixInput).next().val();
                     }
                 } else {
-                    songToSave[remixInput.id] = "NEW-" + $(remixInput).val();
+                    songToSave[concatInput.id] = "NEW-" + $(remixInput).val();
                 }
                 var concatInput = $("#remixConcatInput-" + i);
                 if (concatInput.length > 0) {

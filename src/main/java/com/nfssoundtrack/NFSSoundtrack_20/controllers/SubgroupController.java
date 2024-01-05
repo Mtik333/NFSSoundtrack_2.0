@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/subgroup")
-public class SubgroupController {
+public class SubgroupController extends BaseControllerWIthErrorHandling{
 
     @Autowired
     private GameRepository gameRepository;

@@ -19,7 +19,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping(path = "/search")
-public class SearchController {
+public class SearchController extends BaseControllerWIthErrorHandling{
 
     @Value("${spring.application.name}")
     String appName;

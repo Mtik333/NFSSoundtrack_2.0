@@ -20,7 +20,7 @@ import java.util.*;
 
 @Controller
 @RequestMapping("/maingroup")
-public class GroupController {
+public class GroupController extends BaseControllerWIthErrorHandling{
 
     @Autowired
     private GameRepository gameRepository;

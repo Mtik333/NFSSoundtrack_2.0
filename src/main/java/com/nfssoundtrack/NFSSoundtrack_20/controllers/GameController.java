@@ -19,7 +19,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/gamedb")
-public class GameController {
+public class GameController extends BaseControllerWIthErrorHandling{
 
     @Autowired
     SerieRepository serieRepository;

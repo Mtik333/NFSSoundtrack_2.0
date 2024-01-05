@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/songSubgroup")
-public class SongSubgroupController {
+public class SongSubgroupController extends BaseControllerWIthErrorHandling{
 
     @Autowired
     private SubgroupRepository subgroupRepository;

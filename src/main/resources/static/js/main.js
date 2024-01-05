@@ -19,6 +19,12 @@ $(document).ready(function () {
         var jsonEdArrayTrigger = JSON.stringify(customPlaylistArrayTrigger)
         localStorage.setItem("custom-playlist", jsonEdArrayTrigger);
         $("#playlistContent").val(jsonEdArrayTrigger);
+    } else {
+        $("#customPlaylistSubmit").prop("disabled", true);
+        $("#customPlaylistSubmit").parent().parent().attr("data-toggle", "tooltip");
+        $("#customPlaylistSubmit").parent().parent().attr("data-placement", "top");
+        $("#customPlaylistSubmit").parent().parent().attr("data-bs-original-title", "Custom playlist is empty");
+        $("#customPlaylistSubmit").parent().parent().tooltip();
     }
     $("#searchStuff").tooltip({ 'trigger': 'focus', 'title': $("#searchStuff").attr("data-tooltip") });
     $("#filter_games_menu").val("");
@@ -26,8 +32,8 @@ $(document).ready(function () {
     $("#flexSwitchCheckDefault").change(function (e) {
         localStorage.setItem("dark-mode", $(this).prop("checked"));
         changeStuffForDarkMode();
-        if (DISQUS != undefined){
-            DISQUS.reset({reload:true});
+        if (DISQUS != undefined) {
+            DISQUS.reset({ reload: true });
         }
     });
 
@@ -219,7 +225,7 @@ $(document).ready(function () {
     $("#filter_songs").on("keyup", function () {
         var searchValue = $(this).val().toLowerCase();
         if (searchValue.length > 3) {
-            $("#game_stuff").find("tr:has(td):not(.subgroup-separator)").filter(function () {
+            $("table").find("tr:has(td):not(.subgroup-separator)").filter(function () {
                 if ($(this).find("td.band").text().toLowerCase().indexOf(searchValue) > -1
                     || $(this).find("td.songtitle").text().toLowerCase().indexOf(searchValue) > -1) {
                     $(this).show();
@@ -232,7 +238,7 @@ $(document).ready(function () {
                 }
             });
         } else {
-            $("#game_stuff").find("tr:has(td)").filter(function () {
+            $("table").find("tr:has(td)").filter(function () {
                 $(this).show();
             });
         }
@@ -523,7 +529,7 @@ $(document).ready(function () {
                 }
             });
         }
-        if (localI==0){
+        if (localI == 0) {
             //show modal that there is nothing to play
             $("#errorThing").parent().fadeIn(500, function () {
                 setTimeout(function () {
@@ -604,11 +610,81 @@ $(document).ready(function () {
         localStorage.setItem("custom-playlist", jsonEdArray);
         $("#playlistContent").val(jsonEdArray);
         var parentDiv = $("#disqusModal").parent();
+        $("#customPlaylistSubmit").prop("disabled", false);
+        $("#customPlaylistSubmit").parent().parent().tooltip('dispose');
         $("#successThing").parent().fadeIn(500, function () {
             setTimeout(function () {
                 $("#successThing").parent().fadeOut(500);
             }, 3000);
         });
+    });
+
+    $(document).on("click", "img.info-about-song", function () {
+        var trElem = $(this).parent().parent();
+        var songIdAttr = $(trElem).attr("data-song_id");
+        $("#getAllUsages").attr("href", "/song/"+songIdAttr);
+        $.ajax({
+            async: false,
+            type: "GET",
+            url: "/songInfo/" + songIdAttr,
+            success: function (ooo) {
+                var songInfo = JSON.parse(ooo);
+                $("#officialArtist").append(document.createTextNode(songInfo.officialArtist));
+                $("#officialTitle").append(document.createTextNode(songInfo.officialTitle));
+                if (songInfo.composers.length != 0) {
+                    for (let i = 0; i < songInfo.composers.length; i++) {
+                        $(songInfo.composers[i]).insertAfter($("#composers"));
+                    }
+                }
+                if (songInfo.subcomposers.length != 0) {
+                    for (let i = 0; i < songInfo.subcomposers.length; i++) {
+                        $(songInfo.subcomposers[i]).insertAfter($("#subcomposers"));
+                    }
+                }
+                if (songInfo.remixers.length != 0) {
+                    for (let i = 0; i < songInfo.remixers.length; i++) {
+                        $(songInfo.remixers[i]).insertAfter($("#remixers"));
+                    }
+                }
+                if (songInfo.featArtists.length != 0) {
+                    for (let i = 0; i < songInfo.featArtists.length; i++) {
+                        $(songInfo.featArtists[i]).insertAfter($("#featArtists"));
+                    }
+                }
+                $("#infoSongModal").modal('show');
+            },
+            error: function (ooo) {
+                console.log("e2");
+            },
+            done: function (ooo) {
+                console.log("e3");
+            }
+        });
+    });
+
+    $('#infoSongModal').on('hide.bs.modal', function (e) {
+        $("#officialArtist").contents().filter(function () {
+            return this.nodeType === 3; //Node.TEXT_NODE
+        }).each(function () {
+            $(this).remove();
+        });
+        $("#officialTitle").contents().filter(function () {
+            return this.nodeType === 3;
+        }).each(function () {
+            $(this).remove();
+        });
+        $("#composers").parent().find("a").each(function () {
+            $(this).remove();
+        })
+        $("#subcomposers").parent().find("a").each(function () {
+            $(this).remove();
+        })
+        $("#remixers").parent().find("a").each(function () {
+            $(this).remove();
+        })
+        $("#featArtists").parent().find("a").each(function () {
+            $(this).remove();
+        })
     });
 
 });

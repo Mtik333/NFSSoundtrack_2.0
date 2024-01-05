@@ -14,22 +14,24 @@
         </span>
     </div>
     <div class="tabbable boxed parentTabs">
-        <table id="game_stuff" class="table table-hover table-striped playlist_table">
+        <table id="customPlaylistStuff" class="table table-hover table-striped playlist_table">
             <thead>
                 <tr>
-                    <th scope="col"></th>
+                    <th scope="col" th:text="#{id}"></th>
+                    <th scope="col" class="no-sort"></th>
                     <th scope="col" th:text="#{country}"></th>
                     <th scope="col" th:text="#{band}"></th>
                     <th scope="col" th:text="#{song}"></th>
                     <th scope="col" th:text="#{genre}"></th>
-                    <th scope="col" th:text="#{actions}"></th>
-                    <th scope="col"></th>
+                    <th scope="col" class="no-sort" th:text="#{actions}"></th>
+                    <th scope="col" class="no-sort"></th>
                 </tr>
             </thead>
             <tbody>
 
-                <tr th:each="songSubgroup : ${customPlaylist}"
-                    th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},justId=${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
+                <tr th:each="songSubgroup, iter1 : ${customPlaylist}"
+                    th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
+                    <td th:text="${iter1.count}"></td>
                     <td class="info_button">
                         <!-- <img class="img-responsive add-to-custom-playlist" th:src="@{/images/plus.png}"> -->
                         <img class="img-responsive" th:src="@{/images/info.png}">
@@ -113,7 +115,7 @@
                             </th:block>
                         </div>
                     </td>
-                    <td>
+                    <td class="col-md-1">
                         <th:block th:if="${songSubgroup.info!=null && songSubgroup.info!=''}">
                             <a data-toggle="tooltip" th:title="${songSubgroup.info}">
                                 <img th:src="@{/images/warn1.png}">
@@ -183,4 +185,5 @@
 <th:block th:if="${customPlaylist?.isEmpty()}">
     <h3>No songs found in "cache" - did you really add any song to the custom playlist? If not, then just go to some games and stuff that you'll see here. Otherwise, well, maybe you should report this as a problem?</h3>
 </th:block>
+<script th:src="@{/js/customPlaylist.js}" type="application/javascript"></script>
 </html>

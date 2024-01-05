@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/serie")
-public class SerieController {
+public class SerieController extends BaseControllerWIthErrorHandling{
 
     @Autowired
     SerieRepository serieRepository;
