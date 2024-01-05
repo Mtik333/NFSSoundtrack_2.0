@@ -1,11 +1,13 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en-us">
 <link rel="stylesheet" th:href="@{/css/own.css}" type="text/css">
 <th:block th:if="${customPlaylist!=null && !customPlaylist.isEmpty()}">
     <h3 th:text="#{customPlaylist}"></h3>
     <div class="form-group pb-2 pt-2">
         <span id="playlist_init" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
             data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
+            <span id="truncate_playlist" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;"
+             th:text="#{playlistEmpty}"></span>
     </div>
     <div class="form-group">
         <span>
@@ -34,7 +36,8 @@
                     <td th:text="${iter1.count}"></td>
                     <td class="info_button">
                         <!-- <img class="img-responsive add-to-custom-playlist" th:src="@{/images/plus.png}"> -->
-                        <img class="img-responsive" th:src="@{/images/info.png}">
+                        <img class="img-responsive remove-from-playlist" data-toggle="tooltip" data-placement="right" th:title="#{removeFromPlaylist}" th:src="@{/images/minus.png}">
+                        <img class="img-responsive info-about-song" data-toggle="tooltip" data-placement="right" th:title="#{showInfo}" th:src="@{/images/info.png}">
                     </td>
                     <td class="countries">
                         <!--
@@ -68,10 +71,13 @@
                         <span
                             th:text="${songSubgroup.ingameDisplayTitle!=null} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
                         <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
-                            <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
-                                th:href="'/author/'+${authorSong.authorAlias.id}"
+                            <span th:text="${iter.first ? '(feat. ' : ''}"></span>
+                            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                                 th:text="${authorSong.authorAlias.alias}"></a><span
                                 th:text="${iter.last ? ')' : ''}"></span>
+                            <th:block th:if="${authorSong.featConcat!=null}">
+                                <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
+                            </th:block>
                         </th:block>
                         <th:block th:if="${songSubgroup.remix.value=='YES'}">
                             <th:block
@@ -176,14 +182,16 @@
         </div>
     </div>
 </th:block>
-<!-- <div class="error-container" aria-hidden="true">
-    <div id="errorThing" class="alert alert-success fade show" role="alert">
-        <span th:text="#{addedToCustomPlaylist}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
+<div class="success-container" aria-hidden="true">
+    <div id="playlistTruncated" class="alert alert-success fade show" role="alert">
+        <span th:text="#{playlistEmpty}"></span>
     </div>
-</div> -->
+</div>
 <th:block th:if="${customPlaylist?.isEmpty()}">
-    <h3>No songs found in "cache" - did you really add any song to the custom playlist? If not, then just go to some games and stuff that you'll see here. Otherwise, well, maybe you should report this as a problem?</h3>
+    <h3>No songs found in "cache" - did you really add any song to the custom playlist? If not, then just go to some
+        games and stuff that you'll see here. Otherwise, well, maybe you should report this as a problem?</h3>
 </th:block>
 <script th:src="@{/js/customPlaylist.js}" type="application/javascript"></script>
+
 </html>

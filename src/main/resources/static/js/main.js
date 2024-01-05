@@ -606,18 +606,20 @@ $(document).ready(function () {
         var relatedTr = $(this).parent().parent();
         var songSubgroupId = $(relatedTr).attr("data-songSubgroup-id");
         customPlaylistArray.push(songSubgroupId);
-        var jsonEdArray = JSON.stringify(customPlaylistArray)
+        var jsonEdArray = JSON.stringify(customPlaylistArray);
         localStorage.setItem("custom-playlist", jsonEdArray);
         $("#playlistContent").val(jsonEdArray);
         var parentDiv = $("#disqusModal").parent();
         $("#customPlaylistSubmit").prop("disabled", false);
         $("#customPlaylistSubmit").parent().parent().tooltip('dispose');
-        $("#successThing").parent().fadeIn(500, function () {
+        $("#successAddToCustomPlaylist").parent().fadeIn(500, function () {
             setTimeout(function () {
-                $("#successThing").parent().fadeOut(500);
+                $("#successAddToCustomPlaylist").parent().fadeOut(500);
             }, 3000);
         });
     });
+
+
 
     $(document).on("click", "img.info-about-song", function () {
         var trElem = $(this).parent().parent();
@@ -651,6 +653,15 @@ $(document).ready(function () {
                         $(songInfo.featArtists[i]).insertAfter($("#featArtists"));
                     }
                 }
+                if (songInfo.spotify!=null){
+                    $(songInfo.spotify).insertAfter("#externalLinks");
+                }
+                if (songInfo.deezer!=null){
+                    $(songInfo.deezer).insertAfter("#externalLinks");
+                }
+                if (songInfo.itunes!=null){
+                    $(songInfo.itunes).insertAfter("#externalLinks");
+                }
                 $("#infoSongModal").modal('show');
             },
             error: function (ooo) {
@@ -683,6 +694,9 @@ $(document).ready(function () {
             $(this).remove();
         })
         $("#featArtists").parent().find("a").each(function () {
+            $(this).remove();
+        })
+        $("#externalLinks").parent().find("a").each(function () {
             $(this).remove();
         })
     });

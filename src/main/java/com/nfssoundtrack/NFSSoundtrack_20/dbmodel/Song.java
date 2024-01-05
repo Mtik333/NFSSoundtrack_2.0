@@ -33,6 +33,21 @@ public class Song implements Serializable {
     @Column(name = "lyrics")
     private String lyrics;
 
+    @Column(name = "spotify_id")
+    private String spotifyId;
+
+    @Column(name = "deezer_id")
+    private String deezerId;
+
+    @Column(name = "itunes_link")
+    private String itunesLink;
+
+    @Column(name = "tidal_link")
+    private String tidalLink;
+
+    @Column(name = "soundcloud_link")
+    private String soundcloudLink;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "song", fetch = FetchType.LAZY)
     private List<AuthorSong> authorSongList = new ArrayList<>();
@@ -105,4 +120,43 @@ public class Song implements Serializable {
         this.songGenreList = songGenreList;
     }
 
+    public String getSpotifyId() {
+        return spotifyId;
+    }
+
+    public void setSpotifyId(String spotifyId) {
+        this.spotifyId = spotifyId;
+    }
+
+    public String getDeezerId() {
+        return deezerId;
+    }
+
+    public void setDeezerId(String deezerId) {
+        this.deezerId = deezerId;
+    }
+
+    public String getItunesLink() {
+        return itunesLink;
+    }
+
+    public void setItunesLink(String itunesLink) {
+        this.itunesLink = itunesLink;
+    }
+
+    public String getTidalLink() {
+        return tidalLink;
+    }
+
+    public void setTidalLink(String tidalLink) {
+        this.tidalLink = tidalLink;
+    }
+
+    public String getSoundcloudLink() {
+        return soundcloudLink;
+    }
+
+    public void setSoundcloudLink(String soundcloudLink) {
+        this.soundcloudLink = soundcloudLink;
+    }
 }

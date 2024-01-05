@@ -354,6 +354,38 @@ public class Application implements CommandLineRunner {
                                 } else {
                                     mySong.setLyrics(null);
                                 }
+                                if (itunes_embed != null && !itunes_embed.isEmpty()) {
+                                    int indexOfSpotify = itunes_embed.indexOf("spotify:track");
+                                    if (indexOfSpotify > -1) {
+                                        String spotifyThing = itunes_embed.substring(indexOfSpotify, indexOfSpotify + 36);
+                                        mySong.setSpotifyId(spotifyThing.trim());
+                                    }
+                                    int indexOfDeezer = itunes_embed.indexOf("deezer:");
+                                    if (indexOfDeezer > -1) {
+                                        String deezerThing = itunes_embed.substring(indexOfDeezer, indexOfDeezer + 37);
+                                        mySong.setDeezerId(deezerThing.trim());
+                                    }
+                                    String itunesThing = null;
+                                    int indexOfItunesNew = itunes_embed.indexOf("https://itunes.apple.com");
+                                    int indexOfReferer = itunes_embed.indexOf("at=11lJZP");
+                                    if (indexOfItunesNew > -1 && indexOfReferer > -1) {
+                                        itunesThing = itunes_embed.substring(indexOfItunesNew, indexOfReferer + 9);
+                                    }
+                                    int indexOfGeoMusic = itunes_embed.indexOf("https://geo.music.apple.com");
+                                    if (indexOfGeoMusic > -1 && indexOfReferer > -1) {
+                                        itunesThing = itunes_embed.substring(indexOfGeoMusic, indexOfReferer + 9);
+                                    }
+                                    int indexOfGeoItunes = itunes_embed.indexOf("https://geo.itunes.apple.com");
+                                    if (indexOfGeoItunes > -1 && indexOfReferer > -1) {
+                                        itunesThing = itunes_embed.substring(indexOfGeoItunes, indexOfReferer + 9);
+                                    }
+                                    if (itunesThing != null) {
+                                        itunesThing = itunesThing.replace("geo.itunes.apple.com", "music.apple.com");
+                                        itunesThing = itunesThing.replace("geo.music.apple.com", "music.apple.com");
+                                        itunesThing = itunesThing.replace("itunes.apple.com", "music.apple.com");
+                                        mySong.setItunesLink(itunesThing.trim());
+                                    }
+                                }
 //                                mySong.setInfo(info);
 //                                mySong.setLyrics(lyrics);
                                 mySong = songRepository.saveAndFlush(mySong);
@@ -398,38 +430,43 @@ public class Application implements CommandLineRunner {
                             songSubgroup.setSrcId(mySong.getSrcId());
                             songSubgroup.setPosition(position * 10);
                             songSubgroup.setLyrics(mySong.getLyrics());
-                            if (itunes_embed != null && !itunes_embed.isEmpty()) {
-                                int indexOfSpotify = itunes_embed.indexOf("spotify:track");
-                                if (indexOfSpotify > -1) {
-                                    String spotifyThing = itunes_embed.substring(indexOfSpotify, indexOfSpotify + 36);
-                                    songSubgroup.setSpotifyId(spotifyThing.trim());
-                                }
-                                int indexOfDeezer = itunes_embed.indexOf("deezer:");
-                                if (indexOfDeezer > -1) {
-                                    String deezerThing = itunes_embed.substring(indexOfDeezer, indexOfDeezer + 37);
-                                    songSubgroup.setDeezerId(deezerThing.trim());
-                                }
-                                String itunesThing = null;
-                                int indexOfItunesNew = itunes_embed.indexOf("https://itunes.apple.com");
-                                int indexOfReferer = itunes_embed.indexOf("at=11lJZP");
-                                if (indexOfItunesNew > -1 && indexOfReferer > -1) {
-                                    itunesThing = itunes_embed.substring(indexOfItunesNew, indexOfReferer + 9);
-                                }
-                                int indexOfGeoMusic = itunes_embed.indexOf("https://geo.music.apple.com");
-                                if (indexOfGeoMusic > -1 && indexOfReferer > -1) {
-                                    itunesThing = itunes_embed.substring(indexOfGeoMusic, indexOfReferer + 9);
-                                }
-                                int indexOfGeoItunes = itunes_embed.indexOf("https://geo.itunes.apple.com");
-                                if (indexOfGeoItunes > -1 && indexOfReferer > -1) {
-                                    itunesThing = itunes_embed.substring(indexOfGeoItunes, indexOfReferer + 9);
-                                }
-                                if (itunesThing != null) {
-                                    itunesThing = itunesThing.replace("geo.itunes.apple.com", "music.apple.com");
-                                    itunesThing = itunesThing.replace("geo.music.apple.com", "music.apple.com");
-                                    itunesThing = itunesThing.replace("itunes.apple.com", "music.apple.com");
-                                    songSubgroup.setItunesLink(itunesThing.trim());
-                                }
-                            }
+                            songSubgroup.setSpotifyId(mySong.getSpotifyId());
+                            songSubgroup.setDeezerId(mySong.getDeezerId());
+                            songSubgroup.setItunesLink(mySong.getItunesLink());
+                            songSubgroup.setSpotifyId(mySong.getSpotifyId());
+                            songSubgroup.setSpotifyId(mySong.getSpotifyId());
+//                            if (itunes_embed != null && !itunes_embed.isEmpty()) {
+//                                int indexOfSpotify = itunes_embed.indexOf("spotify:track");
+//                                if (indexOfSpotify > -1) {
+//                                    String spotifyThing = itunes_embed.substring(indexOfSpotify, indexOfSpotify + 36);
+//                                    songSubgroup.setSpotifyId(spotifyThing.trim());
+//                                }
+//                                int indexOfDeezer = itunes_embed.indexOf("deezer:");
+//                                if (indexOfDeezer > -1) {
+//                                    String deezerThing = itunes_embed.substring(indexOfDeezer, indexOfDeezer + 37);
+//                                    songSubgroup.setDeezerId(deezerThing.trim());
+//                                }
+//                                String itunesThing = null;
+//                                int indexOfItunesNew = itunes_embed.indexOf("https://itunes.apple.com");
+//                                int indexOfReferer = itunes_embed.indexOf("at=11lJZP");
+//                                if (indexOfItunesNew > -1 && indexOfReferer > -1) {
+//                                    itunesThing = itunes_embed.substring(indexOfItunesNew, indexOfReferer + 9);
+//                                }
+//                                int indexOfGeoMusic = itunes_embed.indexOf("https://geo.music.apple.com");
+//                                if (indexOfGeoMusic > -1 && indexOfReferer > -1) {
+//                                    itunesThing = itunes_embed.substring(indexOfGeoMusic, indexOfReferer + 9);
+//                                }
+//                                int indexOfGeoItunes = itunes_embed.indexOf("https://geo.itunes.apple.com");
+//                                if (indexOfGeoItunes > -1 && indexOfReferer > -1) {
+//                                    itunesThing = itunes_embed.substring(indexOfGeoItunes, indexOfReferer + 9);
+//                                }
+//                                if (itunesThing != null) {
+//                                    itunesThing = itunesThing.replace("geo.itunes.apple.com", "music.apple.com");
+//                                    itunesThing = itunesThing.replace("geo.music.apple.com", "music.apple.com");
+//                                    itunesThing = itunesThing.replace("itunes.apple.com", "music.apple.com");
+//                                    songSubgroup.setItunesLink(itunesThing.trim());
+//                                }
+//                            }
                             songSubgroup.setSubgroup(tempSubgroup);
                             songSubgroup.setInfo(info);
                             songSubgroup = songSubgroupRepository.saveAndFlush(songSubgroup);

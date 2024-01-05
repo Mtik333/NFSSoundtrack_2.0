@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en-us">
 <link rel="stylesheet" th:href="@{/css/own.css}" type="text/css">
-<h3 th:text="'Usages of song: '+${songToCheck?.officialDisplayBand}+' - '+${songToCheck?.officialDisplayTitle}"></h3>
+<h3 th:text="#{usagesOfSong}+' '+${songToCheck?.officialDisplayBand}+' - '+${songToCheck?.officialDisplayTitle}"></h3>
 <!-- <div class="form-group pb-2 pt-2">
     <span id="playlist_init" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
         data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>

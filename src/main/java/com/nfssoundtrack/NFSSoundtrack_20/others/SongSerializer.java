@@ -70,6 +70,15 @@ public class SongSerializer extends StdSerializer<Song> {
             jsonGenerator.writeString(stringToWrite.toString());
         }
         jsonGenerator.writeEndArray();
+        if (song.getSpotifyId()!=null){
+            jsonGenerator.writeStringField("spotify","<a class='p-2' href='"+song.getSpotifyId()+"' style='text-decoration:none;'><img class='img-responsive' src='/images/spotify.png' width='25' height='25'></a>");
+        }
+        if (song.getDeezerId()!=null){
+            jsonGenerator.writeStringField("deezer","<a class='p-2' href='"+song.getDeezerId()+"' style='text-decoration:none;'><img class='img-responsive' src='/images/deezer.png' width='25' height='25'></a>");
+        }
+        if (song.getItunesLink()!=null){
+            jsonGenerator.writeStringField("itunes","<a class='p-2' href='"+song.getItunesLink()+"' style='text-decoration:none;'><img class='img-responsive' src='/images/itunes2.png' width='25' height='25'></a>");
+        }
         jsonGenerator.writeEndObject();
     }
 }

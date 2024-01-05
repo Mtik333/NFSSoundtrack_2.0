@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en-us">
 <link rel="stylesheet" th:href="@{/css/own.css}" type="text/css">
 <th:block th:if="${songSubgroups!=null && !songSubgroups.isEmpty()}">
     <div class="form-group pb-2 pt-2">
@@ -80,10 +80,10 @@
                             <tr th:each="songSubgroup : ${subgroup.songSubgroupList}"
                                 th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
                                 <td class="info_button">
-                                    <img class="img-responsive add-to-custom-playlist" th:src="@{/images/plus.png}">
-                                    <img class="img-responsive info-about-song" th:src="@{/images/info.png}">
+                                    <img class="img-responsive add-to-custom-playlist" data-toggle="tooltip" data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/plus.png}">
+                                    <img class="img-responsive info-about-song" data-toggle="tooltip" data-placement="right" th:title="#{showInfo}" th:src="@{/images/info.png}">
                                     <!-- data-bs-toggle="modal" data-bs-target="#infoSongModal"  -->
-                                    
+
                                 </td>
                                 <td class="countries">
                                     <!--
@@ -121,8 +121,11 @@
                                         th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
                                         <span th:text="${iter.first ? '(feat. ' : ''}"></span>
                                         <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                                            th:text="${authorSong.authorAlias.alias}"></a>
-                                            <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span><span th:text="${iter.last ? ')' : ''}"></span>
+                                            th:text="${authorSong.authorAlias.alias}"></a><span
+                                            th:text="${iter.last ? ')' : ''}"></span>
+                                        <th:block th:if="${authorSong.featConcat!=null}">
+                                            <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
+                                        </th:block>
                                     </th:block>
                                     <th:block th:if="${songSubgroup.remix.value=='YES'}">
                                         <th:block
@@ -342,77 +345,29 @@
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="infoSongModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
-        aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <a href="" id="getAllUsages" class="btn btn-outline-info"
-                        th:text="'Find all usages of this song'"></a>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <span id="officialArtist"><b>Official artist:</b></span>
-                        </div>
-                        <div class="col-md-6">
-                            <span id="officialTitle"><b>Official title:</b> </span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <span id="composers">Composers: </span><br>
-                            <!--place for a hrefs-->
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <span id="subcomposers">Subcomposers: </span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <span id="remixers">Remixed by: </span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <span id="featArtists">Featuring: </span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <span>External links</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <span>Spotify img, Deezer img etc.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
 
 </th:block>
 <th:block th:if="${songSubgroups!=null && songSubgroups.isEmpty()}">
     <h2>No songs found, that's quite odd. Would you like to report it? Click the "Report problem" button from the top
         menu to proceed</h2>
 </th:block>
-<div class="error-container" aria-hidden="true">
-    <div id="successThing" class="alert alert-success fade show" role="alert">
+<div class="success-container" aria-hidden="true">
+    <div id="successAddToCustomPlaylist" class="alert alert-success fade show" role="alert">
         <span th:text="#{addedToCustomPlaylist}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 </div>
-<div class="success-container" aria-hidden="true">
+<div class="error-container" aria-hidden="true">
     <div id="errorThing" class="alert alert-danger fade show" role="alert">
-        <span th:text="'Nothing to play!'"></span>
+        <span th:text="#{nothingToPlay}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 </div>
-
+<div class="remove-from-playlist-container" aria-hidden="true">
+    <div id="successRemoveFromCustomPlaylist" class="alert alert-success fade show" role="alert">
+        <span th:text="#{removedFromPlaylist}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
 </html>

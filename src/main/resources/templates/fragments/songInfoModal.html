@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="en-us">
+<div class="modal fade" id="infoSongModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a href="" id="getAllUsages" class="btn btn-outline-info"
+                    th:text="'Find all usages of this song'"></a>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <span id="officialArtist"><b th:text="#{officialArtist}+': '"></b></span>
+                    </div>
+                    <div class="col-md-6">
+                        <span id="officialTitle"><b th:text="#{officialTitle}+': '"></b></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <span id="composers"><b th:text="#{composers}+': '"></b></span><br>
+                        <!--place for a hrefs-->
+                    </div>
+                    <div class="col-md-6">
+                        <span id="externalLinks"><b th:text="#{streamFrom}+': '"></b></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span id="subcomposers"><b th:text="#{subcomposers}+': '"></b></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span id="remixers"><b th:text="#{remixedBy}+': '"></b></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span id="featArtists"><b th:text="#{featuring}+': '"></b></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</html>

@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en-us">
 <link rel="stylesheet" th:href="@{/css/own.css}" type="text/css">
 <h3 th:text="#{songsWithGenre}+' '+${genre?.genreName}"></h3>
 <th:block th:if="${#lists.size(songSubgroupList)>=50 and readFull!=null}">
@@ -10,10 +10,11 @@
 <div class="form-group pb-2 pt-2">
     <span id="playlist_init" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
         data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
-        </div>
+</div>
 <table id="genreTable" class="table table-hover table-striped playlist_table">
     <thead>
         <th scope="col" th:text="#{id}"></th>
+        <th scope="col" class="no-sort"></th>
         <th scope="col" th:text="#{band}"></th>
         <th scope="col" th:text="#{song}"></th>
         <th scope="col" th:text="#{subgroup}"></th>
@@ -23,8 +24,12 @@
     </thead>
     <tbody>
         <tr th:each="songSubgroup, iter1 : ${songSubgroupList}"
-            th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id}">
+            th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
             <td th:text="${iter1.count}"></td>
+            <td class="info_button">
+                <img class="img-responsive add-to-custom-playlist" data-toggle="tooltip" data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/plus.png}">
+                <img class="img-responsive info-about-song" data-toggle="tooltip" data-placement="right" th:title="#{showInfo}" th:src="@{/images/info.png}">
+            </td>
             <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
                 <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
                     <td class="band">
@@ -37,9 +42,12 @@
                 <span
                     th:text="${songSubgroup.ingameDisplayTitle!=null} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
                 <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
-                    <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
-                        th:href="'/author/'+${authorSong.authorAlias.id}"
+                    <span th:text="${iter.first ? '(feat. ' : ''}"></span>
+                    <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                         th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
+                    <th:block th:if="${authorSong.featConcat!=null}">
+                        <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
+                    </th:block>
                 </th:block>
                 <th:block th:if="${songSubgroup.remix.value=='YES'}">
                     <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
@@ -100,27 +108,28 @@
         </li>
     </ul>
 </nav> -->
-<div class="modal fade" id="playlistModeModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
-aria-hidden="true">
-<div class="modal-dialog modal-xl" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 th:text="#{playlistMode}"></h3>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <div id="playlistModePlayer" class="ratio ratio-16x9">
+<div class="modal fade" id="playlistModeModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 th:text="#{playlistMode}"></h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="playlistModePlayer" class="ratio ratio-16x9">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <table class="table table-bordered table-hover table-sm" id="playlist_progress"></table>
+                    <div class="col-md-6">
+                        <table class="table table-bordered table-hover table-sm" id="playlist_progress"></table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-</div>
+<th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
 <script th:src="@{/js/genre.js}" type="application/javascript"></script>
+
 </html>

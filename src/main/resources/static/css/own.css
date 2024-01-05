@@ -257,6 +257,12 @@ td.playlist_disable_song {
   right:20px;
   display: none;
 }
+.remove-from-playlist-container{
+  position:fixed;
+  bottom:0;
+  right:20px;
+  display: none;
+}
 :root {
 color-scheme: unset;
 }
@@ -266,5 +272,9 @@ img.info-about-song {
 }
 
 img.add-to-custom-playlist {
+  cursor: pointer;
+}
+
+img.remove-from-playlist {
   cursor: pointer;
 }

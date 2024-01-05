@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en-us">
 <nav id="topNavbar" class="navbar navbar-expand-xxl navbar-light bg-light">
     <div class="collapse navbar-collapse d-flex" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto d-inline ml-2">
@@ -46,7 +46,7 @@
                 <form th:action="@{/custom/playlist}" method="post" class="d-inline p-1">
                     <input class="form-control" id="playlistContent" type="hidden" name="customPlaylist"></input>
                     <button id="customPlaylistSubmit" type="submit" class="nav-link d-inline-block p-1"
-                        th:text="'Custom playlist'"></button>
+                        th:text="#{customPlaylist}"></button>
                 </form>
             </li>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
