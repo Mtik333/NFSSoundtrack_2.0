@@ -535,7 +535,7 @@ CREATE TABLE IF NOT EXISTS `song` (
   `tidal_link` tinytext DEFAULT NULL,
   `soundcloud_link` tinytext DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=887 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='make song_variant later';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='make song_variant later';
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
@@ -553,7 +553,7 @@ CREATE TABLE IF NOT EXISTS `song` (
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 CREATE TABLE IF NOT EXISTS `genre` (
-  `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `genre_name` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `Indeks 2` (`genre_name`)
@@ -577,7 +577,7 @@ CREATE TABLE IF NOT EXISTS `genre` (
 CREATE TABLE IF NOT EXISTS `song_genre` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `song_id` mediumint(8) unsigned NOT NULL,
-  `genre_id` tinyint(3) unsigned NOT NULL,
+  `genre_id` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_song_genre_genre` (`genre_id`),
   KEY `FK_song_genre_song` (`song_id`),

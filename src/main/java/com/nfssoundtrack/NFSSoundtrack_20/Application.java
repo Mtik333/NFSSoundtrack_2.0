@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
 import java.io.FileInputStream;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -237,16 +238,16 @@ public class Application implements CommandLineRunner {
                 try {
                     FileInputStream stream = new FileInputStream(args[1]);
                     XSSFWorkbook excelWookBook = new XSSFWorkbook(stream);
-                    XSSFSheet mySheet = excelWookBook.getSheet("Arkusz1");
+                    XSSFSheet mySheet = excelWookBook.getSheet(args[2]);
                     Set<Row> filteredRows = new HashSet<>();
                     int gameTraversedNow = 0;
                     Game game = null;
                     MainGroup tempGroup = null;
                     Subgroup tempSubgroup = null;
                     for (Row row : mySheet) {
-                        if (row.getRowNum() == 0) {
-                            continue;
-                        }
+//                        if (row.getRowNum() == 0) {
+//                            continue;
+//                        }
                         currentRow = row;
                         Long id = (long) row.getCell(0).getNumericCellValue();
                         Long position = (long) row.getCell(1).getNumericCellValue();
@@ -261,7 +262,7 @@ public class Application implements CommandLineRunner {
                         String src_id = row.getCell(9).toString().trim();
                         String info = null;
                         if (row.getCell(10) != null) {
-                            info = row.getCell(10).getStringCellValue().trim();
+                            info = row.getCell(10).toString().trim();
                         }
                         String genre = null;
                         if (row.getCell(14) != null) {
@@ -273,30 +274,38 @@ public class Application implements CommandLineRunner {
                         }
                         if (Math.toIntExact(game_id) != gameTraversedNow) {
                             game = gameRepository.findById(game_id.intValue()).get();
-                            MainGroup allGroup = new MainGroup();
-                            allGroup.setGroupName("All");
-                            allGroup.setGame(game);
-                            mainGroupRepository.save(allGroup);
-                            Subgroup allSubgroup = new Subgroup();
-                            allSubgroup.setSubgroupName("All");
-                            allSubgroup.setMainGroup(allGroup);
-                            allSubgroup.setPosition(1);
-                            subgroupRepository.save(allSubgroup);
-                            gameTraversedNow = Math.toIntExact(game_id);
-                            tempGroup = new MainGroup();
-                            tempGroup.setGroupName("Custom");
-                            tempGroup.setGame(game);
-                            tempGroup = mainGroupRepository.save(tempGroup);
-                            tempSubgroup = new Subgroup();
-                            tempSubgroup.setSubgroupName("All");
-                            tempSubgroup.setMainGroup(tempGroup);
-                            tempSubgroup.setPosition(1);
-                            subgroupRepository.save(tempSubgroup);
-                            tempSubgroup = new Subgroup();
-                            tempSubgroup.setSubgroupName("Ungrouped");
-                            tempSubgroup.setMainGroup(tempGroup);
-                            tempSubgroup.setPosition(2);
-                            subgroupRepository.save(tempSubgroup);
+                            List<MainGroup> mainGroups = game.getMainGroups();
+                            if (!mainGroups.isEmpty()){
+                                //we start with 2nd or 3rd or next sheet so we have to continue from where hwe stopped
+                                tempGroup = mainGroups.stream().filter(mainGroup -> mainGroup.getGroupName().equals("Custom")).findFirst().get();
+                                tempGroup.getSubgroups().sort(Comparator.comparing(Subgroup::getPosition));
+                                tempSubgroup = tempGroup.getSubgroups().get(tempGroup.getSubgroups().size()-1);
+                            } else {
+                                MainGroup allGroup = new MainGroup();
+                                allGroup.setGroupName("All");
+                                allGroup.setGame(game);
+                                mainGroupRepository.save(allGroup);
+                                Subgroup allSubgroup = new Subgroup();
+                                allSubgroup.setSubgroupName("All");
+                                allSubgroup.setMainGroup(allGroup);
+                                allSubgroup.setPosition(1);
+                                subgroupRepository.save(allSubgroup);
+                                gameTraversedNow = Math.toIntExact(game_id);
+                                tempGroup = new MainGroup();
+                                tempGroup.setGroupName("Custom");
+                                tempGroup.setGame(game);
+                                tempGroup = mainGroupRepository.save(tempGroup);
+                                tempSubgroup = new Subgroup();
+                                tempSubgroup.setSubgroupName("All");
+                                tempSubgroup.setMainGroup(tempGroup);
+                                tempSubgroup.setPosition(1);
+                                subgroupRepository.save(tempSubgroup);
+                                tempSubgroup = new Subgroup();
+                                tempSubgroup.setSubgroupName("Ungrouped");
+                                tempSubgroup.setMainGroup(tempGroup);
+                                tempSubgroup.setPosition(2);
+                                subgroupRepository.save(tempSubgroup);
+                            }
 //                            tempSubgroup=null;
                         }
                         if (band.equals("Somebody") || band.equals("Somebodies")) {

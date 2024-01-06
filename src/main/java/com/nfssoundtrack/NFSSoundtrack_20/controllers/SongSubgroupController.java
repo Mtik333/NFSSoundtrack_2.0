@@ -66,6 +66,7 @@ public class SongSubgroupController extends BaseControllerWIthErrorHandling{
             String ingameTitle = (String) objectMapper.get("ingameTitle");
             String ingameSrcId = (String) objectMapper.get("ingameSrcId");
             String lyrics = (String) objectMapper.get("lyrics");
+            String info = (String) objectMapper.get("info");
             boolean instrumental = (boolean) objectMapper.get("instrumental");
             boolean feat = (boolean) objectMapper.get("feat");
             boolean remix = (boolean) objectMapper.get("remix");
@@ -158,6 +159,11 @@ public class SongSubgroupController extends BaseControllerWIthErrorHandling{
                 songSubgroup.setSrcId(ingameSrcId);
             } else {
                 songSubgroup.setSrcId(null);
+            }
+            if (!info.equals("null") && !info.equals("undefined")) {
+                songSubgroup.setInfo(info);
+            } else {
+                songSubgroup.setInfo(null);
             }
             if (subcomposer) {
                 List<String> comingSubcomposers = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerSelect")).collect(Collectors.toList());

@@ -87,6 +87,7 @@ public class SubgroupController extends BaseControllerWIthErrorHandling{
             songSubgroup.setLyrics(originalSongSubgroup.getLyrics());
             songSubgroup.setRemix(originalSongSubgroup.getRemix());
             songSubgroup.setSrcId(originalSongSubgroup.getSrcId());
+            songSubgroup.setInfo(originalSongSubgroup.getInfo());
             songSubgroupRepository.save(songSubgroup);
         }
         return new ObjectMapper().writeValueAsString("OK");

@@ -10,7 +10,7 @@
 CREATE TABLE IF NOT EXISTS `song_genre` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `song_id` mediumint(8) unsigned NOT NULL,
-  `genre_id` tinyint(3) unsigned NOT NULL,
+  `genre_id` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_song_genre_genre` (`genre_id`),
   KEY `FK_song_genre_song` (`song_id`),

@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en-us">
 <div class="col-xl-auto flex-nowrap list-group list-group-flush overflow-auto vh-100">
     <input class="filter_games" maxlength="15" placeholder="Search games (type min. 3 chars)">
-    <button id="manage-countries" type="submit" class="btn btn-primary mt-2">Manage countries</button>
     <button id="reposition-series" type="submit" class="btn btn-primary mt-2">Manage series</button>
     <button id="manage-artists" type="submit" class="btn btn-primary mt-2">Manage artists</button>
     <ul class="nav-item list-group-item ps-0" th:each="serie: ${series}">

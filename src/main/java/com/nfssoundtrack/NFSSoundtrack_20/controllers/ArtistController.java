@@ -157,4 +157,24 @@ public class ArtistController extends BaseControllerWIthErrorHandling {
             return result;
         }
     }
+
+    @GetMapping(value = "/authorNameMgmt/{input}")
+    public @ResponseBody String readArtistsForMgmt(Model model, @PathVariable("input") String input) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (input.isEmpty()) {
+            return objectMapper.writeValueAsString("[]");
+        }
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(AuthorAlias.class, new AuthorAliasSerializer(AuthorAlias.class));
+        objectMapper.registerModule(simpleModule);
+        if (input.length() <= 3) {
+            AuthorAlias authorList = authorAliasRepository.findByAlias(input);
+            String result = objectMapper.writeValueAsString(Collections.singleton(authorList));
+            return result;
+        } else {
+            List<AuthorAlias> authorList = authorAliasRepository.findByAliasContains(input);
+            String result = objectMapper.writeValueAsString(authorList);
+            return result;
+        }
+    }
 }

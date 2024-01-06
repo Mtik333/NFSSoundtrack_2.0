@@ -278,3 +278,21 @@ img.add-to-custom-playlist {
 img.remove-from-playlist {
   cursor: pointer;
 }
+/*
+@media only screen and (max-height: 412px){
+    .ratio-16x9{
+        height: 65vh;
+    }
+}
+@media only screen and (max-height: 412px){
+    .ratio-16x9{
+        height: 65vh;
+    }
+}
+
+@media (max-height: 1080px){
+    .ratio-16x9 {
+        height: 75vh;
+    }
+}
+*/

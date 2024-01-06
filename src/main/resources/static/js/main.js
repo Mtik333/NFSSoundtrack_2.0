@@ -62,7 +62,18 @@ $(document).ready(function () {
         });
     }
     $(document).find("td.countries").each(function () {
-        $(this).find('.country-img:nth-child(n+2)').remove();
+        var imgsOfCountries = $(this).children();
+        var arrayOfLinks = new Array();
+        // var duplicatesToRemove = new Array();
+        for (let i=0; i<imgsOfCountries.length; i++){
+            var srcOfImg = imgsOfCountries[i].src;
+            if (arrayOfLinks.indexOf(srcOfImg)==-1){
+                arrayOfLinks.push(srcOfImg);
+            } else {
+                // duplicatesToRemove.push(imgsOfCountries[i]);
+                $(imgsOfCountries[i]).remove();
+            }
+        }
     });
     var activeSubgroups;
     var baseVideoSrc;
