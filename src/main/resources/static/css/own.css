@@ -6,6 +6,14 @@
   max-height: 88px;
 }
 
+.img-responsive2 {
+  max-height: 88px;
+}
+.img-responsive3 {
+  max-height: 88px;
+}
+
+
 .nfs-top-item-active {
   background-color: #d1e2ff;
 }
@@ -194,6 +202,7 @@ html[data-bs-theme="dark"] #filter_songs {
   background-color: #39426F;
   color: #fff;
 }
+
 td.playlist_play_it {
   cursor: pointer;
 }
@@ -203,68 +212,71 @@ td.playlist_disable_song {
 }
 
 #genreTable thead tr th:after {
-	position: relative;
-	right: -3px;
+  position: relative;
+  right: -3px;
 }
 
 #genreTable thead tr th.sort-asc:after {
-	content: "\25b4";
+  content: "\25b4";
 }
 
 #genreTable thead tr th.sort-desc:after {
-	content: "\25be";
+  content: "\25be";
 }
 
 #customPlaylistStuff thead tr th:after {
-	position: relative;
-	right: -3px;
+  position: relative;
+  right: -3px;
 }
 
 #customPlaylistStuff thead tr th.sort-asc:after {
-	content: "\25b4";
+  content: "\25b4";
 }
 
 #customPlaylistStuff thead tr th.sort-desc:after {
-	content: "\25be";
+  content: "\25be";
 }
 
 #songTable thead tr th:after {
-	position: relative;
-	right: -3px;
+  position: relative;
+  right: -3px;
 }
 
 #songTable thead tr th.sort-asc:after {
-	content: "\25b4";
+  content: "\25b4";
 }
 
 #songTable thead tr th.sort-desc:after {
-	content: "\25be";
+  content: "\25be";
 }
 
-#nightModeSwitch{
+#nightModeSwitch {
   text-decoration: none;
 }
 
-.error-container{
-  position:fixed;
-  bottom:0;
-  right:20px;
+.error-container {
+  position: fixed;
+  bottom: 0;
+  right: 20px;
   display: none;
 }
-.success-container{
-  position:fixed;
-  bottom:0;
-  right:20px;
+
+.success-container {
+  position: fixed;
+  bottom: 0;
+  right: 20px;
   display: none;
 }
-.remove-from-playlist-container{
-  position:fixed;
-  bottom:0;
-  right:20px;
+
+.remove-from-playlist-container {
+  position: fixed;
+  bottom: 0;
+  right: 20px;
   display: none;
 }
+
 :root {
-color-scheme: unset;
+  color-scheme: unset;
 }
 
 img.info-about-song {
@@ -278,12 +290,58 @@ img.add-to-custom-playlist {
 img.remove-from-playlist {
   cursor: pointer;
 }
-/*
-@media only screen and (max-height: 412px){
-    .ratio-16x9{
-        height: 65vh;
-    }
+
+#game_stuff {
+  table-layout: fixed;
 }
+
+@media screen and (max-width: 600px) {
+  #game_stuff {
+    table-layout: fixed;
+    font-size: 2vw;
+  }
+
+  .img-responsive {
+    width: 3vw;
+    height: 3vw;
+  }
+
+  .img-responsive2 {
+    width: 7vw;
+    height: 7vw;
+  }
+  .img-responsive3 {
+    height: 14vw;
+  }
+  .country-img {
+    width: 4vw;
+    height: 4vw;
+  }
+
+  .nav-link {
+    font-size: 2.5vw;
+  }
+
+  .nfs-top-item {
+    font-size: 2.5vw;
+  }
+
+  #searchStuff {
+    font-size: 2vw;
+  }
+
+  #filter_songs {
+    font-size: 2.5vw;
+  }
+  #socialButtons{
+    margin: auto;
+  }
+  .tooltip{
+    font-size: 2.5vw;
+  }
+}
+
+/*
 @media only screen and (max-height: 412px){
     .ratio-16x9{
         height: 65vh;
