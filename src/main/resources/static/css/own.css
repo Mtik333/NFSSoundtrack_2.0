@@ -9,6 +9,7 @@
 .img-responsive2 {
   max-height: 88px;
 }
+
 .img-responsive3 {
   max-height: 88px;
 }
@@ -291,14 +292,32 @@ img.remove-from-playlist {
   cursor: pointer;
 }
 
-#game_stuff {
-  table-layout: fixed;
-}
+  #offcanvas{
+    width: 25%;
+  }
 
+@media screen and (min-width: 1080px) {
+    .lyrics_main{
+    width:65%;
+    float: right;
+    overflow: auto;
+    height: 300px;
+    }
+
+    #ytrow{
+    width: 470px;
+    height: 300px;
+    }
+}
 @media screen and (max-width: 600px) {
   #game_stuff {
     table-layout: fixed;
-    font-size: 2vw;
+    font-size: 3vw;
+  }
+
+  #genreTable {
+    table-layout: fixed;
+    font-size: 3vw;
   }
 
   .img-responsive {
@@ -310,12 +329,14 @@ img.remove-from-playlist {
     width: 7vw;
     height: 7vw;
   }
+
   .img-responsive3 {
     height: 14vw;
   }
+
   .country-img {
-    width: 4vw;
-    height: 4vw;
+    width: 5.4vw;
+    height: 3vw;
   }
 
   .nav-link {
@@ -333,12 +354,111 @@ img.remove-from-playlist {
   #filter_songs {
     font-size: 2.5vw;
   }
-  #socialButtons{
+
+    #filter_games_menu {
+      font-size: 2.5vw;
+    }
+
+  #socialButtons {
     margin: auto;
   }
-  .tooltip{
+
+  .tooltip {
     font-size: 2.5vw;
   }
+
+  col.info_button {
+    width: 5%;
+  }
+
+  col.countries {
+    width: 10%;
+  }
+
+  col.band {
+    width: 20%;
+  }
+
+  col.songtitle {
+    width: 35%;
+  }
+
+  col.genre {
+    width: 15%;
+  }
+
+  col.actions {
+    width: 8%;
+  }
+
+  col.infowarn {
+    width: 7%;
+  }
+/*
+  col.genre-id {
+    width: 3%;
+  }
+
+  col.genre-info_button {
+    width: 5%;
+  }
+
+  col.genre-band {
+    width: 12%;
+  }
+
+  col.genre-songtitle {
+    width: 25%;
+  }
+
+  col.genre-subgroup {
+    width: 15%;
+  }
+
+  col.genre-group {
+    width: 15%;
+  }
+
+  col.genre-game {
+    width: 8%;
+  }
+
+  col.genre-actions {
+    width: 7%;
+  }
+*/
+  genre-h3{
+  font-size: 4vw;
+  }
+
+  genre-h5{
+  font-size: 3vw;
+  }
+  .genreLink{
+  font-size: 3vw;
+  }
+
+
+  td {
+    vertical-align: middle;
+  }
+
+  #offcanvas{
+    width: 70%;
+  }
+
+  .accordion-button {
+    font-size: 3.5vw;
+  }
+  .list-group-item {
+    font-size: 3vw;
+  }
+  #ytrow{
+    width: 100%;
+  }
+  /* td.songtitle{
+    text-align: center;
+  } */
 }
 
 /*

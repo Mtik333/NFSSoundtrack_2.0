@@ -1,9 +1,9 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org" lang="en-us">
 <link rel="stylesheet" th:href="@{/css/own.css}" type="text/css">
-<h3 th:text="#{songsWithGenre}+' '+${genre?.genreName}"></h3>
+<h3 class="genre-h3" th:text="#{songsWithGenre}+' '+${genre?.genreName}"></h3>
 <th:block th:if="${#lists.size(songSubgroupList)>=50 and readFull!=null}">
-    <h5 th:text="#{listOfSongsOver50}"></h5>
+    <h5 class="genre-h5" th:text="#{listOfSongsOver50}"></h5>
     <a class="genreLink" th:href="@{/genre/readfull/{genreid}(genreid=${genre.id})}" th:text="#{seeFullGenreList}"></a>
     <br>
 </th:block>
@@ -12,6 +12,15 @@
         data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
 </div>
 <table id="genreTable" class="table table-hover table-striped playlist_table">
+    <colgroup>
+        <col class="genre-id"/>
+        <col class="genre-info_button"/>
+        <col class="genre-band"/>
+        <col class="genre-songtitle"/>
+        <col class="genre-genre"/>
+        <col class="genre-actions"/>
+        <col class="genre-infowarn"/>
+    </colgroup>
     <thead>
         <th scope="col" th:text="#{id}"></th>
         <th scope="col" class="no-sort"></th>

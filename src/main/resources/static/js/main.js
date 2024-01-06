@@ -8,12 +8,13 @@ $(document).ready(function () {
         $("#offcanvas").removeClass("w-35");
         $("#offcanvas").removeClass("w-50");
         $("#offcanvas").addClass("w-" + newWidth);
-    } else {
-        $("#offcanvas").removeClass("w-25");
-        $("#offcanvas").removeClass("w-35");
-        $("#offcanvas").removeClass("w-50");
-        $("#offcanvas").addClass("w-25");
     }
+    // else {
+    //     $("#offcanvas").removeClass("w-25");
+    //     $("#offcanvas").removeClass("w-35");
+    //     $("#offcanvas").removeClass("w-50");
+    //     $("#offcanvas").addClass("w-25");
+    // }
     if (localStorage.getItem("custom-playlist") != undefined) {
         var customPlaylistArrayTrigger = JSON.parse(localStorage.getItem("custom-playlist"));
         var jsonEdArrayTrigger = JSON.stringify(customPlaylistArrayTrigger)
@@ -25,6 +26,13 @@ $(document).ready(function () {
         $("#customPlaylistSubmit").parent().parent().attr("data-placement", "top");
         $("#customPlaylistSubmit").parent().parent().attr("data-bs-original-title", "Custom playlist is empty");
         $("#customPlaylistSubmit").parent().parent().tooltip();
+    }
+    var useRowDisplay = localStorage.getItem("video-rendering-stuff");
+    if (useRowDisplay == undefined || useRowDisplay == "true") {
+        $(document).find(".play_icon").each(function (e) {
+            $(this).removeAttr("data-bs-target");
+            $(this).removeAttr("data-bs-toggle");
+        });
     }
     $("#searchStuff").tooltip({ 'trigger': 'focus', 'title': $("#searchStuff").attr("data-tooltip") });
     $("#filter_games_menu").val("");
@@ -65,9 +73,9 @@ $(document).ready(function () {
         var imgsOfCountries = $(this).children();
         var arrayOfLinks = new Array();
         // var duplicatesToRemove = new Array();
-        for (let i=0; i<imgsOfCountries.length; i++){
+        for (let i = 0; i < imgsOfCountries.length; i++) {
             var srcOfImg = imgsOfCountries[i].src;
-            if (arrayOfLinks.indexOf(srcOfImg)==-1){
+            if (arrayOfLinks.indexOf(srcOfImg) == -1) {
                 arrayOfLinks.push(srcOfImg);
             } else {
                 // duplicatesToRemove.push(imgsOfCountries[i]);
@@ -99,20 +107,37 @@ $(document).ready(function () {
     //     }
     // });
 
+    $(".play_icon").on("click", function () {
+        var useRowDisplay = localStorage.getItem("video-rendering-stuff");
+        if (useRowDisplay==undefined || useRowDisplay == "true") {
+            var existingTr = $("#listen-music");
+            if (existingTr.length != 0) {
+                existingTr.remove();
+            } else {
+                var videoToUse = $(this).attr("data-tagvideo");
+                var lyricsText = $(this).next().text();
+                var parentTr = $(this).parent().parent().parent();
+                var newTr = $('<tr id="listen-music">');
+                var newTd = $('<td colspan="7" id="listen-music-id">');
+                var iframeToPut = $('<iframe id="ytrow" frameborder="0">');
+                var lyricsDiv = $('<div class="lyrics_main">');
+                var clearDiv = $('<div style="clear:both;">');
+                var pElem = $('<p>');
+                iframeToPut.attr("src", videoToUse + "?autoplay=1&amp;autohide=0&amp;theme=light&amp;wmode=transparent");
+                pElem.text(lyricsText);
+                lyricsDiv.append(pElem);
+                newTd.append(iframeToPut);
+                newTd.append(lyricsDiv);
+                newTd.append(clearDiv);
+                newTr.append(newTd)
+                newTr.insertAfter(parentTr);
+            }
+        }
+
+    });
+
     $('.play_icon').mouseover(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
-        // baseVideoSrc = $(this).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
-        // $("#lyricsCollapse").empty()
-        // var lyricsTxt = $(this).next().text();
-        // if (lyricsTxt == "null" || lyricsTxt == "") {
-        //     $("#showLyrics").text("Lyrics not found");
-        //     $("#showLyrics").prop("disabled", true);
-        // } else if (lyricsTxt == "0.0") {
-        //     $("#showLyrics").text("This is instrumental, no lyrics");
-        //     $("#showLyrics").prop("disabled", true);
-        // } else {
-        //     $("#lyricsCollapse").append(lyricsTxt);
-        //     $("#showLyrics").prop("disabled", false);
         // }
     }).mouseout(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
@@ -635,7 +660,7 @@ $(document).ready(function () {
     $(document).on("click", "img.info-about-song", function () {
         var trElem = $(this).parent().parent();
         var songIdAttr = $(trElem).attr("data-song_id");
-        $("#getAllUsages").attr("href", "/song/"+songIdAttr);
+        $("#getAllUsages").attr("href", "/song/" + songIdAttr);
         $.ajax({
             async: false,
             type: "GET",
@@ -664,13 +689,13 @@ $(document).ready(function () {
                         $(songInfo.featArtists[i]).insertAfter($("#featArtists"));
                     }
                 }
-                if (songInfo.spotify!=null){
+                if (songInfo.spotify != null) {
                     $(songInfo.spotify).insertAfter("#externalLinks");
                 }
-                if (songInfo.deezer!=null){
+                if (songInfo.deezer != null) {
                     $(songInfo.deezer).insertAfter("#externalLinks");
                 }
-                if (songInfo.itunes!=null){
+                if (songInfo.itunes != null) {
                     $(songInfo.itunes).insertAfter("#externalLinks");
                 }
                 $("#infoSongModal").modal('show');

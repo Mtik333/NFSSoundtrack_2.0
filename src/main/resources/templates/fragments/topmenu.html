@@ -99,13 +99,24 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
+                        <label for="video-rendering-stuff">Render stuff in "old" way via row</label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="video-rendering-stuff" checked>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
                         <label for="expandable-width">Width of expandable menu</label>
                     </div>
                     <div class="col-md-6">
                         <select class="form-select" id="expandable-width" aria-label="Set language">
                             <option selected value="25">25%</option>
-                            <option value="35">35%</option>
                             <option value="50">50%</option>
+                            <option value="75">75%</option>
                         </select>
                     </div>
                 </div>
@@ -121,6 +132,7 @@
     $(document).on("click", "#save-preferences", function () {
         localStorage.setItem("expandable-width", $("#expandable-width").val());
         localStorage.setItem("scrolling-stuff", $("#scrolling-stuff").prop("checked"));
+        localStorage.setItem("video-rendering-stuff", $("#video-rendering-stuff").prop("checked"));
         var langAlreadyThere = window.location.toString().indexOf("?lang") > -1;
         if (langAlreadyThere) {
             window.location.search = "?lang=" + $("#lang-select").val();

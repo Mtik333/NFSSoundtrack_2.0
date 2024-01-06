@@ -56,6 +56,15 @@
             </ul>
         </th:block>
         <table id="game_stuff" class="table table-hover table-striped playlist_table">
+            <colgroup>
+                <col class="info_button"/>
+                <col class="countries"/>
+                <col class="band"/>
+                <col class="songtitle"/>
+                <col class="genre"/>
+                <col class="actions"/>
+                <col class="infowarn"/>
+            </colgroup>
             <thead>
                 <tr>
                     <th scope="col"></th>
@@ -139,14 +148,14 @@
                                         </th:block>
                                     </th:block>
                                 </td>
-                                <td>
+                                <td class="genre">
                                     <th:block th:each="songGenre,iter : ${songSubgroup.song.songGenreList}">
                                         <a class="table_link" th:text="${songGenre.genre.genreName}"
                                             th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                             th:text="${!iter.last ? ', ' : ''}"></span>
                                     </th:block>
                                 </td>
-                                <td>
+                                <td class="actions">
                                     <div class="play_icondiv">
                                         <th:block th:if="${songSubgroup.srcId!=null or songSubgroup.song.srcId!=null}">
                                             <img class="play_icon img-responsive" data-bs-toggle="modal"
@@ -176,7 +185,7 @@
                                         </th:block>
                                     </div>
                                 </td>
-                                <td class="w-5">
+                                <td class="infowarn">
                                     <th:block th:if="${songSubgroup.info!=null && songSubgroup.info!=''}">
                                         <a data-toggle="tooltip" data-placement="left" th:title="${songSubgroup.info}">
                                             <img class="img-responsive" th:src="@{/images/warn1.png}">
