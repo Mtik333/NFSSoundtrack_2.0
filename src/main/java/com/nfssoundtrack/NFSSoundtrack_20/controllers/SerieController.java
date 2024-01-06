@@ -9,6 +9,8 @@ import com.nfssoundtrack.NFSSoundtrack_20.others.GameSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.others.SerieSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -22,8 +24,9 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/serie")
-public class SerieController extends BaseControllerWIthErrorHandling{
+public class SerieController extends BaseControllerWithErrorHandling {
 
+    private static final Logger logger = LoggerFactory.getLogger(SerieController.class);
     @Autowired
     SerieRepository serieRepository;
 

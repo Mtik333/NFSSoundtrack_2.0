@@ -6,6 +6,8 @@ import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -23,6 +25,8 @@ import java.util.Set;
 @Transactional
 //public class Application  {
 public class Application implements CommandLineRunner {
+
+    private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -275,11 +279,11 @@ public class Application implements CommandLineRunner {
                         if (Math.toIntExact(game_id) != gameTraversedNow) {
                             game = gameRepository.findById(game_id.intValue()).get();
                             List<MainGroup> mainGroups = game.getMainGroups();
-                            if (!mainGroups.isEmpty()){
+                            if (!mainGroups.isEmpty()) {
                                 //we start with 2nd or 3rd or next sheet so we have to continue from where hwe stopped
                                 tempGroup = mainGroups.stream().filter(mainGroup -> mainGroup.getGroupName().equals("Custom")).findFirst().get();
                                 tempGroup.getSubgroups().sort(Comparator.comparing(Subgroup::getPosition));
-                                tempSubgroup = tempGroup.getSubgroups().get(tempGroup.getSubgroups().size()-1);
+                                tempSubgroup = tempGroup.getSubgroups().get(tempGroup.getSubgroups().size() - 1);
                             } else {
                                 MainGroup allGroup = new MainGroup();
                                 allGroup.setGroupName("All");

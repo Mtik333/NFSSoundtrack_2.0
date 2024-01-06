@@ -6,12 +6,17 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorSong;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Role;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SongSerializer extends StdSerializer<Song> {
+
+    private static final Logger logger = LoggerFactory.getLogger(SongSerializer.class);
+
     public SongSerializer(Class<Song> t) {
         super(t);
     }
@@ -70,14 +75,14 @@ public class SongSerializer extends StdSerializer<Song> {
             jsonGenerator.writeString(stringToWrite.toString());
         }
         jsonGenerator.writeEndArray();
-        if (song.getSpotifyId()!=null){
-            jsonGenerator.writeStringField("spotify","<a class='p-2' href='"+song.getSpotifyId()+"' style='text-decoration:none;'><img class='img-responsive' src='/images/spotify.png' width='25' height='25'></a>");
+        if (song.getSpotifyId() != null) {
+            jsonGenerator.writeStringField("spotify", "<a class='p-2' href='" + song.getSpotifyId() + "' style='text-decoration:none;'><img class='img-responsive' src='/images/spotify.png' width='25' height='25'></a>");
         }
-        if (song.getDeezerId()!=null){
-            jsonGenerator.writeStringField("deezer","<a class='p-2' href='"+song.getDeezerId()+"' style='text-decoration:none;'><img class='img-responsive' src='/images/deezer.png' width='25' height='25'></a>");
+        if (song.getDeezerId() != null) {
+            jsonGenerator.writeStringField("deezer", "<a class='p-2' href='" + song.getDeezerId() + "' style='text-decoration:none;'><img class='img-responsive' src='/images/deezer.png' width='25' height='25'></a>");
         }
-        if (song.getItunesLink()!=null){
-            jsonGenerator.writeStringField("itunes","<a class='p-2' href='"+song.getItunesLink()+"' style='text-decoration:none;'><img class='img-responsive' src='/images/itunes2.png' width='25' height='25'></a>");
+        if (song.getItunesLink() != null) {
+            jsonGenerator.writeStringField("itunes", "<a class='p-2' href='" + song.getItunesLink() + "' style='text-decoration:none;'><img class='img-responsive' src='/images/itunes2.png' width='25' height='25'></a>");
         }
         jsonGenerator.writeEndObject();
     }

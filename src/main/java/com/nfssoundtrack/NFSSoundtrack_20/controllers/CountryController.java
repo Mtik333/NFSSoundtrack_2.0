@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Country;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.CountryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,8 +17,9 @@ import java.util.List;
 
 @Controller
 @RequestMapping(path = "/country")
-public class CountryController extends BaseControllerWIthErrorHandling{
+public class CountryController extends BaseControllerWithErrorHandling {
 
+    private static final Logger logger = LoggerFactory.getLogger(CountryController.class);
     @Autowired
     CountryRepository countryRepository;
 

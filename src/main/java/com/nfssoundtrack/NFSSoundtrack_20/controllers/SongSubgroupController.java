@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -18,8 +20,9 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/songSubgroup")
-public class SongSubgroupController extends BaseControllerWIthErrorHandling{
+public class SongSubgroupController extends BaseControllerWithErrorHandling {
 
+    private static final Logger logger = LoggerFactory.getLogger(SongSubgroupController.class);
     @Autowired
     private SubgroupRepository subgroupRepository;
 

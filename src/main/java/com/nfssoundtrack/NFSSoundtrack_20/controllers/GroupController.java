@@ -10,6 +10,8 @@ import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.MainGroupRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SongSubgroupRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SubgroupRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -20,8 +22,9 @@ import java.util.*;
 
 @Controller
 @RequestMapping("/maingroup")
-public class GroupController extends BaseControllerWIthErrorHandling{
+public class GroupController extends BaseControllerWithErrorHandling {
 
+    private static final Logger logger = LoggerFactory.getLogger(GroupController.class);
     @Autowired
     private GameRepository gameRepository;
 

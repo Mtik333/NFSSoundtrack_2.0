@@ -5,6 +5,8 @@ import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.AuthorAliasRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SongRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -19,8 +21,9 @@ import java.util.List;
 
 @Controller
 @RequestMapping(path = "/search")
-public class SearchController extends BaseControllerWIthErrorHandling{
+public class SearchController extends BaseControllerWithErrorHandling {
 
+    private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
     @Value("${spring.application.name}")
     String appName;
 

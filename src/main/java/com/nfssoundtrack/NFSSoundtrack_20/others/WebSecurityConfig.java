@@ -1,5 +1,7 @@
 package com.nfssoundtrack.NFSSoundtrack_20.others;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +22,7 @@ import java.util.Locale;
 @EnableWebSecurity
 public class WebSecurityConfig implements WebMvcConfigurer {
 
+    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
     @Autowired
     private DatabaseUserDetailsService databaseUserDetailsService;
 
@@ -35,7 +38,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
                                 "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
                                 "/serie/**", "/country/**", "/gamedb/**", "/custom/**", "/song/**",
-                                "/songinfo/**","/favicon.ico").permitAll()
+                                "/songinfo/**", "/favicon.ico").permitAll()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")

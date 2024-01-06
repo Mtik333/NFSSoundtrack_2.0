@@ -10,6 +10,8 @@ import com.nfssoundtrack.NFSSoundtrack_20.repository.GenreRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SongGenreRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SongSubgroupRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -24,8 +26,9 @@ import java.util.List;
 
 @Controller
 @RequestMapping(path = "/genre")
-public class GenreController extends BaseControllerWIthErrorHandling{
+public class GenreController extends BaseControllerWithErrorHandling {
 
+    private static final Logger logger = LoggerFactory.getLogger(GenreController.class);
     @Value("${spring.application.name}")
     String appName;
     @Autowired

@@ -7,6 +7,8 @@ import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ArtistSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.others.AuthorAliasSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -24,7 +26,9 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/author")
-public class ArtistController extends BaseControllerWIthErrorHandling {
+public class ArtistController extends BaseControllerWithErrorHandling {
+
+    private static final Logger logger = LoggerFactory.getLogger(ArtistController.class);
     @Value("${spring.application.name}")
     String appName;
     @Autowired

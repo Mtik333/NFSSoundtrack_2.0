@@ -7,6 +7,8 @@ import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SongRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SongSubgroupRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SubgroupRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -20,8 +22,9 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/subgroup")
-public class SubgroupController extends BaseControllerWIthErrorHandling{
+public class SubgroupController extends BaseControllerWithErrorHandling {
 
+    private static final Logger logger = LoggerFactory.getLogger(SubgroupController.class);
     @Autowired
     private GameRepository gameRepository;
 

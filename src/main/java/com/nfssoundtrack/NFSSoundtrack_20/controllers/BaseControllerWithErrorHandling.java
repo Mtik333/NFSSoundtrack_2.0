@@ -2,6 +2,8 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.data.domain.Sort;
@@ -12,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-public class BaseControllerWIthErrorHandling implements ErrorController {
+public class BaseControllerWithErrorHandling implements ErrorController {
 
+    private static final Logger logger = LoggerFactory.getLogger(BaseControllerWithErrorHandling.class);
     @Autowired
     private SerieRepository serieRepository;
-//
+
+    //
     @RequestMapping(value = "/{otherval}")
     public String nonExistingPagee(Model model, @PathVariable("otherval") String otherval) throws Exception {
         throw new Exception("Tried to access non-existing page: " + otherval);

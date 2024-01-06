@@ -1,6 +1,8 @@
 package com.nfssoundtrack.NFSSoundtrack_20.others;
 
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +14,8 @@ import java.util.List;
 
 @Service
 public class GenreService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GenreService.class);
 
     public Page<SongSubgroup> findPaginated(Pageable pageable, List<SongSubgroup> list) {
         int pageSize = pageable.getPageSize();

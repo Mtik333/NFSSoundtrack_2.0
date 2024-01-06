@@ -41,7 +41,7 @@
 </th:block>
 <hr>
 <h3>All found lyrics with this phrase</h3>
-<th:block th:each="song : ${songTitleList}">
+<th:block th:each="song : ${songLyricsList}">
     <th:block th:each="authorSong,iter : ${song.authorSongList}">
         <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"

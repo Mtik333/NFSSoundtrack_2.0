@@ -7,6 +7,8 @@ import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.GameStatus;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Serie;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -19,8 +21,8 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/gamedb")
-public class GameController extends BaseControllerWIthErrorHandling{
-
+public class GameController extends BaseControllerWithErrorHandling {
+    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
     @Autowired
     SerieRepository serieRepository;
 
