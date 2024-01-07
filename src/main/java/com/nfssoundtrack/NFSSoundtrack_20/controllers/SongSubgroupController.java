@@ -12,10 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -37,6 +34,18 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
 
     @Autowired
     private AuthorSongRepository authorSongRepository;
+
+    @Autowired
+    private SongGenreRepository songGenreRepository;
+
+    @Autowired
+    private GenreRepository genreRepository;
+
+    @Autowired
+    private AuthorCountryRepository authorCountryRepository;
+
+    @Autowired
+    private SongRepository songRepository;
 
     @PutMapping(value = "/positions/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String putSubgroupPositions(@PathVariable("subgroupId") String subgroupId, @RequestBody String formData) throws JsonProcessingException {
@@ -301,5 +310,60 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             authorSong.setSubcomposerConcat(concatValue);
         }
         authorSongRepository.save(authorSong);
+    }
+
+    @DeleteMapping(value = "/delete/{subgroupId}")
+    public @ResponseBody String deleteSongSubgroup(@PathVariable("subgroupId") String subgroupId) throws JsonProcessingException {
+        try {
+            SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(subgroupId)).get();
+            Song song = songSubgroup.getSong();
+            List<SongSubgroup> allSongSubgroupEntries = songSubgroupRepository.findBySong(song);
+            if (allSongSubgroupEntries.size()==1){
+                //means we basically have to delete song entirely to avoid orphans
+                List<SongGenre> songGenresToDelete = song.getSongGenreList();
+                List<Genre> genresToDelete = new ArrayList<>();
+                for (SongGenre songGenre : songGenresToDelete){
+                    Genre genre = songGenre.getGenre();
+                    List<SongGenre> allUsagesOfGenre = songGenreRepository.findByGenre(genre);
+                    if (allUsagesOfGenre.size()==1){
+                        genresToDelete.add(genre);
+                    }
+                }
+                List<AuthorSong> authorsOfSong = song.getAuthorSongList();
+                List<AuthorAlias> authorAliasToDelete = new ArrayList<>();
+                List<Author> authorsToDelete = new ArrayList<>();
+                List<AuthorCountry> authorCountriesToDelete = new ArrayList<>();
+                for (AuthorSong authorSong : authorsOfSong){
+                    Author author = authorSong.getAuthorAlias().getAuthor();
+                    List<AuthorSong> allUsagesOfAlias = authorSongRepository.findByAuthorAlias(authorSong.getAuthorAlias());
+                    if (allUsagesOfAlias.size()==1){
+                        authorAliasToDelete.add(authorSong.getAuthorAlias());
+                        List<AuthorAlias> authorAliases = authorAliasRepository.findByAuthor(author);
+                        if (authorAliases.size()==1){
+                            authorsToDelete.add(author);
+                            authorCountriesToDelete.addAll(author.getAuthorCountries());
+                        }
+                    }
+                }
+                authorSongRepository.deleteAll(authorsOfSong);
+                if (!authorsToDelete.isEmpty()){
+                    authorCountryRepository.deleteAll(authorCountriesToDelete);
+                    authorAliasRepository.deleteAll(authorAliasToDelete);
+                    authorRepository.deleteAll(authorsToDelete);
+                }
+                songGenreRepository.deleteAllInBatch(songGenresToDelete);
+                if (!genresToDelete.isEmpty()){
+                    genreRepository.deleteAllInBatch(genresToDelete);
+                }
+                songSubgroupRepository.delete(songSubgroup);
+                songRepository.delete(song);
+            }
+            else {
+                songSubgroupRepository.delete(songSubgroup);
+            }
+            return new ObjectMapper().writeValueAsString("OK");
+        } catch (Throwable thr) {
+            return new ObjectMapper().writeValueAsString(thr);
+        }
     }
 }

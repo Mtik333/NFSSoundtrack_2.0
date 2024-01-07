@@ -263,15 +263,19 @@ $(document).ready(function () {
         var newGameDiv = $('<div class="form-group newGameDiv" id="newGameDiv">');
         var firstRowDiv = $('<div class="row">');
         var gameTitleColDiv = $('<div class="col">');
+        var gameDisplayColDiv = $('<div class="col">');
         var gameShortColDiv = $('<div class="col">');
         var prefixColDiv = $('<div class="col">');
         var gameStatusColDiv = $('<div class="col">');
         var gameTitleInput = $('<input class="form-control" id="gameTitle" type="text">');
+        var gameDisplayInput = $('<input class="form-control" id="gameDisplay" type="text">');
         var gameShortInput = $('<input class="form-control" id="gameShort" type="text">');
         var gamePrefixInput = $('<input class="form-control" id="gamePrefix" type="text">');
         var gameStatusInput = $('<select class="form-select" id="gameStatus"><option value="RELEASED" selected>Released</option><option value="UNRELEASED">Unreleased</option><option value="UNPLAYABLE">Unplayable</option><option value="CANCELED">Canceled</option>');
         gameTitleColDiv.append('<label for="gameTitle">Game title</label>');
         gameTitleColDiv.append(gameTitleInput);
+        gameDisplayColDiv.append('<label for="gameDisplay">Game display title</label>');
+        gameDisplayColDiv.append(gameDisplayInput);
         gameShortColDiv.append('<label for="gameShort">Game short (URL path)</label>');
         gameShortColDiv.append(gameShortInput);
         prefixColDiv.append('<label for="gamePrefix">Game prefix</label>');
@@ -279,6 +283,7 @@ $(document).ready(function () {
         gameStatusColDiv.append('<label for="gameStatus">Game status</label>');
         gameStatusColDiv.append(gameStatusInput);
         firstRowDiv.append(gameTitleColDiv);
+        firstRowDiv.append(gameDisplayColDiv);
         firstRowDiv.append(gameShortColDiv);
         firstRowDiv.append(prefixColDiv);
         firstRowDiv.append(gameStatusColDiv);
@@ -312,14 +317,19 @@ $(document).ready(function () {
         secondRowDiv.append(soundcloudColDiv);
         newGameDiv.append(secondRowDiv);
         divToAppend.append('<button id="saveNewGame" type="submit" class="btn btn-success">Save</button>');
+        divToAppend.append('<button id="cancelNewGame" type="submit" class="btn btn-primary">Cancel</button>');
         divToAppend.append(newGameDiv);
     });
 
+    $(document).on('click', '#cancelNewGame', function (e) {
+        getAllSeriesAndDisplay();
+    });
 
     $(document).on('click', '#saveNewGame', function (e) {
         var formData = new Object();
         formData.serieId = currentlyEditedSerieId;
         formData.gameTitle = $("#gameTitle").val();
+        formData.displayTitle = $("#gameDisplay").val();
         formData.gameShort = $("#gameShort").val();
         formData.gamePrefix = $("#gamePrefix").val();
         formData.gameStatus = $("#gameStatus").val();

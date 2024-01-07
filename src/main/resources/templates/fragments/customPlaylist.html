@@ -7,7 +7,7 @@
         <span id="playlist_init" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
             data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
             <span id="truncate_playlist" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;"
-             th:text="#{playlistEmpty}"></span>
+             th:text="#{truncatePlaylist}"></span>
     </div>
     <div class="form-group">
         <span>
@@ -18,15 +18,25 @@
     <div class="tabbable boxed parentTabs">
         <table id="customPlaylistStuff" class="table table-hover table-striped playlist_table">
             <thead>
+                <colgroup>
+                    <col class="playlist-id"/>
+                    <col class="playlist-info_button"/>
+                    <col class="playlist-countries"/>
+                    <col class="playlist-band"/>
+                    <col class="playlist-songtitle"/>
+                    <col class="playlist-genre"/>
+                    <col class="playlist-actions"/>
+                    <col class="playlist-infowarn"/>
+                </colgroup>
                 <tr>
-                    <th scope="col" th:text="#{id}"></th>
-                    <th scope="col" class="no-sort"></th>
-                    <th scope="col" th:text="#{country}"></th>
-                    <th scope="col" th:text="#{band}"></th>
-                    <th scope="col" th:text="#{song}"></th>
-                    <th scope="col" th:text="#{genre}"></th>
-                    <th scope="col" class="no-sort" th:text="#{actions}"></th>
-                    <th scope="col" class="no-sort"></th>
+                    <th class="game_content_th" scope="col" th:text="#{id}"></th>
+                    <th class="game_content_th no-sort"></th>
+                    <th class="game_content_th" scope="col" th:text="#{country}"></th>
+                    <th class="game_content_th" scope="col" th:text="#{band}"></th>
+                    <th class="game_content_th" scope="col" th:text="#{song}"></th>
+                    <th class="game_content_th" scope="col" th:text="#{genre}"></th>
+                    <th class="game_content_th no-sort"></th>
+                    <th class="game_content_th no-sort"></th>
                 </tr>
             </thead>
             <tbody>
@@ -170,7 +180,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <div id="playlistModePlayer" class="ratio ratio-16x9" style="height: 75vh;">
+                            <div id="playlistModePlayer" class="ratio ratio-16x9">
                             </div>
                         </div>
                         <div class="col-md-6">

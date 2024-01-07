@@ -17,19 +17,20 @@
         <col class="genre-info_button"/>
         <col class="genre-band"/>
         <col class="genre-songtitle"/>
-        <col class="genre-genre"/>
+        <col class="genre-subgroup"/>
+        <col class="genre-group"/>
+        <col class="genre-game"/>
         <col class="genre-actions"/>
-        <col class="genre-infowarn"/>
     </colgroup>
     <thead>
-        <th scope="col" th:text="#{id}"></th>
-        <th scope="col" class="no-sort"></th>
-        <th scope="col" th:text="#{band}"></th>
-        <th scope="col" th:text="#{song}"></th>
-        <th scope="col" th:text="#{subgroup}"></th>
-        <th scope="col" th:text="#{group}"></th>
-        <th scope="col" th:text="#{game}"></th>
-        <th scope="col" class="no-sort" th:text="#{actions}"></th>
+        <th class="game_content_th" scope="col" th:text="#{id}"></th>
+        <th class="game_content_th no-sort"></th>
+        <th class="game_content_th" scope="col" th:text="#{band}"></th>
+        <th class="game_content_th" scope="col" th:text="#{song}"></th>
+        <th class="game_content_th" scope="col" th:text="#{subgroup}"></th>
+        <th class="game_content_th" scope="col" th:text="#{group}"></th>
+        <th class="game_content_th" scope="col" th:text="#{game}"></th>
+        <th class="game_content_th no-sort"></th>
     </thead>
     <tbody>
         <tr th:each="songSubgroup, iter1 : ${songSubgroupList}"
@@ -127,7 +128,7 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <div id="playlistModePlayer" class="ratio ratio-16x9" style="height: 75vh;">
+                        <div id="playlistModePlayer" class="ratio ratio-16x9">
                         </div>
                     </div>
                     <div class="col-md-6">

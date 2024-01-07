@@ -296,6 +296,10 @@ img.remove-from-playlist {
     width: 25%;
   }
 
+  #playlistModePlayer{
+    height: 75vh;
+  }
+
 @media screen and (min-width: 1080px) {
     .lyrics_main{
     width:65%;
@@ -316,6 +320,11 @@ img.remove-from-playlist {
   }
 
   #genreTable {
+    table-layout: fixed;
+    font-size: 3vw;
+  }
+
+  #customPlaylistStuff {
     table-layout: fixed;
     font-size: 3vw;
   }
@@ -375,6 +384,8 @@ img.remove-from-playlist {
     width: 10%;
   }
 
+
+/*
   col.band {
     width: 20%;
   }
@@ -386,15 +397,15 @@ img.remove-from-playlist {
   col.genre {
     width: 15%;
   }
-
+*/
   col.actions {
-    width: 8%;
+    width: 5%;
   }
 
   col.infowarn {
-    width: 7%;
+    width: 6%;
   }
-/*
+
   col.genre-id {
     width: 3%;
   }
@@ -402,7 +413,7 @@ img.remove-from-playlist {
   col.genre-info_button {
     width: 5%;
   }
-
+/*
   col.genre-band {
     width: 12%;
   }
@@ -422,22 +433,46 @@ img.remove-from-playlist {
   col.genre-game {
     width: 8%;
   }
-
-  col.genre-actions {
-    width: 7%;
-  }
 */
-  genre-h3{
+  col.genre-actions {
+    width: 8%;
+  }
+
+  col.playlist-id {
+    width: 3%;
+  }
+
+  col.playlist-info_button {
+    width: 5%;
+  }
+
+  col.playlist-countries {
+    width: 10%;
+  }
+
+  col.playlist-actions {
+    width: 5%;
+  }
+
+  col.playlist-infowarn {
+    width: 5%;
+  }
+
+
+ .genre-h3{
   font-size: 4vw;
   }
 
-  genre-h5{
+  .genre-h5{
   font-size: 3vw;
   }
   .genreLink{
   font-size: 3vw;
   }
 
+.game_content_th{
+    text-align: center;
+}
 
   td {
     vertical-align: middle;
@@ -455,6 +490,10 @@ img.remove-from-playlist {
   }
   #ytrow{
     width: 100%;
+  }
+
+  #playlistModePlayer{
+    height: 40vh;
   }
   /* td.songtitle{
     text-align: center;

@@ -90,13 +90,12 @@ $(document).ready(function () {
             } else {
                 songDisplay += songs[i].song.officialDisplayTitle;
             }
-            var textTd = $('<td class="col-md-8">');
+            var textTd = $('<td class="col-md-9">');
             textTd.append(songDisplay);
             tr.append(textTd);
             tr.append('<td class="text-right col-md-1"><button type="button" id="edit-song-' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-warning edit-song">Edit (in subgroup)</button></td>');
             tr.append('<td class="text-right col-md-1"><button type="button" id="edit-song-globally-' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-warning edit-song">Edit globally</button></td>');
             tr.append('<td class="text-right col-md-1"><button type="button" id="delete-song-' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-danger delete-song">Delete from subgroup</button></td>');
-            tr.append('<td class="text-right col-md-1"><button type="button" id="delete-song-globally' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-danger delete-song">Delete globally</button></td>');
             tableToFill.append(tr);
         }
         return tableToFill;
@@ -105,6 +104,24 @@ $(document).ready(function () {
     $("a.manage-songs").click(function (e) {
         gameId = e.target.attributes["data-gameid"].value;
         getSubgroupsFromGame();
+    });
+
+    $(document).on('click', 'button.delete-song', function (e) {
+    var divToAppend = $('#nfs-content');
+        var songId = $(this).attr("data-songSubgroupId");
+        divToAppend.empty();
+        $.ajax({
+            async: false,
+            type: "DELETE",
+            url: "/songSubgroup/delete/" + songId,
+            success: function (ooo) {
+                console.log("e");
+                getSubgroupsFromGame();
+                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
+                    $('#success-alert').slideUp(500);
+                });
+            }
+        });
     });
 
     $(document).on('click', 'button.edit-song', function (e) {
