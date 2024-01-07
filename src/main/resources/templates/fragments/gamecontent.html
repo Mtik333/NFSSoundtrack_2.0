@@ -25,8 +25,10 @@
                 data-bs-target="#soundcloudModal" id="soundcloudLink" th:attr="data-tagVideo=${game.soundcloudId}"
                 th:text="#{launchSoundcloud}"></span>
         </th:block>
+        <!--
         <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
             data-bs-target="#disqusModal" id="disqusLink" th:text="#{showDisqus}"></span>
+        -->
     </div>
     <div class="form-group">
         <span>
@@ -346,14 +348,35 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <div id="disqus_thread">
-                            </div>
+                            <!-- <div id="disqus_thread">
+                            </div> -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    var disqus_config = function () {
+    this.page.url = 'https://nfssoundtrack.com';  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = 'nfssoundtrack'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    
+    var disqus_shortname = 'nfssoundtrack'; // required: replace example with your forum shortname
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://nfssoundtrack.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 <th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
 
 </th:block>

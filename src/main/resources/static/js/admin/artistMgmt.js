@@ -6,8 +6,6 @@ $(document).ready(function () {
         var divToAppend = $('#nfs-content');
         divToAppend.empty();
         var rowDiv = $('<div class="row p-1">');
-        var countriesRowDiv = $('<div id="countriesRow" class="row p-1">');
-        var aliasesRow = $('<div id="aliasesRow" class="row p-1">');
         var leftCellDiv = $('<div class="col">');
         var rightCellDiv = $('<div class="col">');
         divToAppend.append(rowDiv);
@@ -20,11 +18,15 @@ $(document).ready(function () {
         leftCellDiv.append(authorSelectHidden);
         setupAutocompleteManageArtist(authorSelect, authorSelectHidden, "");
         rightCellDiv.append('<button id="save-artist" type="submit" class="btn btn-primary">Save</button>');
+        rightCellDiv.append('<button id="cancel-artist" type="submit" class="btn btn-warning">Cancel</button>');
         rowDiv.append(leftCellDiv);
         rowDiv.append(rightCellDiv);
         divToAppend.append(rowDiv);
-        divToAppend.append(aliasesRow);
-        divToAppend.append(countriesRowDiv);
+    });
+
+    $(document).on('click', "#cancel-artist", function (e) {
+        var divToAppend = $('#nfs-content');
+        divToAppend.empty();
     });
 });
 
@@ -52,15 +54,187 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
             $(mySelect).val(ui.item.label);
             $(mySelect).text(ui.item.label);
             $(mySelectHidden).val(ui.item.value);
-
+            if (foundArtist.length == 1) {
+                setupCountryAndAliasFields(foundArtist[0])
+            } else {
+                for (let i = 0; i < foundArtist.length; i++) {
+                    var foundArtistId = foundArtist[i].value;
+                    if (ui.item.value == foundArtistId) {
+                        setupCountryAndAliasFields(foundArtist[i]);
+                        break;
+                    }
+                }
+            }
         },
         minLength: 0
     });
 }
 
 function setupCountryAndAliasFields(foundArtist) {
-    var countriesDiv
-    var countriesRowDiv = $('<div id="countriesRow" class="row p-1">');
-    var aliasesRow = $('<div id="aliasesRow" class="row p-1">');
-    
+    var allAliases = foundArtist.aliases;
+    var allCountries = foundArtist.countries;
+    var countriesDiv = $('<div id="country-info">');
+    if (allCountries.length > 0) {
+        for (let i = 0; i < allCountries.length; i++) {
+            generateCountryDiv(i, allCountries[i], countriesDiv);
+        }
+    } else {
+        generateCountryDiv(0, null, countriesDiv);
+    }
+    var divToAppend = $('#nfs-content');
+    divToAppend.append(countriesDiv);
+    var aliasesDiv = $('<div id="alias-info">');
+    for (let i = 0; i < allAliases.length; i++) {
+        generateAliasDiv(i, allAliases[i], aliasesDiv);
+    }
+    divToAppend.append(aliasesDiv);
+}
+
+$(document).on('click', 'button.delete-alias', function (e) {
+    var col = $(this).parent();
+    var rowCol = col.parent();
+    var idOfInput = $(this).attr("id").replace("delete-alias-", "aliasInfo-");
+    if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val() == undefined) {
+        var rowCol = col.parent();
+        var divCol = rowCol.parent();
+        divCol.remove();
+    } else {
+        $("#" + idOfInput).addClass("text-decoration-line-through");
+    }
+});
+
+$(document).on('click', 'button.delete-country', function (e) {
+    var col = $(this).parent();
+    var rowCol = col.parent();
+    var idOfInput = $(this).attr("id").replace("delete-country-", "countryInfo-");
+    if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val() == undefined) {
+        var rowCol = col.parent();
+        var divCol = rowCol.parent();
+        divCol.remove();
+    } else {
+        $("#" + idOfInput).addClass("text-decoration-line-through");
+    }
+});
+
+$(document).on('click', 'button.add-country', function (e) {
+    var col = $(this).parent();
+    var rowCol = col.parent();
+    var divCol = rowCol.parent();
+    var thisId = parseInt($(this).attr("id").replace("add-country-", ""));
+    generateCountryDiv((thisId+1),null,divCol);
+});
+
+$(document).on('click', 'button.add-alias', function (e) {
+    var col = $(this).parent();
+    var rowCol = col.parent();
+    var divCol = rowCol.parent();
+    var thisId = parseInt($(this).attr("id").replace("add-alias-", ""));
+    generateAliasDiv((thisId+1),null,divCol);
+});
+
+function generateCountryDiv(i, country, countriesDiv) {
+    var countriesRowDiv = $('<div id="countriesRow-' + i + '" class="row p-1">');
+    var inputDiv = $('<div class="col">');
+    var buttonsDiv = $('<div class="col">');
+    inputDiv.append('<label for="countryInfo-' + i + '">Country</label>');
+    var countrySelect = $('<input class="form-control" id="countryInfo-' + i + '">');
+    if (country != undefined) {
+        countrySelect.val(country.countryName);
+    }
+    inputDiv.append(countrySelect);
+    var countrySelectHidden = $('<input type="hidden" id="countryInfoHidden-' + i + '"/>');
+    if (country != undefined) {
+        countrySelectHidden.val(country.countryId);
+    }
+    inputDiv.append(countrySelectHidden);
+    var addCountryButton = $('<button id="add-country-' + i + '" type="submit" class="btn btn-primary add-country">+</button>');
+    var deleteFeatButton = $('<button id="delete-country-' + i + '" type="submit" class="btn btn-danger delete-country">-</button>');
+    buttonsDiv.append(addCountryButton);
+    buttonsDiv.append(deleteFeatButton);
+    countriesRowDiv.append(inputDiv);
+    countriesRowDiv.append(buttonsDiv);
+    setupAutocompleteCountry(countrySelect, countrySelectHidden, null);
+    countriesDiv.append(countriesRowDiv);
+}
+
+function generateAliasDiv(i, alias, aliasesDiv) {
+    var aliasesRowDiv = $('<div id="aliasesRow-' + i + '" class="row p-1">');
+    var inputDiv = $('<div class="col">');
+    var buttonsDiv = $('<div class="col">');
+    inputDiv.append('<label for="aliasInfo-' + i + '">Alias</label>');
+    var aliasSelect = $('<input class="form-control" id="aliasInfo-' + i + '">');
+    if (alias!=undefined){
+        aliasSelect.val(alias.aliasName);
+    }
+    inputDiv.append(aliasSelect);
+    var aliasSelectHidden = $('<input type="hidden" id="aliasInfoHidden-' + i + '"/>');
+    if (alias!=undefined){
+        aliasSelectHidden.val(alias.aliasId);
+    }
+    inputDiv.append(aliasSelectHidden);
+    var addAliasButton = $('<button id="add-alias-' + i + '" type="submit" class="btn btn-primary add-alias">+</button>');
+    var deleteAliasButton = $('<button id="delete-alias-' + i + '" type="submit" class="btn btn-danger delete-alias">-</button>');
+    buttonsDiv.append(addAliasButton);
+    buttonsDiv.append(deleteAliasButton);
+    aliasesRowDiv.append(inputDiv);
+    aliasesRowDiv.append(buttonsDiv);
+    setupAutocompleteAliasArtistMgmt(aliasSelect, aliasSelectHidden, null);
+    aliasesDiv.append(aliasesRowDiv);
+}
+
+function setupAutocompleteCountry(mySelect, mySelectHidden, valueToSet) {
+    mySelect.autocomplete({
+        source: function (request, response, url) {
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/country/countryName/" + $(mySelect).val(),
+                success: function (ooo) {
+                    response(JSON.parse(ooo));
+                },
+                error: function (ooo) {
+                    console.log("e2");
+                },
+                done: function (ooo) {
+                    console.log("e3");
+                }
+            });
+        },
+        select: function (event, ui) {
+            event.preventDefault();
+            $(mySelect).val(ui.item.label);
+            $(mySelect).text(ui.item.label);
+            $(mySelectHidden).val(ui.item.value);
+
+        },
+        minLength: 0
+    });
+}
+
+function setupAutocompleteAliasArtistMgmt(mySelect, mySelectHidden, valueToSet) {
+    mySelect.autocomplete({
+        source: function (request, response, url) {
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/author/aliasName/" + $(mySelect).val(),
+                success: function (ooo) {
+                    response(JSON.parse(ooo));
+                },
+                error: function (ooo) {
+                    console.log("e2");
+                },
+                done: function (ooo) {
+                    console.log("e3");
+                }
+            });
+        },
+        select: function (event, ui) {
+            event.preventDefault();
+            $(mySelect).val(ui.item.label);
+            $(mySelect).text(ui.item.label);
+            $(mySelectHidden).val(ui.item.value);
+        },
+        minLength: 0
+    });
 }
