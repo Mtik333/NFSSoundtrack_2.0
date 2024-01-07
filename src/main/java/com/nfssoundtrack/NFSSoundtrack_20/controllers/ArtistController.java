@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
+import com.nfssoundtrack.NFSSoundtrack_20.others.ArtistMgmtSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ArtistSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.others.AuthorAliasSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.*;
@@ -12,12 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +47,9 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 
     @Autowired
     private SongSubgroupRepository songSubgroupRepository;
+
+    @Autowired
+    private AuthorCountryRepository authorCountryRepository;
 
     @GetMapping(value = "/{authorId}")
     public String author(Model model, @PathVariable("authorId") String authorId) {
@@ -123,14 +125,6 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         if (input.isEmpty()) {
             return objectMapper.writeValueAsString("[]");
         }
-//        SimpleModule simpleModule = new SimpleModule();
-//        AuthorSong authorSong = authorSongRepository.findById(Integer.valueOf(input)).get();
-//        Author author = authorSong.getAuthorAlias().getAuthor();
-//        List<AuthorAlias> authorAliases = authorAliasRepository.findByAuthor(author);
-//        simpleModule.addSerializer(AuthorAlias.class, new AuthorAliasSerializer(AuthorAlias.class));
-//        objectMapper.registerModule(simpleModule);
-//        String result = objectMapper.writeValueAsString(authorAliases);
-//        return result;
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(AuthorAlias.class, new AuthorAliasSerializer(AuthorAlias.class));
         objectMapper.registerModule(simpleModule);
@@ -169,16 +163,43 @@ public class ArtistController extends BaseControllerWithErrorHandling {
             return objectMapper.writeValueAsString("[]");
         }
         SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(AuthorAlias.class, new AuthorAliasSerializer(AuthorAlias.class));
+        ArtistMgmtSerializer artistMgmtSerializer = new ArtistMgmtSerializer(Author.class);
+        ArtistMgmtSerializer.authorAliasRepository=authorAliasRepository;
+        simpleModule.addSerializer(Author.class, artistMgmtSerializer);
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
-            AuthorAlias authorList = authorAliasRepository.findByAlias(input);
+            Author authorList = authorRepository.findByName(input);
             String result = objectMapper.writeValueAsString(Collections.singleton(authorList));
             return result;
         } else {
-            List<AuthorAlias> authorList = authorAliasRepository.findByAliasContains(input);
+            List<Author> authorList = authorRepository.findByNameContains(input);
             String result = objectMapper.writeValueAsString(authorList);
             return result;
         }
+    }
+
+    @PutMapping(value = "/merge", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String mergeArtists(@RequestBody String formData) throws JsonProcessingException {
+        Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
+        String authorToMerge = (String) mergeInfo.get("authorToMergeId");
+        String targetAuthor = (String) mergeInfo.get("targetAuthorId");
+        Author authorToDelete = authorRepository.findById(Integer.valueOf(authorToMerge)).get();
+        AuthorAlias existingAuthorAlias = authorAliasRepository.findByAlias(authorToDelete.getName());
+        Author authorToUpdate = authorRepository.findById(Integer.valueOf(targetAuthor)).get();
+        AuthorAlias authorAlias = new AuthorAlias();
+        authorAlias.setAlias(authorToDelete.getName());
+        authorAlias.setAuthor(authorToUpdate);
+        authorAlias = authorAliasRepository.save(authorAlias);
+        List<AuthorSong> songsToReassign = authorSongRepository.findByAuthorAlias(existingAuthorAlias);
+        for (AuthorSong authorSong : songsToReassign){
+            authorSong.setAuthorAlias(authorAlias);
+        }
+        authorSongRepository.saveAll(songsToReassign);
+        List<AuthorCountry> authorCountries = authorToDelete.getAuthorCountries();
+        authorCountryRepository.deleteAll(authorCountries);
+        List<AuthorAlias> aliasesToDelete = authorAliasRepository.findByAuthor(authorToDelete);
+        authorAliasRepository.deleteAll(aliasesToDelete);
+        authorRepository.delete(authorToDelete);
+        return new ObjectMapper().writeValueAsString("OK");
     }
 }

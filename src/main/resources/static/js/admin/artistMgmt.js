@@ -59,6 +59,7 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
 }
 
 function setupCountryAndAliasFields(foundArtist) {
+    var countriesDiv
     var countriesRowDiv = $('<div id="countriesRow" class="row p-1">');
     var aliasesRow = $('<div id="aliasesRow" class="row p-1">');
     

@@ -12,6 +12,65 @@
 <th:block th:each="authorCountry : ${author?.authorCountries}">
     <img class="country-img" th:src="${authorCountry.country.countryLink}">
 </th:block>
+
+<div class="tabbable boxed parentTabs">
+    <ul class="nav nav-tabs gamegroup">
+        <li class="nav-item">
+            <!-- <a class="nav-link gamegroup" th:href="@{'#gamegroupid'+${gamegroup.id}}"
+                th:attr="data-el_id='gamegroupid'+${gamegroup.id}" data-toggle="tab"
+                th:text="${gamegroup.groupName}"></a> -->
+            <a class="nav-link artistgroup" th:attr="data-el_id='all'" data-toggle="tab" th:text="'All'"></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link artistgroup" th:attr="data-el_id='composer'" data-toggle="tab" th:text="'Composer'"></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link artistgroup" th:attr="data-el_id='subcomposer'" data-toggle="tab"
+                th:text="'Subcomposer'"></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link artistgroup" th:attr="data-el_id='feat'" data-toggle="tab" th:text="'Feat.'"></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link artistgroup" th:attr="data-el_id='remix'" data-toggle="tab" th:text="'Remix'"></a>
+        </li>
+    </ul>
+    <ul class="nav nav-tabs subgroup">
+        <li class="nav-item">
+            <button class="nav-link subgroup"
+                th:attr="id='all', data-gameGroupTxt='all', data-subgroupTxt='all',data-group_id='all'" href=""
+                th:text="'All'"></button>
+        </li>
+        <th:block th:each="singleAlias,iter : ${allAliases}">
+            <li class="nav-item">
+                <button class="nav-link subgroup"
+                    th:attr="id='songSubgroup'+${singleAlias.alias}, data-gameGroupTxt=${singleAlias.alias}, data-subgroupTxt=${singleAlias.alias},data-group_id=${singleAlias.id}"
+                    href="" th:text="${singleAlias.alias}"></button>
+            </li>
+        </th:block>
+        <!-- <th:block th:each="enumVal : ${T(com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Role).values()}">
+            <li class="nav-item">
+                <button class="nav-link subgroup"
+                    th:attr="id='songSubgroup'+${enumVal}, data-gameGroupTxt=${enumVal}, data-subgroupTxt=${enumVal},data-group_id=${enumVal}"
+                    href="" th:text="${enumVal}"></button>
+            </li>
+        </th:block> -->
+    </ul>
+    <!-- <th:block th:each="singleAlias: ${allAliases}">
+        <ul class="nav nav-tabs subgroup visually-hidden"
+            th:attr="id='alias'+${singleAlias.id}, data-el_id='singleAliasId'+${singleAlias.id}">
+
+            <li class="nav-item" th:each="subgroup: ${gamegroup.subgroups}">
+                <button class="nav-link subgroup"
+                    th:attr="id='songSubgroup'+${subgroup.id}, data-gameGroupTxt=${gamegroup.groupName}, data-subgroupTxt=${subgroup.subgroupName},data-group_id=${gamegroup.id}"
+                    href="" th:text="${subgroup.subgroupName}"></button>
+
+            </li>
+
+        </ul> -->
+    </th:block>
+</div>
+
 <h3 th:text="#{songsWrittenAs}+' Composer'"></h3>
 <th:block th:each="mapEntry : ${songsAsComposer}">
     <h5 th:text="'Alias: ' + ${mapEntry.key}"></h5>
