@@ -101,6 +101,20 @@ html[data-bs-theme="dark"] tr.subgroup-separator:nth-of-type(odd) {
   --bs-table-hover-color: #fff;
 }
 
+html[data-bs-theme="dark"] tr.rolegroup-separator:nth-of-type(even) {
+  --bs-table-bg: #004319;
+  --bs-table-color: #fff;
+  --bs-table-hover-bg: #205319;
+  --bs-table-hover-color: #fff;
+}
+
+html[data-bs-theme="dark"] tr.rolegroup-separator:nth-of-type(odd) {
+  --bs-table-striped-bg: #005319;
+  --bs-table-striped-color: #fff;
+  --bs-table-hover-bg: #205319;
+  --bs-table-hover-color: #fff;
+}
+
 
 .my_padding {
   background: #d1e2ff;
@@ -300,6 +314,17 @@ img.remove-from-playlist {
     height: 75vh;
   }
 
+tr.songgroup{
+    text-align: center;
+    font-weight: bold;
+}
+
+tr.rolegroup-separator{
+    text-align: center;
+    font-weight: bold;
+}
+
+
 @media screen and (min-width: 1080px) {
     .lyrics_main{
     width:65%;
@@ -325,6 +350,11 @@ img.remove-from-playlist {
   }
 
   #customPlaylistStuff {
+    table-layout: fixed;
+    font-size: 3vw;
+  }
+
+  #artistStuff {
     table-layout: fixed;
     font-size: 3vw;
   }
@@ -495,6 +525,9 @@ img.remove-from-playlist {
   #playlistModePlayer{
     height: 40vh;
   }
+    #briefInfo{
+      font-size: 3vw;
+    }
   /* td.songtitle{
     text-align: center;
   } */

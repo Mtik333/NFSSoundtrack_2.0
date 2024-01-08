@@ -18,10 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(path = "/author")
@@ -51,22 +49,24 @@ public class ArtistController extends BaseControllerWithErrorHandling {
     @Autowired
     private AuthorCountryRepository authorCountryRepository;
 
+    @Autowired
+    CountryRepository countryRepository;
     @GetMapping(value = "/{authorId}")
     public String author(Model model, @PathVariable("authorId") String authorId) {
         Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
         List<AuthorAlias> allAliases = authorAliasRepository.findByAuthor(author);
         authorSongRepository.findByAuthorAlias(allAliases.get(0));
-        Map<String, Map<Song, List<SongSubgroup>>> songsAsComposer = new HashMap<>();
-        Map<String, Map<Song, List<SongSubgroup>>> songsAsSubcomposer = new HashMap<>();
-        Map<String, Map<Song, List<SongSubgroup>>> songsAsFeat = new HashMap<>();
-        Map<String, Map<Song, List<SongSubgroup>>> songsRemixed = new HashMap<>();
+        Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsAsComposer = new HashMap<>();
+        Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsAsSubcomposer = new HashMap<>();
+        Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsAsFeat = new HashMap<>();
+        Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsRemixed = new HashMap<>();
         for (AuthorAlias authorAlias : allAliases) {
             List<AuthorSong> allAuthorSongs = authorSongRepository.findByAuthorAlias(authorAlias);
             for (AuthorSong authorSong : allAuthorSongs) {
                 fillMapForArtistDisplay(authorAlias, authorSong, Role.COMPOSER, songsAsComposer);
                 fillMapForArtistDisplay(authorAlias, authorSong, Role.SUBCOMPOSER, songsAsSubcomposer);
-                fillMapForArtistDisplay(authorAlias, authorSong, Role.REMIX, songsAsFeat);
-                fillMapForArtistDisplay(authorAlias, authorSong, Role.FEAT, songsRemixed);
+                fillMapForArtistDisplay(authorAlias, authorSong, Role.FEAT, songsAsFeat);
+                fillMapForArtistDisplay(authorAlias, authorSong, Role.REMIX, songsRemixed);
             }
         }
         model.addAttribute("author", author);
@@ -83,21 +83,21 @@ public class ArtistController extends BaseControllerWithErrorHandling {
     }
 
     private void fillMapForArtistDisplay(AuthorAlias authorAlias, AuthorSong authorSong, Role role,
-                                         Map<String, Map<Song, List<SongSubgroup>>> songsAsComposer) {
+                                         Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsAsComposer) {
         List<SongSubgroup> songSubgroupList = songSubgroupRepository.findBySong(authorSong.getSong());
         if (role.equals(authorSong.getRole())) {
-            if (songsAsComposer.get(authorAlias.getAlias()) == null) {
+            if (songsAsComposer.get(authorAlias) == null) {
                 Map<Song, List<SongSubgroup>> songsPerSubgroup = new HashMap<>();
                 songsPerSubgroup.put(authorSong.getSong(), songSubgroupList);
-                songsAsComposer.put(authorAlias.getAlias(), songsPerSubgroup);
+                songsAsComposer.put(authorAlias, songsPerSubgroup);
             } else {
-                Map<Song, List<SongSubgroup>> songsPerSubgroup = songsAsComposer.get(authorAlias.getAlias());
+                Map<Song, List<SongSubgroup>> songsPerSubgroup = songsAsComposer.get(authorAlias);
                 if (songsPerSubgroup.get(authorSong.getSong()) != null) {
                     songsPerSubgroup.get(authorSong.getSong()).addAll(songSubgroupList);
                 } else {
                     songsPerSubgroup.put(authorSong.getSong(), songSubgroupList);
                 }
-                songsAsComposer.put(authorAlias.getAlias(), songsPerSubgroup);
+                songsAsComposer.put(authorAlias, songsPerSubgroup);
             }
         }
     }
@@ -200,6 +200,81 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         List<AuthorAlias> aliasesToDelete = authorAliasRepository.findByAuthor(authorToDelete);
         authorAliasRepository.deleteAll(aliasesToDelete);
         authorRepository.delete(authorToDelete);
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
+    @PutMapping(value = "/put", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String updateArtist(@RequestBody String formData) throws JsonProcessingException {
+        Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
+        String authorId = (String) mergeInfo.get("authorId");
+        String authorName = (String) mergeInfo.get("authorName");
+        Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
+        author.setName(authorName);
+        AuthorAlias rootAlias = authorAliasRepository.findByAuthor(author).get(0);
+        List<AuthorCountry> existingCountries = author.getAuthorCountries();
+        List<String> countryInfos = (List<String>) mergeInfo.keySet().stream().filter(o -> o.toString().contains("countryInfo")).collect(Collectors.toList());
+        List<String> aliasInfos = (List<String>) mergeInfo.keySet().stream().filter(o -> o.toString().contains("aliasInfo")).collect(Collectors.toList());
+        List<String> targetCountrIds = new ArrayList<>();
+        Set<AuthorCountry> countriesToCreate = new HashSet<>();
+        Set<AuthorCountry> countriesToUnlink = new HashSet<>();
+        for (String countryInfo : countryInfos){
+            String valueToGet = (String) mergeInfo.get(countryInfo);
+            if (valueToGet.contains("DELETE")){
+                String actualCountryId = valueToGet.replace("DELETE-","");
+                AuthorCountry authorCountryToDelete = existingCountries.stream().filter(authorCountry -> authorCountry.getCountry().getId()
+                        .equals(Long.parseLong(actualCountryId))).findFirst().get();
+                countriesToUnlink.add(authorCountryToDelete);
+//                countriesToUnlink.add(authorCountry);
+            } else {
+                String countryId = (String) mergeInfo.get(countryInfo);
+                Optional<AuthorCountry> optionalAuthorCountry = existingCountries.stream().filter(authorCountry
+                        -> authorCountry.getCountry().getId()
+                        .equals(Long.parseLong(countryId))).findFirst();
+                if (optionalAuthorCountry.isEmpty()){
+                    AuthorCountry authorCountry = new AuthorCountry();
+                    authorCountry.setAuthor(author);
+                    Country country = countryRepository.findById(Long.valueOf(countryId));
+                    authorCountry.setCountry(country);
+                    countriesToCreate.add(authorCountry);
+                }
+                targetCountrIds.add(countryId);
+
+            }
+        }
+        for (AuthorCountry authorCountry : existingCountries){
+            if (!targetCountrIds.contains(authorCountry.getCountry().getId().toString())){
+                countriesToUnlink.add(authorCountry);
+            }
+        }
+        authorCountryRepository.deleteAll(countriesToUnlink);
+        authorCountryRepository.saveAll(countriesToCreate);
+        for (String aliasInfo : aliasInfos){
+            String valueToGet = (String) mergeInfo.get(aliasInfo);
+            if (valueToGet.contains("DELETE")){
+                String actualAliasId = valueToGet.replace("DELETE-","");
+                AuthorAlias authorAlias = authorAliasRepository.findById(Integer.valueOf(actualAliasId)).get();
+                List<AuthorSong> authorSongs = authorSongRepository.findByAuthorAlias(authorAlias);
+                for (AuthorSong authorSong : authorSongs){
+                    authorSong.setAuthorAlias(rootAlias);
+                }
+                authorSongRepository.saveAll(authorSongs);
+                authorAliasRepository.delete(authorAlias);
+            } else if (valueToGet.contains("NEW")){
+                AuthorAlias authorAlias = new AuthorAlias();
+                String actualNewAlias = valueToGet.replace("NEW-","");
+                authorAlias.setAlias(actualNewAlias);
+                authorAlias.setAuthor(author);
+                authorAliasRepository.save(authorAlias);
+            } else if (valueToGet.contains("EXISTING")){
+                String[] existingAlias = valueToGet.split("-VAL-");
+                String existingId = existingAlias[0].replace("EXISTING-","");
+                AuthorAlias authorAlias = authorAliasRepository.findById(Integer.valueOf(existingId)).get();
+                authorAlias.setAlias(existingAlias[1]);
+                authorAliasRepository.save(authorAlias);
+            }
+        }
+        authorRepository.save(author);
+//        String authorToMerge = (String) mergeInfo.get("authorToMergeId");
         return new ObjectMapper().writeValueAsString("OK");
     }
 }

@@ -109,7 +109,7 @@ $(document).ready(function () {
 
     $(".play_icon").on("click", function () {
         var useRowDisplay = localStorage.getItem("video-rendering-stuff");
-        if (useRowDisplay==undefined || useRowDisplay == "true") {
+        if (useRowDisplay == undefined || useRowDisplay == "true") {
             var existingTr = $("#listen-music");
             if (existingTr.length != 0) {
                 existingTr.remove();
@@ -700,7 +700,7 @@ $(document).ready(function () {
                 }
                 $("#infoSongModal").modal('show');
             },
-            error: function (ooo) {
+            error: function (ooo) {songsAsFeat
                 console.log("e2");
             },
             done: function (ooo) {
@@ -737,4 +737,167 @@ $(document).ready(function () {
         })
     });
 
+
+    //this is for artist.html
+    $(document).on('click', 'a.artistgroup', function (e) {
+        console.log("jesus");
+        e.preventDefault();
+        var howManyActiveAlready = $('.artistgroup.active').length;
+        var isActive = $(this).hasClass("active");
+        var isAllGroupActive = $('a[data-authorcontribution="all"]').hasClass("active");
+        var contributionType = $(this).attr('data-authorcontribution');
+        if (contributionType == 'all') {
+            if (!isActive) {
+                $('.artistgroup.active').each(function () {
+                    $(this).removeClass('active');
+                    //we get rid of any previously active groups
+                });
+                $(this).addClass('active');
+                $("#artistStuff").find("tr.all").each(function () {
+                    $(this).removeClass('visually-hidden');
+                });
+            }
+        } else {
+            if (!isActive) {
+                //we activate
+                $(this).addClass('active');
+                if (isAllGroupActive){
+                    $('tr.all').each(function () {
+                        $(this).addClass('visually-hidden');
+                    //we get rid of any previously active groups
+                    });
+                    $('a[data-authorcontribution="all"]').each(function () {
+                        $(this).removeClass('active');
+                        //we get rid of any previously active groups
+                    });
+                }
+                $("#artistStuff").find("tr." + contributionType).each(function () {
+                    $(this).removeClass('visually-hidden');
+                });
+            } else {
+                $(this).removeClass('active');
+                $("#artistStuff").find("tr." + contributionType).each(function () {
+                    $(this).addClass('visually-hidden');
+                });
+                howManyActiveAlready = $('.artistgroup.active').length;
+                if (howManyActiveAlready==0){
+                    $('a[data-authorcontribution="all"]').each(function () {
+                        $(this).addClass('active');
+                        //we get rid of any previously active groups
+                    });
+                    $("#artistStuff").find("tr.all").each(function () {
+                        $(this).removeClass('visually-hidden');
+                    });
+                }
+            }
+
+        }
+    });
+
+    $(document).on('click', 'a.aliassubgroup', function (e) {
+    
+    });
+
+    /*
+    $('#playlistModeModalArtist').on('show.bs.modal', function (e) {
+        initPlayer(0);
+    });
+    $('#playlistModeModalArtist').on('shown.bs.modal', function (e) {
+        var divWithVideo = $("#playlistModePlayer");
+        var divContainer = divWithVideo.parent();
+        var playlistContainer = divContainer.next();
+        var iframeContainer = divWithVideo.children().first();
+        $(playlistContainer).css("max-height", iframeContainer.height());
+        $(playlistContainer).css("overflow-y", "auto");
+    });
+    $('#playlistModeModalArtist').on('hide.bs.modal', function (e) {
+        disablePlayer(true);
+    });
+
+    function disablePlayer(cleanDiv) {
+        $('#playlistModePlayer').html('');
+        if (cleanDiv) {
+            $('#playlist_progress').empty();
+        }
+    }
+
+    function initPlayer(changeId) {
+        disablePlayer(false);
+        // var tbody = $('#playlistModePlayer').append("<tbody>");
+        if (changeId >= 0) {
+            current_id = parseInt(changeId);
+        }
+        var localI = 0;
+        if ($('#playlist_progress').is(":empty")) {
+            $("table.playlist_table").find("tr:visible:not(.subgroup-separator):not(.visually-hidden)").each(function () {
+                var bandText = $(this).find("td.band").html();
+                var titleText = $(this).find("td.songtitle").html();
+                bandText = $.trim(bandText).replaceAll("\n", "").replaceAll("<span>", "").replaceAll("</span>", "").replaceAll("> ", ">");
+                titleText = $.trim(titleText).replaceAll("\n", "").replaceAll("<span>", "").replaceAll("</span>", "").replaceAll("> ", ">");
+                var youtubePlayIcon = $(this).find("img.play_icon");
+                if (youtubePlayIcon.length > 0) {
+                    var youtubeLink = youtubePlayIcon.attr("data-tagvideo")
+                        .replace("https://www.youtube.com/embed/", "");
+                    var trElem = $('<tr id="' + localI + '" rel="' + youtubeLink + '"></tr>');
+                    trElem.append('<td class="playlist_play_it"><img width="25" height="25" src="/images/znakwodny.png" style="background-color: transparent"></td>');
+                    trElem.append('<td class="playlist_row">' + bandText + ' - ' + titleText + '</td>');
+                    trElem.append('<td class="playlist_disable_song"><img width="25" height="25" src="/images/trashcan3.png" style="background-color: transparent"></td>');
+                    $("#playlist_progress").append(trElem);
+                    localI++;
+                }
+            });
+        }
+        if (localI == 0) {
+            //show modal that there is nothing to play
+            $("#errorThing").parent().fadeIn(500, function () {
+                setTimeout(function () {
+                    $("#errorThing").parent().fadeOut(500);
+                }, 3000);
+            });
+        }
+        var data_song = [];
+        i = 0;
+        $('#playlist_progress tr').each(function () {
+            data_song[i] = $(this).attr("rel");
+            i++;
+        });
+        if (current_id >= i) {
+            current_id = 0;
+        }
+        if ($('#playlist_progress tr:nth-child(' + (current_id + 1) + ')').hasClass("disabled")) {
+            initPlayer(current_id + 1);
+        } else {
+            $('#playlistModePlayer').html('<iframe id="player" type="text/html" src="https://www.youtube.com/embed/' + data_song[current_id] + '?enablejsapi=1&autoplay=1&autohide=0&theme=light&wmode=transparent" frameborder="0"></iframe>');
+            function onPlayerReady(event) {
+                event.target.playVideo();
+            }
+            function onPlayerStateChange(event) {
+                if (event.data === 0) {
+                    initPlayer(current_id + 1);
+                }
+            }
+            var player = new YT.Player('player', {
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+            var el = $('#playlist_progress tr:nth-child(' + (current_id + 1) + ')');
+            var p = $('#playlist_progress');
+            $('#playlist_progress').animate({
+                scrollTop: p.scrollTop() + el.position().top - (p.height() / 2) + (el.height() / 2)
+            }, 300);
+            var previousTr = $('#playlist_progress tr');
+            previousTr.removeClass("current");
+            previousTr.find("td.playlist_disable_song").show();
+            previousTr.find("td.playlist_play_it").show();
+            previousTr.find("td.playlist_row").attr("colspan", 1);
+            var currentTr = $('#playlist_progress tr:nth-child(' + (current_id + 1) + ')');
+            currentTr.addClass("current");
+            currentTr.find("td.playlist_disable_song").hide();
+            currentTr.find("td.playlist_play_it").hide();
+            currentTr.find("td.playlist_row").attr("colspan", 3);
+        }
+    }
+    */
 });

@@ -5,6 +5,7 @@ $(document).ready(function () {
     $("#manage-artists").click(function (e) {
         var divToAppend = $('#nfs-content');
         divToAppend.empty();
+        divToAppend.append(successAlertHtml);
         var rowDiv = $('<div class="row p-1">');
         var leftCellDiv = $('<div class="col">');
         var rightCellDiv = $('<div class="col">');
@@ -13,7 +14,7 @@ $(document).ready(function () {
         rowDiv.append(rightCellDiv);
         var authorSelect = $('<input class="form-control" id="authorInput"/>');
         var authorSelectHidden = $('<input type="hidden" id="authorInputHidden"/>');
-        leftCellDiv.append('<label for="authorSelect">Author name</label>');
+        leftCellDiv.append('<label for="authorInput">Author name</label>');
         leftCellDiv.append(authorSelect);
         leftCellDiv.append(authorSelectHidden);
         setupAutocompleteManageArtist(authorSelect, authorSelectHidden, "");
@@ -54,6 +55,8 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
             $(mySelect).val(ui.item.label);
             $(mySelect).text(ui.item.label);
             $(mySelectHidden).val(ui.item.value);
+            $("#country-info").empty();
+            $("#alias-info").empty();
             if (foundArtist.length == 1) {
                 setupCountryAndAliasFields(foundArtist[0])
             } else {
@@ -132,12 +135,77 @@ $(document).on('click', 'button.add-alias', function (e) {
     generateAliasDiv((thisId+1),null,divCol);
 });
 
+$(document).on('click', '#save-artist', function (e) {
+    var artistToSave = new Object();
+    if ($("#authorInput").val() == "") {
+        artistToSave.authorId = "NEW-" + $("#authorInputHidden").val();
+    } else {
+        artistToSave.authorId = $("#authorInputHidden").val();
+    }
+    artistToSave.authorName=$("#authorInput").val();
+    var countries = $("#country-info").find("input.countryInfo");
+    for (let i = 0; i < countries.length; i++) {
+        var countryInput = countries[i];
+        if ($(countryInput).val() != "") {
+            if ($(countryInput).next().val() != "") {
+                if ($(countryInput).hasClass("text-decoration-line-through")) {
+                    artistToSave[countryInput.id] = "DELETE-" + $(countryInput).next().val();
+                } else {
+                    artistToSave[countryInput.id] = $(countryInput).next().val();
+                }
+            } else {
+                artistToSave[countryInput.id] = "NEW-" + $(countryInput).val();
+            }
+        }
+    }
+    var aliases = $("#alias-info").find("input.aliasInfo");
+    for (let i = 0; i < aliases.length; i++) {
+        var aliasInput = aliases[i];
+        if ($(aliasInput).val() != "") {
+            if ($(aliasInput).next().val() != "") {
+                if ($(aliasInput).hasClass("text-decoration-line-through")) {
+                    artistToSave[aliasInput.id] = "DELETE-" + $(aliasInput).next().val();
+                } else {
+                    artistToSave[aliasInput.id] = "EXISTING-"+$(aliasInput).next().val()
+                    +"-VAL-"+$(aliasInput).val();
+                }
+            } else {
+                artistToSave[aliasInput.id] = "NEW-" + $(aliasInput).val();
+            }
+        }
+    }
+    $.ajax({
+        async: false,
+        type: "PUT",
+        data: JSON.stringify(artistToSave),
+        url: "/author/put",
+        contentType: 'application/json; charset=utf-8',
+        // dataType: 'json',
+        success: function (ooo) {
+            $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
+                $('#success-alert').slideUp(500);
+                var divToAppend = $('#nfs-content');
+                divToAppend.empty();
+            });
+        },
+        error: function (ooo) {
+            console.log("e2");
+
+        },
+        done: function (ooo) {
+            console.log("e3");
+
+        }
+    });
+});
+
+
 function generateCountryDiv(i, country, countriesDiv) {
     var countriesRowDiv = $('<div id="countriesRow-' + i + '" class="row p-1">');
     var inputDiv = $('<div class="col">');
     var buttonsDiv = $('<div class="col">');
     inputDiv.append('<label for="countryInfo-' + i + '">Country</label>');
-    var countrySelect = $('<input class="form-control" id="countryInfo-' + i + '">');
+    var countrySelect = $('<input class="form-control countryInfo" id="countryInfo-' + i + '">');
     if (country != undefined) {
         countrySelect.val(country.countryName);
     }
@@ -162,7 +230,7 @@ function generateAliasDiv(i, alias, aliasesDiv) {
     var inputDiv = $('<div class="col">');
     var buttonsDiv = $('<div class="col">');
     inputDiv.append('<label for="aliasInfo-' + i + '">Alias</label>');
-    var aliasSelect = $('<input class="form-control" id="aliasInfo-' + i + '">');
+    var aliasSelect = $('<input class="form-control aliasInfo" id="aliasInfo-' + i + '">');
     if (alias!=undefined){
         aliasSelect.val(alias.aliasName);
     }
@@ -174,6 +242,9 @@ function generateAliasDiv(i, alias, aliasesDiv) {
     inputDiv.append(aliasSelectHidden);
     var addAliasButton = $('<button id="add-alias-' + i + '" type="submit" class="btn btn-primary add-alias">+</button>');
     var deleteAliasButton = $('<button id="delete-alias-' + i + '" type="submit" class="btn btn-danger delete-alias">-</button>');
+    if (i==0){
+        $("#delete-alias-0").prop("disabled",true);
+    }
     buttonsDiv.append(addAliasButton);
     buttonsDiv.append(deleteAliasButton);
     aliasesRowDiv.append(inputDiv);
