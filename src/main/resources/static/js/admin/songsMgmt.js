@@ -5,22 +5,8 @@ function SubmitSongChange(subgroup_id, song_id, state) {
 }
 
 var currentSongSubgroup;
+var currentSubgroup;
 $(document).ready(function () {
-    // $.ajax({
-    //     async: false,
-    //     type: "GET",
-    //     url: "/author/readAll",
-    //     success: function (ooo) {
-    //         allArtistsForDropdown = JSON.parse(ooo);
-    //         console.log("e");
-    //     },
-    //     error: function (ooo) {
-    //         console.log("e2");
-    //     },
-    //     done: function (ooo) {
-    //         console.log("e3");
-    //     }
-    // });
 
     $("#success-alert").hide();
     function getSubgroupsFromGame() {
@@ -94,7 +80,7 @@ $(document).ready(function () {
             textTd.append(songDisplay);
             tr.append(textTd);
             tr.append('<td class="text-right col-md-1"><button type="button" id="edit-song-' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-warning edit-song">Edit (in subgroup)</button></td>');
-            tr.append('<td class="text-right col-md-1"><button type="button" id="edit-song-globally-' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-warning edit-song">Edit globally</button></td>');
+            tr.append('<td class="text-right col-md-1"><button type="button" id="edit-song-globally-' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-warning edit-song-globally">Edit globally</button></td>');
             tr.append('<td class="text-right col-md-1"><button type="button" id="delete-song-' + songs[i].song.id + '" data-songsubgroupid="' + songs[i].id + '" data-songId="' + songs[i].song.id + '" class="btn btn-danger delete-song">Delete from subgroup</button></td>');
             tableToFill.append(tr);
         }
@@ -107,7 +93,7 @@ $(document).ready(function () {
     });
 
     $(document).on('click', 'button.delete-song', function (e) {
-    var divToAppend = $('#nfs-content');
+        var divToAppend = $('#nfs-content');
         var songId = $(this).attr("data-songSubgroupId");
         divToAppend.empty();
         $.ajax({
@@ -137,95 +123,7 @@ $(document).ready(function () {
                 console.log("e");
                 songSubgroup = JSON.parse(ooo);
                 currentSongSubgroup = songSubgroup;
-                var saveCancelFormDiv = $('<div class="form-group">');
-                var saveOrCancelDiv = $('<div class="row p-1">');
-                saveCancelFormDiv.append(saveOrCancelDiv);
-                var saveCol = $('<div class="col">');
-                saveCol.append('<button id="save-song" type="submit" class="btn btn-success m-2">Save</button>');
-                saveCol.append('<button id="cancel-song" type="submit" class="btn btn-primary">Cancel</button>');
-                saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate to other subgroups?</label>');
-                saveOrCancelDiv.append(saveCol);
-                var artistAndAliasDiv = $('<div class="row p-1">');
-                var artistDiv = $('<div class="col">');
-                var aliasDiv = $('<div class="col">');
-                var instrumentalDiv = $('<div class="col">');
-                var mainComposerDiv = $('<div class="form-group mainComposer" id="mainComposer">');
-                var ingameDisplayDiv = $('<div class="form-group inGameDisplay" id="inGameDisplay">');
-                var spotifyOthersDiv = $('<div class="form-group spotifyDisplay" id="spotifyDisplay">');
-                var featDiv = $('<div class="form-group featDiv" id="featDiv">');
-                var featRowDiv = $('<div class="row p-1">');
-                var featInputColDiv = $('<div class="col">');
-                var featButtonColDiv = $('<div class="col">');
-                var remixDiv = $('<div class="form-group remixer" id="remixer">');
-                var remixRowDiv = $('<div class="row p-1">');
-                var remixInputColDiv = $('<div class="col">');
-                var remixButtonColDiv = $('<div class="col">');
-                var subcomposerDiv = $('<div class="form-group subcomposerDiv" id="subcomposerDiv">');
-                var subcomposerRowDiv = $('<div class="row p-1">');
-                var subcomposerInputColDiv = $('<div class="col">');
-                var subcomposerConcatColDiv = $('<div class="col">');
-                var subcomposerButtonColDiv = $('<div class="col">');
-                var lyricsDiv = $('<div class="form-group lyrics_edit" id="lyrics_edit">');
-                var featSelect = $('<input class="form-control feat-select" id="featSelect-1"/>');
-                var featSelectHidden = $('<input type="hidden" id="featSelectHidden-1"/>');
-                var subcomposerSelect = $('<input class="form-control subcomposer-select" id="subcomposerSelect-1"/>');
-                var subcomposerSelectHidden = $('<input type="hidden" id="subcomposerSelectHidden-1"/>');
-                var remixSelect = $('<input class="form-control remix-select" id="remixSelect-1"/>');
-                var remixSelectHidden = $('<input type="hidden" id="remixSelectHidden-1"/>');
-                var howManyFeats = 0;
-                var howManyRemixes = 0;
-                var howManySubcomposers = 0;
-                for (let i = 0; i < songSubgroup.song.authorSongList.length; i++) {
-                    var authorSong = songSubgroup.song.authorSongList[i];
-                    var officialArtistName = authorSong.authorAlias.author.name;
-                    var aliasSelect = $('<input class="form-control w-100" id="aliasSelect-' + i + '" value="' + officialArtistName + '"/>');
-                    var aliasSelectHidden = $('<input type="hidden" id="aliasSelectHidden-' + i + '" value="' + authorSong.authorAlias.id + '"/>');
-                    if (authorSong.role == "COMPOSER") {
-                        generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv, artistAndAliasDiv, aliasSelect, aliasSelectHidden, i, authorSong, instrumentalDiv,
-                            songSubgroup.instrumental);
-                    }
-                    if (authorSong.role == "SUBCOMPOSER") {
-                        howManySubcomposers++;
-                        generateSubcomposerDiv(subcomposerSelect, subcomposerSelectHidden, subcomposerDiv, subcomposerInputColDiv, subcomposerConcatColDiv, subcomposerButtonColDiv, subcomposerRowDiv, howManySubcomposers, i, officialArtistName, authorSong);
-                    }
-                    if (authorSong.role == "FEAT") {
-                        howManyFeats++;
-                        generateFeatDiv(featSelect, featSelectHidden, featDiv, featInputColDiv, featButtonColDiv, featRowDiv, howManyFeats, howManyFeats, officialArtistName, authorSong);
-                        console.log(authorSong);
-                    }
-                    if (authorSong.role == "REMIX") {
-                        howManyRemixes++;
-                        console.log(authorSong);
-                        generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixRowDiv, howManyRemixes, officialArtistName, i, authorSong);
-                    }
-                }
-                if (howManySubcomposers == 0) {
-                    // howManySubcomposers++;
-                    generateSubcomposerDiv(subcomposerSelect, subcomposerSelectHidden, subcomposerDiv, subcomposerInputColDiv, subcomposerConcatColDiv, subcomposerButtonColDiv, subcomposerRowDiv, howManySubcomposers, howManySubcomposers, officialArtistName, undefined);
-                }
-                if (howManyFeats == 0) {
-                    // howManyFeats++;
-                    generateFeatDiv(featSelect, featSelectHidden, featDiv, featInputColDiv, featButtonColDiv, featRowDiv, howManyFeats, howManyFeats, undefined);
-                }
-                if (howManyRemixes == 0) {
-                    // howManyRemixes++;
-                    generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixRowDiv, howManyRemixes, officialArtistName, howManyFeats, undefined);
-                }
-                divToAppend.append(saveOrCancelDiv);
-                generateIngameDisplayDiv(ingameDisplayDiv, songSubgroup);
-                divToAppend.append(mainComposerDiv);
-                divToAppend.append(ingameDisplayDiv);
-                divToAppend.append(subcomposerDiv);
-                divToAppend.append(featDiv);
-                divToAppend.append(remixDiv);
-                generateSpotifyAndLyrics(spotifyOthersDiv, songSubgroup);
-                divToAppend.append(spotifyOthersDiv);
-                /*
-                divToAppend.append("<h3>Author country info</h3>");
-                divToAppend.append("<h3>Song subgroup info</h3>");
-                divToAppend.append("<h3>Genre info</h3>");
-                */
-
+                renderEditCreateSong(divToAppend, songSubgroup);
             },
             error: function (ooo) {
                 console.log("e2");
@@ -235,6 +133,136 @@ $(document).ready(function () {
             }
         });
 
+    });
+
+    function renderEditCreateSong(divToAppend, songSubgroup) {
+        var saveCancelFormDiv = $('<div class="form-group">');
+        var saveOrCancelDiv = $('<div class="row p-1">');
+        saveCancelFormDiv.append(saveOrCancelDiv);
+        var saveCol = $('<div class="col">');
+        saveCol.append('<button id="save-song" type="submit" class="btn btn-success m-2">Savenew song </button>');
+        saveCol.append('<button id="cancel-song" type="submit" class="btn btn-primary">Cancel</button>');
+        saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate to other subgroups?</label>');
+        saveOrCancelDiv.append(saveCol);
+        var artistAndAliasDiv = $('<div class="row p-1">');
+        var artistDiv = $('<div class="col">');
+        var aliasDiv = $('<div class="col">');
+        var instrumentalDiv = $('<div class="col">');
+        var mainComposerDiv = $('<div class="form-group mainComposer" id="mainComposer">');
+        var ingameDisplayDiv = $('<div class="form-group inGameDisplay" id="inGameDisplay">');
+        var spotifyOthersDiv = $('<div class="form-group spotifyDisplay" id="spotifyDisplay">');
+        var featDiv = $('<div class="form-group featDiv" id="featDiv">');
+        var featRowDiv = $('<div class="row p-1">');
+        var featInputColDiv = $('<div class="col">');
+        var featButtonColDiv = $('<div class="col">');
+        var remixDiv = $('<div class="form-group remixer" id="remixer">');
+        var remixRowDiv = $('<div class="row p-1">');
+        var remixInputColDiv = $('<div class="col">');
+        var remixButtonColDiv = $('<div class="col">');
+        var subcomposerDiv = $('<div class="form-group subcomposerDiv" id="subcomposerDiv">');
+        var subcomposerRowDiv = $('<div class="row p-1">');
+        var subcomposerInputColDiv = $('<div class="col">');
+        var subcomposerConcatColDiv = $('<div class="col">');
+        var subcomposerButtonColDiv = $('<div class="col">');
+        var lyricsDiv = $('<div class="form-group lyrics_edit" id="lyrics_edit">');
+        var featSelect = $('<input class="form-control feat-select" id="featSelect-1"/>');
+        var featSelectHidden = $('<input type="hidden" id="featSelectHidden-1"/>');
+        var subcomposerSelect = $('<input class="form-control subcomposer-select" id="subcomposerSelect-1"/>');
+        var subcomposerSelectHidden = $('<input type="hidden" id="subcomposerSelectHidden-1"/>');
+        var remixSelect = $('<input class="form-control remix-select" id="remixSelect-1"/>');
+        var remixSelectHidden = $('<input type="hidden" id="remixSelectHidden-1"/>');
+        var howManyFeats = 0;
+        var howManyRemixes = 0;
+        var howManySubcomposers = 0;
+        if (songSubgroup != null) {
+            for (let i = 0; i < songSubgroup.song.authorSongList.length; i++) {
+                var authorSong = songSubgroup.song.authorSongList[i];
+                var officialArtistName = authorSong.authorAlias.author.name;
+                var aliasSelect = $('<input class="form-control w-100" id="aliasSelect-' + i + '" value="' + officialArtistName + '"/>');
+                var aliasSelectHidden = $('<input type="hidden" id="aliasSelectHidden-' + i + '" value="' + authorSong.authorAlias.id + '"/>');
+                if (authorSong.role == "COMPOSER") {
+                    generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv, artistAndAliasDiv, aliasSelect, aliasSelectHidden, i, authorSong, instrumentalDiv,
+                        songSubgroup.instrumental);
+                }
+                if (authorSong.role == "SUBCOMPOSER") {
+                    howManySubcomposers++;
+                    generateSubcomposerDiv(subcomposerSelect, subcomposerSelectHidden, subcomposerDiv, subcomposerInputColDiv, subcomposerConcatColDiv, subcomposerButtonColDiv, subcomposerRowDiv, howManySubcomposers, i, officialArtistName, authorSong);
+                }
+                if (authorSong.role == "FEAT") {
+                    howManyFeats++;
+                    generateFeatDiv(featSelect, featSelectHidden, featDiv, featInputColDiv, featButtonColDiv, featRowDiv, howManyFeats, howManyFeats, officialArtistName, authorSong);
+                    console.log(authorSong);
+                }
+                if (authorSong.role == "REMIX") {
+                    howManyRemixes++;
+                    console.log(authorSong);
+                    generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixRowDiv, howManyRemixes, officialArtistName, i, authorSong);
+                }
+            }
+        } else {
+            var aliasSelect = $('<input class="form-control w-100" id="aliasSelect-0"/>');
+            var aliasSelectHidden = $('<input type="hidden" id="aliasSelectHidden-0"/>');
+            generateAuthorDiv(mainComposerDiv, "", artistDiv, aliasDiv, artistAndAliasDiv, aliasSelect, aliasSelectHidden, 0, null, instrumentalDiv,
+                false);
+        }
+        if (howManySubcomposers == 0) {
+            // howManySubcomposers++;
+            generateSubcomposerDiv(subcomposerSelect, subcomposerSelectHidden, subcomposerDiv, subcomposerInputColDiv, subcomposerConcatColDiv, subcomposerButtonColDiv, subcomposerRowDiv, howManySubcomposers, howManySubcomposers, officialArtistName, undefined);
+        }
+        if (howManyFeats == 0) {
+            // howManyFeats++;
+            generateFeatDiv(featSelect, featSelectHidden, featDiv, featInputColDiv, featButtonColDiv, featRowDiv, howManyFeats, howManyFeats, undefined);
+        }
+        if (howManyRemixes == 0) {
+            // howManyRemixes++;
+            generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixRowDiv, howManyRemixes, officialArtistName, howManyFeats, undefined);
+        }
+        divToAppend.append(saveOrCancelDiv);
+        divToAppend.append(mainComposerDiv);
+        if (songSubgroup==null){
+            var officialDisplayDiv = $('<div class="form-group officialDisplay" id="officialDisplay">');
+            generateOfficialDisplayDiv(officialDisplayDiv,null);
+            divToAppend.append(officialDisplayDiv);
+        }
+        generateIngameDisplayDiv(ingameDisplayDiv, songSubgroup);
+        divToAppend.append(ingameDisplayDiv);
+        divToAppend.append(subcomposerDiv);
+        divToAppend.append(featDiv);
+        divToAppend.append(remixDiv);
+        generateSpotifyAndLyrics(spotifyOthersDiv, songSubgroup);
+        divToAppend.append(spotifyOthersDiv);
+    }
+
+    $(document).on('click', 'button.edit-song-globally', function (e) {
+        var divToAppend = $('#nfs-content');
+        var songId = $(this).attr("data-songSubgroupId");
+        divToAppend.empty();
+        var songSubgroup;
+        $.ajax({
+            async: false,
+            type: "GET",
+            url: "/songSubgroup/read/" + songId,
+            success: function (ooo) {
+                console.log("e");
+                songSubgroup = JSON.parse(ooo);
+                currentSongSubgroup = songSubgroup;
+                var globallySaveCancelFormDiv = $('<div class="form-group">');
+                var globallySaveOrCancelDiv = $('<div class="row p-1">');
+                globallySaveCancelFormDiv.append(globallySaveOrCancelDiv);
+                var saveCol = $('<div class="col">');
+                saveCol.append('<button id="save-song-globally" type="submit" class="btn btn-success m-2">Save</button>');
+                saveCol.append('<button id="cancel-song-globally" type="submit" class="btn btn-primary">Cancel</button>');
+                saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate to other subgroups?</label>');
+                globallySaveOrCancelDiv.append(saveCol);
+                var officialDisplayDiv = $('<div class="form-group officialDisplay" id="officialDisplay">');
+                generateOfficialDisplayDiv(officialDisplayDiv, songSubgroup);
+                var spotifyOthersDiv = $('<div class="form-group spotifyDisplay" id="spotifyDisplay">');
+                generateSpotifyAndLyrics(spotifyOthersDiv, songSubgroup.song);
+                divToAppend.append(globallySaveCancelFormDiv);
+                divToAppend.append(officialDisplayDiv);
+                divToAppend.append(spotifyOthersDiv);
+            }
+        });
     });
 
     function setupAutocompleteArtist(mySelect, mySelectHidden, valueToSet) {
@@ -324,6 +352,7 @@ $(document).ready(function () {
     $(document).on('click', 'a.songItem', function (e) {
         $("#subgroupsDropdown").text($(this).text());
         var subgroupId = parseInt($(this).attr('data-subgroupId'));
+        currentSubgroup = subgroupId;
         var groupId = parseInt($(this).attr('data-groupId'));
         var subgroupSongs;
         for (let i = 0; i < fullScopeOfEdit.length; i++) {
@@ -342,9 +371,9 @@ $(document).ready(function () {
         });
         for (let i = 0; i < subgroupSongs.length; i++) {
             var songId = subgroupSongs[i].song.id;
-            var songToMark = $("#songs-table").find('tr[data-songId="' + songId + '"][data-songsubgroupid="'+subgroupSongs[i].id+'"]').first();
+            var songToMark = $("#songs-table").find('tr[data-songId="' + songId + '"][data-songsubgroupid="' + subgroupSongs[i].id + '"]').first();
             songToMark.attr("data-songSubgroupId", subgroupSongs[i].id);
-            
+
 
             songToMark.removeClass("visually-hidden");
         };
@@ -356,14 +385,21 @@ $(document).ready(function () {
         instrumentalValue) {
         mainComposerDiv.append("<h4>Author / Alias info</h4>");
         var authorSelect = $('<input class="form-control" id="authorSelect-' + i + '" value="' + officialArtistName + '"/>');
-        var authorSelectHidden = $('<input type="hidden" id="authorSelectHidden-' + i + '" value="' + authorSong.authorAlias.author.id + '"/>');
+        var authorSelectHidden = $('<input type="hidden" id="authorSelectHidden-' + i + '"/>');
+        if (authorSong!=null){
+            authorSelectHidden.val(authorSong.authorAlias.author.id);
+        }
         artistDiv.append('<label for="authorSelect-"' + i + '">Author name</label>');
         aliasDiv.append('<label for="aliasSelect-"' + i + '">Alias</label>');
         setupAutocompleteArtist(authorSelect, authorSelectHidden, officialArtistName);
         artistDiv.append(authorSelect);
         artistDiv.append(authorSelectHidden);
         artistAndAliasDiv.append(artistDiv);
-        setupAutocompleteAliasArtist(aliasSelect, aliasSelectHidden, authorSong.id);
+        if (authorSong!=null){
+            setupAutocompleteAliasArtist(aliasSelect, aliasSelectHidden, authorSong.id);
+        } else {
+            setupAutocompleteAliasArtist(aliasSelect, aliasSelectHidden, "");
+        }
         aliasDiv.append(aliasSelect);
         aliasDiv.append(aliasSelectHidden);
         artistAndAliasDiv.append(aliasDiv);
@@ -382,17 +418,14 @@ $(document).ready(function () {
 
     function generateIngameDisplayDiv(ingameDisplayDiv, songSubgroup) {
         ingameDisplayDiv.append("<h4>In-game display</h4>");
-        var ingameBand = $(`<input class="form-control" id="ingameBand" value="` + songSubgroup.ingameDisplayBand + `"/>`);
-        if (songSubgroup.ingameDisplayBand!=null){
-            ingameBand.val(songSubgroup.ingameDisplayBand);
-        }
-        var ingameTitle = $(`<input class="form-control" id="ingameTitle" value="` + songSubgroup.ingameDisplayTitle + `"/>`);
-        if (songSubgroup.ingameDisplayTitle!=null){
-            ingameTitle.val(songSubgroup.ingameDisplayTitle);
-        }
-        var ingameSrcId = $('<input class="form-control" id="ingameSrcId" value="' + songSubgroup.srcId + '"/>');
+        var ingameBand = $(`<input class="form-control" id="ingameBand"/>`);
+        var ingameTitle = $(`<input class="form-control" id="ingameTitle"/>`);
+        var ingameSrcId = $('<input class="form-control" id="ingameSrcId"/>');
         var ingameInfo = $(`<input class="form-control" id="ingameInfo"/>`);
-        if (songSubgroup.info!=null){
+        if (songSubgroup != null) {
+            ingameBand.val(songSubgroup.ingameDisplayBand);
+            ingameBand.val(songSubgroup.ingameDisplayBand);
+            ingameTitle.val(songSubgroup.ingameDisplayTitle);
             ingameInfo.val(songSubgroup.info);
         }
         var ingameDiv = $('<div class="row p-1">');
@@ -402,7 +435,7 @@ $(document).ready(function () {
         var ingameInfoDiv = $('<div class="col">');
         ingameBandDiv.append('<label for="ingameBand">Ingame band display</label>');
         ingameTitleDiv.append('<label for="ingameTitle">Ingame band display</label>');
-        ingameSrcIdDiv.append('<label for="ingameSrcId">Youtube Source Id</label>');
+        ingameSrcIdDiv.append('<label for="ingameSrcId">Ingame Youtube Source Id</label>');
         ingameInfoDiv.append('<label for="ingameInfo">Info</label>');
         ingameBandDiv.append(ingameBand);
         ingameTitleDiv.append(ingameTitle);
@@ -415,20 +448,34 @@ $(document).ready(function () {
         ingameDisplayDiv.append(ingameDiv);
     }
 
-    function generateOfficialDisplayDiv(ingameDisplayDiv, songSubgroup) {
-        ingameDisplayDiv.append("<h4>In-game display</h4>");
-        var ingameBand = $('<input class="form-control" id="ingameBand" value="' + songSubgroup.ingameDisplayBand + '"/>');
-        var ingameTitle = $('<input class="form-control" id="ingameTitle" value="' + songSubgroup.ingameDisplayTitle + '"/>');
-        var ingameDiv = $('<div class="row p-1">');
-        var ingameBandDiv = $('<div class="col">');
-        var ingameTitleDiv = $('<div class="col">');
-        ingameBandDiv.append('<label for="ingameBand">Ingame band display</label>');
-        ingameTitleDiv.append('<label for="ingameTitle">Ingame band display</label>');
-        ingameBandDiv.append(ingameBand);
-        ingameTitleDiv.append(ingameTitle);
-        ingameDiv.append(ingameBandDiv);
-        ingameDiv.append(ingameTitleDiv);
-        ingameDisplayDiv.append(ingameDiv);
+    function generateOfficialDisplayDiv(officialDisplayDiv, songSubgroup) {
+        officialDisplayDiv.append("<h4>Official display</h4>");
+        var officialBand = $(`<input class="form-control" id="officialBand"/>`);
+        var officialTitle = $(`<input class="form-control" id="officialTitle"/>`);
+        var officialSrcId = $('<input class="form-control" id="officialSrcId"/>');
+        if (songSubgroup != null){
+            officialBand.val(songSubgroup.song.officialDisplayBand);
+            officialTitle.val(songSubgroup.song.officialDisplayTitle);
+            officialSrcId.val(songSubgroup.song.srcId);
+        }
+        var officialDiv = $('<div class="row p-1">');
+        var officialBandDiv = $('<div class="col">');
+        var officialTitleDiv = $('<div class="col">');
+        var officialSrcIdDiv = $('<div class="col">');
+        officialBandDiv.append('<label for="officialBand">Official band display</label>');
+        officialTitleDiv.append('<label for="officialTitle">Official title display</label>');
+        officialSrcIdDiv.append('<label for="officialSrcId">Official YouTube Src ID</label>');
+        officialBandDiv.append(officialBand);
+        officialTitleDiv.append(officialTitle);
+        officialSrcIdDiv.append(officialSrcId);
+        officialDiv.append(officialBandDiv);
+        officialDiv.append(officialTitleDiv);
+        officialDiv.append(officialSrcIdDiv);
+        officialDisplayDiv.append(officialDiv);
+    }
+
+    function generateGenreDiv(){
+
     }
 
     function generateFeatDiv(featSelect, featSelectHidden, featDiv, featInputColDiv, featButtonColDiv,
@@ -461,7 +508,7 @@ $(document).ready(function () {
             var featButtonColDivNext = $('<div class="col">');
             var featSelectNext = $('<input class="form-control feat-select" id="featSelect-' + i + '" value="' + officialArtistName + '"/>');
             var featSelectHiddenNext = $('<input type="hidden" id="featSelectHidden-' + i + '" value="' + officialArtistName + '"/>');
-            featInputColDivNext.append('<label for="featSelect-'+i+'">Feat.</label>');
+            featInputColDivNext.append('<label for="featSelect-' + i + '">Feat.</label>');
             featInputColDivNext.append(featSelectNext);
             featInputColDivNext.append(featSelectHiddenNext);
             featButtonColDivNext.append('<button id="add-feat-' + i + '" type="submit" class="btn btn-primary add-feat">+</button>');
@@ -471,7 +518,7 @@ $(document).ready(function () {
                 setupAutocompleteAlias(featSelectNext, featSelectHiddenNext, authorSong.authorAlias.author.id);
                 featSelectHiddenNext.val(authorSong.authorAlias.author.id);
                 featSelectNext.val(officialArtistName);
-                if (authorSong.featConcat!=null){
+                if (authorSong.featConcat != null) {
                     var divNewCol = $('<div class="col"></div>');
                     var featConcatInput = $('<input type="text" class="form-control" id="featConcatInput-' + howManyFeats + '"/>');
                     featConcatInput.val(authorSong.featConcat);
@@ -522,7 +569,7 @@ $(document).ready(function () {
             var subcomposerButtonColDivNext = $('<div class="col">');
             var subcomposerSelectNext = $('<input class="form-control subcomposer-select" id="subcomposerSelect-' + i + '" value="' + officialArtistName + '"/>');
             var subcomposerSelectHiddenNext = $('<input type="hidden" id="subcomposerSelectHidden-' + i + '" value="' + officialArtistName + '"/>');
-            subcomposerInputColDivNext.append('<label for="subcomposerSelect-'+i+'">Subcomposer</label>');
+            subcomposerInputColDivNext.append('<label for="subcomposerSelect-' + i + '">Subcomposer</label>');
             subcomposerInputColDivNext.append(subcomposerSelectNext);
             subcomposerInputColDivNext.append(subcomposerSelectHiddenNext);
             subcomposerButtonColDivNext.append('<button id="add-subcomposer-' + i + '" type="submit" class="btn btn-primary add-subcomposer">+</button>');
@@ -532,7 +579,7 @@ $(document).ready(function () {
                 setupAutocompleteAlias(subcomposerSelectNext, subcomposerSelectHiddenNext, authorSong.authorAlias.author.id);
                 subcomposerSelectHiddenNext.val(authorSong.authorAlias.author.id);
                 subcomposerSelectNext.val(officialArtistName);
-                if (authorSong.subcomposerConcat!=null){
+                if (authorSong.subcomposerConcat != null) {
                     var divNewCol = $('<div class="col"></div>');
                     var subcomposerConcatInput = $('<input type="text" class="form-control" id="subcomposerConcatInput-' + howManySubcomposers + '"/>');
                     subcomposerConcatInput.val(authorSong.subcomposerConcat);
@@ -594,7 +641,7 @@ $(document).ready(function () {
                 setupAutocompleteAlias(remixSelectNext, remixSelectHiddenNext, authorSong.authorAlias.author.id);
                 remixSelectHiddenNext.val(authorSong.authorAlias.author.id);
                 remixSelectNext.val(officialArtistName);
-                if (authorSong.remixConcat!=null){
+                if (authorSong.remixConcat != null) {
                     var divNewCol = $('<div class="col"></div>');
                     var remixConcatInput = $('<input type="text" class="form-control" id="remixConcatInput-' + howManyRemixes + '"/>');
                     remixConcatInput.val(authorSong.remixConcat);
@@ -615,7 +662,7 @@ $(document).ready(function () {
         var rowCol = col.parent();
         var divCol = rowCol.parent();
         var thisId = parseInt($(this).attr("id").replace("add-remix-", ""));
-        generateRemixDiv(null, null, divCol, null, null, null, null, null, "", (thisId+1));
+        generateRemixDiv(null, null, divCol, null, null, null, null, null, "", (thisId + 1));
         var divNewCol = $('<div class="col"></div>');
         var remixConcatInput = $('<input type="text" class="form-control" id="remixConcatInput-' + thisId + '"/>');
         divNewCol.append('<label for="remixConcatInput-' + thisId + '">Remix concat string</label>');
@@ -627,7 +674,7 @@ $(document).ready(function () {
         var col = $(this).parent();
         var rowCol = col.parent();
         var idOfInput = $(this).attr("id").replace("delete-remix-", "remixSelect-");
-        if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val()==undefined) {
+        if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val() == undefined) {
             var rowCol = col.parent();
             var divCol = rowCol.parent();
             divCol.remove();
@@ -642,7 +689,7 @@ $(document).ready(function () {
         var rowCol = col.parent();
         var divCol = rowCol.parent();
         var thisId = parseInt($(this).attr("id").replace("add-feat-", ""));
-        generateFeatDiv(null, null, divCol, null, null, null, (thisId+1), (thisId+1), "");
+        generateFeatDiv(null, null, divCol, null, null, null, (thisId + 1), (thisId + 1), "");
         var divNewCol = $('<div class="col"></div>');
         var featConcatInput = $('<input type="text" class="form-control" id="featConcatInput-' + thisId + '"/>');
         divNewCol.append('<label for="featConcatInput-' + thisId + '">Feat. concat string</label>');
@@ -654,7 +701,7 @@ $(document).ready(function () {
         var col = $(this).parent();
         var rowCol = col.parent();
         var idOfInput = $(this).attr("id").replace("delete-feat-", "featSelect-");
-        if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val()==undefined) {
+        if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val() == undefined) {
             var rowCol = col.parent();
             var divCol = rowCol.parent();
             divCol.remove();
@@ -667,16 +714,16 @@ $(document).ready(function () {
         var col = $(this).parent();
         var rowCol = col.parent();
         var divCol = rowCol.parent();
-        var thisId = parseInt($(this).attr("id").replace("add-subcomposer-", ""))+1;
-        generateSubcomposerDiv(null,null,divCol,null,null,null,null,thisId,thisId,"",null);
+        var thisId = parseInt($(this).attr("id").replace("add-subcomposer-", "")) + 1;
+        generateSubcomposerDiv(null, null, divCol, null, null, null, null, thisId, thisId, "", null);
         var divNewCol = $('<div class="col"></div>');
         var subcomposerConcatInput = $('<input type="text" class="form-control" id="subcomposerConcatInput-' + thisId + '"/>');
         divNewCol.append('<label for="subcomposerConcatInput-' + thisId + '">Subcomposer concat</label>');
         divNewCol.append(subcomposerConcatInput);
         var childrenOfDivCol = divCol.children();
-        var rowToPutConcat = $(divCol.children()[thisId+1]);
-        if (rowToPutConcat.length==0){
-            rowToPutConcat = $(divCol.children()[childrenOfDivCol.length-1]);
+        var rowToPutConcat = $(divCol.children()[thisId + 1]);
+        if (rowToPutConcat.length == 0) {
+            rowToPutConcat = $(divCol.children()[childrenOfDivCol.length - 1]);
         }
         var colWithButtons = rowToPutConcat.children()[1];
         divNewCol.insertBefore(colWithButtons);
@@ -686,7 +733,7 @@ $(document).ready(function () {
         var col = $(this).parent();
         var rowCol = col.parent();
         var idOfInput = $(this).attr("id").replace("delete-subcomposer-", "subcomposerSelect-");
-        if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val()==undefined) {
+        if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val() == undefined) {
             var rowCol = col.parent();
             rowCol.remove();
         } else {
@@ -698,14 +745,26 @@ $(document).ready(function () {
         getSubgroupsFromGame();
     });
 
+    $(document).on('click', '#cancel-song-globally', function (e) {
+        getSubgroupsFromGame();
+    });
+
     function generateSpotifyAndLyrics(ingameDisplayDiv, songSubgroup) {
         ingameDisplayDiv.append("<h4>Spotify and others / lyrics</h4>");
-        var itunesInput = $('<input type="text" class="form-control" id="itunesInput" value="' + songSubgroup.itunesLink + '"/>');
-        var spotifyInput = $('<input type="text" class="form-control" id="spotifyInput" value="' + songSubgroup.spotifyId + '"/>');
-        var soundcloudInput = $('<input type="text" class="form-control" id="soundcloudInput" value="' + songSubgroup.soundcloudLink + '"/>');
-        var deezerInput = $('<input type="text" class="form-control" id="deezerInput" value="' + songSubgroup.deezerId + '"/>');
-        var tidalInput = $('<input type="text" class="form-control" id="tidalInput" value="' + songSubgroup.tidalLink + '"/>');
-        var lyricsTextArea = $('<textarea class="form-control" id="lyrics">' + songSubgroup.lyrics + '</textarea/>');
+        var itunesInput = $('<input type="text" class="form-control" id="itunesInput"/>');
+        var spotifyInput = $('<input type="text" class="form-control" id="spotifyInput"/>');
+        var soundcloudInput = $('<input type="text" class="form-control" id="soundcloudInput"/>');
+        var deezerInput = $('<input type="text" class="form-control" id="deezerInput"/>');
+        var tidalInput = $('<input type="text" class="form-control" id="tidalInput"/>');
+        var lyricsTextArea = $('<textarea class="form-control" id="lyrics"></textarea/>');
+        if (songSubgroup!=null){
+            itunesInput.val(songSubgroup.itunesLink);
+            spotifyInput.val(songSubgroup.spotifyId);
+            soundcloudInput.val(songSubgroup.soundcloudLink);
+            deezerInput.val(songSubgroup.deezerId);
+            tidalInput.val(songSubgroup.tidalLink);
+            lyricsTextArea.text(songSubgroup.lyrics);
+        }
         var socialDiv = $('<div class="row p-1">');
         var itunesInputDiv = $('<div class="col">');
         var spotifyInputDiv = $('<div class="col">');
@@ -764,12 +823,12 @@ $(document).ready(function () {
     $(document).on('focusout', '#ingameSrcId', function (e) {
         var typedSrcId = $(this).val();
         var indexOfMark = typedSrcId.indexOf("?v=");
-        if (indexOfMark>-1){
-            $(this).val(typedSrcId.substring(indexOfMark+3,indexOfMark+14));
+        if (indexOfMark > -1) {
+            $(this).val(typedSrcId.substring(indexOfMark + 3, indexOfMark + 14));
         } else {
             var indexOfTuDotBe = typedSrcId.indexOf(".be");
-            if (indexOfTuDotBe>-1){
-                $(this).val(typedSrcId.substring(indexOfTuDotBe+4,indexOfTuDotBe+15));
+            if (indexOfTuDotBe > -1) {
+                $(this).val(typedSrcId.substring(indexOfTuDotBe + 4, indexOfTuDotBe + 15));
             }
         }
     });
@@ -777,6 +836,14 @@ $(document).ready(function () {
     $(document).on('click', '#save-song', function (e) {
         var divToAppend = $('#nfs-content');
         var songToSave = new Object();
+        if ($("#officialDisplay").length>0){
+            songToSave.newSong=true;
+            songToSave.officialBand = $("#officialBand").val();
+            songToSave.officialTitle = $("#officialTitle").val();
+            songToSave.officialSrcId = $("#officialSrcId").val();
+        } else {
+            songToSave.newSong=false;
+        }
         if ($("#authorSelectHidden-0").val() == "") {
             songToSave.authorId = "NEW-" + $("#authorSelect-0").val();
         } else {
@@ -848,7 +915,7 @@ $(document).ready(function () {
                 } else {
                     songToSave[subcomposerInput.id] = "NEW-" + $(subcomposerInput).val();
                 }
-                var concatInput = $("#subcomposerConcatInput-" + (i+1));
+                var concatInput = $("#subcomposerConcatInput-" + (i + 1));
                 if (concatInput.length > 0) {
                     songToSave[concatInput.attr("id")] = $(concatInput).val();
                 }
@@ -884,5 +951,51 @@ $(document).ready(function () {
 
             }
         });
+    });
+
+    $(document).on('click', '#save-song-globally', function (e) {
+        var divToAppend = $('#nfs-content');
+        var songGloballyToSave = new Object();
+
+        songToSave.officialBand = $("#officialBand").val();
+        songToSave.officialTitle = $("#officialTitle").val();
+        songToSave.officialSrcId = $("#officialSrcId").val();
+        songToSave.lyrics = $("#lyrics").val();
+        songToSave.spotify = $("#spotifyInput").val();
+        songToSave.itunes = $("#itunesInput").val();
+        songToSave.soundcloud = $("#soundcloudInput").val();
+        songToSave.deezer = $("#deezerInput").val();
+        songToSave.tidal = $("#tidalInput").val();
+        songToSave.info = $("#ingameInfo").val();
+        $.ajax({
+            async: false,
+            type: "PUT",
+            data: JSON.stringify(songToSave),
+            url: "/songSubgroup/putGlobally/" + currentSongSubgroup.id + '',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (ooo) {
+                console.log("eee");
+                getSubgroupsFromGame();
+                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
+                    $('#success-alert').slideUp(500);
+                    divToAppend.empty();
+                });
+            },
+            error: function (ooo) {
+                console.log("e2");
+
+            },
+            done: function (ooo) {
+                console.log("e3");
+
+            }
+        });
+    });
+
+    $(document).on('click', '#new-song', function (e) {
+        var divToAppend = $('#nfs-content');
+        divToAppend.empty();
+        renderEditCreateSong(divToAppend, null);
     });
 });

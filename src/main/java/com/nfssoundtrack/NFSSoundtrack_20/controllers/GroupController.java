@@ -42,18 +42,18 @@ public class GroupController extends BaseControllerWithErrorHandling {
         ObjectMapper objectMapper = new ObjectMapper();
         Game game = gameRepository.findById(Integer.valueOf(gameId)).get();
         List<MainGroup> mainGroups = game.getMainGroups();
-        for (MainGroup mainGroup : mainGroups) {
-            List<Subgroup> subgroups = mainGroup.getSubgroups();
-            for (Subgroup subgroup : subgroups) {
-                List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
-                for (SongSubgroup songSubgroup : songSubgroupList) {
-                    songSubgroup.getSong();
-                    break;
-                }
-                break;
-            }
-            mainGroup.getSubgroups().sort(Comparator.comparing(Subgroup::getPosition));
-        }
+//        for (MainGroup mainGroup : mainGroups) {
+//            List<Subgroup> subgroups = mainGroup.getSubgroups();
+//            for (Subgroup subgroup : subgroups) {
+//                List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
+//                for (SongSubgroup songSubgroup : songSubgroupList) {
+//                    songSubgroup.getSong();
+//                    break;
+//                }
+//                break;
+//            }
+//            mainGroup.getSubgroups().sort(Comparator.comparing(Subgroup::getPosition));
+//        }
         return objectMapper.writeValueAsString(mainGroups);
     }
 

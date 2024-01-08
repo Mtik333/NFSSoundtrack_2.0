@@ -129,12 +129,18 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         simpleModule.addSerializer(AuthorAlias.class, new AuthorAliasSerializer(AuthorAlias.class));
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
-            AuthorAlias authorList = authorAliasRepository.findByAlias(input);
-            String result = objectMapper.writeValueAsString(Collections.singleton(authorList));
+            AuthorAlias authorAlias = authorAliasRepository.findByAlias(input);
+            if (authorAlias==null){
+                return objectMapper.writeValueAsString("[]");
+            }
+            String result = objectMapper.writeValueAsString(Collections.singleton(authorAlias));
             return result;
         } else {
-            List<AuthorAlias> authorList = authorAliasRepository.findByAliasContains(input);
-            String result = objectMapper.writeValueAsString(authorList);
+            List<AuthorAlias> authorAliasList = authorAliasRepository.findByAliasContains(input);
+            if (authorAliasList==null){
+                return objectMapper.writeValueAsString("[]");
+            }
+            String result = objectMapper.writeValueAsString(authorAliasList);
             return result;
         }
     }
@@ -146,11 +152,17 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         simpleModule.addSerializer(Author.class, new ArtistSerializer(Author.class));
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
-            Author authorList = authorRepository.findByName(input);
-            String result = objectMapper.writeValueAsString(Collections.singleton(authorList));
+            Author author = authorRepository.findByName(input);
+            if (author==null){
+                return objectMapper.writeValueAsString("[]");
+            }
+            String result = objectMapper.writeValueAsString(Collections.singleton(author));
             return result;
         } else {
             List<Author> authorList = authorRepository.findByNameContains(input);
+            if (authorList==null){
+                return objectMapper.writeValueAsString("[]");
+            }
             String result = objectMapper.writeValueAsString(authorList);
             return result;
         }
@@ -168,11 +180,17 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         simpleModule.addSerializer(Author.class, artistMgmtSerializer);
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
-            Author authorList = authorRepository.findByName(input);
-            String result = objectMapper.writeValueAsString(Collections.singleton(authorList));
+            Author author = authorRepository.findByName(input);
+            if (author==null){
+                return objectMapper.writeValueAsString("[]");
+            }
+            String result = objectMapper.writeValueAsString(Collections.singleton(author));
             return result;
         } else {
             List<Author> authorList = authorRepository.findByNameContains(input);
+            if (authorList==null){
+                return objectMapper.writeValueAsString("[]");
+            }
             String result = objectMapper.writeValueAsString(authorList);
             return result;
         }

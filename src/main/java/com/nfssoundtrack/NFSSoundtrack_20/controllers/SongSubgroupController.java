@@ -366,4 +366,65 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             return new ObjectMapper().writeValueAsString(thr);
         }
     }
+
+    @PutMapping(value = "/putGlobally/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String putGlobally(@PathVariable("subgroupId") String subgroupId,
+                                          @RequestBody String formData) throws JsonProcessingException {
+        try {
+            SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(subgroupId)).get();
+            Song relatedSong = songSubgroup.getSong();
+            Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
+            String spotifyLink = (String) objectMapper.get("spotify");
+            String itunesLink = (String) objectMapper.get("itunes");
+            String soundcloudLink = (String) objectMapper.get("soundcloud");
+            String deezerLink = (String) objectMapper.get("deezer");
+            String tidalink = (String) objectMapper.get("tidal");
+            String officialBand = (String) objectMapper.get("officialBand");
+            String officialTitle = (String) objectMapper.get("officialTitle");
+            String officialSrcId = (String) objectMapper.get("officialSrcId");
+            String lyrics = (String) objectMapper.get("lyrics");
+            String info = (String) objectMapper.get("info");
+            if (!officialBand.equals("null") && !officialBand.equals("undefined")) {
+                relatedSong.setOfficialDisplayBand(officialBand);
+            }
+            if (!officialTitle.equals("null") && !officialTitle.equals("undefined")) {
+                relatedSong.setOfficialDisplayTitle(officialTitle);
+            }
+            if (!spotifyLink.equals("null") && !spotifyLink.equals("undefined")) {
+                relatedSong.setSpotifyId(spotifyLink);
+            } else {
+                relatedSong.setSpotifyId(null);
+            }
+            if (!itunesLink.equals("null") && !itunesLink.equals("undefined")) {
+                relatedSong.setItunesLink(itunesLink);
+            } else {
+                relatedSong.setItunesLink(null);
+            }
+            if (!soundcloudLink.equals("null") && !soundcloudLink.equals("undefined")) {
+                relatedSong.setSoundcloudLink(soundcloudLink);
+            } else {
+                relatedSong.setSoundcloudLink(null);
+            }
+            if (!deezerLink.equals("null") && !deezerLink.equals("undefined")) {
+                relatedSong.setDeezerId(deezerLink);
+            } else {
+                relatedSong.setDeezerId(null);
+            }
+            if (!tidalink.equals("null") && !tidalink.equals("undefined")) {
+                relatedSong.setTidalLink(tidalink);
+            } else {
+                relatedSong.setTidalLink(null);
+            }
+            if (!officialSrcId.equals("null") && !officialSrcId.equals("undefined")) {
+                relatedSong.setSrcId(officialSrcId);
+            } else {
+                relatedSong.setSrcId(null);
+            }
+            songSubgroup.setLyrics(lyrics);
+            songRepository.save(relatedSong);
+            return new ObjectMapper().writeValueAsString("OK");
+        } catch (Throwable thr) {
+            return new ObjectMapper().writeValueAsString(thr);
+        }
+    }
 }

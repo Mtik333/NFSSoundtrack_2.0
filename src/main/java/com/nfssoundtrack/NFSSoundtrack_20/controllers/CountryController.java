@@ -43,12 +43,18 @@ public class CountryController extends BaseControllerWithErrorHandling {
         simpleModule.addSerializer(Country.class, new CountrySerializer(Country.class));
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
-            Country authorList = countryRepository.findByCountryName(input);
-            String result = objectMapper.writeValueAsString(Collections.singleton(authorList));
+            Country country = countryRepository.findByCountryName(input);
+            if (country==null){
+                return objectMapper.writeValueAsString("[]");
+            }
+            String result = objectMapper.writeValueAsString(Collections.singleton(country));
             return result;
         } else {
-            List<Country> authorList = countryRepository.findByCountryNameContains(input);
-            String result = objectMapper.writeValueAsString(authorList);
+            List<Country> countryList = countryRepository.findByCountryNameContains(input);
+            if (countryList==null){
+                return objectMapper.writeValueAsString("[]");
+            }
+            String result = objectMapper.writeValueAsString(countryList);
             return result;
         }
     }

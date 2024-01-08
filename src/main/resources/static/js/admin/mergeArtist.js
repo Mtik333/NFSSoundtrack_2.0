@@ -6,6 +6,8 @@ $(document).ready(function () {
         var divToAppend = $('#nfs-content');
         divToAppend.empty();
         divToAppend.append(successAlertHtml);
+        var buttonDiv = $('<div class="row p-1">');
+        var buttonCol = $('<div class="col">');
         var rowDiv = $('<div class="row p-1">');
         //var countriesRowDiv = $('<div id="countriesRow" class="row p-1">');
         //var aliasesRow = $('<div id="aliasesRow" class="row p-1">');
@@ -26,7 +28,9 @@ $(document).ready(function () {
         rightCellDiv.append(targetAuthorSelect);
         rightCellDiv.append(targetAuthorSelectSelectHidden);
         setupAutocompleteMergeArtist(targetAuthorSelect, targetAuthorSelectSelectHidden, "");
-        rowDiv.append('<button id="merge-artist" type="submit" class="btn btn-primary">Save</button>');
+        buttonCol.append('<button id="merge-artist" type="submit" class="btn btn-primary">Save</button>');
+        buttonDiv.append(buttonCol);
+        rowDiv.append(buttonDiv);
         rowDiv.append(leftCellDiv);
         rowDiv.append(rightCellDiv);
         divToAppend.append(rowDiv);
