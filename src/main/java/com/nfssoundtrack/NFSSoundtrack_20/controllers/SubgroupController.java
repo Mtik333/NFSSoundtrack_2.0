@@ -3,10 +3,7 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.SongRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.SongSubgroupRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.SubgroupRepository;
+import com.nfssoundtrack.NFSSoundtrack_20.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +33,10 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
 
     @Autowired
     private SongRepository songRepository;
+    @Autowired
+    private SongGenreRepository songGenreRepository;
+    @Autowired
+    private AuthorSongRepository authorSongRepository;
 
     @GetMapping(value = "/read/{gameId}")
     public @ResponseBody String subGroupManage(Model model, @PathVariable("gameId") String gameId) throws JsonProcessingException {
@@ -70,7 +71,17 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
         for (String song : songsToDetach) {
             Optional<SongSubgroup> subgroupOptional = songSubgroupList.stream().filter(songSubgroup -> String.valueOf(songSubgroup.getSong().getId()).equals(song)).findFirst();
             if (subgroupOptional.isPresent()) {
+                Song mySong = subgroupOptional.get().getSong();
                 songSubgroupRepository.delete(subgroupOptional.get());
+                //delete orphaned stuff
+                List<SongSubgroup> orphanedSong = songSubgroupRepository.findBySong(mySong);
+                if (orphanedSong.isEmpty()){
+                    List<SongGenre> songGenres = songGenreRepository.findBySong(mySong);
+                    songGenreRepository.deleteAll(songGenres);
+                    List<AuthorSong> authorSongs = authorSongRepository.findBySong(mySong);
+                    authorSongRepository.deleteAll(authorSongs);
+                    songRepository.delete(mySong);
+                }
             }
         }
         int position = 10 + (10 * songsToDetach.size());

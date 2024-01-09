@@ -179,9 +179,9 @@ public class Application implements CommandLineRunner {
                                     myGenre.setGenreName(genre);
                                     genreRepository.saveAndFlush(myGenre);
                                 }
-                                SongGenre songGenre = songGenreRepository.findBySong(mySong);
-                                if (songGenre == null) {
-                                    songGenre = new SongGenre();
+                                List<SongGenre> songGenres = songGenreRepository.findBySong(mySong);
+                                if (songGenres.isEmpty()){
+                                    SongGenre songGenre = new SongGenre();
                                     songGenre.setGenre(myGenre);
                                     songGenre.setSong(mySong);
                                     songGenreRepository.saveAndFlush(songGenre);
@@ -412,9 +412,9 @@ public class Application implements CommandLineRunner {
                                     myGenre.setGenreName(genre);
                                     genreRepository.saveAndFlush(myGenre);
                                 }
-                                SongGenre songGenre = songGenreRepository.findBySong(mySong);
-                                if (songGenre == null) {
-                                    songGenre = new SongGenre();
+                                List<SongGenre> songGenres = songGenreRepository.findBySong(mySong);
+                                if (songGenres.isEmpty()){
+                                    SongGenre songGenre = new SongGenre();
                                     songGenre.setGenre(myGenre);
                                     songGenre.setSong(mySong);
                                     songGenreRepository.saveAndFlush(songGenre);

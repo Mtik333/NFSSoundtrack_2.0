@@ -5,12 +5,13 @@
     <button id="reposition-series" type="submit" class="btn btn-primary mt-2">Manage series</button>
     <button id="manage-artists" type="submit" class="btn btn-primary mt-2">Manage artists</button>
     <button id="merge-alias-with-artist" type="submit" class="btn btn-primary mt-2">Associate existing alias with other artist</button>
+    <button id="merge-songs" type="submit" class="btn btn-primary mt-2">Merge songs</button>
     <ul class="nav-item list-group-item ps-0" th:each="serie: ${series}">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
             th:attr="data-bs-target='#id'+${serie.id}" aria-expanded="false">
             <span th:text="${serie.name}"></span>
         </button>
-        <div class="collapse" th:attr="id='id'+${serie.id}" style="">
+        <div class="collapse" th:attr="id='id'+${serie.id}">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                 <li class="nav-item" th:each="game: ${serie.games}">
                     <div class="dropdown .container-fluid">

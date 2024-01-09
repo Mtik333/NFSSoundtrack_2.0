@@ -32,7 +32,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.disable())
                 .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/manage/manage", "/manage/manage#", "/maingroup/**", "/songSubgroup/**", "/subgroup/**")
+                        .requestMatchers("/manage/manage", "/manage/manage#",
+                                "/maingroup/**", "/songSubgroup/**", "/subgroup/**",
+                                "/song/**")
                         .hasAuthority("ADMIN"))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
