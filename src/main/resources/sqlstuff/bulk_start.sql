@@ -639,7 +639,7 @@ CREATE TABLE IF NOT EXISTS `song_subgroup` (
   `soundcloud_link` tinytext DEFAULT NULL,
   `ingame_display_band` tinytext DEFAULT NULL,
   `ingame_display_title` tinytext DEFAULT NULL,
-  `position` smallint(5) unsigned DEFAULT NULL,
+  `position` int(10) unsigned DEFAULT NULL,
   `lyrics` text DEFAULT NULL,
   `info` varchar(250) DEFAULT NULL,
   `feat_title` tinyint(4) DEFAULT 0,

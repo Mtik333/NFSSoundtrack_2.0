@@ -12,6 +12,8 @@ public interface AuthorSongRepository extends JpaRepository<AuthorSong, Integer>
 
     List<AuthorSong> findByAuthorAlias(AuthorAlias authorAlias);
 
+    List<AuthorSong> findBySong(Song song);
+
     List<AuthorSong> findByAuthorAliasAndRole(AuthorAlias authorAlias, Role role);
 
     AuthorSong findByAuthorAliasAndSong(AuthorAlias authorAlias, Song song);

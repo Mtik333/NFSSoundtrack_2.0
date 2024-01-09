@@ -4,13 +4,17 @@
 <h2 th:text="#{infoAbout}+' '+${author?.name}"></h2>
 <hr>
 <div id="briefInfo">
-Rom Di Prisco is a classically trained composer, producer, and remixer who has been creating music for video games, TV, and film for over 20 years.
-Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Need for Speed, Paragon, Foxhole, Puzzle Fighter, Mass Effect 2, Gears of War, Unreal Tournament 3, and SSX Tricky. Rom has also worked closely with Epic Games, producing music for official Unreal Engine tech demos, promotional materials, and the world premiere of Unreal Engine 4. 
+    Rom Di Prisco is a classically trained composer, producer, and remixer who has been creating music for video games,
+    TV, and film for over 20 years.
+    Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Need for Speed, Paragon, Foxhole,
+    Puzzle Fighter, Mass Effect 2, Gears of War, Unreal Tournament 3, and SSX Tricky. Rom has also worked closely with
+    Epic Games, producing music for official Unreal Engine tech demos, promotional materials, and the world premiere of
+    Unreal Engine 4.
 </div>
 <div id="socialLinks">
-<p><b>More info at: </b></p>
-<img class="img-responsive" th:src="@{/images/spotify.png}" width="25" height="25">
-<img class="img-responsive" th:src="@{/images/itunes2.png}" width="25" height="25">
+    <p><b>More info at: </b></p>
+    <img class="img-responsive" th:src="@{/images/spotify.png}" width="25" height="25">
+    <img class="img-responsive" th:src="@{/images/itunes2.png}" width="25" height="25">
 </div>
 <h4 th:text="#{allAliases}"></h4>
 <th:block th:each="singleAlias,iter : ${allAliases}">
@@ -32,31 +36,35 @@ Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Ne
             <!-- <a class="nav-link gamegroup" th:href="@{'#gamegroupid'+${gamegroup.id}}"
                 th:attr="data-el_id='gamegroupid'+${gamegroup.id}" data-toggle="tab"
                 th:text="${gamegroup.groupName}"></a> -->
-            <a class="nav-link artistgroup active" th:attr="data-authorcontribution='all'" data-toggle="tab" th:text="'All'" href="#"></a>
+            <a class="nav-link artistgroup active" th:attr="data-authorcontribution='all'" data-toggle="tab"
+                id="allartistgroup" th:text="'All'" href="#"></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link artistgroup" th:attr="data-authorcontribution='composer'" data-toggle="tab" th:text="'Composer'" href="#"></a>
+            <a class="nav-link artistgroup" th:attr="data-authorcontribution='composer'" data-toggle="tab"
+                th:text="'Composer'" href="#"></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link artistgroup" th:attr="data-authorcontribution='subcomposer'" data-toggle="tab" th:text="'Subcomposer'" href="#"></a>
+            <a class="nav-link artistgroup" th:attr="data-authorcontribution='subcomposer'" data-toggle="tab"
+                th:text="'Subcomposer'" href="#"></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link artistgroup" th:attr="data-authorcontribution='feat'" data-toggle="tab" th:text="'Feat.'" href="#"></a>
+            <a class="nav-link artistgroup" th:attr="data-authorcontribution='feat'" data-toggle="tab" th:text="'Feat.'"
+                href="#"></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link artistgroup" th:attr="data-authorcontribution='remix'" data-toggle="tab" th:text="'Remix'" href="#"></a>
+            <a class="nav-link artistgroup" th:attr="data-authorcontribution='remix'" data-toggle="tab"
+                th:text="'Remix'" href="#"></a>
         </li>
     </ul>
     <ul class="nav nav-tabs aliassubgroup">
         <li class="nav-item">
             <button class="nav-link aliassubgroup active"
-                th:attr="id='allaliases', data-authoralias='all'" href=""
+                th:attr="id='allaliases', data-authoralias='all',data-aliassubgroupid='all'" href=""
                 th:text="'All'"></button>
         </li>
         <th:block th:each="singleAlias,iter : ${allAliases}">
             <li class="nav-item">
-                <button class="nav-link aliassubgroup"
-                    th:attr="data-aliassubgroupid=${singleAlias.id}" href=""
+                <button class="nav-link aliassubgroup" th:attr="data-aliassubgroupid=${singleAlias.id}" href=""
                     th:text="${singleAlias.alias}"></button>
             </li>
         </th:block>
@@ -69,19 +77,53 @@ Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Ne
         <th scope="col" th:text="#{subgroup}"></th>
         <th scope="col" th:text="#{group}"></th>
         <th scope="col" th:text="#{game}"></th>
+        <th scope="col" th:text="#{remix}"></th>
         <th scope="col" th:text="#{instrumental}"></th>
         <th scope="col" th:text="#{actions}"></th>
     </thead>
     <tbody>
         <th:block th:each="mapEntry : ${songsAsComposer}">
-            <tr class="all composer rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id}">
+            <tr class="all composer rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id},data-role='composer'">
                 <td colspan="5" th:text="${mapEntry.key.alias}+' - Composer'"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
-                <tr class="all subgroup-separator songgroup composer" th:attr="data-aliasid=${mapEntry.key.id}">
+                <tr class="all subgroup-separator songgroup composer"
+                    th:attr="data-aliasid=${mapEntry.key.id},data-role='composer'">
                     <td colspan="5">
-                        <span
-                            th:text="${songToSongSubgroupMap.key.officialDisplayBand} + ' - ' + ${songToSongSubgroupMap.key.officialDisplayTitle}"></span>
+                        <th:block
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
+                            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                                th:text="${authorSong.authorAlias.alias} "></a>
+                        </th:block>
+                        <th:block
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
+                            <span
+                                th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                                th:text="${authorSong.authorAlias.alias}"></a>
+                        </th:block>
+                        -
+                        <span th:text="${songToSongSubgroupMap.key.officialDisplayTitle} "></span>
+                        <th:block
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
+                            <span th:text="${iter.first ? '(feat. ' : ''}"></span>
+                            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                                th:text="${authorSong.authorAlias.alias}"></a><span
+                                th:text="${iter.last ? ')' : ''}"></span>
+                            <th:block th:if="${authorSong.featConcat!=null}">
+                                <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
+                            </th:block>
+                        </th:block>
+                        <!-- <th:block th:if="${songSubgroup.remix.value=='YES'}">
+                                <th:block
+                                    th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='REMIX']}">
+                                    <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+                                        th:href="'/author/'+${authorSong.authorAlias.id}"
+                                        th:text="${authorSong.authorAlias.alias}"></a>
+                                    <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
+                                    <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+                                </th:block>
+                            </th:block> -->
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
                             /
                             <span th:text="'Associated genres: '"></span>
@@ -91,15 +133,40 @@ Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Ne
                         </th:block>
                     </td>
                 </tr>
-                <tr class="all composer" th:attr="data-aliasid=${mapEntry.key.id}" th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+
+                <!-- <span
+                            th:text="${songToSongSubgroupMap.key.officialDisplayBand} + ' - ' + ${songToSongSubgroupMap.key.officialDisplayTitle}"></span>
+                        <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
+                            /
+                            <span th:text="'Associated genres: '"></span>
+                            <a class="table_link" th:text="${songGenre.genre.genreName}"
+                                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:text="${!iter.last ? ', ' : ''}"></span>
+                        </th:block> -->
+
+                <tr class="all composer" th:attr="data-aliasid=${mapEntry.key.id},data-role='composer'"
+                    th:each="songSubgroup : ${songToSongSubgroupMap.value}">
                     <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
                     </td>
-                    <td class="songtitle" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayTitle}">
+                    <td class="songtitle" style="display: none"
+                        th:text="${songToSongSubgroupMap.key.officialDisplayTitle}">
                     </td>
                     <td th:text=${songSubgroup.subgroup.subgroupName}></td>
                     <td th:text=${songSubgroup.subgroup.mainGroup.groupName}></td>
                     <td><a class="table_link" th:text="${songSubgroup.subgroup.mainGroup.game.displayTitle}"
                             th:href="'/game/'+${songSubgroup.subgroup.mainGroup.game.gameShort}"></a></td>
+                    <td>
+                        <span th:text="${songSubgroup.remix}"></span>
+                        <br>
+                        <th:block
+                            th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
+                            <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+                                th:href="'/author/'+${authorSong.authorAlias.id}"
+                                th:text="${authorSong.authorAlias.alias}"></a>
+                            <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
+                            <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+                        </th:block>
+                    </td>
                     <td th:text="${songSubgroup.instrumental}"></td>
                     <td>
                         <div class="play_icondiv">
@@ -129,11 +196,13 @@ Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Ne
             </th:block>
         </th:block>
         <th:block th:each="mapEntry : ${songsAsSubcomposer}">
-            <tr class="all subcomposer rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id}">
+            <tr class="all subcomposer rolegroup-separator"
+                th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer'">
                 <td colspan="5" th:text="${mapEntry.key.alias}+' - Subcomposer'"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
-                <tr class="all subgroup-separator songgroup subcomposer" th:attr="data-aliasid=${mapEntry.key.id}">
+                <tr class="all subgroup-separator songgroup subcomposer"
+                    th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer'">
                     <td colspan="5">
                         <span
                             th:text="${songToSongSubgroupMap.key.officialDisplayBand} + ' - ' + ${songToSongSubgroupMap.key.officialDisplayTitle}"></span>
@@ -146,7 +215,13 @@ Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Ne
                         </th:block>
                     </td>
                 </tr>
-                <tr class="all subcomposer" th:attr="data-aliasid=${mapEntry.key.id}" th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+                <tr class="all subcomposer" th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer'"
+                    th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+                    <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
+                    </td>
+                    <td class="songtitle" style="display: none"
+                        th:text="${songToSongSubgroupMap.key.officialDisplayTitle}">
+                    </td>
                     <td th:text=${songSubgroup.subgroup.subgroupName}></td>
                     <td th:text=${songSubgroup.subgroup.mainGroup.groupName}></td>
                     <td><a class="table_link" th:text="${songSubgroup.subgroup.mainGroup.game.displayTitle}"
@@ -180,11 +255,12 @@ Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Ne
             </th:block>
         </th:block>
         <th:block th:each="mapEntry : ${songsRemixed}">
-            <tr class="all remix rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id}">
+            <tr class="all remix rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id},data-role='remix'">
                 <td colspan="5" th:text="${mapEntry.key.alias}+' - Remixer'"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
-                <tr class="all subgroup-separator songgroup remix" th:attr="data-aliasid=${mapEntry.key.id}">
+                <tr class="all subgroup-separator songgroup remix"
+                    th:attr="data-aliasid=${mapEntry.key.id},data-role='remix'">
                     <td colspan="5">
                         <span
                             th:text="${songToSongSubgroupMap.key.officialDisplayBand} + ' - ' + ${songToSongSubgroupMap.key.officialDisplayTitle}"></span>
@@ -197,7 +273,13 @@ Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Ne
                         </th:block>
                     </td>
                 </tr>
-                <tr class="all remix" th:attr="data-aliasid=${mapEntry.key.id}" th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+                <tr class="all remix" th:attr="data-aliasid=${mapEntry.key.id},data-role='remix'"
+                    th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+                    <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
+                    </td>
+                    <td class="songtitle" style="display: none"
+                        th:text="${songToSongSubgroupMap.key.officialDisplayTitle}">
+                    </td>
                     <td th:text=${songSubgroup.subgroup.subgroupName}></td>
                     <td th:text=${songSubgroup.subgroup.mainGroup.groupName}></td>
                     <td><a class="table_link" th:text="${songSubgroup.subgroup.mainGroup.game.displayTitle}"
@@ -231,11 +313,12 @@ Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Ne
             </th:block>
         </th:block>
         <th:block th:each="mapEntry : ${songsAsFeat}">
-            <tr class="all feat rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id}">
+            <tr class="all feat rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id},data-role='feat'">
                 <td colspan="5" th:text="${mapEntry.key.alias}+' - Feat.'"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
-                <tr class="all subgroup-separator songgroup feat" th:attr="data-aliasid=${mapEntry.key.id}">
+                <tr class="all subgroup-separator songgroup feat"
+                    th:attr="data-aliasid=${mapEntry.key.id},data-role='feat'">
                     <td colspan="5">
                         <span
                             th:text="${songToSongSubgroupMap.key.officialDisplayBand} + ' - ' + ${songToSongSubgroupMap.key.officialDisplayTitle}"></span>
@@ -248,7 +331,13 @@ Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Ne
                         </th:block>
                     </td>
                 </tr>
-                <tr class="all feat" th:attr="data-aliasid=${mapEntry.key.id}" th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+                <tr class="all feat" th:attr="data-aliasid=${mapEntry.key.id},data-role='feat'"
+                    th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+                    <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
+                    </td>
+                    <td class="songtitle" style="display: none"
+                        th:text="${songToSongSubgroupMap.key.officialDisplayTitle}">
+                    </td>
                     <td th:text=${songSubgroup.subgroup.subgroupName}></td>
                     <td th:text=${songSubgroup.subgroup.mainGroup.groupName}></td>
                     <td><a class="table_link" th:text="${songSubgroup.subgroup.mainGroup.game.displayTitle}"
@@ -331,4 +420,5 @@ Rom has worked on over 50 video game titles, including Fortnite, Guacamelee!, Ne
         </div>
     </div>
 </div>
+
 </html>
