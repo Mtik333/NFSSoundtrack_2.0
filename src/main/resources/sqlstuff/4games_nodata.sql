@@ -21,10 +21,11 @@ CREATE TABLE IF NOT EXISTS `game` (
   `soundcloud_id` tinytext DEFAULT NULL,
   `youtube_id` tinytext DEFAULT NULL,
   `game_status` enum('RELEASED','UNRELEASED','UNPLAYABLE','CANCELED') NOT NULL DEFAULT 'UNRELEASED',
+  `disqus_link` tinytext DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_game_serie` (`series_id`),
   CONSTRAINT `FK_game_serie` FOREIGN KEY (`series_id`) REFERENCES `serie` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=979 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

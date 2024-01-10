@@ -230,6 +230,7 @@ $(document).ready(function () {
             generateOfficialDisplayDiv(officialDisplayDiv, null);
             divToAppend.append(officialDisplayDiv);
             var genreDisplayDiv = $('<div class="form-group genreDisplay" id="genreDisplay">')
+            genreDiv.append('<h4>Genre display</h4>');
             generateGenreDiv(genreDisplayDiv, null, 0);
             divToAppend.append(genreDisplayDiv);
         }
@@ -265,7 +266,8 @@ $(document).ready(function () {
                 globallySaveOrCancelDiv.append(saveCol);
                 var officialDisplayDiv = $('<div class="form-group officialDisplay" id="officialDisplay">');
                 generateOfficialDisplayDiv(officialDisplayDiv, songSubgroup);
-                var genreDisplayDiv = $('<div class="form-group genreDisplay" id="genreDisplay">')
+                var genreDisplayDiv = $('<div class="form-group genreDisplay" id="genreDisplay">');
+                genreDiv.append('<h4>Genre display</h4>');
                 generateGenreDiv(genreDisplayDiv, songSubgroup.song, 0);
                 var spotifyOthersDiv = $('<div class="form-group spotifyDisplay" id="spotifyDisplay">');
                 generateSpotifyAndLyrics(spotifyOthersDiv, songSubgroup.song);
@@ -305,7 +307,6 @@ $(document).ready(function () {
                         $("#aliasSelect-0").val(ui.item.label);
                         $("#aliasSelectHidden-0").val(ui.item.value);
                         $("#officialBand").val(ui.item.label);
-                        officialBand
                     }
                 }
             },
@@ -531,7 +532,6 @@ $(document).ready(function () {
     }
 
     function generateGenreDiv(genreDiv, song, index) {
-        genreDiv.append('<h4>Genre display</h4>');
         if (song != undefined) {
             var songGenreList = song.songGenreList;
             for (let i = 0; i < songGenreList.length; i++) {
@@ -951,11 +951,11 @@ $(document).ready(function () {
 
                 }
             });
-            var hiddenVal = $("#authorSelectHidden-0").val();
-            if (hiddenVal == "") {
-                $("#aliasSelect-0").val($(this).val());
-                $("#officialBand").val($(this).val());
-            }
+            // var hiddenVal = $("#authorSelectHidden-0").val();
+            // if (hiddenVal == "") {
+            //     $("#aliasSelect-0").val($(this).val());
+            //     $("#officialBand").val($(this).val());
+            // }
         }
     });
 
@@ -1179,10 +1179,19 @@ $(document).ready(function () {
         } else {
             songToSave.aliasId = $("#aliasSelectHidden-0").val();
         }
+        songToSave.officialBand = $("#officialBand").val();
+        songToSave.officialTitle = $("#officialTitle").val();
+        songToSave.officialSrcId = $("#officialSrcId").val();
         songToSave.instrumental = $("#instrumentalBox").prop("checked");
-        songToSave.ingameBand = $("#ingameBand").val();
-        songToSave.ingameTitle = $("#ingameTitle").val();
-        songToSave.ingameSrcId = $("#ingameSrcId").val();
+        if ($("#ingameBand").val() != "") {
+            songToSave.ingameBand = $("#ingameBand").val();
+        }
+        if ($("#ingameTitle").val() != "") {
+            songToSave.ingameTitle = $("#ingameTitle").val();
+        }
+        if ($("#ingameSrcId").val() != "") {
+            songToSave.ingameSrcId = $("#ingameSrcId").val();
+        }
         songToSave.info = $("#ingameInfo").val();
         songToSave.subgroup = currentSubgroup;
         if ($("#existingSongId").val() != "") {
@@ -1245,7 +1254,7 @@ $(document).ready(function () {
             async: false,
             type: "POST",
             data: JSON.stringify(songToSave),
-            url: "/songSubgroup/post/" + currentSongSubgroup.id + '',
+            url: "/songSubgroup/post/" + currentSubgroup + '',
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {

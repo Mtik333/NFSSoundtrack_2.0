@@ -1,6 +1,7 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -14,12 +15,12 @@ public class SongGenre implements Serializable {
     private Long id;
 
     @JsonBackReference
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @OneToOne(optional = false)
     @JoinColumn(name = "song_id")
     private Song song;
 
-    @JsonBackReference
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    @OneToOne(optional = false)
     @JoinColumn(name = "genre_id")
     private Genre genre;
 

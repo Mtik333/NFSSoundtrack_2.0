@@ -19,8 +19,11 @@ CREATE TABLE IF NOT EXISTS `song` (
   `itunes_link` tinytext DEFAULT NULL,
   `tidal_link` tinytext DEFAULT NULL,
   `soundcloud_link` tinytext DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='make song_variant later';
+  `basesong_id` mediumint(8) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_song_song` (`basesong_id`),
+  CONSTRAINT `FK_song_song` FOREIGN KEY (`basesong_id`) REFERENCES `song` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=27578 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='make song_variant later';
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

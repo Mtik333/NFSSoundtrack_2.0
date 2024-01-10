@@ -359,7 +359,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
     }
 
     private String returnValueToSet(String field) {
-        if (!field.equals("null") && !field.equals("undefined")) {
+        if (!("null").equals(field) && !("undefined").equals(field)) {
             return field;
         } else return null;
     }
@@ -371,22 +371,149 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             String ingameBand = (String) objectMapper.get("ingameBand");
             String ingameTitle = (String) objectMapper.get("ingameTitle");
             String ingameSrcId = (String) objectMapper.get("ingameSrcId");
+            String officialBand = (String) objectMapper.get("officialBand");
+            String officialTitle = (String) objectMapper.get("officialTitle");
+            String officialSrcId = (String) objectMapper.get("officialSrcId");
             String mainAliasId = (String) objectMapper.get("aliasId");
             String authorId = (String) objectMapper.get("authorId");
+            String spotifyLink = (String) objectMapper.get("spotify");
+            String itunesLink = (String) objectMapper.get("itunes");
+            String soundcloudLink = (String) objectMapper.get("soundcloud");
+            String deezerLink = (String) objectMapper.get("deezer");
+            String tidalink = (String) objectMapper.get("tidal");
+            String lyrics = (String) objectMapper.get("lyrics");
+            String info = (String) objectMapper.get("info");
             Subgroup subgroup = subgroupRepository.findById(Integer.valueOf(subgroupId)).get();
             Object potentialExistingSong = objectMapper.get("existingSongId");
+            boolean instrumental = (boolean) objectMapper.get("instrumental");
+            SongSubgroup songSubgroup = new SongSubgroup();
+            songSubgroup.setSubgroup(subgroup);
+            songSubgroup.setIngameDisplayBand(returnValueToSet(ingameBand));
+            songSubgroup.setIngameDisplayTitle(returnValueToSet(ingameTitle));
+            songSubgroup.setSrcId(returnValueToSet(ingameSrcId));
+            songSubgroup.setInfo(returnValueToSet(info));
+            songSubgroup.setDeezerId(returnValueToSet(deezerLink));
+            songSubgroup.setTidalLink(returnValueToSet(tidalink));
+            songSubgroup.setLyrics(returnValueToSet(lyrics));
+            songSubgroup.setItunesLink(returnValueToSet(itunesLink));
+            songSubgroup.setSoundcloudLink(returnValueToSet(soundcloudLink));
+            songSubgroup.setSpotifyId(returnValueToSet(spotifyLink));
+            songSubgroup.setInstrumental(Instrumental.fromBoolean(instrumental));
+            songSubgroup.setPosition(10000L);
             if (potentialExistingSong != null) {
                 Integer existingSongId = Integer.valueOf(potentialExistingSong.toString());
                 Song existingSong = songRepository.findById(existingSongId).get();
-                SongSubgroup newSongSubgroup = new SongSubgroup();
-                newSongSubgroup.setSubgroup(subgroup);
-                newSongSubgroup.setIngameDisplayBand(returnValueToSet(ingameBand));
-                newSongSubgroup.setIngameDisplayTitle(returnValueToSet(ingameTitle));
-                newSongSubgroup.setSrcId(returnValueToSet(ingameSrcId));
-//                newSongSubgroup.set
-//                newSongSubgroup.set
+                songSubgroup.setSong(existingSong);
+                if (existingSong.getBaseSong() != null) {
+                    songSubgroup.setRemix(Remix.YES);
+                } else {
+                    songSubgroup.setRemix(Remix.NO);
+                }
+                songSubgroupRepository.save(songSubgroup);
+            } else {
+                Song song = new Song();
+                song.setOfficialDisplayTitle(returnValueToSet(officialTitle));
+                song.setOfficialDisplayBand(returnValueToSet(officialBand));
+                song.setSrcId(returnValueToSet(officialSrcId));
+                song.setDeezerId(returnValueToSet(deezerLink));
+                song.setTidalLink(returnValueToSet(tidalink));
+                song.setLyrics(returnValueToSet(lyrics));
+                song.setItunesLink(returnValueToSet(itunesLink));
+                song.setSoundcloudLink(returnValueToSet(soundcloudLink));
+                song.setSpotifyId(returnValueToSet(spotifyLink));
+                song = songRepository.save(song);
+                songSubgroup.setSong(song);
+                Author mainComposer;
+                AuthorAlias composerAlias;
+                if (authorId.startsWith("NEW")) {
+                    String newAuthor = authorId.replace("NEW-", "");
+                    mainComposer = new Author();
+                    mainComposer.setName(newAuthor);
+                    mainComposer = authorRepository.save(mainComposer);
+                    composerAlias = new AuthorAlias();
+                    composerAlias.setAuthor(mainComposer);
+                    composerAlias.setAlias(newAuthor);
+                    composerAlias = authorAliasRepository.save(composerAlias);
+                } else {
+                    Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
+                    if (mainAliasId.startsWith("NEW")) {
+                        String newAlias = mainAliasId.replace("NEW-", "");
+                        composerAlias = new AuthorAlias();
+                        composerAlias.setAlias(newAlias);
+                        composerAlias.setAuthor(author);
+                        composerAlias = authorAliasRepository.save(composerAlias);
+                    } else {
+                        composerAlias = authorAliasRepository.findById(Integer.valueOf(mainAliasId)).get();
+                    }
+                }
+                AuthorSong authorSong = new AuthorSong();
+                authorSong.setSong(songSubgroup.getSong());
+                authorSong.setAuthorAlias(composerAlias);
+                authorSong.setRole(Role.COMPOSER);
+                authorSongRepository.save(authorSong);
+                boolean feat = (boolean) objectMapper.get("feat");
+                boolean subcomposer = (boolean) objectMapper.get("subcomposer");
+                boolean remix = (boolean) objectMapper.get("remix");
+                songSubgroup.setInstrumental(Instrumental.fromBoolean(instrumental));
+                songSubgroup.setRemix(Remix.fromBoolean(remix));
+                if (subcomposer) {
+                    List<String> comingSubcomposers = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerSelect")).collect(Collectors.toList());
+                    Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerConcatInput")).collect(Collectors.toList()).iterator();
+                    for (String comingFeat : comingSubcomposers) {
+                        String concatVal = null;
+                        if (comingConcats.hasNext()) {
+                            concatVal = (String) objectMapper.get(comingConcats.next());
+                        }
+                        String keySubcomposer = comingFeat;
+                        String subcomposerValue = (String) objectMapper.get(keySubcomposer);
+                        if (subcomposerValue.startsWith("NEW")) {
+                            String actualSubcomposerValue = subcomposerValue.replace("NEW-", "");
+                            saveNewFeatOrRemixer(actualSubcomposerValue, songSubgroup, Role.SUBCOMPOSER, concatVal);
+                        } else {
+                            saveNewAssignmentOfExistingFeatRemixer(subcomposerValue, songSubgroup, Role.SUBCOMPOSER, concatVal);
+                        }
+                    }
+                }
+                if (feat) {
+                    List<String> comingFeats = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("featSelect")).collect(Collectors.toList());
+                    Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("featConcatInput")).collect(Collectors.toList()).iterator();
+                    for (String comingFeat : comingFeats) {
+                        String concatVal = null;
+                        if (comingConcats.hasNext()) {
+                            concatVal = (String) objectMapper.get(comingConcats.next());
+                        }
+                        String keyFeat = comingFeat;
+                        String featValue = (String) objectMapper.get(keyFeat);
+                        if (featValue.startsWith("NEW")) {
+                            String actualFeatValue = featValue.replace("NEW-", "");
+                            saveNewFeatOrRemixer(actualFeatValue, songSubgroup, Role.FEAT, concatVal);
+                        } else {
+                            saveNewAssignmentOfExistingFeatRemixer(featValue, songSubgroup, Role.FEAT, concatVal);
+                        }
+                    }
+                }
+                if (remix) {
+                    List<String> comingRemixes = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("remixSelect")).collect(Collectors.toList());
+                    Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("remixConcatInput")).collect(Collectors.toList()).iterator();
+                    for (String comingRemix : comingRemixes) {
+                        String concatVal = null;
+                        if (comingConcats.hasNext()) {
+                            concatVal = (String) objectMapper.get(comingConcats.next());
+                        }
+                        String keyRemix = comingRemix;
+                        String remixValue = (String) objectMapper.get(keyRemix);
+                        if (remixValue.startsWith("NEW")) {
+                            String actualRemixValue = remixValue.replace("NEW-", "");
+                            saveNewFeatOrRemixer(actualRemixValue, songSubgroup, Role.REMIX, concatVal);
+                        } else {
+                            saveNewAssignmentOfExistingFeatRemixer(remixValue, songSubgroup, Role.REMIX, concatVal);
+                        }
+                    }
+                }
+                songSubgroup.setLyrics(lyrics);
+                songSubgroupRepository.save(songSubgroup);
             }
-            return "OK";
+            return new ObjectMapper().writeValueAsString("OK");
         } catch (Exception exp) {
             return null;
         }

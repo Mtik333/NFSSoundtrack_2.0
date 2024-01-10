@@ -54,6 +54,9 @@ public class Game implements Serializable, Comparable<Game> {
     @Column(name = "game_status")
     private GameStatus gameStatus;
 
+    @Column(name="disqus_link")
+    private String disqusLink;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     private List<MainGroup> mainGroups = new ArrayList<>();
@@ -168,6 +171,14 @@ public class Game implements Serializable, Comparable<Game> {
 
     public void setMainGroups(List<MainGroup> mainGroups) {
         this.mainGroups = mainGroups;
+    }
+
+    public String getDisqusLink() {
+        return disqusLink;
+    }
+
+    public void setDisqusLink(String disqusLink) {
+        this.disqusLink = disqusLink;
     }
 
     @Override
