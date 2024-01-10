@@ -508,7 +508,7 @@ $(document).ready(function () {
         if ($("#disqus_thread").children().length == 0) {
             var disqusLink = $("#disqusModal").attr("data-disqusLink");
             var script = document.createElement('script');
-            script.innerHTML = "var disqus_config = function () {     this.page.url = '"+disqusLink+"';     this.page.identifier = 'nfssoundtrack';  }; var disqus_shortname = 'nfssoundtrack'; (function () {  var d = document, s = d.createElement('script'); s.src = 'https://vps-6a670942-vps-ovh-net.disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date());(d.head || d.body).appendChild(s);})();";
+            script.innerHTML = "var disqus_config = function () {     this.page.url = '"+disqusLink+"';  }; (function () {  var d = document, s = d.createElement('script'); s.src = 'https://nfssoundtrack.disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date());(d.head || d.body).appendChild(s);})();";
             var noscript = document.createElement('noscript');
             noscript.innerHTML = 'Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>';
             $(this).append(script);
