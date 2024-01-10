@@ -67,7 +67,6 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
     public @ResponseBody String putSubgroup(@PathVariable("subgroupId") String subgroupId, @RequestBody String formData) throws JsonProcessingException {
         try {
             SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(subgroupId)).get();
-            Song relatedSong = songSubgroup.getSong();
             Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
             String spotifyLink = (String) objectMapper.get("spotify");
             String itunesLink = (String) objectMapper.get("itunes");
@@ -85,6 +84,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             boolean subcomposer = (boolean) objectMapper.get("subcomposer");
             String mainAliasId = (String) objectMapper.get("aliasId");
             String authorId = (String) objectMapper.get("authorId");
+            Song relatedSong = songSubgroup.getSong();
             Author mainComposer;
             AuthorAlias composerAlias;
             if (authorId.startsWith("NEW")) {
@@ -126,57 +126,17 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                     }
                 }
             }
-            if (instrumental) {
-                songSubgroup.setInstrumental(Instrumental.YES);
-            } else {
-                songSubgroup.setInstrumental(Instrumental.NO);
-            }
-            if (remix) {
-                songSubgroup.setRemix(Remix.YES);
-            } else {
-                songSubgroup.setRemix(Remix.NO);
-            }
-            if (!ingameBand.equals("null") && !ingameBand.equals("undefined")) {
-                songSubgroup.setIngameDisplayBand(ingameBand);
-            }
-            if (!ingameTitle.equals("null") && !ingameTitle.equals("undefined")) {
-                songSubgroup.setIngameDisplayTitle(ingameTitle);
-            }
-            if (!spotifyLink.equals("null") && !spotifyLink.equals("undefined")) {
-                songSubgroup.setSpotifyId(spotifyLink);
-            } else {
-                songSubgroup.setSpotifyId(null);
-            }
-            if (!itunesLink.equals("null") && !itunesLink.equals("undefined")) {
-                songSubgroup.setItunesLink(itunesLink);
-            } else {
-                songSubgroup.setItunesLink(null);
-            }
-            if (!soundcloudLink.equals("null") && !soundcloudLink.equals("undefined")) {
-                songSubgroup.setSoundcloudLink(soundcloudLink);
-            } else {
-                songSubgroup.setSoundcloudLink(null);
-            }
-            if (!deezerLink.equals("null") && !deezerLink.equals("undefined")) {
-                songSubgroup.setDeezerId(deezerLink);
-            } else {
-                songSubgroup.setDeezerId(null);
-            }
-            if (!tidalink.equals("null") && !tidalink.equals("undefined")) {
-                songSubgroup.setTidalLink(tidalink);
-            } else {
-                songSubgroup.setTidalLink(null);
-            }
-            if (!ingameSrcId.equals("null") && !ingameSrcId.equals("undefined")) {
-                songSubgroup.setSrcId(ingameSrcId);
-            } else {
-                songSubgroup.setSrcId(null);
-            }
-            if (!info.equals("null") && !info.equals("undefined")) {
-                songSubgroup.setInfo(info);
-            } else {
-                songSubgroup.setInfo(null);
-            }
+            songSubgroup.setInstrumental(Instrumental.fromBoolean(instrumental));
+            songSubgroup.setRemix(Remix.fromBoolean(remix));
+            songSubgroup.setIngameDisplayBand(returnValueToSet(ingameBand));
+            songSubgroup.setIngameDisplayTitle(returnValueToSet(ingameTitle));
+            songSubgroup.setSpotifyId(returnValueToSet(spotifyLink));
+            songSubgroup.setItunesLink(returnValueToSet(itunesLink));
+            songSubgroup.setSoundcloudLink(returnValueToSet(soundcloudLink));
+            songSubgroup.setDeezerId(returnValueToSet(deezerLink));
+            songSubgroup.setTidalLink(returnValueToSet(tidalink));
+            songSubgroup.setSrcId(returnValueToSet(ingameSrcId));
+            songSubgroup.setInfo(returnValueToSet(info));
             if (subcomposer) {
                 List<String> comingSubcomposers = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerSelect")).collect(Collectors.toList());
                 Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerConcatInput")).collect(Collectors.toList()).iterator();
@@ -318,14 +278,14 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(subgroupId)).get();
             Song song = songSubgroup.getSong();
             List<SongSubgroup> allSongSubgroupEntries = songSubgroupRepository.findBySong(song);
-            if (allSongSubgroupEntries.size()==1){
+            if (allSongSubgroupEntries.size() == 1) {
                 //means we basically have to delete song entirely to avoid orphans
                 List<SongGenre> songGenresToDelete = song.getSongGenreList();
                 List<Genre> genresToDelete = new ArrayList<>();
-                for (SongGenre songGenre : songGenresToDelete){
+                for (SongGenre songGenre : songGenresToDelete) {
                     Genre genre = songGenre.getGenre();
                     List<SongGenre> allUsagesOfGenre = songGenreRepository.findByGenre(genre);
-                    if (allUsagesOfGenre.size()==1){
+                    if (allUsagesOfGenre.size() == 1) {
                         genresToDelete.add(genre);
                     }
                 }
@@ -333,32 +293,31 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 List<AuthorAlias> authorAliasToDelete = new ArrayList<>();
                 List<Author> authorsToDelete = new ArrayList<>();
                 List<AuthorCountry> authorCountriesToDelete = new ArrayList<>();
-                for (AuthorSong authorSong : authorsOfSong){
+                for (AuthorSong authorSong : authorsOfSong) {
                     Author author = authorSong.getAuthorAlias().getAuthor();
                     List<AuthorSong> allUsagesOfAlias = authorSongRepository.findByAuthorAlias(authorSong.getAuthorAlias());
-                    if (allUsagesOfAlias.size()==1){
+                    if (allUsagesOfAlias.size() == 1) {
                         authorAliasToDelete.add(authorSong.getAuthorAlias());
                         List<AuthorAlias> authorAliases = authorAliasRepository.findByAuthor(author);
-                        if (authorAliases.size()==1){
+                        if (authorAliases.size() == 1) {
                             authorsToDelete.add(author);
                             authorCountriesToDelete.addAll(author.getAuthorCountries());
                         }
                     }
                 }
                 authorSongRepository.deleteAll(authorsOfSong);
-                if (!authorsToDelete.isEmpty()){
+                if (!authorsToDelete.isEmpty()) {
                     authorCountryRepository.deleteAll(authorCountriesToDelete);
                     authorAliasRepository.deleteAll(authorAliasToDelete);
                     authorRepository.deleteAll(authorsToDelete);
                 }
                 songGenreRepository.deleteAllInBatch(songGenresToDelete);
-                if (!genresToDelete.isEmpty()){
+                if (!genresToDelete.isEmpty()) {
                     genreRepository.deleteAllInBatch(genresToDelete);
                 }
                 songSubgroupRepository.delete(songSubgroup);
                 songRepository.delete(song);
-            }
-            else {
+            } else {
                 songSubgroupRepository.delete(songSubgroup);
             }
             return new ObjectMapper().writeValueAsString("OK");
@@ -369,7 +328,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
 
     @PutMapping(value = "/putGlobally/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String putGlobally(@PathVariable("subgroupId") String subgroupId,
-                                          @RequestBody String formData) throws JsonProcessingException {
+                                            @RequestBody String formData) throws JsonProcessingException {
         try {
             SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(subgroupId)).get();
             Song relatedSong = songSubgroup.getSong();
@@ -383,48 +342,53 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             String officialTitle = (String) objectMapper.get("officialTitle");
             String officialSrcId = (String) objectMapper.get("officialSrcId");
             String lyrics = (String) objectMapper.get("lyrics");
-            String info = (String) objectMapper.get("info");
-            if (!officialBand.equals("null") && !officialBand.equals("undefined")) {
-                relatedSong.setOfficialDisplayBand(officialBand);
-            }
-            if (!officialTitle.equals("null") && !officialTitle.equals("undefined")) {
-                relatedSong.setOfficialDisplayTitle(officialTitle);
-            }
-            if (!spotifyLink.equals("null") && !spotifyLink.equals("undefined")) {
-                relatedSong.setSpotifyId(spotifyLink);
-            } else {
-                relatedSong.setSpotifyId(null);
-            }
-            if (!itunesLink.equals("null") && !itunesLink.equals("undefined")) {
-                relatedSong.setItunesLink(itunesLink);
-            } else {
-                relatedSong.setItunesLink(null);
-            }
-            if (!soundcloudLink.equals("null") && !soundcloudLink.equals("undefined")) {
-                relatedSong.setSoundcloudLink(soundcloudLink);
-            } else {
-                relatedSong.setSoundcloudLink(null);
-            }
-            if (!deezerLink.equals("null") && !deezerLink.equals("undefined")) {
-                relatedSong.setDeezerId(deezerLink);
-            } else {
-                relatedSong.setDeezerId(null);
-            }
-            if (!tidalink.equals("null") && !tidalink.equals("undefined")) {
-                relatedSong.setTidalLink(tidalink);
-            } else {
-                relatedSong.setTidalLink(null);
-            }
-            if (!officialSrcId.equals("null") && !officialSrcId.equals("undefined")) {
-                relatedSong.setSrcId(officialSrcId);
-            } else {
-                relatedSong.setSrcId(null);
-            }
+            relatedSong.setOfficialDisplayBand(returnValueToSet(officialBand));
+            relatedSong.setOfficialDisplayTitle(returnValueToSet(officialTitle));
+            relatedSong.setSpotifyId(returnValueToSet(spotifyLink));
+            relatedSong.setItunesLink(returnValueToSet(itunesLink));
+            relatedSong.setSoundcloudLink(returnValueToSet(soundcloudLink));
+            relatedSong.setDeezerId(returnValueToSet(deezerLink));
+            relatedSong.setTidalLink(returnValueToSet(tidalink));
+            relatedSong.setSrcId(returnValueToSet(officialSrcId));
             songSubgroup.setLyrics(lyrics);
             songRepository.save(relatedSong);
             return new ObjectMapper().writeValueAsString("OK");
         } catch (Throwable thr) {
             return new ObjectMapper().writeValueAsString(thr);
+        }
+    }
+
+    private String returnValueToSet(String field) {
+        if (!field.equals("null") && !field.equals("undefined")) {
+            return field;
+        } else return null;
+    }
+
+    @PostMapping(value = "/post/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String postNewSong(@PathVariable("subgroupId") String subgroupId, @RequestBody String formData) throws JsonProcessingException {
+        try {
+            Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
+            String ingameBand = (String) objectMapper.get("ingameBand");
+            String ingameTitle = (String) objectMapper.get("ingameTitle");
+            String ingameSrcId = (String) objectMapper.get("ingameSrcId");
+            String mainAliasId = (String) objectMapper.get("aliasId");
+            String authorId = (String) objectMapper.get("authorId");
+            Subgroup subgroup = subgroupRepository.findById(Integer.valueOf(subgroupId)).get();
+            Object potentialExistingSong = objectMapper.get("existingSongId");
+            if (potentialExistingSong != null) {
+                Integer existingSongId = Integer.valueOf(potentialExistingSong.toString());
+                Song existingSong = songRepository.findById(existingSongId).get();
+                SongSubgroup newSongSubgroup = new SongSubgroup();
+                newSongSubgroup.setSubgroup(subgroup);
+                newSongSubgroup.setIngameDisplayBand(returnValueToSet(ingameBand));
+                newSongSubgroup.setIngameDisplayTitle(returnValueToSet(ingameTitle));
+                newSongSubgroup.setSrcId(returnValueToSet(ingameSrcId));
+//                newSongSubgroup.set
+//                newSongSubgroup.set
+            }
+            return "OK";
+        } catch (Exception exp) {
+            return null;
         }
     }
 }

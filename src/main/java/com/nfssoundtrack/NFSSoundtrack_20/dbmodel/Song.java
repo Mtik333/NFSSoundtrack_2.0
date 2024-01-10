@@ -56,6 +56,10 @@ public class Song implements Serializable {
     @OneToMany(mappedBy = "song", fetch = FetchType.LAZY)
     private List<SongGenre> songGenreList = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "basesong_id")
+    private Song baseSong;
+
     public Long getId() {
         return id;
     }
@@ -158,5 +162,13 @@ public class Song implements Serializable {
 
     public void setSoundcloudLink(String soundcloudLink) {
         this.soundcloudLink = soundcloudLink;
+    }
+
+    public Song getBaseSong() {
+        return baseSong;
+    }
+
+    public void setBaseSong(Song baseSong) {
+        this.baseSong = baseSong;
     }
 }

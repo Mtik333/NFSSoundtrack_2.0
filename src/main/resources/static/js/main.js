@@ -698,6 +698,10 @@ $(document).ready(function () {
                 if (songInfo.itunes != null) {
                     $(songInfo.itunes).insertAfter("#externalLinks");
                 }
+                if (songInfo.baseSongId != null){
+                    $(songInfo.baseSongId).insertAfter("#baseSong");
+                    $("#baseSongDiv").css("display","");
+                }
                 $("#infoSongModal").modal('show');
             },
             error: function (ooo) {
@@ -736,6 +740,11 @@ $(document).ready(function () {
         $("#externalLinks").parent().find("a").each(function () {
             $(this).remove();
         })
+        $("#baseSong").parent().find("a").each(function () {
+            $(this).remove();
+        })
+        $("#baseSongDiv").css("display","none");
+
     });
 
     var activeArtistGroups = new Array();

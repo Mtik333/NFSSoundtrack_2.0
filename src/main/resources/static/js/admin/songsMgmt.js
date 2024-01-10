@@ -6,6 +6,7 @@ function SubmitSongChange(subgroup_id, song_id, state) {
 
 var currentSongSubgroup;
 var currentSubgroup;
+var newSong = false;
 $(document).ready(function () {
 
     $("#success-alert").hide();
@@ -114,6 +115,7 @@ $(document).ready(function () {
         var divToAppend = $('#nfs-content');
         var songId = $(this).attr("data-songSubgroupId");
         divToAppend.empty();
+        newSong = false;
         var songSubgroup;
         $.ajax({
             async: false,
@@ -140,7 +142,11 @@ $(document).ready(function () {
         var saveOrCancelDiv = $('<div class="row p-1">');
         saveCancelFormDiv.append(saveOrCancelDiv);
         var saveCol = $('<div class="col">');
-        saveCol.append('<button id="save-song" type="submit" class="btn btn-success m-2">Savenew song </button>');
+        if (songSubgroup != null) {
+            saveCol.append('<button id="save-song" type="submit" class="btn btn-success m-2">Save song </button>');
+        } else {
+            saveCol.append('<button id="save-new-song" type="submit" class="btn btn-success m-2">Save new song </button>');
+        }
         saveCol.append('<button id="cancel-song" type="submit" class="btn btn-primary">Cancel</button>');
         saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate to other subgroups?</label>');
         saveOrCancelDiv.append(saveCol);
@@ -219,10 +225,13 @@ $(document).ready(function () {
         }
         divToAppend.append(saveOrCancelDiv);
         divToAppend.append(mainComposerDiv);
-        if (songSubgroup==null){
+        if (songSubgroup == null) {
             var officialDisplayDiv = $('<div class="form-group officialDisplay" id="officialDisplay">');
-            generateOfficialDisplayDiv(officialDisplayDiv,null);
+            generateOfficialDisplayDiv(officialDisplayDiv, null);
             divToAppend.append(officialDisplayDiv);
+            var genreDisplayDiv = $('<div class="form-group genreDisplay" id="genreDisplay">')
+            generateGenreDiv(genreDisplayDiv, null, 0);
+            divToAppend.append(genreDisplayDiv);
         }
         generateIngameDisplayDiv(ingameDisplayDiv, songSubgroup);
         divToAppend.append(ingameDisplayDiv);
@@ -256,10 +265,13 @@ $(document).ready(function () {
                 globallySaveOrCancelDiv.append(saveCol);
                 var officialDisplayDiv = $('<div class="form-group officialDisplay" id="officialDisplay">');
                 generateOfficialDisplayDiv(officialDisplayDiv, songSubgroup);
+                var genreDisplayDiv = $('<div class="form-group genreDisplay" id="genreDisplay">')
+                generateGenreDiv(genreDisplayDiv, songSubgroup.song, 0);
                 var spotifyOthersDiv = $('<div class="form-group spotifyDisplay" id="spotifyDisplay">');
                 generateSpotifyAndLyrics(spotifyOthersDiv, songSubgroup.song);
                 divToAppend.append(globallySaveCancelFormDiv);
                 divToAppend.append(officialDisplayDiv);
+                divToAppend.append(genreDisplayDiv);
                 divToAppend.append(spotifyOthersDiv);
             }
         });
@@ -288,6 +300,14 @@ $(document).ready(function () {
                 $(mySelect).val(ui.item.label);
                 $(mySelect).text(ui.item.label);
                 $(mySelectHidden).val(ui.item.value);
+                if (newSong) {
+                    if ($(mySelect).hasClass("authorSelect")) {
+                        $("#aliasSelect-0").val(ui.item.label);
+                        $("#aliasSelectHidden-0").val(ui.item.value);
+                        $("#officialBand").val(ui.item.label);
+                        officialBand
+                    }
+                }
             },
             minLength: 0
         });
@@ -300,6 +320,34 @@ $(document).ready(function () {
                     async: false,
                     type: "GET",
                     url: "/author/aliasName/" + $(mySelect).val(),
+                    success: function (ooo) {
+                        response(JSON.parse(ooo));
+                    },
+                    error: function (ooo) {
+                        console.log("e2");
+                    },
+                    done: function (ooo) {
+                        console.log("e3");
+                    }
+                });
+            },
+            select: function (event, ui) {
+                event.preventDefault();
+                $(mySelect).val(ui.item.label);
+                $(mySelect).text(ui.item.label);
+                $(mySelectHidden).val(ui.item.value);
+            },
+            minLength: 0
+        });
+    }
+
+    function setupAutocompleteGenre(mySelect, mySelectHidden, valueToSet) {
+        mySelect.autocomplete({
+            source: function (request, response, url) {
+                $.ajax({
+                    async: false,
+                    type: "GET",
+                    url: "/genre/genreName/" + $(mySelect).val(),
                     success: function (ooo) {
                         response(JSON.parse(ooo));
                     },
@@ -384,9 +432,9 @@ $(document).ready(function () {
         artistAndAliasDiv, aliasSelect, aliasSelectHidden, i, authorSong, instrumentalDiv,
         instrumentalValue) {
         mainComposerDiv.append("<h4>Author / Alias info</h4>");
-        var authorSelect = $('<input class="form-control" id="authorSelect-' + i + '" value="' + officialArtistName + '"/>');
+        var authorSelect = $('<input class="form-control authorSelect" id="authorSelect-' + i + '" value="' + officialArtistName + '"/>');
         var authorSelectHidden = $('<input type="hidden" id="authorSelectHidden-' + i + '"/>');
-        if (authorSong!=null){
+        if (authorSong != null) {
             authorSelectHidden.val(authorSong.authorAlias.author.id);
         }
         artistDiv.append('<label for="authorSelect-"' + i + '">Author name</label>');
@@ -395,10 +443,10 @@ $(document).ready(function () {
         artistDiv.append(authorSelect);
         artistDiv.append(authorSelectHidden);
         artistAndAliasDiv.append(artistDiv);
-        if (authorSong!=null){
+        if (authorSong != null) {
             setupAutocompleteAliasArtist(aliasSelect, aliasSelectHidden, authorSong.id);
         } else {
-            setupAutocompleteAliasArtist(aliasSelect, aliasSelectHidden, "");
+            setupAutocompleteAlias(aliasSelect, aliasSelectHidden, authorSelect.val());
         }
         aliasDiv.append(aliasSelect);
         aliasDiv.append(aliasSelectHidden);
@@ -434,7 +482,7 @@ $(document).ready(function () {
         var ingameSrcIdDiv = $('<div class="col">');
         var ingameInfoDiv = $('<div class="col">');
         ingameBandDiv.append('<label for="ingameBand">Ingame band display</label>');
-        ingameTitleDiv.append('<label for="ingameTitle">Ingame band display</label>');
+        ingameTitleDiv.append('<label for="ingameTitle">Ingame title display</label>');
         ingameSrcIdDiv.append('<label for="ingameSrcId">Ingame Youtube Source Id</label>');
         ingameInfoDiv.append('<label for="ingameInfo">Info</label>');
         ingameBandDiv.append(ingameBand);
@@ -453,7 +501,8 @@ $(document).ready(function () {
         var officialBand = $(`<input class="form-control" id="officialBand"/>`);
         var officialTitle = $(`<input class="form-control" id="officialTitle"/>`);
         var officialSrcId = $('<input class="form-control" id="officialSrcId"/>');
-        if (songSubgroup != null){
+        var existingSongId = $('<input class="form-control" id="existingSongId"/>');
+        if (songSubgroup != null) {
             officialBand.val(songSubgroup.song.officialDisplayBand);
             officialTitle.val(songSubgroup.song.officialDisplayTitle);
             officialSrcId.val(songSubgroup.song.srcId);
@@ -462,20 +511,65 @@ $(document).ready(function () {
         var officialBandDiv = $('<div class="col">');
         var officialTitleDiv = $('<div class="col">');
         var officialSrcIdDiv = $('<div class="col">');
+        var existingSongIdDiv = $('<div class="col">');
         officialBandDiv.append('<label for="officialBand">Official band display</label>');
         officialTitleDiv.append('<label for="officialTitle">Official title display</label>');
         officialSrcIdDiv.append('<label for="officialSrcId">Official YouTube Src ID</label>');
+        existingSongIdDiv.append('<label for="existingSongId">Existing Song ID</label>');
         officialBandDiv.append(officialBand);
         officialTitleDiv.append(officialTitle);
         officialSrcIdDiv.append(officialSrcId);
+        existingSongIdDiv.append(existingSongId);
         officialDiv.append(officialBandDiv);
         officialDiv.append(officialTitleDiv);
         officialDiv.append(officialSrcIdDiv);
+        officialDiv.append(existingSongIdDiv);
+        if (songSubgroup != null) {
+            existingSongId.val(songSubgroup.id);
+        }
         officialDisplayDiv.append(officialDiv);
     }
 
-    function generateGenreDiv(){
-
+    function generateGenreDiv(genreDiv, song, index) {
+        genreDiv.append('<h4>Genre display</h4>');
+        if (song != undefined) {
+            var songGenreList = song.songGenreList;
+            for (let i = 0; i < songGenreList.length; i++) {
+                var genreRowDiv = $('<div class="row p-1">');
+                var genreInputColDiv = $('<div class="col">');
+                var genreButtonColDiv = $('<div class="col">');
+                var genreSelectNext = $('<input class="form-control genre-select" id="genreSelect-' + i + '" value="' + songGenreList[i].genre.genreName + '"/>');
+                var genreSelectHiddenNext = $('<input type="hidden" id="genreSelectHidden-' + i + '" value="' + songGenreList[i].genre.id + '"/>');
+                genreInputColDiv.append('<label for="genreSelect-' + i + '">Genre</label>');
+                genreInputColDiv.append(genreSelectNext);
+                genreInputColDiv.append(genreSelectHiddenNext);
+                var addGenreButton = $('<button id="add-genre-' + i + '" type="submit" class="btn btn-primary add-genre">+</button>');
+                var deleteGenreButton = $('<button id="delete-genre-' + i + '" type="submit" class="btn btn-danger delete-genre">-</button>');
+                genreButtonColDiv.append(addGenreButton);
+                genreButtonColDiv.append(deleteGenreButton);
+                genreRowDiv.append(genreInputColDiv);
+                genreRowDiv.append(genreButtonColDiv);
+                genreDiv.append(genreRowDiv);
+                setupAutocompleteGenre(genreSelectNext, genreSelectHiddenNext, "");
+            }
+        } else {
+            var genreRowDiv = $('<div class="row p-1">');
+            var genreInputColDiv = $('<div class="col">');
+            var genreButtonColDiv = $('<div class="col">');
+            var genreSelectNext = $('<input class="form-control genre-select" id="genreSelect-' + index + '"/>');
+            var genreSelectHiddenNext = $('<input type="hidden" id="genreSelectHidden-' + index + '"/>');
+            genreInputColDiv.append('<label for="genreSelect-' + index + '">Genre</label>');
+            genreInputColDiv.append(genreSelectNext);
+            genreInputColDiv.append(genreSelectHiddenNext);
+            var addGenreButton = $('<button id="add-genre-' + index + '" type="submit" class="btn btn-primary add-genre">+</button>');
+            var deleteGenreButton = $('<button id="delete-genre-' + index + '" type="submit" class="btn btn-danger delete-genre">-</button>');
+            genreButtonColDiv.append(addGenreButton);
+            genreButtonColDiv.append(deleteGenreButton);
+            genreRowDiv.append(genreInputColDiv);
+            genreRowDiv.append(genreButtonColDiv);
+            genreDiv.append(genreRowDiv);
+            setupAutocompleteGenre(genreSelectNext, genreSelectHiddenNext, "");
+        }
     }
 
     function generateFeatDiv(featSelect, featSelectHidden, featDiv, featInputColDiv, featButtonColDiv,
@@ -741,6 +835,24 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on('click', 'button.add-genre', function (e) {
+        var thisId = parseInt($(this).attr("id").replace("add-genre-", ""));
+        generateGenreDiv($("#genreDisplay"), null, (thisId + 1));
+    });
+
+    $(document).on('click', 'button.delete-genre', function (e) {
+        var col = $(this).parent();
+        var rowCol = col.parent();
+        var idOfInput = $(this).attr("id").replace("delete-genre-", "genreSelect-");
+        if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val() == undefined) {
+            var rowCol = col.parent();
+            var divCol = rowCol.parent();
+            divCol.remove();
+        } else {
+            $("#" + idOfInput).addClass("text-decoration-line-through");
+        }
+    });
+
     $(document).on('click', '#cancel-song', function (e) {
         getSubgroupsFromGame();
     });
@@ -757,7 +869,7 @@ $(document).ready(function () {
         var deezerInput = $('<input type="text" class="form-control" id="deezerInput"/>');
         var tidalInput = $('<input type="text" class="form-control" id="tidalInput"/>');
         var lyricsTextArea = $('<textarea class="form-control" id="lyrics"></textarea/>');
-        if (songSubgroup!=null){
+        if (songSubgroup != null) {
             itunesInput.val(songSubgroup.itunesLink);
             spotifyInput.val(songSubgroup.spotifyId);
             soundcloudInput.val(songSubgroup.soundcloudLink);
@@ -793,6 +905,58 @@ $(document).ready(function () {
 
     $(document).on('focusin', '#authorSelect-0', function (e) {
         $("#authorSelectHidden-0").val("");
+    });
+
+    $(document).on('focusout', '#authorSelect-0', function (e) {
+        if (newSong) {
+            var hiddenVal = $("#authorSelectHidden-0").val();
+            if (hiddenVal == "") {
+                $("#aliasSelect-0").val($(this).val());
+                $("#officialBand").val($(this).val());
+            }
+        }
+    });
+
+    $(document).on('focusout', '#officialTitle', function (e) {
+        if (newSong) {
+            var songToFind = new Object();
+            songToFind.band = $("#officialBand").val();
+            songToFind.title = $(this).val();
+            $.ajax({
+                async: false,
+                type: "PUT",
+                data: JSON.stringify(songToFind),
+                url: "/song/findExact",
+                contentType: 'application/json; charset=utf-8',
+                // dataType: 'json',
+                success: function (ooo) {
+                    var existingSong = JSON.parse(ooo);
+                    if (existingSong != "[]") {
+                        $("#existingSongId").val(existingSong.id);
+                        $("#itunesInput").val(existingSong.itunesLink);
+                        $("#spotifyInput").val(existingSong.spotifyId);
+                        $("#soundcloudInput").val(existingSong.soundcloudLink);
+                        $("#deezerInput").val(existingSong.deezerId);
+                        $("#tidalInput").val(existingSong.tidalLink);
+                        $("#lyricsTextArea").text(existingSong.lyrics);
+                        $("#officialSrcId").val(existingSong.srcId);
+                    }
+                },
+                error: function (ooo) {
+                    console.log("e2");
+
+                },
+                done: function (ooo) {
+                    console.log("e3");
+
+                }
+            });
+            var hiddenVal = $("#authorSelectHidden-0").val();
+            if (hiddenVal == "") {
+                $("#aliasSelect-0").val($(this).val());
+                $("#officialBand").val($(this).val());
+            }
+        }
     });
 
     $(document).on('focusin', '#aliasSelect-0', function (e) {
@@ -833,17 +997,21 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on('focusout', '#officialSrcId', function (e) {
+        var typedSrcId = $(this).val();
+        var indexOfMark = typedSrcId.indexOf("?v=");
+        if (indexOfMark > -1) {
+            $(this).val(typedSrcId.substring(indexOfMark + 3, indexOfMark + 14));
+        } else {
+            var indexOfTuDotBe = typedSrcId.indexOf(".be");
+            if (indexOfTuDotBe > -1) {
+                $(this).val(typedSrcId.substring(indexOfTuDotBe + 4, indexOfTuDotBe + 15));
+            }
+        }
+    });
+
     $(document).on('click', '#save-song', function (e) {
         var divToAppend = $('#nfs-content');
-        var songToSave = new Object();
-        if ($("#officialDisplay").length>0){
-            songToSave.newSong=true;
-            songToSave.officialBand = $("#officialBand").val();
-            songToSave.officialTitle = $("#officialTitle").val();
-            songToSave.officialSrcId = $("#officialSrcId").val();
-        } else {
-            songToSave.newSong=false;
-        }
         if ($("#authorSelectHidden-0").val() == "") {
             songToSave.authorId = "NEW-" + $("#authorSelect-0").val();
         } else {
@@ -956,21 +1124,20 @@ $(document).ready(function () {
     $(document).on('click', '#save-song-globally', function (e) {
         var divToAppend = $('#nfs-content');
         var songGloballyToSave = new Object();
-
-        songToSave.officialBand = $("#officialBand").val();
-        songToSave.officialTitle = $("#officialTitle").val();
-        songToSave.officialSrcId = $("#officialSrcId").val();
-        songToSave.lyrics = $("#lyrics").val();
-        songToSave.spotify = $("#spotifyInput").val();
-        songToSave.itunes = $("#itunesInput").val();
-        songToSave.soundcloud = $("#soundcloudInput").val();
-        songToSave.deezer = $("#deezerInput").val();
-        songToSave.tidal = $("#tidalInput").val();
-        songToSave.info = $("#ingameInfo").val();
+        songGloballyToSave.officialBand = $("#officialBand").val();
+        songGloballyToSave.officialTitle = $("#officialTitle").val();
+        songGloballyToSave.officialSrcId = $("#officialSrcId").val();
+        songGloballyToSave.lyrics = $("#lyrics").val();
+        songGloballyToSave.spotify = $("#spotifyInput").val();
+        songGloballyToSave.itunes = $("#itunesInput").val();
+        songGloballyToSave.soundcloud = $("#soundcloudInput").val();
+        songGloballyToSave.deezer = $("#deezerInput").val();
+        songGloballyToSave.tidal = $("#tidalInput").val();
+        songGloballyToSave.info = $("#ingameInfo").val();
         $.ajax({
             async: false,
             type: "PUT",
-            data: JSON.stringify(songToSave),
+            data: JSON.stringify(songGloballyToSave),
             url: "/songSubgroup/putGlobally/" + currentSongSubgroup.id + '',
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
@@ -996,6 +1163,106 @@ $(document).ready(function () {
     $(document).on('click', '#new-song', function (e) {
         var divToAppend = $('#nfs-content');
         divToAppend.empty();
+        newSong = true;
         renderEditCreateSong(divToAppend, null);
+    });
+
+    $(document).on('click', '#save-new-song', function (e) {
+        var songToSave = new Object();
+        if ($("#authorSelectHidden-0").val() == "") {
+            songToSave.authorId = "NEW-" + $("#authorSelect-0").val();
+        } else {
+            songToSave.authorId = $("#authorSelectHidden-0").val();
+        }
+        if ($("#aliasSelectHidden-0").val() == "") {
+            songToSave.aliasId = "NEW-" + $("#aliasSelect-0").val();
+        } else {
+            songToSave.aliasId = $("#aliasSelectHidden-0").val();
+        }
+        songToSave.instrumental = $("#instrumentalBox").prop("checked");
+        songToSave.ingameBand = $("#ingameBand").val();
+        songToSave.ingameTitle = $("#ingameTitle").val();
+        songToSave.ingameSrcId = $("#ingameSrcId").val();
+        songToSave.info = $("#ingameInfo").val();
+        songToSave.subgroup = currentSubgroup;
+        if ($("#existingSongId").val() != "") {
+            songToSave.existingSongId = $("#existingSongId").val();
+        } else {
+            var feats = $("#featDiv").find("input.feat-select");
+            songToSave.feat = false;
+            for (let i = 0; i < feats.length; i++) {
+                var featInput = feats[i];
+                if ($(featInput).val() != "") {
+                    songToSave.feat = true;
+                    if ($(featInput).next().val() != "") {
+                        songToSave[featInput.id] = $(featInput).next().val();
+                    } else {
+                        songToSave[featInput.id] = "NEW-" + $(featInput).val();
+                    }
+                    var concatInput = $("#featConcatInput-" + i);
+                    if (concatInput.length > 0) {
+                        songToSave[concatInput.attr("id")] = $(concatInput).val();
+                    }
+                }
+            }
+            var remixes = $("#remixer").find("input.remix-select");
+            songToSave.remix = false;
+            for (let i = 0; i < remixes.length; i++) {
+                var remixInput = remixes[i];
+                if ($(remixInput).val() != "") {
+                    songToSave.remix = true;
+                    if ($(remixInput).next().val() != "") {
+                        songToSave[remixInput.id] = $(remixInput).next().val();
+
+                    } else {
+                        songToSave[remixInput.id] = "NEW-" + $(remixInput).val();
+                    }
+                    var concatInput = $("#remixConcatInput-" + i);
+                    if (concatInput.length > 0) {
+                        songToSave[concatInput.attr("id")] = $(concatInput).val();
+                    }
+                }
+            }
+            var subcomposers = $("#subcomposerDiv").find("input.subcomposer-select");
+            songToSave.subcomposer = false;
+            for (let i = 0; i < subcomposers.length; i++) {
+                var subcomposerInput = subcomposers[i];
+                if ($(subcomposerInput).val() != "") {
+                    songToSave.subcomposer = true;
+                    if ($(subcomposerInput).next().val() != "") {
+                        songToSave[subcomposerInput.id] = $(subcomposerInput).next().val();
+                    } else {
+                        songToSave[subcomposerInput.id] = "NEW-" + $(subcomposerInput).val();
+                    }
+                    var concatInput = $("#subcomposerConcatInput-" + (i + 1));
+                    if (concatInput.length > 0) {
+                        songToSave[concatInput.attr("id")] = $(concatInput).val();
+                    }
+                }
+            }
+        }
+        $.ajax({
+            async: false,
+            type: "POST",
+            data: JSON.stringify(songToSave),
+            url: "/songSubgroup/post/" + currentSongSubgroup.id + '',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (ooo) {
+                console.log("eee");
+                getSubgroupsFromGame();
+                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
+                    $('#success-alert').slideUp(500);
+                    divToAppend.empty();
+                });
+            },
+            error: function (ooo) {
+                console.log("e2");
+
+            },
+            done: function (ooo) {
+                console.log("e3");
+            }
+        });
     });
 });

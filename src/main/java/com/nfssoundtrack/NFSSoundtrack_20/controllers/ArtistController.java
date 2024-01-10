@@ -51,6 +51,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 
     @Autowired
     CountryRepository countryRepository;
+
     @GetMapping(value = "/{authorId}")
     public String author(Model model, @PathVariable("authorId") String authorId) {
         Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
@@ -130,14 +131,14 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
             AuthorAlias authorAlias = authorAliasRepository.findByAlias(input);
-            if (authorAlias==null){
+            if (authorAlias == null) {
                 return objectMapper.writeValueAsString("[]");
             }
             String result = objectMapper.writeValueAsString(Collections.singleton(authorAlias));
             return result;
         } else {
             List<AuthorAlias> authorAliasList = authorAliasRepository.findByAliasContains(input);
-            if (authorAliasList==null){
+            if (authorAliasList == null) {
                 return objectMapper.writeValueAsString("[]");
             }
             String result = objectMapper.writeValueAsString(authorAliasList);
@@ -153,14 +154,14 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
             Author author = authorRepository.findByName(input);
-            if (author==null){
+            if (author == null) {
                 return objectMapper.writeValueAsString("[]");
             }
             String result = objectMapper.writeValueAsString(Collections.singleton(author));
             return result;
         } else {
             List<Author> authorList = authorRepository.findByNameContains(input);
-            if (authorList==null){
+            if (authorList == null) {
                 return objectMapper.writeValueAsString("[]");
             }
             String result = objectMapper.writeValueAsString(authorList);
@@ -176,19 +177,19 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         }
         SimpleModule simpleModule = new SimpleModule();
         ArtistMgmtSerializer artistMgmtSerializer = new ArtistMgmtSerializer(Author.class);
-        ArtistMgmtSerializer.authorAliasRepository=authorAliasRepository;
+        ArtistMgmtSerializer.authorAliasRepository = authorAliasRepository;
         simpleModule.addSerializer(Author.class, artistMgmtSerializer);
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
             Author author = authorRepository.findByName(input);
-            if (author==null){
+            if (author == null) {
                 return objectMapper.writeValueAsString("[]");
             }
             String result = objectMapper.writeValueAsString(Collections.singleton(author));
             return result;
         } else {
             List<Author> authorList = authorRepository.findByNameContains(input);
-            if (authorList==null){
+            if (authorList == null) {
                 return objectMapper.writeValueAsString("[]");
             }
             String result = objectMapper.writeValueAsString(authorList);
@@ -209,7 +210,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         authorAlias.setAuthor(authorToUpdate);
         authorAlias = authorAliasRepository.save(authorAlias);
         List<AuthorSong> songsToReassign = authorSongRepository.findByAuthorAlias(existingAuthorAlias);
-        for (AuthorSong authorSong : songsToReassign){
+        for (AuthorSong authorSong : songsToReassign) {
             authorSong.setAuthorAlias(authorAlias);
         }
         authorSongRepository.saveAll(songsToReassign);
@@ -235,10 +236,10 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         List<String> targetCountrIds = new ArrayList<>();
         Set<AuthorCountry> countriesToCreate = new HashSet<>();
         Set<AuthorCountry> countriesToUnlink = new HashSet<>();
-        for (String countryInfo : countryInfos){
+        for (String countryInfo : countryInfos) {
             String valueToGet = (String) mergeInfo.get(countryInfo);
-            if (valueToGet.contains("DELETE")){
-                String actualCountryId = valueToGet.replace("DELETE-","");
+            if (valueToGet.contains("DELETE")) {
+                String actualCountryId = valueToGet.replace("DELETE-", "");
                 AuthorCountry authorCountryToDelete = existingCountries.stream().filter(authorCountry -> authorCountry.getCountry().getId()
                         .equals(Long.parseLong(actualCountryId))).findFirst().get();
                 countriesToUnlink.add(authorCountryToDelete);
@@ -248,7 +249,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 Optional<AuthorCountry> optionalAuthorCountry = existingCountries.stream().filter(authorCountry
                         -> authorCountry.getCountry().getId()
                         .equals(Long.parseLong(countryId))).findFirst();
-                if (optionalAuthorCountry.isEmpty()){
+                if (optionalAuthorCountry.isEmpty()) {
                     AuthorCountry authorCountry = new AuthorCountry();
                     authorCountry.setAuthor(author);
                     Country country = countryRepository.findById(Long.valueOf(countryId));
@@ -259,33 +260,33 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 
             }
         }
-        for (AuthorCountry authorCountry : existingCountries){
-            if (!targetCountrIds.contains(authorCountry.getCountry().getId().toString())){
+        for (AuthorCountry authorCountry : existingCountries) {
+            if (!targetCountrIds.contains(authorCountry.getCountry().getId().toString())) {
                 countriesToUnlink.add(authorCountry);
             }
         }
         authorCountryRepository.deleteAll(countriesToUnlink);
         authorCountryRepository.saveAll(countriesToCreate);
-        for (String aliasInfo : aliasInfos){
+        for (String aliasInfo : aliasInfos) {
             String valueToGet = (String) mergeInfo.get(aliasInfo);
-            if (valueToGet.contains("DELETE")){
-                String actualAliasId = valueToGet.replace("DELETE-","");
+            if (valueToGet.contains("DELETE")) {
+                String actualAliasId = valueToGet.replace("DELETE-", "");
                 AuthorAlias authorAlias = authorAliasRepository.findById(Integer.valueOf(actualAliasId)).get();
                 List<AuthorSong> authorSongs = authorSongRepository.findByAuthorAlias(authorAlias);
-                for (AuthorSong authorSong : authorSongs){
+                for (AuthorSong authorSong : authorSongs) {
                     authorSong.setAuthorAlias(rootAlias);
                 }
                 authorSongRepository.saveAll(authorSongs);
                 authorAliasRepository.delete(authorAlias);
-            } else if (valueToGet.contains("NEW")){
+            } else if (valueToGet.contains("NEW")) {
                 AuthorAlias authorAlias = new AuthorAlias();
-                String actualNewAlias = valueToGet.replace("NEW-","");
+                String actualNewAlias = valueToGet.replace("NEW-", "");
                 authorAlias.setAlias(actualNewAlias);
                 authorAlias.setAuthor(author);
                 authorAliasRepository.save(authorAlias);
-            } else if (valueToGet.contains("EXISTING")){
+            } else if (valueToGet.contains("EXISTING")) {
                 String[] existingAlias = valueToGet.split("-VAL-");
-                String existingId = existingAlias[0].replace("EXISTING-","");
+                String existingId = existingAlias[0].replace("EXISTING-", "");
                 AuthorAlias authorAlias = authorAliasRepository.findById(Integer.valueOf(existingId)).get();
                 authorAlias.setAlias(existingAlias[1]);
                 authorAliasRepository.save(authorAlias);

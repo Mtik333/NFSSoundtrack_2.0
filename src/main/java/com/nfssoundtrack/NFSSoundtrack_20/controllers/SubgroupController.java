@@ -75,7 +75,7 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
                 songSubgroupRepository.delete(subgroupOptional.get());
                 //delete orphaned stuff
                 List<SongSubgroup> orphanedSong = songSubgroupRepository.findBySong(mySong);
-                if (orphanedSong.isEmpty()){
+                if (orphanedSong.isEmpty()) {
                     List<SongGenre> songGenres = songGenreRepository.findBySong(mySong);
                     songGenreRepository.deleteAll(songGenres);
                     List<AuthorSong> authorSongs = authorSongRepository.findBySong(mySong);

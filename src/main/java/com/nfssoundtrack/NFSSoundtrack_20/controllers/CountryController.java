@@ -3,9 +3,7 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Country;
-import com.nfssoundtrack.NFSSoundtrack_20.others.ArtistSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.others.CountrySerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.CountryRepository;
 import org.slf4j.Logger;
@@ -44,14 +42,14 @@ public class CountryController extends BaseControllerWithErrorHandling {
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
             Country country = countryRepository.findByCountryName(input);
-            if (country==null){
+            if (country == null) {
                 return objectMapper.writeValueAsString("[]");
             }
             String result = objectMapper.writeValueAsString(Collections.singleton(country));
             return result;
         } else {
             List<Country> countryList = countryRepository.findByCountryNameContains(input);
-            if (countryList==null){
+            if (countryList == null) {
                 return objectMapper.writeValueAsString("[]");
             }
             String result = objectMapper.writeValueAsString(countryList);

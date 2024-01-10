@@ -115,6 +115,20 @@ html[data-bs-theme="dark"] tr.rolegroup-separator:nth-of-type(odd) {
   --bs-table-hover-color: #fff;
 }
 
+html tr.rolegroup-separator:nth-of-type(even) {
+  --bs-table-bg: #CAF5DA;
+  --bs-table-color: #000;
+  --bs-table-hover-bg: #8DE9AF;
+  --bs-table-hover-color: #000;
+}
+
+html tr.rolegroup-separator:nth-of-type(odd) {
+  --bs-table-striped-bg: #B3E6C6;
+  --bs-table-striped-color: #000;
+  --bs-table-hover-bg: #8DE9AF;
+  --bs-table-hover-color: #000;
+}
+
 
 .my_padding {
   background: #d1e2ff;

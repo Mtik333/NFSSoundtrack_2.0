@@ -13,4 +13,12 @@ public enum Remix {
     Remix(String value) {
         this.value = value;
     }
+
+    public static Remix fromBoolean(Boolean value) {
+        if (value) {
+            return YES;
+        } else {
+            return NO;
+        }
+    }
 }

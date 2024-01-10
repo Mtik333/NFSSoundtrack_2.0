@@ -33,8 +33,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/manage/manage", "/manage/manage#",
-                                "/maingroup/**", "/songSubgroup/**", "/subgroup/**",
-                                "/song/**")
+                                "/maingroup/**", "/songSubgroup/**", "/subgroup/**")
                         .hasAuthority("ADMIN"))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",

@@ -13,4 +13,11 @@ public enum Instrumental {
         this.value = value;
     }
 
+    public static Instrumental fromBoolean(Boolean value) {
+        if (value) {
+            return YES;
+        } else {
+            return NO;
+        }
+    }
 }

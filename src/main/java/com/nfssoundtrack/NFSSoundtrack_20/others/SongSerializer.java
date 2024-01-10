@@ -26,6 +26,11 @@ public class SongSerializer extends StdSerializer<Song> {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField("officialArtist", song.getOfficialDisplayBand());
         jsonGenerator.writeStringField("officialTitle", song.getOfficialDisplayTitle());
+        if (song.getBaseSong() != null) {
+            jsonGenerator.writeStringField("baseSongId",
+                    "<a class='table_link' href='/song/" + song.getBaseSong().getId() + "'>"
+                            + song.getBaseSong().getOfficialDisplayBand() + " - " + song.getBaseSong().getOfficialDisplayTitle() + "</a>");
+        }
         jsonGenerator.writeFieldName("composers");
         jsonGenerator.writeStartArray();
         song.getAuthorSongList().stream().filter(authorSong -> authorSong.getRole().equals(Role.COMPOSER)).forEach(authorSong -> {

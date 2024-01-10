@@ -10,7 +10,6 @@ import com.nfssoundtrack.NFSSoundtrack_20.repository.AuthorAliasRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,14 +24,14 @@ public class ArtistMgmtSerializer extends StdSerializer<Author> {
         super(t);
     }
 
-    public ArtistMgmtSerializer(){
+    public ArtistMgmtSerializer() {
         super(Author.class);
     }
 
     @Autowired
-    public ArtistMgmtSerializer(AuthorAliasRepository authorAliasRepository){
+    public ArtistMgmtSerializer(AuthorAliasRepository authorAliasRepository) {
         this();
-        ArtistMgmtSerializer.authorAliasRepository=authorAliasRepository;
+        ArtistMgmtSerializer.authorAliasRepository = authorAliasRepository;
     }
 
     @Override
@@ -42,7 +41,7 @@ public class ArtistMgmtSerializer extends StdSerializer<Author> {
         jsonGenerator.writeStringField("label", author.getName());
         List<AuthorAlias> authorAliases = authorAliasRepository.findByAuthor(author);
         jsonGenerator.writeArrayFieldStart("aliases");
-        for (AuthorAlias authorAlias : authorAliases){
+        for (AuthorAlias authorAlias : authorAliases) {
             jsonGenerator.writeStartObject();
             jsonGenerator.writeObjectField("aliasId", authorAlias.getId());
             jsonGenerator.writeObjectField("aliasName", authorAlias.getAlias());
@@ -54,7 +53,7 @@ public class ArtistMgmtSerializer extends StdSerializer<Author> {
 //        jsonGenerator.writeEndArray();
         List<AuthorCountry> authorCountries = author.getAuthorCountries();
         jsonGenerator.writeArrayFieldStart("countries");
-        for (AuthorCountry authorCountry : authorCountries){
+        for (AuthorCountry authorCountry : authorCountries) {
             jsonGenerator.writeStartObject();
             jsonGenerator.writeObjectField("countryAuthorId", authorCountry.getId());
             jsonGenerator.writeObjectField("countryName", authorCountry.getCountry().getCountryName());

@@ -180,7 +180,7 @@ public class Application implements CommandLineRunner {
                                     genreRepository.saveAndFlush(myGenre);
                                 }
                                 List<SongGenre> songGenres = songGenreRepository.findBySong(mySong);
-                                if (songGenres.isEmpty()){
+                                if (songGenres.isEmpty()) {
                                     SongGenre songGenre = new SongGenre();
                                     songGenre.setGenre(myGenre);
                                     songGenre.setSong(mySong);
@@ -413,7 +413,7 @@ public class Application implements CommandLineRunner {
                                     genreRepository.saveAndFlush(myGenre);
                                 }
                                 List<SongGenre> songGenres = songGenreRepository.findBySong(mySong);
-                                if (songGenres.isEmpty()){
+                                if (songGenres.isEmpty()) {
                                     SongGenre songGenre = new SongGenre();
                                     songGenre.setGenre(myGenre);
                                     songGenre.setSong(mySong);
