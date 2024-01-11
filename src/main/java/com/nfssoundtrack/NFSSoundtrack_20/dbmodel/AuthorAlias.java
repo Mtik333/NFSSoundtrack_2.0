@@ -21,6 +21,9 @@ public class AuthorAlias implements Serializable {
     @Column(name = "alias")
     private String alias;
 
+    public AuthorAlias() {
+    }
+
     public Long getId() {
         return id;
     }
