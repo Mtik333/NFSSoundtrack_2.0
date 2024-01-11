@@ -230,7 +230,7 @@ $(document).ready(function () {
             generateOfficialDisplayDiv(officialDisplayDiv, null);
             divToAppend.append(officialDisplayDiv);
             var genreDisplayDiv = $('<div class="form-group genreDisplay" id="genreDisplay">')
-            genreDiv.append('<h4>Genre display</h4>');
+            genreDisplayDiv.append('<h4>Genre display</h4>');
             generateGenreDiv(genreDisplayDiv, null, 0);
             divToAppend.append(genreDisplayDiv);
         }
@@ -267,7 +267,7 @@ $(document).ready(function () {
                 var officialDisplayDiv = $('<div class="form-group officialDisplay" id="officialDisplay">');
                 generateOfficialDisplayDiv(officialDisplayDiv, songSubgroup);
                 var genreDisplayDiv = $('<div class="form-group genreDisplay" id="genreDisplay">');
-                genreDiv.append('<h4>Genre display</h4>');
+                genreDisplayDiv.append('<h4>Genre display</h4>');
                 generateGenreDiv(genreDisplayDiv, songSubgroup.song, 0);
                 var spotifyOthersDiv = $('<div class="form-group spotifyDisplay" id="spotifyDisplay">');
                 generateSpotifyAndLyrics(spotifyOthersDiv, songSubgroup.song);
@@ -400,9 +400,9 @@ $(document).ready(function () {
 
     $(document).on('click', 'a.songItem', function (e) {
         $("#subgroupsDropdown").text($(this).text());
-        var subgroupId = parseInt($(this).attr('data-subgroupId'));
+        var subgroupId = Number($(this).attr('data-subgroupId'));
         currentSubgroup = subgroupId;
-        var groupId = parseInt($(this).attr('data-groupId'));
+        var groupId = Number($(this).attr('data-groupId'));
         var subgroupSongs;
         for (let i = 0; i < fullScopeOfEdit.length; i++) {
             if (fullScopeOfEdit[i].id == groupId) {
@@ -534,17 +534,36 @@ $(document).ready(function () {
     function generateGenreDiv(genreDiv, song, index) {
         if (song != undefined) {
             var songGenreList = song.songGenreList;
-            for (let i = 0; i < songGenreList.length; i++) {
+            if (songGenreList.length > 0) {
+                for (let i = 0; i < songGenreList.length; i++) {
+                    var genreRowDiv = $('<div class="row p-1">');
+                    var genreInputColDiv = $('<div class="col">');
+                    var genreButtonColDiv = $('<div class="col">');
+                    var genreSelectNext = $('<input class="form-control genre-select" id="genreSelect-' + i + '" value="' + songGenreList[i].genre.genreName + '"/>');
+                    var genreSelectHiddenNext = $('<input type="hidden" id="genreSelectHidden-' + i + '" value="' + songGenreList[i].genre.id + '"/>');
+                    genreInputColDiv.append('<label for="genreSelect-' + i + '">Genre</label>');
+                    genreInputColDiv.append(genreSelectNext);
+                    genreInputColDiv.append(genreSelectHiddenNext);
+                    var addGenreButton = $('<button id="add-genre-' + i + '" type="submit" class="btn btn-primary add-genre">+</button>');
+                    var deleteGenreButton = $('<button id="delete-genre-' + i + '" type="submit" class="btn btn-danger delete-genre">-</button>');
+                    genreButtonColDiv.append(addGenreButton);
+                    genreButtonColDiv.append(deleteGenreButton);
+                    genreRowDiv.append(genreInputColDiv);
+                    genreRowDiv.append(genreButtonColDiv);
+                    genreDiv.append(genreRowDiv);
+                    setupAutocompleteGenre(genreSelectNext, genreSelectHiddenNext, "");
+                }
+            } else {
                 var genreRowDiv = $('<div class="row p-1">');
                 var genreInputColDiv = $('<div class="col">');
                 var genreButtonColDiv = $('<div class="col">');
-                var genreSelectNext = $('<input class="form-control genre-select" id="genreSelect-' + i + '" value="' + songGenreList[i].genre.genreName + '"/>');
-                var genreSelectHiddenNext = $('<input type="hidden" id="genreSelectHidden-' + i + '" value="' + songGenreList[i].genre.id + '"/>');
-                genreInputColDiv.append('<label for="genreSelect-' + i + '">Genre</label>');
+                var genreSelectNext = $('<input class="form-control genre-select" id="genreSelect-' + index + '"/>');
+                var genreSelectHiddenNext = $('<input type="hidden" id="genreSelectHidden-' + index + '"/>');
+                genreInputColDiv.append('<label for="genreSelect-' + index + '">Genre</label>');
                 genreInputColDiv.append(genreSelectNext);
                 genreInputColDiv.append(genreSelectHiddenNext);
-                var addGenreButton = $('<button id="add-genre-' + i + '" type="submit" class="btn btn-primary add-genre">+</button>');
-                var deleteGenreButton = $('<button id="delete-genre-' + i + '" type="submit" class="btn btn-danger delete-genre">-</button>');
+                var addGenreButton = $('<button id="add-genre-' + index + '" type="submit" class="btn btn-primary add-genre">+</button>');
+                var deleteGenreButton = $('<button id="delete-genre-' + index + '" type="submit" class="btn btn-danger delete-genre">-</button>');
                 genreButtonColDiv.append(addGenreButton);
                 genreButtonColDiv.append(deleteGenreButton);
                 genreRowDiv.append(genreInputColDiv);
@@ -755,7 +774,7 @@ $(document).ready(function () {
         var col = $(this).parent();
         var rowCol = col.parent();
         var divCol = rowCol.parent();
-        var thisId = parseInt($(this).attr("id").replace("add-remix-", ""));
+        var thisId = Number($(this).attr("id").replace("add-remix-", ""));
         generateRemixDiv(null, null, divCol, null, null, null, null, null, "", (thisId + 1));
         var divNewCol = $('<div class="col"></div>');
         var remixConcatInput = $('<input type="text" class="form-control" id="remixConcatInput-' + thisId + '"/>');
@@ -782,7 +801,7 @@ $(document).ready(function () {
         var col = $(this).parent();
         var rowCol = col.parent();
         var divCol = rowCol.parent();
-        var thisId = parseInt($(this).attr("id").replace("add-feat-", ""));
+        var thisId = Number($(this).attr("id").replace("add-feat-", ""));
         generateFeatDiv(null, null, divCol, null, null, null, (thisId + 1), (thisId + 1), "");
         var divNewCol = $('<div class="col"></div>');
         var featConcatInput = $('<input type="text" class="form-control" id="featConcatInput-' + thisId + '"/>');
@@ -808,7 +827,7 @@ $(document).ready(function () {
         var col = $(this).parent();
         var rowCol = col.parent();
         var divCol = rowCol.parent();
-        var thisId = parseInt($(this).attr("id").replace("add-subcomposer-", "")) + 1;
+        var thisId = Number($(this).attr("id").replace("add-subcomposer-", "")) + 1;
         generateSubcomposerDiv(null, null, divCol, null, null, null, null, thisId, thisId, "", null);
         var divNewCol = $('<div class="col"></div>');
         var subcomposerConcatInput = $('<input type="text" class="form-control" id="subcomposerConcatInput-' + thisId + '"/>');
@@ -836,7 +855,7 @@ $(document).ready(function () {
     });
 
     $(document).on('click', 'button.add-genre', function (e) {
-        var thisId = parseInt($(this).attr("id").replace("add-genre-", ""));
+        var thisId = Number($(this).attr("id").replace("add-genre-", ""));
         generateGenreDiv($("#genreDisplay"), null, (thisId + 1));
     });
 
@@ -1134,6 +1153,21 @@ $(document).ready(function () {
         songGloballyToSave.deezer = $("#deezerInput").val();
         songGloballyToSave.tidal = $("#tidalInput").val();
         songGloballyToSave.info = $("#ingameInfo").val();
+        var genres = $("#genreDisplay").find("input.genre-select");
+        for (let i = 0; i < genres.length; i++) {
+            var genreInput = genres[i];
+            if ($(genreInput).val() != "") {
+                if ($(genreInput).next().val() != "") {
+                    if ($(genreInput).hasClass("text-decoration-line-through")) {
+                        songGloballyToSave[genreInput.id] = "DELETE-" + $(genreInput).next().val();
+                    } else {
+                        songGloballyToSave[genreInput.id] = $(genreInput).next().val();
+                    }
+                } else {
+                    songGloballyToSave[genreInput.id] = "NEW-" + $(genreInput).val();
+                }
+            }
+        }
         $.ajax({
             async: false,
             type: "PUT",
@@ -1246,6 +1280,17 @@ $(document).ready(function () {
                     var concatInput = $("#subcomposerConcatInput-" + (i + 1));
                     if (concatInput.length > 0) {
                         songToSave[concatInput.attr("id")] = $(concatInput).val();
+                    }
+                }
+            }
+            var genres = $("#genreDisplay").find("input.genre-select");
+            for (let i = 0; i < genres.length; i++) {
+                var genreInput = genres[i];
+                if ($(genreInput).val() != "") {
+                    if ($(genreInput).next().val() != "") {
+                        songToSave[genreInput.id] = $(genreInput).next().val();
+                    } else {
+                        songToSave[genreInput.id] = "NEW-" + $(genreInput).val();
                     }
                 }
             }

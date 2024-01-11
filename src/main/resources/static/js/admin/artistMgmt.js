@@ -98,7 +98,6 @@ $(document).on('click', 'button.delete-alias', function (e) {
     var rowCol = col.parent();
     var idOfInput = $(this).attr("id").replace("delete-alias-", "aliasInfo-");
     if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val() == undefined) {
-        var rowCol = col.parent();
         var divCol = rowCol.parent();
         divCol.remove();
     } else {
@@ -111,7 +110,6 @@ $(document).on('click', 'button.delete-country', function (e) {
     var rowCol = col.parent();
     var idOfInput = $(this).attr("id").replace("delete-country-", "countryInfo-");
     if ($("#" + idOfInput).val() == "" || $("#" + idOfInput).val() == undefined) {
-        var rowCol = col.parent();
         var divCol = rowCol.parent();
         divCol.remove();
     } else {
@@ -123,7 +121,7 @@ $(document).on('click', 'button.add-country', function (e) {
     var col = $(this).parent();
     var rowCol = col.parent();
     var divCol = rowCol.parent();
-    var thisId = parseInt($(this).attr("id").replace("add-country-", ""));
+    var thisId = Number($(this).attr("id").replace("add-country-", ""));
     generateCountryDiv((thisId+1),null,divCol);
 });
 
@@ -131,12 +129,12 @@ $(document).on('click', 'button.add-alias', function (e) {
     var col = $(this).parent();
     var rowCol = col.parent();
     var divCol = rowCol.parent();
-    var thisId = parseInt($(this).attr("id").replace("add-alias-", ""));
+    var thisId = Number($(this).attr("id").replace("add-alias-", ""));
     generateAliasDiv((thisId+1),null,divCol);
 });
 
 $(document).on('click', '#save-artist', function (e) {
-    var artistToSave = new Object();
+    var artistToSave = {};
     if ($("#authorInput").val() == "") {
         artistToSave.authorId = "NEW-" + $("#authorInputHidden").val();
     } else {
@@ -166,8 +164,7 @@ $(document).on('click', '#save-artist', function (e) {
                 if ($(aliasInput).hasClass("text-decoration-line-through")) {
                     artistToSave[aliasInput.id] = "DELETE-" + $(aliasInput).next().val();
                 } else {
-                    artistToSave[aliasInput.id] = "EXISTING-"+$(aliasInput).next().val()
-                    +"-VAL-"+$(aliasInput).val();
+                    artistToSave[aliasInput.id] = "EXISTING-"+$(aliasInput).next().val()+"-VAL-"+$(aliasInput).val();
                 }
             } else {
                 artistToSave[aliasInput.id] = "NEW-" + $(aliasInput).val();

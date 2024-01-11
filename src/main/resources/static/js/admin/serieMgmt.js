@@ -369,8 +369,8 @@ $(document).ready(function () {
     function sortTableSeries() {
         var $tbody = $('#series-table tbody');
         $("#series-table").find('tr').sort(function (a, b) {
-            var tda = parseInt($($(a).find("input")[0]).val()); // target order attribute
-            var tdb = parseInt($($(b).find("input")[0]).val()); // target order attribute
+            var tda = Number($($(a).find("input")[0]).val()); // target order attribute
+            var tdb = Number($($(b).find("input")[0]).val()); // target order attribute
             // if a < b return 1
             return tda > tdb ? 1
                 // else if a > b return -1
@@ -383,8 +383,8 @@ $(document).ready(function () {
     function sortTableGames() {
         var $tbody = $('#games-table tbody');
         $("#games-table").find('tr').sort(function (a, b) {
-            var tda = parseInt($($(a).find("input")[0]).val()); // target order attribute
-            var tdb = parseInt($($(b).find("input")[0]).val()); // target order attribute
+            var tda = Number($($(a).find("input")[0]).val()); // target order attribute
+            var tdb = Number($($(b).find("input")[0]).val()); // target order attribute
             // if a < b return 1
             return tda > tdb ? 1
                 // else if a > b return -1

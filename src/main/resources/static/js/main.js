@@ -544,7 +544,7 @@ $(document).ready(function () {
         disablePlayer(false);
         // var tbody = $('#playlistModePlayer').append("<tbody>");
         if (changeId >= 0) {
-            current_id = parseInt(changeId);
+            current_id = Number(changeId);
         }
         var localI = 0;
         if ($('#playlist_progress').is(":empty")) {

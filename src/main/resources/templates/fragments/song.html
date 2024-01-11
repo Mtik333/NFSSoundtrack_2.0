@@ -1,13 +1,6 @@
-<!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" lang="en-us">
-<link rel="stylesheet" th:href="@{/css/own.css}" type="text/css">
 <h3 th:text="#{usagesOfSong}+' '+${songToCheck?.officialDisplayBand}+' - '+${songToCheck?.officialDisplayTitle}"></h3>
-<!-- <div class="form-group pb-2 pt-2">
-    <span id="playlist_init" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
-        data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
-        </div> -->
 <table id="songTable" class="table table-hover table-striped playlist_table">
-    <thead>
+    <thead><tr>
         <th scope="col" th:text="#{id}"></th>
         <th scope="col" th:text="#{remix}"></th>
         <th scope="col" th:text="#{instrumental}"></th>
@@ -15,6 +8,7 @@
         <th scope="col" th:text="#{group}"></th>
         <th scope="col" th:text="#{game}"></th>
         <th scope="col" class="no-sort" th:text="#{actions}"></th>
+    </tr>
     </thead>
     <tbody>
         <tr th:each="songSubgroup, iter1 : ${songUsages}"
@@ -77,5 +71,3 @@
     </div>
 </div> -->
 <script th:src="@{/js/song.js}" type="application/javascript"></script>
-
-</html>

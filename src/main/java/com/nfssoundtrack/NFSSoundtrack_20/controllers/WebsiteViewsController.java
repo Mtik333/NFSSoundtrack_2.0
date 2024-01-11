@@ -85,6 +85,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("songSubgroups", null);
         model.addAttribute("author", null);
         model.addAttribute("genre", null);
+        model.addAttribute("home", value.contains("home"));
         model.addAttribute("appName", value + " - " + appName);
 //        response.sendRedirect("index");
         return "index";

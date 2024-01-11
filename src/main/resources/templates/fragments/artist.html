@@ -1,6 +1,3 @@
-<!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" lang="en-us">
-<link rel="stylesheet" th:href="@{/css/own.css}" type="text/css">
 <h2 th:text="#{infoAbout}+' '+${author?.name}"></h2>
 <hr>
 <div id="briefInfo">
@@ -69,17 +66,17 @@
             </li>
         </th:block>
     </ul>
-    </th:block>
 </div>
 
 <table id="artistStuff" class="table table-hover table-striped playlist_table">
-    <thead>
+    <thead><tr>
         <th scope="col" th:text="#{subgroup}"></th>
         <th scope="col" th:text="#{group}"></th>
         <th scope="col" th:text="#{game}"></th>
         <th scope="col" th:text="#{remix}"></th>
         <th scope="col" th:text="#{instrumental}"></th>
         <th scope="col" th:text="#{actions}"></th>
+    </tr>
     </thead>
     <tbody>
         <th:block th:each="mapEntry : ${songsAsComposer}">
@@ -173,7 +170,6 @@
                             <img class="play_icon img-responsive" data-bs-toggle="modal" data-bs-target="#videoModal"
                                 th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                                 th:src="@{/images/znakwodny.png}" width="25" height="25">
-                            </img>
                             <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a th:href="${songSubgroup.spotifyId}" style="text-decoration:none;">
@@ -230,10 +226,10 @@
                         <span th:text="${songSubgroup.remix}"></span>
                         <br>
                         <th:block
-                                th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
+                            th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
                             <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
-                                                                               th:href="'/author/'+${authorSong.authorAlias.id}"
-                                                                               th:text="${authorSong.authorAlias.alias}"></a>
+                                th:href="'/author/'+${authorSong.authorAlias.id}"
+                                th:text="${authorSong.authorAlias.alias}"></a>
                             <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
                             <span th:text="${iter.last ? ' Remix)' : ''}"></span>
                         </th:block>
@@ -244,7 +240,6 @@
                             <img class="play_icon img-responsive" data-bs-toggle="modal" data-bs-target="#videoModal"
                                 th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                                 th:src="@{/images/znakwodny.png}" width="25" height="25">
-                            </img>
                             <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a th:href="${songSubgroup.spotifyId}" style="text-decoration:none;">
@@ -300,10 +295,10 @@
                         <span th:text="${songSubgroup.remix}"></span>
                         <br>
                         <th:block
-                                th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
+                            th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
                             <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
-                                                                               th:href="'/author/'+${authorSong.authorAlias.id}"
-                                                                               th:text="${authorSong.authorAlias.alias}"></a>
+                                th:href="'/author/'+${authorSong.authorAlias.id}"
+                                th:text="${authorSong.authorAlias.alias}"></a>
                             <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
                             <span th:text="${iter.last ? ' Remix)' : ''}"></span>
                         </th:block>
@@ -314,7 +309,6 @@
                             <img class="play_icon img-responsive" data-bs-toggle="modal" data-bs-target="#videoModal"
                                 th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                                 th:src="@{/images/znakwodny.png}" width="25" height="25">
-                            </img>
                             <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a th:href="${songSubgroup.spotifyId}" style="text-decoration:none;">
@@ -370,10 +364,10 @@
                         <span th:text="${songSubgroup.remix}"></span>
                         <br>
                         <th:block
-                                th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
+                            th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
                             <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
-                                                                               th:href="'/author/'+${authorSong.authorAlias.id}"
-                                                                               th:text="${authorSong.authorAlias.alias}"></a>
+                                th:href="'/author/'+${authorSong.authorAlias.id}"
+                                th:text="${authorSong.authorAlias.alias}"></a>
                             <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
                             <span th:text="${iter.last ? ' Remix)' : ''}"></span>
                         </th:block>
@@ -384,7 +378,6 @@
                             <img class="play_icon img-responsive" data-bs-toggle="modal" data-bs-target="#videoModal"
                                 th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                                 th:src="@{/images/znakwodny.png}" width="25" height="25">
-                            </img>
                             <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a th:href="${songSubgroup.spotifyId}" style="text-decoration:none;">
@@ -456,5 +449,3 @@
         </div>
     </div>
 </div>
-
-</html>

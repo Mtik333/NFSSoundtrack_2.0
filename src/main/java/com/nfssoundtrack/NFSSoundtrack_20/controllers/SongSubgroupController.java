@@ -248,6 +248,23 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         }
     }
 
+    private void saveNewAssignmentOfExistingGenre(String genreValue, Song song) {
+        Genre genre = genreRepository.findById(Integer.valueOf(genreValue)).get();
+        boolean alreadyAssigned = false;
+        for (SongGenre songGenre : song.getSongGenreList()){
+            if (songGenre.getGenre().equals(genre)){
+                alreadyAssigned=true;
+                break;
+            }
+        }
+        if (!alreadyAssigned) {
+            SongGenre songGenre = new SongGenre();
+            songGenre.setGenre(genre);
+            songGenre.setSong(song);
+            songGenreRepository.save(songGenre);
+        }
+    }
+
     private void saveNewFeatOrRemixer(String actualRemixValue, SongSubgroup songSubgroup, Role role, String concatValue) {
         Author author = new Author();
         author.setName(actualRemixValue);
@@ -351,6 +368,33 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             relatedSong.setTidalLink(returnValueToSet(tidalink));
             relatedSong.setSrcId(returnValueToSet(officialSrcId));
             songSubgroup.setLyrics(lyrics);
+            List<String> comingGenres = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("genreSelect")).collect(Collectors.toList());
+            for (String comingGenre : comingGenres) {
+                String keyGenre = comingGenre;
+                String genreValue = (String) objectMapper.get(keyGenre);
+                if (genreValue.startsWith("NEW")) {
+                    String actualGenreValue = genreValue.replace("NEW-", "");
+                    Genre genre = new Genre();
+                    genre.setGenreName(actualGenreValue);
+                    genre = genreRepository.save(genre);
+                    SongGenre songGenre = new SongGenre();
+                    songGenre.setSong(songSubgroup.getSong());
+                    songGenre.setGenre(genre);
+                    songGenreRepository.save(songGenre);
+                } else if (genreValue.startsWith("DELETE")) {
+                    String deleteGenreId = genreValue.replace("DELETE-", "");
+                    Genre genre = genreRepository.findById(Integer.valueOf(deleteGenreId)).get();
+                    List<SongGenre> existingGenres = songSubgroup.getSong().getSongGenreList();
+                    for (SongGenre songGenre : existingGenres){
+                        if (songGenre.getGenre().equals(genre)){
+                            songGenreRepository.delete(songGenre);
+                            break;
+                        }
+                    }
+                } else {
+                    saveNewAssignmentOfExistingGenre(genreValue,songSubgroup.getSong());
+                }
+            }
             songRepository.save(relatedSong);
             return new ObjectMapper().writeValueAsString("OK");
         } catch (Throwable thr) {
@@ -508,6 +552,23 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                         } else {
                             saveNewAssignmentOfExistingFeatRemixer(remixValue, songSubgroup, Role.REMIX, concatVal);
                         }
+                    }
+                }
+                List<String> comingGenres = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("genreSelect")).collect(Collectors.toList());
+                for (String comingGenre : comingGenres) {
+                    String keyGenre = comingGenre;
+                    String genreValue = (String) objectMapper.get(keyGenre);
+                    if (genreValue.startsWith("NEW")) {
+                        String actualGenreValue = genreValue.replace("NEW-", "");
+                        Genre genre = new Genre();
+                        genre.setGenreName(actualGenreValue);
+                        genre = genreRepository.save(genre);
+                        SongGenre songGenre = new SongGenre();
+                        songGenre.setSong(songSubgroup.getSong());
+                        songGenre.setGenre(genre);
+                        songGenreRepository.save(songGenre);
+                    } else {
+                        saveNewAssignmentOfExistingGenre(genreValue,songSubgroup.getSong());
                     }
                 }
                 songSubgroup.setLyrics(lyrics);
