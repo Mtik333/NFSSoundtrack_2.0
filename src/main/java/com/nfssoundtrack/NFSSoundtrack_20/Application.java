@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @EnableCaching
@@ -138,8 +139,9 @@ public class Application implements CommandLineRunner {
                             tempSubgroup.setMainGroup(tempGroup);
                             tempSubgroup = subgroupRepository.saveAndFlush(tempSubgroup);
                         } else {
-                            Author existingBand = authorRepository.findByName(band);
-                            if (existingBand == null) {
+                            Author existingBand=null;
+                            Optional<Author> optionalExistingBand = authorRepository.findByName(band);
+                            if (optionalExistingBand.isEmpty()) {
                                 Author newBand = new Author();
                                 newBand.setName(band);
                                 existingBand = authorRepository.saveAndFlush(newBand);
@@ -151,12 +153,11 @@ public class Application implements CommandLineRunner {
                                     authorCountryRepository.saveAndFlush(authorCountry);
                                 }
                             }
-                            AuthorAlias authorAlias = authorAliasRepository.findByAlias(band);
-                            if (authorAlias == null) {
-                                AuthorAlias authorAlias1 = new AuthorAlias();
-                                authorAlias1.setAlias(band);
-                                authorAlias1.setAuthor(existingBand);
-                                authorAlias = authorAliasRepository.saveAndFlush(authorAlias1);
+                            AuthorAlias authorAliasToPersist=null;
+                            Optional<AuthorAlias> authorAlias = authorAliasRepository.findByAlias(band);
+                            if (authorAlias.isEmpty()) {
+                                AuthorAlias authorAlias1 = new AuthorAlias(existingBand,band);
+                                authorAliasToPersist = authorAliasRepository.saveAndFlush(authorAlias1);
                             }
                             Song mySong = null;
                             List<Song> alreadyExistingSongs = songRepository.findByOfficialDisplayBandAndOfficialDisplayTitle(band, title);
@@ -187,11 +188,11 @@ public class Application implements CommandLineRunner {
                                     songGenreRepository.saveAndFlush(songGenre);
                                 }
                             }
-                            AuthorSong authorSong = authorSongRepository.findByAuthorAliasAndSong(authorAlias, mySong);
+                            AuthorSong authorSong = authorSongRepository.findByAuthorAliasAndSong(authorAliasToPersist, mySong);
                             if (authorSong == null) {
                                 authorSong = new AuthorSong();
                                 authorSong.setSong(mySong);
-                                authorSong.setAuthorAlias(authorAlias);
+                                authorSong.setAuthorAlias(authorAliasToPersist);
                                 authorSong.setRole(Role.COMPOSER);
                                 authorSongRepository.save(authorSong);
                             }
@@ -322,8 +323,9 @@ public class Application implements CommandLineRunner {
                             tempSubgroup.setMainGroup(tempGroup);
                             tempSubgroup = subgroupRepository.saveAndFlush(tempSubgroup);
                         } else {
-                            Author existingBand = authorRepository.findByName(band);
-                            if (existingBand == null) {
+                            Author existingBand=null;
+                            Optional<Author> optionalExistingBand = authorRepository.findByName(band);
+                            if (optionalExistingBand.isEmpty()) {
                                 Author newBand = new Author();
                                 newBand.setName(band);
                                 existingBand = authorRepository.saveAndFlush(newBand);
@@ -335,11 +337,10 @@ public class Application implements CommandLineRunner {
                                     authorCountryRepository.saveAndFlush(authorCountry);
                                 }
                             }
-                            AuthorAlias authorAlias = authorAliasRepository.findByAlias(band);
-                            if (authorAlias == null) {
-                                AuthorAlias authorAlias1 = new AuthorAlias();
-                                authorAlias1.setAlias(band);
-                                authorAlias1.setAuthor(existingBand);
+                            AuthorAlias authorAlias=null;
+                            Optional<AuthorAlias> optionalAuthorAlias = authorAliasRepository.findByAlias(band);
+                            if (optionalAuthorAlias.isEmpty()) {
+                                AuthorAlias authorAlias1 = new AuthorAlias(existingBand,band);
                                 authorAlias = authorAliasRepository.saveAndFlush(authorAlias1);
                             }
                             Song mySong = null;

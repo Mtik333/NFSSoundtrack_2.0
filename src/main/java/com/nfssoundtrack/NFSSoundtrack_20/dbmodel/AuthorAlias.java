@@ -44,4 +44,13 @@ public class AuthorAlias implements Serializable {
     public void setAlias(String alias) {
         this.alias = alias;
     }
+
+    public AuthorAlias(Author author, String alias) {
+        this.author = author;
+        this.alias = alias;
+    }
+
+    public AuthorAlias(AuthorAlias authorAlias){
+        this(authorAlias.author,authorAlias.alias);
+    }
 }

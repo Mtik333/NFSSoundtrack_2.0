@@ -70,22 +70,22 @@ public class ArtistController extends BaseControllerWithErrorHandling {
     public @ResponseBody String readAliases(Model model, @PathVariable("input") String input) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         if (input.isEmpty()) {
-            return objectMapper.writeValueAsString("[]");
+            return objectMapper.writeValueAsString(null);
         }
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(AuthorAlias.class, new AuthorAliasSerializer(AuthorAlias.class));
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
-            AuthorAlias authorAlias = authorAliasRepository.findByAlias(input);
-            if (authorAlias == null) {
-                return objectMapper.writeValueAsString("[]");
+            Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(input);
+            if (authorAlias.isEmpty()) {
+                return objectMapper.writeValueAsString(null);
             }
-            String result = objectMapper.writeValueAsString(Collections.singleton(authorAlias));
+            String result = objectMapper.writeValueAsString(Collections.singleton(authorAlias.get()));
             return result;
         } else {
-            List<AuthorAlias> authorAliasList = authorAliasRepository.findByAliasContains(input);
-            if (authorAliasList == null) {
-                return objectMapper.writeValueAsString("[]");
+            List<AuthorAlias> authorAliasList = authorAliasService.findByAliasContains(input);
+            if (authorAliasList.isEmpty()) {
+                return objectMapper.writeValueAsString(null);
             }
             String result = objectMapper.writeValueAsString(authorAliasList);
             return result;
@@ -99,16 +99,16 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         simpleModule.addSerializer(Author.class, new ArtistSerializer(Author.class));
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
-            Author author = authorRepository.findByName(input);
-            if (author == null) {
-                return objectMapper.writeValueAsString("[]");
+            Optional<Author> author = authorService.findByName(input);
+            if (author.isEmpty()) {
+                return objectMapper.writeValueAsString(null);
             }
-            String result = objectMapper.writeValueAsString(Collections.singleton(author));
+            String result = objectMapper.writeValueAsString(Collections.singleton(author.get()));
             return result;
         } else {
-            List<Author> authorList = authorRepository.findByNameContains(input);
+            List<Author> authorList = authorService.findByNameContains(input);
             if (authorList == null) {
-                return objectMapper.writeValueAsString("[]");
+                return objectMapper.writeValueAsString(null);
             }
             String result = objectMapper.writeValueAsString(authorList);
             return result;
@@ -119,7 +119,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
     public @ResponseBody String readArtistsForMgmt(Model model, @PathVariable("input") String input) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         if (input.isEmpty()) {
-            return objectMapper.writeValueAsString("[]");
+            return objectMapper.writeValueAsString(null);
         }
         SimpleModule simpleModule = new SimpleModule();
         ArtistMgmtSerializer artistMgmtSerializer = new ArtistMgmtSerializer(Author.class);
@@ -127,16 +127,16 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         simpleModule.addSerializer(Author.class, artistMgmtSerializer);
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
-            Author author = authorRepository.findByName(input);
-            if (author == null) {
-                return objectMapper.writeValueAsString("[]");
+            Optional<Author> author = authorService.findByName(input);
+            if (author.isEmpty()) {
+                return objectMapper.writeValueAsString(null);
             }
             String result = objectMapper.writeValueAsString(Collections.singleton(author));
             return result;
         } else {
-            List<Author> authorList = authorRepository.findByNameContains(input);
+            List<Author> authorList = authorService.findByNameContains(input);
             if (authorList == null) {
-                return objectMapper.writeValueAsString("[]");
+                return objectMapper.writeValueAsString(null);
             }
             String result = objectMapper.writeValueAsString(authorList);
             return result;
@@ -144,16 +144,19 @@ public class ArtistController extends BaseControllerWithErrorHandling {
     }
 
     @PutMapping(value = "/merge", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String mergeArtists(@RequestBody String formData) throws JsonProcessingException {
+    public @ResponseBody String mergeArtists(@RequestBody String formData) throws Exception {
         Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
-        String authorToMerge = (String) mergeInfo.get("authorToMergeId");
-        String targetAuthor = (String) mergeInfo.get("targetAuthorId");
-        Author authorToDelete = authorRepository.findById(Integer.valueOf(authorToMerge)).get();
-        AuthorAlias existingAuthorAlias = authorAliasRepository.findByAlias(authorToDelete.getName());
-        Author authorToUpdate = authorRepository.findById(Integer.valueOf(targetAuthor)).get();
-        AuthorAlias authorAlias = new AuthorAlias();
-        authorAlias.setAlias(authorToDelete.getName());
-        authorAlias.setAuthor(authorToUpdate);
+        int authorToMerge = (int) mergeInfo.get("authorToMergeId");
+        int targetAuthor = (int) mergeInfo.get("targetAuthorId");
+        Author authorToDelete =
+                authorService.findById(authorToMerge).orElseThrow(() -> new Exception("No author " +
+                        "with id found" + authorToMerge ));
+        AuthorAlias existingAuthorAlias =
+                authorAliasService.findByAlias(authorToDelete.getName()).orElseThrow(() -> new Exception("No alias " +
+                        "with input found " + authorToDelete.getName()));
+        Author authorToUpdate = authorService.findById(targetAuthor).orElseThrow(() -> new Exception("No author with " +
+                "id found " + targetAuthor));
+        AuthorAlias authorAlias = new AuthorAlias(authorToUpdate,authorToDelete.getName());
         authorAlias = authorAliasRepository.save(authorAlias);
         List<AuthorSong> songsToReassign = authorSongRepository.findByAuthorAlias(existingAuthorAlias);
         for (AuthorSong authorSong : songsToReassign) {
@@ -225,10 +228,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 authorSongRepository.saveAll(authorSongs);
                 authorAliasRepository.delete(authorAlias);
             } else if (valueToGet.contains("NEW")) {
-                AuthorAlias authorAlias = new AuthorAlias();
                 String actualNewAlias = valueToGet.replace("NEW-", "");
-                authorAlias.setAlias(actualNewAlias);
-                authorAlias.setAuthor(author);
+                AuthorAlias authorAlias = new AuthorAlias(author,actualNewAlias);
                 authorAliasRepository.save(authorAlias);
             } else if (valueToGet.contains("EXISTING")) {
                 String[] existingAlias = valueToGet.split("-VAL-");

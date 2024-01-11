@@ -39,8 +39,10 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
                 type: "GET",
                 url: "/author/authorNameMgmt/" + $(mySelect).val(),
                 success: function (ooo) {
-                    foundArtist = JSON.parse(ooo);
-                    response(foundArtist);
+                        foundArtist = JSON.parse(ooo);
+                        if (result){
+                            response(foundArtist);
+                        }
                 },
                 error: function (ooo) {
                     console.log("e2");
@@ -258,7 +260,10 @@ function setupAutocompleteCountry(mySelect, mySelectHidden, valueToSet) {
                 type: "GET",
                 url: "/country/countryName/" + $(mySelect).val(),
                 success: function (ooo) {
-                    response(JSON.parse(ooo));
+                        var result = JSON.parse(ooo);
+                        if (result){
+                            response(result);
+                        }
                 },
                 error: function (ooo) {
                     console.log("e2");
@@ -287,7 +292,10 @@ function setupAutocompleteAliasArtistMgmt(mySelect, mySelectHidden, valueToSet) 
                 type: "GET",
                 url: "/author/aliasName/" + $(mySelect).val(),
                 success: function (ooo) {
-                    response(JSON.parse(ooo));
+                        var result = JSON.parse(ooo);
+                        if (result){
+                            response(result);
+                        }
                 },
                 error: function (ooo) {
                     console.log("e2");

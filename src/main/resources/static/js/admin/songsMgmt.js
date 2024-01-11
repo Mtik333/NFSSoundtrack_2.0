@@ -287,7 +287,10 @@ $(document).ready(function () {
                     type: "GET",
                     url: "/author/authorName/" + $(mySelect).val(),
                     success: function (ooo) {
-                        response(JSON.parse(ooo));
+                        var result = JSON.parse(ooo);
+                        if (result){
+                            response(result);
+                        }
                     },
                     error: function (ooo) {
                         console.log("e2");
@@ -322,7 +325,10 @@ $(document).ready(function () {
                     type: "GET",
                     url: "/author/aliasName/" + $(mySelect).val(),
                     success: function (ooo) {
-                        response(JSON.parse(ooo));
+                        var result = JSON.parse(ooo);
+                        if (result){
+                            response(result);
+                        }
                     },
                     error: function (ooo) {
                         console.log("e2");
@@ -350,7 +356,10 @@ $(document).ready(function () {
                     type: "GET",
                     url: "/genre/genreName/" + $(mySelect).val(),
                     success: function (ooo) {
-                        response(JSON.parse(ooo));
+                        var result = JSON.parse(ooo);
+                        if (result){
+                            response(result);
+                        }
                     },
                     error: function (ooo) {
                         console.log("e2");
@@ -378,7 +387,10 @@ $(document).ready(function () {
                     type: "GET",
                     url: "/author/authorAlias/" + valueToSet,
                     success: function (ooo) {
-                        response(JSON.parse(ooo));
+                        var result = JSON.parse(ooo);
+                        if (result){
+                            response(result);
+                        }
                     },
                     error: function (ooo) {
                         console.log("e2");

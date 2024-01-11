@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class GenreController extends BaseControllerWithErrorHandling {
     public @ResponseBody String readAliases(Model model, @PathVariable("input") String input) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         if (input.isEmpty()) {
-            return objectMapper.writeValueAsString("[]");
+            return objectMapper.writeValueAsString(null);
         }
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(Genre.class, new GenreSerializer(Genre.class));
@@ -40,14 +41,14 @@ public class GenreController extends BaseControllerWithErrorHandling {
         if (input.length() <= 3) {
             Genre genre = genreRepository.findByGenreName(input);
             if (genre == null) {
-                return objectMapper.writeValueAsString("[]");
+                return objectMapper.writeValueAsString(null);
             }
             String result = objectMapper.writeValueAsString(Collections.singleton(genre));
             return result;
         } else {
             List<Genre> genreList = genreRepository.findByGenreNameContains(input);
             if (genreList == null) {
-                return objectMapper.writeValueAsString("[]");
+                return objectMapper.writeValueAsString(null);
             }
             String result = objectMapper.writeValueAsString(genreList);
             return result;

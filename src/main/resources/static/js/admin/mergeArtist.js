@@ -42,8 +42,8 @@ $(document).ready(function () {
         var authorToMerge = $("#authorMergeInputHidden").val();
         var targetAuthor = $("#targetAuthorInputHidden").val();
         var objToSubmit = new Object();
-        objToSubmit.authorToMergeId=authorToMerge;
-        objToSubmit.targetAuthorId=targetAuthor;
+        objToSubmit.authorToMergeId=Number(authorToMerge);
+        objToSubmit.targetAuthorId=Number(targetAuthor);
         $('#success-alert').hide();
         $.ajax({
             async: false,
@@ -77,8 +77,10 @@ function setupAutocompleteMergeArtist(mySelect, mySelectHidden, valueToSet) {
                 type: "GET",
                 url: "/author/authorNameMgmt/" + $(mySelect).val(),
                 success: function (ooo) {
-                    foundArtist = JSON.parse(ooo);
-                    response(foundArtist);
+                        var foundArtist = JSON.parse(ooo);
+                        if (result){
+                            response(foundArtist);
+                        }
                 },
                 error: function (ooo) {
                     console.log("e2");

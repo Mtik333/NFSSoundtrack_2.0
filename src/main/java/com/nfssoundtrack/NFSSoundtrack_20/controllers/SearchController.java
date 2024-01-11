@@ -46,7 +46,7 @@ public class SearchController extends BaseControllerWithErrorHandling {
             System.out.println("well...");
         } else if (searchData.length() <= 3) {
             //treat as exact input
-            AuthorAlias authorAlias = authorAliasRepository.findByAlias(searchData.trim());
+            AuthorAlias authorAlias = authorAliasRepository.findByAlias(searchData.trim()).get();
             if (authorAlias != null) {
                 authorAliases.add(authorAlias);
             }
@@ -56,7 +56,7 @@ public class SearchController extends BaseControllerWithErrorHandling {
             boolean fullPhraseSearch = searchData.contains("\"");
             if (fullPhraseSearch) {
                 searchData = searchData.replaceAll("\"", "");
-                AuthorAlias authorAlias = authorAliasRepository.findByAlias(searchData.trim());
+                AuthorAlias authorAlias = authorAliasRepository.findByAlias(searchData.trim()).get();
                 if (authorAlias != null) {
                     authorAliases.add(authorAlias);
                 }

@@ -78,7 +78,7 @@ public class SongController {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
         if (formData.isEmpty()) {
-            return objectMapper.writeValueAsString("[]");
+            return objectMapper.writeValueAsString(null);
         }
         String band = (String) mergeInfo.get("band");
         String title = (String) mergeInfo.get("title");
@@ -86,7 +86,7 @@ public class SongController {
         if (!matchingSongs.isEmpty()) {
             return objectMapper.writeValueAsString(matchingSongs.get(0));
         } else {
-            return objectMapper.writeValueAsString("[]");
+            return objectMapper.writeValueAsString(null);
         }
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,14 +44,14 @@ public class CountryController extends BaseControllerWithErrorHandling {
         if (input.length() <= 3) {
             Country country = countryRepository.findByCountryName(input);
             if (country == null) {
-                return objectMapper.writeValueAsString("[]");
+                return objectMapper.writeValueAsString(null);
             }
             String result = objectMapper.writeValueAsString(Collections.singleton(country));
             return result;
         } else {
             List<Country> countryList = countryRepository.findByCountryNameContains(input);
             if (countryList == null) {
-                return objectMapper.writeValueAsString("[]");
+                return objectMapper.writeValueAsString(null);
             }
             String result = objectMapper.writeValueAsString(countryList);
             return result;
