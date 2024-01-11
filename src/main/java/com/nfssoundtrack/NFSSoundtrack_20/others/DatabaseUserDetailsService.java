@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabaseUserDetailsService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseUserDetailsService.class);
+
     @Autowired
     UserRepository userRepository;
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Country;
-import com.nfssoundtrack.NFSSoundtrack_20.others.CountrySerializer;
+import com.nfssoundtrack.NFSSoundtrack_20.serializers.CountrySerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.CountryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

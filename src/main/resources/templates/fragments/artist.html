@@ -125,7 +125,7 @@
                             /
                             <span th:text="'Associated genres: '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
-                                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
                     </td>
@@ -137,7 +137,7 @@
                             /
                             <span th:text="'Associated genres: '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
-                                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block> -->
 
@@ -206,7 +206,7 @@
                             -
                             <span th:text="'Associated genres: '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
-                                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
                     </td>
@@ -275,7 +275,7 @@
                             -
                             <span th:text="'Associated genres: '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
-                                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
                     </td>
@@ -344,7 +344,7 @@
                             -
                             <span th:text="'Associated genres: '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
-                                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
                     </td>

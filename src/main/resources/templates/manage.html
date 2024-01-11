@@ -47,7 +47,7 @@
             <th:block th:insert="~{fragments/leftmenumanage.html}"></th:block>
             <div class="col" id="nfs-content">
                 <div th:replace="~{fragments/topmenuentry.html}"></div>
-                <div th:if="${gamegroups!=null}" th:replace="~{fragments/gamecontent.html}"></div>
+                <div th:if="${gamegroups}" th:replace="~{fragments/gamecontent.html}"></div>
             </div>
         </div>
         <!--</div>-->

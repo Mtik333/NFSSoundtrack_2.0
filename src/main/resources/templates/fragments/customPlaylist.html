@@ -100,7 +100,7 @@
                     <td>
                         <th:block th:each="songGenre,iter : ${songSubgroup.song.songGenreList}">
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
-                                th:href="'/genre/read/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
                     </td>

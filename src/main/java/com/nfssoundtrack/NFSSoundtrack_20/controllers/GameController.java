@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.GameStatus;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Serie;
-import com.nfssoundtrack.NFSSoundtrack_20.others.GameEditSerializer;
+import com.nfssoundtrack.NFSSoundtrack_20.serializers.GameEditSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
 import org.slf4j.Logger;

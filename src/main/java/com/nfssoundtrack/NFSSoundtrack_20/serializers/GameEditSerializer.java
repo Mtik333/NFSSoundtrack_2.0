@@ -1,9 +1,10 @@
-package com.nfssoundtrack.NFSSoundtrack_20.others;
+package com.nfssoundtrack.NFSSoundtrack_20.serializers;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
+import com.nfssoundtrack.NFSSoundtrack_20.serializers.GameSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

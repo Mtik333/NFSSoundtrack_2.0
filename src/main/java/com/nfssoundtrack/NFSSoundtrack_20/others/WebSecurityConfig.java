@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -29,17 +30,16 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.disable())
-                .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
+                .cors(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/manage/manage", "/manage/manage#",
-                                "/maingroup/**", "/songSubgroup/**", "/subgroup/**")
+                        .requestMatchers("/manage/manage", "/manage/manage#","/serie/**","/country/**",
+                                "/maingroup/**", "/songSubgroup/**", "/subgroup/**", "/gamedb/**")
                         .hasAuthority("ADMIN"))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
                                 "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
-                                "/serie/**", "/country/**", "/gamedb/**", "/custom/**", "/song/**",
-                                "/songinfo/**", "/favicon.ico").permitAll()
+                                "/custom/playlist", "/song/**", "/songinfo/**", "/favicon.ico").permitAll()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
@@ -52,7 +52,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .permitAll()).userDetailsService(databaseUserDetailsService);
         return http.build();
     }
-
 
     @Bean
     public LocaleResolver localeResolver() {
