@@ -92,16 +92,12 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 mainComposer = new Author();
                 mainComposer.setName(newAuthor);
                 mainComposer = authorRepository.save(mainComposer);
-                composerAlias = new AuthorAlias();
-                composerAlias.setAuthor(mainComposer);
-                composerAlias.setAlias(newAuthor);
+                composerAlias = new AuthorAlias(mainComposer,newAuthor);
             } else {
                 Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
                 if (mainAliasId.startsWith("NEW")) {
                     String newAlias = mainAliasId.replace("NEW-", "");
-                    composerAlias = new AuthorAlias();
-                    composerAlias.setAlias(newAlias);
-                    composerAlias.setAuthor(author);
+                    composerAlias = new AuthorAlias(author,newAlias);
                     composerAlias = authorAliasRepository.save(composerAlias);
                 } else {
                     composerAlias = authorAliasRepository.findById(Integer.valueOf(mainAliasId)).get();
@@ -269,9 +265,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         Author author = new Author();
         author.setName(actualRemixValue);
         author = authorRepository.save(author);
-        AuthorAlias authorAlias = new AuthorAlias();
-        authorAlias.setAuthor(author);
-        authorAlias.setAlias(actualRemixValue);
+        AuthorAlias authorAlias = new AuthorAlias(author,actualRemixValue);
         authorAlias = authorAliasRepository.save(authorAlias);
         AuthorSong authorSong = new AuthorSong();
         authorSong.setSong(songSubgroup.getSong());
@@ -474,17 +468,13 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                     mainComposer = new Author();
                     mainComposer.setName(newAuthor);
                     mainComposer = authorRepository.save(mainComposer);
-                    composerAlias = new AuthorAlias();
-                    composerAlias.setAuthor(mainComposer);
-                    composerAlias.setAlias(newAuthor);
+                    composerAlias = new AuthorAlias(mainComposer,newAuthor);
                     composerAlias = authorAliasRepository.save(composerAlias);
                 } else {
                     Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
                     if (mainAliasId.startsWith("NEW")) {
                         String newAlias = mainAliasId.replace("NEW-", "");
-                        composerAlias = new AuthorAlias();
-                        composerAlias.setAlias(newAlias);
-                        composerAlias.setAuthor(author);
+                        composerAlias = new AuthorAlias(author,newAlias);
                         composerAlias = authorAliasRepository.save(composerAlias);
                     } else {
                         composerAlias = authorAliasRepository.findById(Integer.valueOf(mainAliasId)).get();
