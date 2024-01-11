@@ -339,7 +339,11 @@ tr.rolegroup-separator{
 }
 
 #subgroupsDropdown{
-white-space: normal;
+    white-space: normal;
+}
+
+.preferences{
+    background-color: #ECEEC7;
 }
 
 @media screen and (min-width: 1080px) {

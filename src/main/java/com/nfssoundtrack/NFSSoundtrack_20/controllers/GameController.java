@@ -3,6 +3,7 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.GameStatus;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Serie;
@@ -22,7 +23,9 @@ import java.util.Map;
 @Controller
 @RequestMapping(path = "/gamedb")
 public class GameController extends BaseControllerWithErrorHandling {
+
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
+
     @Autowired
     SerieRepository serieRepository;
 
@@ -30,20 +33,23 @@ public class GameController extends BaseControllerWithErrorHandling {
     GameRepository gameRepository;
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String saveNewGame(@RequestBody String formData) throws JsonProcessingException {
-        Map<?, ?> gameProps = new ObjectMapper().readValue(formData, Map.class);
-        String serieId = (String) gameProps.get("serieId");
-        Serie currentSerie = serieRepository.findById(Integer.valueOf(serieId)).get();
-        String gameTitle = (String) gameProps.get("gameTitle");
-        String displayTitle = (String) gameProps.get("displayTitle");
-        String gameShort = (String) gameProps.get("gameShort");
-        String gamePrefix = (String) gameProps.get("gamePrefix");
-        GameStatus gameStatus = GameStatus.valueOf((String) gameProps.get("gameStatus"));
-        String spotifyId = (String) gameProps.get("spotifyId");
-        String deezerId = (String) gameProps.get("deezerId");
-        String tidalId = (String) gameProps.get("tidalId");
-        String youtubeId = (String) gameProps.get("youtubeId");
-        String soundcloudId = (String) gameProps.get("soundcloudId");
+    public @ResponseBody String saveNewGame(@RequestBody String formData) throws Exception {
+        Map<String, String> gameProps = new ObjectMapper().readValue(formData,
+                TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class));
+        String serieId = gameProps.get("serieId");
+        Serie currentSerie = serieService.findById(Integer.parseInt(serieId)).orElseThrow(() -> new Exception("No " +
+                "serie with id found " + serieId));
+        Game game = new Game();
+        String gameTitle = gameProps.get("gameTitle");
+        String displayTitle = gameProps.get("displayTitle");
+        String gameShort = gameProps.get("gameShort");
+        String gamePrefix = gameProps.get("gamePrefix");
+        GameStatus gameStatus = GameStatus.valueOf(gameProps.get("gameStatus"));
+        String spotifyId = gameProps.get("spotifyId");
+        String deezerId = gameProps.get("deezerId");
+        String tidalId = gameProps.get("tidalId");
+        String youtubeId = gameProps.get("youtubeId");
+        String soundcloudId =gameProps.get("soundcloudId");
         Game newGame = new Game();
         newGame.setSerie(currentSerie);
         newGame.setGameTitle(gameTitle);
@@ -86,6 +92,7 @@ public class GameController extends BaseControllerWithErrorHandling {
 
     @PutMapping(value = "/put", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String modifyGame(@RequestBody String formData) throws JsonProcessingException {
+		//readerforupdating
         Map<?, ?> gameProps = new ObjectMapper().readValue(formData, Map.class);
         String id = gameProps.get("id").toString();
         String gameTitle = (String) gameProps.get("gameTitle");

@@ -7,7 +7,7 @@ $(document).ready(function () {
         $.ajax({
             async: false,
             type: "GET",
-            url: "/gamedb/read/" + gameId,
+            url: "/gamedb/read/" + Number(gameId),
             success: function (ooo) {
                 gameToEdit = JSON.parse(ooo);
                 var divToAppend = $('#nfs-content');

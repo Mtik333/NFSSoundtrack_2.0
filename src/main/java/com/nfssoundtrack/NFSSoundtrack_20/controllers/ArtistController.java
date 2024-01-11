@@ -3,6 +3,7 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.ArtistMgmtSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.ArtistSerializer;
@@ -25,31 +26,10 @@ import java.util.stream.Collectors;
 public class ArtistController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(ArtistController.class);
-    @Value("${spring.application.name}")
-    String appName;
-    @Autowired
-    AuthorRepository authorRepository;
-
-    @Autowired
-    AuthorSongRepository authorSongRepository;
 
     @Autowired
     AuthorAliasRepository authorAliasRepository;
 
-    @Autowired
-    private SerieRepository serieRepository;
-
-    @Autowired
-    private SongRepository songRepository;
-
-    @Autowired
-    private SongSubgroupRepository songSubgroupRepository;
-
-    @Autowired
-    private AuthorCountryRepository authorCountryRepository;
-
-    @Autowired
-    CountryRepository countryRepository;
 
     @GetMapping(value = "/authorAlias/{input}")
     public @ResponseBody String readAliasesFromArtist(Model model, @PathVariable("input") int input) throws Exception {
@@ -157,56 +137,58 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         Author authorToUpdate = authorService.findById(targetAuthor).orElseThrow(() -> new Exception("No author with " +
                 "id found " + targetAuthor));
         AuthorAlias authorAlias = new AuthorAlias(authorToUpdate,authorToDelete.getName());
-        authorAlias = authorAliasRepository.save(authorAlias);
-        List<AuthorSong> songsToReassign = authorSongRepository.findByAuthorAlias(existingAuthorAlias);
+        authorAlias = authorAliasService.save(authorAlias);
+        List<AuthorSong> songsToReassign =
+                authorSongService.findByAuthorAlias(existingAuthorAlias);
         for (AuthorSong authorSong : songsToReassign) {
             authorSong.setAuthorAlias(authorAlias);
         }
-        authorSongRepository.saveAll(songsToReassign);
+        authorSongService.saveAll(songsToReassign);
         List<AuthorCountry> authorCountries = authorToDelete.getAuthorCountries();
-        authorCountryRepository.deleteAll(authorCountries);
-        List<AuthorAlias> aliasesToDelete = authorAliasRepository.findByAuthor(authorToDelete);
-        authorAliasRepository.deleteAll(aliasesToDelete);
-        authorRepository.delete(authorToDelete);
+        authorCountryService.deleteAll(authorCountries);
+        List<AuthorAlias> aliasesToDelete = authorAliasService.findByAuthor(authorToDelete);
+        authorAliasService.deleteAll(aliasesToDelete);
+        authorService.delete(authorToDelete);
         return new ObjectMapper().writeValueAsString("OK");
     }
 
     @PutMapping(value = "/put", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String updateArtist(@RequestBody String formData) throws JsonProcessingException {
-        Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
+    public @ResponseBody String updateArtist(@RequestBody String formData) throws Exception {
+        Map<String, ?> mergeInfo = new ObjectMapper().readValue(formData,
+                TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class));
         String authorId = (String) mergeInfo.get("authorId");
         String authorName = (String) mergeInfo.get("authorName");
-        Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
+        Author author = authorService.findById(Integer.parseInt(authorId)).get();
         author.setName(authorName);
-        AuthorAlias rootAlias = authorAliasRepository.findByAuthor(author).get(0);
+        AuthorAlias rootAlias = authorAliasService.findByAuthor(author).get(0);
         List<AuthorCountry> existingCountries = author.getAuthorCountries();
-        List<String> countryInfos = (List<String>) mergeInfo.keySet().stream().filter(o -> o.toString().contains("countryInfo")).collect(Collectors.toList());
-        List<String> aliasInfos = (List<String>) mergeInfo.keySet().stream().filter(o -> o.toString().contains("aliasInfo")).collect(Collectors.toList());
+        List<String> countryInfos = mergeInfo.keySet().stream().filter(
+                o -> o.contains("countryInfo")).toList();
+        List<String> aliasInfos = mergeInfo.keySet().stream().filter(o -> o.contains("aliasInfo")).toList();
         List<String> targetCountrIds = new ArrayList<>();
-        Set<AuthorCountry> countriesToCreate = new HashSet<>();
-        Set<AuthorCountry> countriesToUnlink = new HashSet<>();
+        List<AuthorCountry> countriesToCreate = new ArrayList<>();
+        List<AuthorCountry> countriesToUnlink = new ArrayList<>();
         for (String countryInfo : countryInfos) {
             String valueToGet = (String) mergeInfo.get(countryInfo);
             if (valueToGet.contains("DELETE")) {
                 String actualCountryId = valueToGet.replace("DELETE-", "");
-                AuthorCountry authorCountryToDelete = existingCountries.stream().filter(authorCountry -> authorCountry.getCountry().getId()
-                        .equals(Long.parseLong(actualCountryId))).findFirst().get();
-                countriesToUnlink.add(authorCountryToDelete);
-//                countriesToUnlink.add(authorCountry);
+                Optional<AuthorCountry> authorCountryToDelete =
+                        existingCountries.stream().filter(authorCountry -> authorCountry.getCountry().getId()
+                        .equals(Long.parseLong(actualCountryId))).findFirst();
+                authorCountryToDelete.ifPresent(countriesToUnlink::add);
             } else {
                 String countryId = (String) mergeInfo.get(countryInfo);
                 Optional<AuthorCountry> optionalAuthorCountry = existingCountries.stream().filter(authorCountry
                         -> authorCountry.getCountry().getId()
                         .equals(Long.parseLong(countryId))).findFirst();
                 if (optionalAuthorCountry.isEmpty()) {
-                    AuthorCountry authorCountry = new AuthorCountry();
-                    authorCountry.setAuthor(author);
-                    Country country = countryRepository.findById(Long.valueOf(countryId));
-                    authorCountry.setCountry(country);
-                    countriesToCreate.add(authorCountry);
+                    Optional<Country> country = countryService.findById(Integer.parseInt(countryId));
+                    if (country.isPresent()){
+                        AuthorCountry authorCountry = new AuthorCountry(author,country.get());
+                        countriesToCreate.add(authorCountry);
+                    }
                 }
                 targetCountrIds.add(countryId);
-
             }
         }
         for (AuthorCountry authorCountry : existingCountries) {
@@ -214,33 +196,36 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 countriesToUnlink.add(authorCountry);
             }
         }
-        authorCountryRepository.deleteAll(countriesToUnlink);
-        authorCountryRepository.saveAll(countriesToCreate);
+        authorCountryService.deleteAll(countriesToUnlink);
+        authorCountryService.saveAll(countriesToCreate);
         for (String aliasInfo : aliasInfos) {
             String valueToGet = (String) mergeInfo.get(aliasInfo);
             if (valueToGet.contains("DELETE")) {
                 String actualAliasId = valueToGet.replace("DELETE-", "");
-                AuthorAlias authorAlias = authorAliasRepository.findById(Integer.valueOf(actualAliasId)).get();
-                List<AuthorSong> authorSongs = authorSongRepository.findByAuthorAlias(authorAlias);
+                AuthorAlias authorAlias =
+                        authorAliasService.findById(Integer.parseInt(actualAliasId)).orElseThrow(() -> new Exception(
+                                "No authoralias with id found " + actualAliasId));
+                List<AuthorSong> authorSongs = authorSongService.findByAuthorAlias(authorAlias);
                 for (AuthorSong authorSong : authorSongs) {
                     authorSong.setAuthorAlias(rootAlias);
                 }
-                authorSongRepository.saveAll(authorSongs);
-                authorAliasRepository.delete(authorAlias);
+                authorSongService.saveAll(authorSongs);
+                authorAliasService.delete(authorAlias);
             } else if (valueToGet.contains("NEW")) {
                 String actualNewAlias = valueToGet.replace("NEW-", "");
                 AuthorAlias authorAlias = new AuthorAlias(author,actualNewAlias);
-                authorAliasRepository.save(authorAlias);
+                authorAliasService.save(authorAlias);
             } else if (valueToGet.contains("EXISTING")) {
                 String[] existingAlias = valueToGet.split("-VAL-");
                 String existingId = existingAlias[0].replace("EXISTING-", "");
-                AuthorAlias authorAlias = authorAliasRepository.findById(Integer.valueOf(existingId)).get();
+                AuthorAlias authorAlias =
+                        authorAliasService.findById(Integer.parseInt(existingId)).orElseThrow(() -> new Exception("No" +
+                                " authoralias with id found " + existingId));
                 authorAlias.setAlias(existingAlias[1]);
                 authorAliasRepository.save(authorAlias);
             }
         }
-        authorRepository.save(author);
-//        String authorToMerge = (String) mergeInfo.get("authorToMergeId");
+        authorService.save(author);
         return new ObjectMapper().writeValueAsString("OK");
     }
 }

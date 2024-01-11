@@ -46,4 +46,17 @@ public class AuthorCountry implements Serializable {
     public void setCountry(Country country) {
         this.country = country;
     }
+
+    public AuthorCountry(){
+
+    }
+
+    public AuthorCountry(Author author, Country country) {
+        this.author = author;
+        this.country = country;
+    }
+
+    public AuthorCountry(AuthorCountry authorCountry){
+        this(authorCountry.author,authorCountry.country);
+    }
 }

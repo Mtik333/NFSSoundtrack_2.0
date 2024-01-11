@@ -48,9 +48,6 @@ public class ArtistMgmtSerializer extends StdSerializer<Author> {
             jsonGenerator.writeEndObject();
         }
         jsonGenerator.writeEndArray();
-//        String[] arrayOfAliases = authorAliases.stream().map(AuthorAlias::getAlias).toArray(String[]::new);
-//        jsonGenerator.writeArray(arrayOfAliases,0,arrayOfAliases.length);
-//        jsonGenerator.writeEndArray();
         List<AuthorCountry> authorCountries = author.getAuthorCountries();
         jsonGenerator.writeArrayFieldStart("countries");
         for (AuthorCountry authorCountry : authorCountries) {
@@ -61,11 +58,6 @@ public class ArtistMgmtSerializer extends StdSerializer<Author> {
             jsonGenerator.writeEndObject();
         }
         jsonGenerator.writeEndArray();
-//        jsonGenerator.writeArrayFieldStart("countries");
-//        String[] arrayOfCountries = authorCountries.stream().map(authorCountry -> authorCountry.getCountry().getCountryName())
-//                .toArray(String[]::new);
-//        jsonGenerator.writeArray(arrayOfCountries,0,arrayOfCountries.length);
-//        jsonGenerator.writeEndArray();
         jsonGenerator.writeEndObject();
     }
 }

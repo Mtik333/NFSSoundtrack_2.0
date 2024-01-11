@@ -1,9 +1,11 @@
 package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
 import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorAliasService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorCountryService;
 import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorService;
 import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorSongService;
 import com.nfssoundtrack.NFSSoundtrack_20.services.ContentService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.CountryService;
 import com.nfssoundtrack.NFSSoundtrack_20.services.GameService;
 import com.nfssoundtrack.NFSSoundtrack_20.services.GenreService;
 import com.nfssoundtrack.NFSSoundtrack_20.services.SerieService;
@@ -56,16 +58,20 @@ public class BaseControllerWithErrorHandling implements ErrorController {
 	@Autowired
 	SongGenreService songGenreService;
 
+	@Autowired
+	CountryService countryService;
+
+	@Autowired
+	AuthorCountryService authorCountryService;
+
 	@RequestMapping(value = "/{otherval}")
 	public String nonExistingPagee(Model model, @PathVariable("otherval") String otherval) throws Exception {
 		throw new Exception("Tried to access non-existing page: " + otherval);
-//        return "redirect:/content/home";
 	}
 
 	@ExceptionHandler
 	@ResponseBody
 	public ModelAndView handleException(HttpServletRequest req, Exception ex) {
-//        logger.error("Request: " + req.getRequestURL() + " raised " + ex);
 		ModelAndView mav = new ModelAndView();
 		mav.addObject("exception", ex);
 		mav.addObject("stacktrace", ex.getStackTrace());

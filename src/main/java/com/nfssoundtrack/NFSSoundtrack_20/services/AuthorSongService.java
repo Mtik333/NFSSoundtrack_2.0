@@ -22,4 +22,8 @@ public class AuthorSongService {
 	public Optional<AuthorSong> findById(int id){
 		return authorSongRepository.findById(id);
 	}
+
+	public List<AuthorSong> saveAll(List<AuthorSong> authorSongs){
+		return authorSongRepository.saveAll(authorSongs);
+	}
 }

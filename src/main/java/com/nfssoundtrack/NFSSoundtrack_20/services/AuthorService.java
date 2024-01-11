@@ -25,4 +25,12 @@ public class AuthorService {
 	public List<Author> findByNameContains(String name){
 		return authorRepository.findByNameContains(name);
 	}
+
+	public void delete(Author author){
+		 authorRepository.delete(author);
+	}
+
+	public Author save(Author author){
+		return authorRepository.save(author);
+	}
 }

@@ -19,19 +19,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(path = "/country")
 public class CountryController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(CountryController.class);
-    @Autowired
-    CountryRepository countryRepository;
 
     @GetMapping(value = "/readAll")
     public @ResponseBody String readAliases(Model model) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        List<Country> countries = countryRepository.findAll();
+        List<Country> countries = countryService.findAll();
         return objectMapper.writeValueAsString(countries);
     }
 
@@ -42,15 +41,15 @@ public class CountryController extends BaseControllerWithErrorHandling {
         simpleModule.addSerializer(Country.class, new CountrySerializer(Country.class));
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
-            Country country = countryRepository.findByCountryName(input);
-            if (country == null) {
+            Optional<Country> country = countryService.findByCountryName(input);
+            if (country.isEmpty()) {
                 return objectMapper.writeValueAsString(null);
             }
             String result = objectMapper.writeValueAsString(Collections.singleton(country));
             return result;
         } else {
-            List<Country> countryList = countryRepository.findByCountryNameContains(input);
-            if (countryList == null) {
+            List<Country> countryList = countryService.findByCountryNameContains(input);
+            if (countryList.isEmpty()) {
                 return objectMapper.writeValueAsString(null);
             }
             String result = objectMapper.writeValueAsString(countryList);

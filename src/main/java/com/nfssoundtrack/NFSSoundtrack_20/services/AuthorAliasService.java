@@ -15,6 +15,10 @@ public class AuthorAliasService {
 	@Autowired
 	AuthorAliasRepository authorAliasRepository;
 
+	public Optional<AuthorAlias> findById(int id){
+		return authorAliasRepository.findById(id);
+	}
+
 	public List<AuthorAlias> findByAuthor(Author author){
 		return authorAliasRepository.findByAuthor(author);
 	}
@@ -25,5 +29,17 @@ public class AuthorAliasService {
 
 	public List<AuthorAlias> findByAliasContains(String alias){
 		return authorAliasRepository.findByAliasContains(alias);
+	}
+
+	public AuthorAlias save(AuthorAlias authorAlias){
+		return authorAliasRepository.save(authorAlias);
+	}
+
+	public void delete(AuthorAlias authorAlias){
+		authorAliasRepository.delete(authorAlias);
+	}
+
+	public void deleteAll(List<AuthorAlias> authorAliases){
+		authorAliasRepository.deleteAll(authorAliases);
 	}
 }
