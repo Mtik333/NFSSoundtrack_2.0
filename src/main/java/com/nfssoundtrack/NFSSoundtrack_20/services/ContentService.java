@@ -11,7 +11,7 @@ public class ContentService {
 	@Autowired
 	ContentRepository contentRepository;
 
-	public Content findByContentShort(String contentShort){
+	public Content findByContentShort(String contentShort) {
 		return contentRepository.findByContentShort(contentShort);
 	}
 }

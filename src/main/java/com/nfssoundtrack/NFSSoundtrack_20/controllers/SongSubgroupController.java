@@ -2,571 +2,350 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorAlias;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorCountry;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorSong;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Genre;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Role;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongGenre;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
+import com.nfssoundtrack.NFSSoundtrack_20.deserializers.SongDeserializer;
+import com.nfssoundtrack.NFSSoundtrack_20.deserializers.SongSubgroupDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/songSubgroup")
 public class SongSubgroupController extends BaseControllerWithErrorHandling {
 
-    private static final Logger logger = LoggerFactory.getLogger(SongSubgroupController.class);
-    @Autowired
-    private SubgroupRepository subgroupRepository;
+	private static final Logger logger = LoggerFactory.getLogger(SongSubgroupController.class);
 
-    @Autowired
-    private SongSubgroupRepository songSubgroupRepository;
+	@Autowired
+	SongSubgroupDeserializer songSubgroupDeserializer;
 
-    @Autowired
-    private AuthorRepository authorRepository;
+	@Autowired
+	SongDeserializer songDeserializer;
 
-    @Autowired
-    private AuthorAliasRepository authorAliasRepository;
+	@PutMapping(value = "/positions/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	String putSubgroupPositions(@PathVariable("subgroupId") int subgroupId,
+								@RequestBody String formData) throws Exception {
+		System.out.println("???");
+		List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
+		for (Object obj : objectMapper) {
+			LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
+			long songSubgroupId = Long.parseLong(String.valueOf(linkedHashMap.get("songSubgroupId")));
+			Long position = Long.parseLong(String.valueOf(linkedHashMap.get("position")));
+			SongSubgroup songSubgroup =
+					songSubgroupService.findById(Math.toIntExact(songSubgroupId)).orElseThrow(() -> new Exception("no" +
+							" songsubgroup found with id " + subgroupId));
+			songSubgroup.setPosition(position);
+			songSubgroupService.save(songSubgroup);
+		}
+		return new ObjectMapper().writeValueAsString("OK");
+	}
 
-    @Autowired
-    private AuthorSongRepository authorSongRepository;
+	@PutMapping(value = "/put/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	String putSubgroup(@PathVariable("subgroupId") int subgroupId, @RequestBody String formData)
+			throws JsonProcessingException {
+		try {
+			SongSubgroup songSubgroup = songSubgroupService.findById(subgroupId).orElseThrow(() -> new Exception(
+					"No songsubgroup found with id " + subgroupId));
+			SimpleModule module = new SimpleModule();
+			ObjectMapper objectMapper = new ObjectMapper();
+			module.addDeserializer(SongSubgroup.class, songSubgroupDeserializer);
+			objectMapper.registerModule(module);
+			songSubgroup = objectMapper.readerForUpdating(songSubgroup).readValue(formData, SongSubgroup.class);
+			Map<String, String> localObjectMapper = new ObjectMapper().readValue(formData,
+					TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class));
+			boolean feat = Boolean.parseBoolean(localObjectMapper.get("feat"));
+			boolean subcomposer = Boolean.parseBoolean(localObjectMapper.get("subcomposer"));
+			boolean remix = Boolean.parseBoolean(localObjectMapper.get("remix"));
+			String mainAliasId = localObjectMapper.get("aliasId");
+			String authorId = localObjectMapper.get("authorId");
+			Song relatedSong = songSubgroup.getSong();
+			Author mainComposer;
+			AuthorAlias composerAlias;
+			if (authorId.startsWith("NEW")) {
+				String newAuthor = authorId.replace("NEW-", "");
+				mainComposer = new Author();
+				mainComposer.setName(newAuthor);
+				mainComposer = authorService.save(mainComposer);
+				composerAlias = new AuthorAlias(mainComposer, newAuthor);
+			} else {
+				Author author =
+						authorService.findById(Integer.parseInt(authorId)).orElseThrow(() -> new Exception("No author" +
+								" find id found " + authorId));
+				if (mainAliasId.startsWith("NEW")) {
+					String newAlias = mainAliasId.replace("NEW-", "");
+					composerAlias = new AuthorAlias(author, newAlias);
+					composerAlias = authorAliasService.save(composerAlias);
+				} else {
+					composerAlias = authorAliasService.findById(Integer.parseInt(mainAliasId)).orElseThrow(
+							() -> new Exception("No author" +
+									" find id found " + mainAliasId));
+				}
+				List<AuthorSong> authorSongList = relatedSong.getAuthorSongList();
+				for (AuthorSong authorSong : authorSongList) {
+					if (Role.COMPOSER.equals(authorSong.getRole())) {
+						Author persistedAuthor = authorSong.getAuthorAlias().getAuthor();
+						if (persistedAuthor.equals(author)) {
+							AuthorAlias persistedAuthorAlias = authorSong.getAuthorAlias();
+							if (!persistedAuthorAlias.equals(composerAlias)) {
+								authorSong.setAuthorAlias(composerAlias);
+								authorSongService.save(authorSong);
+							}
+						} else {
+							AuthorSong newAuthorSong = new AuthorSong(composerAlias, relatedSong, Role.COMPOSER);
+							authorSongService.save(newAuthorSong);
+						}
+					}
+				}
+			}
+			if (subcomposer) {
+				songSubgroupService.updateFeat(localObjectMapper, "subcomposerSelect",
+						"subcomposerConcatInput", songSubgroup, Role.SUBCOMPOSER, relatedSong);
+			}
+			if (feat) {
+				songSubgroupService.updateFeat(localObjectMapper, "featSelect",
+						"featConcatInput", songSubgroup, Role.FEAT, relatedSong);
+			}
+			if (remix) {
+				songSubgroupService.updateFeat(localObjectMapper, "remixSelect",
+						"remixConcatInput", songSubgroup, Role.REMIX, relatedSong);
+			}
+			songSubgroupService.save(songSubgroup);
+			return new ObjectMapper().writeValueAsString("OK");
+		} catch (Throwable thr) {
+			return new ObjectMapper().writeValueAsString(thr);
+		}
+	}
 
-    @Autowired
-    private SongGenreRepository songGenreRepository;
+	@GetMapping(value = "/read/{songSubgroup}")
+	public @ResponseBody
+	String readAllSubgroupManage(@PathVariable("songSubgroup") int songSubgroupId)
+			throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper();
+		SongSubgroup songSubgroup =
+				songSubgroupService.findById(songSubgroupId).orElseThrow(() ->
+						new Exception("No subgroup with id found " + songSubgroupId));
+		return objectMapper.writeValueAsString(songSubgroup);
+	}
 
-    @Autowired
-    private GenreRepository genreRepository;
+	@DeleteMapping(value = "/delete/{subgroupId}")
+	public @ResponseBody
+	String deleteSongSubgroup(@PathVariable("subgroupId") int subgroupId) throws JsonProcessingException {
+		try {
+			SongSubgroup songSubgroup =
+					songSubgroupService.findById(subgroupId).orElseThrow(() -> new Exception("No subgroup found " +
+							"with id " + subgroupId));
+			Song song = songSubgroup.getSong();
+			List<SongSubgroup> allSongSubgroupEntries = songSubgroupService.findBySong(song);
+			if (allSongSubgroupEntries.size() == 1) {
+				//means we basically have to delete song entirely to avoid orphans
+				List<SongGenre> songGenresToDelete = song.getSongGenreList();
+				List<Genre> genresToDelete = new ArrayList<>();
+				for (SongGenre songGenre : songGenresToDelete) {
+					Genre genre = songGenre.getGenre();
+					List<SongGenre> allUsagesOfGenre = songGenreService.findByGenre(genre);
+					if (allUsagesOfGenre.size() == 1) {
+						genresToDelete.add(genre);
+					}
+				}
+				List<AuthorSong> authorsOfSong = song.getAuthorSongList();
+				List<AuthorAlias> authorAliasToDelete = new ArrayList<>();
+				List<Author> authorsToDelete = new ArrayList<>();
+				List<AuthorCountry> authorCountriesToDelete = new ArrayList<>();
+				for (AuthorSong authorSong : authorsOfSong) {
+					Author author = authorSong.getAuthorAlias().getAuthor();
+					List<AuthorSong> allUsagesOfAlias = authorSongService.findByAuthorAlias(
+							authorSong.getAuthorAlias());
+					if (allUsagesOfAlias.size() == 1) {
+						authorAliasToDelete.add(authorSong.getAuthorAlias());
+						List<AuthorAlias> authorAliases = authorAliasService.findByAuthor(author);
+						if (authorAliases.size() == 1) {
+							authorsToDelete.add(author);
+							authorCountriesToDelete.addAll(author.getAuthorCountries());
+						}
+					}
+				}
+				authorSongService.deleteAll(authorsOfSong);
+				if (!authorsToDelete.isEmpty()) {
+					authorCountryService.deleteAll(authorCountriesToDelete);
+					authorAliasService.deleteAll(authorAliasToDelete);
+					authorService.deleteAll(authorsToDelete);
+				}
+				songGenreService.deleteAll(songGenresToDelete);
+				if (!genresToDelete.isEmpty()) {
+					genreService.deleteAll(genresToDelete);
+				}
+				songSubgroupService.delete(songSubgroup);
+				songService.delete(song);
+			} else {
+				songSubgroupService.delete(songSubgroup);
+			}
+			return new ObjectMapper().writeValueAsString("OK");
+		} catch (Throwable thr) {
+			return new ObjectMapper().writeValueAsString(thr);
+		}
+	}
 
-    @Autowired
-    private AuthorCountryRepository authorCountryRepository;
+	@PutMapping(value = "/putGlobally/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	String putGlobally(@PathVariable("subgroupId") int subgroupId,
+					   @RequestBody String formData) throws JsonProcessingException {
+		try {
+			SongSubgroup songSubgroup = songSubgroupService.findById(subgroupId).orElseThrow(() -> new Exception(
+					"No song subgroup with id found " + subgroupId));
+			Song relatedSong = songSubgroup.getSong();
+			SimpleModule module = new SimpleModule();
+			ObjectMapper objectMapper = new ObjectMapper();
+			module.addDeserializer(Song.class, songDeserializer);
+			objectMapper.registerModule(module);
+			relatedSong = objectMapper.readerForUpdating(relatedSong).readValue(formData, Song.class);
+			Map<String, String> localObjectMapper = new ObjectMapper().readValue(formData,
+					TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class));
+			List<String> comingGenres = localObjectMapper.keySet().stream().filter(
+					o -> o.contains("genreSelect")).toList();
+			for (String comingGenre : comingGenres) {
+				String keyGenre = comingGenre;
+				String genreValue = localObjectMapper.get(keyGenre);
+				if (genreValue.startsWith("NEW")) {
+					String actualGenreValue = genreValue.replace("NEW-", "");
+					Genre genre = new Genre();
+					genre.setGenreName(actualGenreValue);
+					genre = genreService.save(genre);
+					SongGenre songGenre = new SongGenre(songSubgroup.getSong(), genre);
+					songGenreService.save(songGenre);
+				} else if (genreValue.startsWith("DELETE")) {
+					String deleteGenreId = genreValue.replace("DELETE-", "");
+					Genre genre = genreService.findById(Integer.parseInt(deleteGenreId))
+							.orElseThrow(() -> new Exception("No genre found with id " + deleteGenreId));
+					List<SongGenre> existingGenres = songSubgroup.getSong().getSongGenreList();
+					for (SongGenre songGenre : existingGenres) {
+						if (songGenre.getGenre().equals(genre)) {
+							songGenreService.delete(songGenre);
+							break;
+						}
+					}
+				} else {
+					songService.saveNewAssignmentOfExistingGenre(genreValue, songSubgroup.getSong());
+				}
+			}
+			songService.save(relatedSong);
+			return new ObjectMapper().writeValueAsString("OK");
+		} catch (Throwable thr) {
+			return new ObjectMapper().writeValueAsString(thr);
+		}
+	}
 
-    @Autowired
-    private SongRepository songRepository;
-
-    @PutMapping(value = "/positions/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String putSubgroupPositions(@PathVariable("subgroupId") String subgroupId, @RequestBody String formData) throws JsonProcessingException {
-        System.out.println("???");
-        Subgroup subgroup = subgroupRepository.getReferenceById(Integer.valueOf(subgroupId));
-        List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
-        for (Object obj : objectMapper) {
-            LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
-            Long songSubgroupId = Long.parseLong(String.valueOf(linkedHashMap.get("songSubgroupId")));
-            Long position = Long.parseLong(String.valueOf(linkedHashMap.get("position")));
-            SongSubgroup songSubgroup = songSubgroupRepository.getReferenceById(Math.toIntExact(songSubgroupId));
-            songSubgroup.setPosition(position);
-            songSubgroupRepository.save(songSubgroup);
-        }
-        return new ObjectMapper().writeValueAsString("OK");
-    }
-
-    @PutMapping(value = "/put/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String putSubgroup(@PathVariable("subgroupId") String subgroupId, @RequestBody String formData) throws JsonProcessingException {
-        try {
-            SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(subgroupId)).get();
-            Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
-            String spotifyLink = (String) objectMapper.get("spotify");
-            String itunesLink = (String) objectMapper.get("itunes");
-            String soundcloudLink = (String) objectMapper.get("soundcloud");
-            String deezerLink = (String) objectMapper.get("deezer");
-            String tidalink = (String) objectMapper.get("tidal");
-            String ingameBand = (String) objectMapper.get("ingameBand");
-            String ingameTitle = (String) objectMapper.get("ingameTitle");
-            String ingameSrcId = (String) objectMapper.get("ingameSrcId");
-            String lyrics = (String) objectMapper.get("lyrics");
-            String info = (String) objectMapper.get("info");
-            boolean instrumental = (boolean) objectMapper.get("instrumental");
-            boolean feat = (boolean) objectMapper.get("feat");
-            boolean remix = (boolean) objectMapper.get("remix");
-            boolean subcomposer = (boolean) objectMapper.get("subcomposer");
-            String mainAliasId = (String) objectMapper.get("aliasId");
-            String authorId = (String) objectMapper.get("authorId");
-            Song relatedSong = songSubgroup.getSong();
-            Author mainComposer;
-            AuthorAlias composerAlias;
-            if (authorId.startsWith("NEW")) {
-                String newAuthor = authorId.replace("NEW-", "");
-                mainComposer = new Author();
-                mainComposer.setName(newAuthor);
-                mainComposer = authorRepository.save(mainComposer);
-                composerAlias = new AuthorAlias(mainComposer,newAuthor);
-            } else {
-                Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
-                if (mainAliasId.startsWith("NEW")) {
-                    String newAlias = mainAliasId.replace("NEW-", "");
-                    composerAlias = new AuthorAlias(author,newAlias);
-                    composerAlias = authorAliasRepository.save(composerAlias);
-                } else {
-                    composerAlias = authorAliasRepository.findById(Integer.valueOf(mainAliasId)).get();
-                }
-                List<AuthorSong> authorSongList = relatedSong.getAuthorSongList();
-                for (AuthorSong authorSong : authorSongList) {
-                    if (Role.COMPOSER.equals(authorSong.getRole())) {
-                        Author persistedAuthor = authorSong.getAuthorAlias().getAuthor();
-                        if (persistedAuthor.equals(author)) {
-                            AuthorAlias persistedAuthorAlias = authorSong.getAuthorAlias();
-                            if (!persistedAuthorAlias.equals(composerAlias)) {
-                                authorSong.setAuthorAlias(composerAlias);
-                                authorSongRepository.save(authorSong);
-                            }
-                        } else {
-                            AuthorSong newAuthorSong = new AuthorSong();
-                            newAuthorSong.setAuthorAlias(composerAlias);
-                            newAuthorSong.setRole(Role.COMPOSER);
-                            newAuthorSong.setSong(relatedSong);
-                            authorSongRepository.save(newAuthorSong);
-                        }
-                    }
-                }
-            }
-            songSubgroup.setInstrumental(Instrumental.fromBoolean(instrumental));
-            songSubgroup.setRemix(Remix.fromBoolean(remix));
-            songSubgroup.setIngameDisplayBand(returnValueToSet(ingameBand));
-            songSubgroup.setIngameDisplayTitle(returnValueToSet(ingameTitle));
-            songSubgroup.setSpotifyId(returnValueToSet(spotifyLink));
-            songSubgroup.setItunesLink(returnValueToSet(itunesLink));
-            songSubgroup.setSoundcloudLink(returnValueToSet(soundcloudLink));
-            songSubgroup.setDeezerId(returnValueToSet(deezerLink));
-            songSubgroup.setTidalLink(returnValueToSet(tidalink));
-            songSubgroup.setSrcId(returnValueToSet(ingameSrcId));
-            songSubgroup.setInfo(returnValueToSet(info));
-            if (subcomposer) {
-                List<String> comingSubcomposers = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerSelect")).collect(Collectors.toList());
-                Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerConcatInput")).collect(Collectors.toList()).iterator();
-                for (String comingFeat : comingSubcomposers) {
-                    String concatVal = null;
-                    if (comingConcats.hasNext()) {
-                        concatVal = (String) objectMapper.get(comingConcats.next());
-                    }
-                    String keySubcomposer = comingFeat;
-                    String subcomposerValue = (String) objectMapper.get(keySubcomposer);
-                    if (subcomposerValue.startsWith("NEW")) {
-                        String actualSubcomposerValue = subcomposerValue.replace("NEW-", "");
-                        saveNewFeatOrRemixer(actualSubcomposerValue, songSubgroup, Role.SUBCOMPOSER, concatVal);
-                    } else if (subcomposerValue.startsWith("DELETE")) {
-                        String deleteFeatId = subcomposerValue.replace("DELETE-", "");
-                        AuthorAlias authorAlias = authorAliasRepository.findById(Integer.valueOf(deleteFeatId)).get();
-                        AuthorSong authorSong = authorSongRepository.findByAuthorAliasAndSong(authorAlias, relatedSong);
-                        authorSongRepository.delete(authorSong);
-                    } else {
-                        saveNewAssignmentOfExistingFeatRemixer(subcomposerValue, songSubgroup, Role.SUBCOMPOSER, concatVal);
-                    }
-                }
-            }
-            if (feat) {
-                List<String> comingFeats = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("featSelect")).collect(Collectors.toList());
-                Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("featConcatInput")).collect(Collectors.toList()).iterator();
-                for (String comingFeat : comingFeats) {
-                    String concatVal = null;
-                    if (comingConcats.hasNext()) {
-                        concatVal = (String) objectMapper.get(comingConcats.next());
-                    }
-                    String keyFeat = comingFeat;
-                    String featValue = (String) objectMapper.get(keyFeat);
-                    if (featValue.startsWith("NEW")) {
-                        String actualFeatValue = featValue.replace("NEW-", "");
-                        saveNewFeatOrRemixer(actualFeatValue, songSubgroup, Role.FEAT, concatVal);
-                    } else if (featValue.startsWith("DELETE")) {
-                        String deleteFeatId = featValue.replace("DELETE-", "");
-                        AuthorAlias authorAlias = authorAliasRepository.findById(Integer.valueOf(deleteFeatId)).get();
-                        AuthorSong authorSong = authorSongRepository.findByAuthorAliasAndSong(authorAlias, relatedSong);
-                        authorSongRepository.delete(authorSong);
-                    } else {
-                        saveNewAssignmentOfExistingFeatRemixer(featValue, songSubgroup, Role.FEAT, concatVal);
-                    }
-                }
-            }
-            if (remix) {
-                List<String> comingRemixes = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("remixSelect")).collect(Collectors.toList());
-                Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("remixConcatInput")).collect(Collectors.toList()).iterator();
-                for (String comingRemix : comingRemixes) {
-                    String concatVal = null;
-                    if (comingConcats.hasNext()) {
-                        concatVal = (String) objectMapper.get(comingConcats.next());
-                    }
-                    String keyRemix = comingRemix;
-                    String remixValue = (String) objectMapper.get(keyRemix);
-                    if (remixValue.startsWith("NEW")) {
-                        String actualRemixValue = remixValue.replace("NEW-", "");
-                        saveNewFeatOrRemixer(actualRemixValue, songSubgroup, Role.REMIX, concatVal);
-                    } else if (remixValue.startsWith("DELETE")) {
-                        String deleteRemixId = remixValue.replace("DELETE-", "");
-                        AuthorAlias authorAlias = authorAliasRepository.findById(Integer.valueOf(deleteRemixId)).get();
-                        AuthorSong authorSong = authorSongRepository.findByAuthorAliasAndSong(authorAlias, relatedSong);
-                        authorSongRepository.delete(authorSong);
-                    } else {
-                        saveNewAssignmentOfExistingFeatRemixer(remixValue, songSubgroup, Role.REMIX, concatVal);
-                    }
-                }
-            }
-            songSubgroup.setLyrics(lyrics);
-            songSubgroupRepository.save(songSubgroup);
-            return new ObjectMapper().writeValueAsString("OK");
-        } catch (Throwable thr) {
-            return new ObjectMapper().writeValueAsString(thr);
-        }
-    }
-
-    @GetMapping(value = "/read/{songSubgroup}")
-    public @ResponseBody String readAllSubgroupManage(Model model, @PathVariable("songSubgroup") String gameId) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(gameId)).get();
-        return objectMapper.writeValueAsString(songSubgroup);
-    }
-
-    private void saveNewAssignmentOfExistingFeatRemixer(String remixValue, SongSubgroup songSubgroup, Role role, String concatValue) {
-        AuthorAlias authorAlias = authorAliasRepository.findById(Integer.valueOf(remixValue)).get();
-        boolean alreadyAssigned = false;
-        for (AuthorSong authorSong : songSubgroup.getSong().getAuthorSongList()) {
-            if (authorSong.getAuthorAlias().equals(authorAlias)) {
-                alreadyAssigned = true;
-                break;
-            }
-        }
-        if (!alreadyAssigned) {
-            AuthorSong authorSong = new AuthorSong();
-            authorSong.setSong(songSubgroup.getSong());
-            authorSong.setAuthorAlias(authorAlias);
-            authorSong.setRole(role);
-            if (role.equals(Role.REMIX)) {
-                authorSong.setRemixConcat(concatValue);
-            }
-            if (role.equals(Role.FEAT)) {
-                authorSong.setFeatConcat(concatValue);
-            }
-            if (role.equals(Role.SUBCOMPOSER)) {
-                authorSong.setSubcomposerConcat(concatValue);
-            }
-            authorSongRepository.save(authorSong);
-        }
-    }
-
-    private void saveNewAssignmentOfExistingGenre(String genreValue, Song song) {
-        Genre genre = genreRepository.findById(Integer.valueOf(genreValue)).get();
-        boolean alreadyAssigned = false;
-        for (SongGenre songGenre : song.getSongGenreList()){
-            if (songGenre.getGenre().equals(genre)){
-                alreadyAssigned=true;
-                break;
-            }
-        }
-        if (!alreadyAssigned) {
-            SongGenre songGenre = new SongGenre();
-            songGenre.setGenre(genre);
-            songGenre.setSong(song);
-            songGenreRepository.save(songGenre);
-        }
-    }
-
-    private void saveNewFeatOrRemixer(String actualRemixValue, SongSubgroup songSubgroup, Role role, String concatValue) {
-        Author author = new Author();
-        author.setName(actualRemixValue);
-        author = authorRepository.save(author);
-        AuthorAlias authorAlias = new AuthorAlias(author,actualRemixValue);
-        authorAlias = authorAliasRepository.save(authorAlias);
-        AuthorSong authorSong = new AuthorSong();
-        authorSong.setSong(songSubgroup.getSong());
-        authorSong.setAuthorAlias(authorAlias);
-        authorSong.setRole(role);
-        if (role.equals(Role.REMIX)) {
-            authorSong.setRemixConcat(concatValue);
-        }
-        if (role.equals(Role.FEAT)) {
-            authorSong.setFeatConcat(concatValue);
-        }
-        if (role.equals(Role.SUBCOMPOSER)) {
-            authorSong.setSubcomposerConcat(concatValue);
-        }
-        authorSongRepository.save(authorSong);
-    }
-
-    @DeleteMapping(value = "/delete/{subgroupId}")
-    public @ResponseBody String deleteSongSubgroup(@PathVariable("subgroupId") String subgroupId) throws JsonProcessingException {
-        try {
-            SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(subgroupId)).get();
-            Song song = songSubgroup.getSong();
-            List<SongSubgroup> allSongSubgroupEntries = songSubgroupRepository.findBySong(song);
-            if (allSongSubgroupEntries.size() == 1) {
-                //means we basically have to delete song entirely to avoid orphans
-                List<SongGenre> songGenresToDelete = song.getSongGenreList();
-                List<Genre> genresToDelete = new ArrayList<>();
-                for (SongGenre songGenre : songGenresToDelete) {
-                    Genre genre = songGenre.getGenre();
-                    List<SongGenre> allUsagesOfGenre = songGenreRepository.findByGenre(genre);
-                    if (allUsagesOfGenre.size() == 1) {
-                        genresToDelete.add(genre);
-                    }
-                }
-                List<AuthorSong> authorsOfSong = song.getAuthorSongList();
-                List<AuthorAlias> authorAliasToDelete = new ArrayList<>();
-                List<Author> authorsToDelete = new ArrayList<>();
-                List<AuthorCountry> authorCountriesToDelete = new ArrayList<>();
-                for (AuthorSong authorSong : authorsOfSong) {
-                    Author author = authorSong.getAuthorAlias().getAuthor();
-                    List<AuthorSong> allUsagesOfAlias = authorSongRepository.findByAuthorAlias(authorSong.getAuthorAlias());
-                    if (allUsagesOfAlias.size() == 1) {
-                        authorAliasToDelete.add(authorSong.getAuthorAlias());
-                        List<AuthorAlias> authorAliases = authorAliasRepository.findByAuthor(author);
-                        if (authorAliases.size() == 1) {
-                            authorsToDelete.add(author);
-                            authorCountriesToDelete.addAll(author.getAuthorCountries());
-                        }
-                    }
-                }
-                authorSongRepository.deleteAll(authorsOfSong);
-                if (!authorsToDelete.isEmpty()) {
-                    authorCountryRepository.deleteAll(authorCountriesToDelete);
-                    authorAliasRepository.deleteAll(authorAliasToDelete);
-                    authorRepository.deleteAll(authorsToDelete);
-                }
-                songGenreRepository.deleteAllInBatch(songGenresToDelete);
-                if (!genresToDelete.isEmpty()) {
-                    genreRepository.deleteAllInBatch(genresToDelete);
-                }
-                songSubgroupRepository.delete(songSubgroup);
-                songRepository.delete(song);
-            } else {
-                songSubgroupRepository.delete(songSubgroup);
-            }
-            return new ObjectMapper().writeValueAsString("OK");
-        } catch (Throwable thr) {
-            return new ObjectMapper().writeValueAsString(thr);
-        }
-    }
-
-    @PutMapping(value = "/putGlobally/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String putGlobally(@PathVariable("subgroupId") String subgroupId,
-                                            @RequestBody String formData) throws JsonProcessingException {
-        try {
-            SongSubgroup songSubgroup = songSubgroupRepository.findById(Integer.valueOf(subgroupId)).get();
-            Song relatedSong = songSubgroup.getSong();
-            Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
-            String spotifyLink = (String) objectMapper.get("spotify");
-            String itunesLink = (String) objectMapper.get("itunes");
-            String soundcloudLink = (String) objectMapper.get("soundcloud");
-            String deezerLink = (String) objectMapper.get("deezer");
-            String tidalink = (String) objectMapper.get("tidal");
-            String officialBand = (String) objectMapper.get("officialBand");
-            String officialTitle = (String) objectMapper.get("officialTitle");
-            String officialSrcId = (String) objectMapper.get("officialSrcId");
-            String lyrics = (String) objectMapper.get("lyrics");
-            relatedSong.setOfficialDisplayBand(returnValueToSet(officialBand));
-            relatedSong.setOfficialDisplayTitle(returnValueToSet(officialTitle));
-            relatedSong.setSpotifyId(returnValueToSet(spotifyLink));
-            relatedSong.setItunesLink(returnValueToSet(itunesLink));
-            relatedSong.setSoundcloudLink(returnValueToSet(soundcloudLink));
-            relatedSong.setDeezerId(returnValueToSet(deezerLink));
-            relatedSong.setTidalLink(returnValueToSet(tidalink));
-            relatedSong.setSrcId(returnValueToSet(officialSrcId));
-            songSubgroup.setLyrics(lyrics);
-            List<String> comingGenres = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("genreSelect")).collect(Collectors.toList());
-            for (String comingGenre : comingGenres) {
-                String keyGenre = comingGenre;
-                String genreValue = (String) objectMapper.get(keyGenre);
-                if (genreValue.startsWith("NEW")) {
-                    String actualGenreValue = genreValue.replace("NEW-", "");
-                    Genre genre = new Genre();
-                    genre.setGenreName(actualGenreValue);
-                    genre = genreRepository.save(genre);
-                    SongGenre songGenre = new SongGenre();
-                    songGenre.setSong(songSubgroup.getSong());
-                    songGenre.setGenre(genre);
-                    songGenreRepository.save(songGenre);
-                } else if (genreValue.startsWith("DELETE")) {
-                    String deleteGenreId = genreValue.replace("DELETE-", "");
-                    Genre genre = genreRepository.findById(Integer.valueOf(deleteGenreId)).get();
-                    List<SongGenre> existingGenres = songSubgroup.getSong().getSongGenreList();
-                    for (SongGenre songGenre : existingGenres){
-                        if (songGenre.getGenre().equals(genre)){
-                            songGenreRepository.delete(songGenre);
-                            break;
-                        }
-                    }
-                } else {
-                    saveNewAssignmentOfExistingGenre(genreValue,songSubgroup.getSong());
-                }
-            }
-            songRepository.save(relatedSong);
-            return new ObjectMapper().writeValueAsString("OK");
-        } catch (Throwable thr) {
-            return new ObjectMapper().writeValueAsString(thr);
-        }
-    }
-
-    private String returnValueToSet(String field) {
-        if (!("null").equals(field) && !("undefined").equals(field)) {
-            return field;
-        } else return null;
-    }
-
-    @PostMapping(value = "/post/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String postNewSong(@PathVariable("subgroupId") String subgroupId, @RequestBody String formData) throws JsonProcessingException {
-        try {
-            Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
-            String ingameBand = (String) objectMapper.get("ingameBand");
-            String ingameTitle = (String) objectMapper.get("ingameTitle");
-            String ingameSrcId = (String) objectMapper.get("ingameSrcId");
-            String officialBand = (String) objectMapper.get("officialBand");
-            String officialTitle = (String) objectMapper.get("officialTitle");
-            String officialSrcId = (String) objectMapper.get("officialSrcId");
-            String mainAliasId = (String) objectMapper.get("aliasId");
-            String authorId = (String) objectMapper.get("authorId");
-            String spotifyLink = (String) objectMapper.get("spotify");
-            String itunesLink = (String) objectMapper.get("itunes");
-            String soundcloudLink = (String) objectMapper.get("soundcloud");
-            String deezerLink = (String) objectMapper.get("deezer");
-            String tidalink = (String) objectMapper.get("tidal");
-            String lyrics = (String) objectMapper.get("lyrics");
-            String info = (String) objectMapper.get("info");
-            Subgroup subgroup = subgroupRepository.findById(Integer.valueOf(subgroupId)).get();
-            Object potentialExistingSong = objectMapper.get("existingSongId");
-            boolean instrumental = (boolean) objectMapper.get("instrumental");
-            SongSubgroup songSubgroup = new SongSubgroup();
-            songSubgroup.setSubgroup(subgroup);
-            songSubgroup.setIngameDisplayBand(returnValueToSet(ingameBand));
-            songSubgroup.setIngameDisplayTitle(returnValueToSet(ingameTitle));
-            songSubgroup.setSrcId(returnValueToSet(ingameSrcId));
-            songSubgroup.setInfo(returnValueToSet(info));
-            songSubgroup.setDeezerId(returnValueToSet(deezerLink));
-            songSubgroup.setTidalLink(returnValueToSet(tidalink));
-            songSubgroup.setLyrics(returnValueToSet(lyrics));
-            songSubgroup.setItunesLink(returnValueToSet(itunesLink));
-            songSubgroup.setSoundcloudLink(returnValueToSet(soundcloudLink));
-            songSubgroup.setSpotifyId(returnValueToSet(spotifyLink));
-            songSubgroup.setInstrumental(Instrumental.fromBoolean(instrumental));
-            songSubgroup.setPosition(10000L);
-            if (potentialExistingSong != null) {
-                Integer existingSongId = Integer.valueOf(potentialExistingSong.toString());
-                Song existingSong = songRepository.findById(existingSongId).get();
-                songSubgroup.setSong(existingSong);
-                if (existingSong.getBaseSong() != null) {
-                    songSubgroup.setRemix(Remix.YES);
-                } else {
-                    songSubgroup.setRemix(Remix.NO);
-                }
-                songSubgroupRepository.save(songSubgroup);
-            } else {
-                Song song = new Song();
-                song.setOfficialDisplayTitle(returnValueToSet(officialTitle));
-                song.setOfficialDisplayBand(returnValueToSet(officialBand));
-                song.setSrcId(returnValueToSet(officialSrcId));
-                song.setDeezerId(returnValueToSet(deezerLink));
-                song.setTidalLink(returnValueToSet(tidalink));
-                song.setLyrics(returnValueToSet(lyrics));
-                song.setItunesLink(returnValueToSet(itunesLink));
-                song.setSoundcloudLink(returnValueToSet(soundcloudLink));
-                song.setSpotifyId(returnValueToSet(spotifyLink));
-                song = songRepository.save(song);
-                songSubgroup.setSong(song);
-                Author mainComposer;
-                AuthorAlias composerAlias;
-                if (authorId.startsWith("NEW")) {
-                    String newAuthor = authorId.replace("NEW-", "");
-                    mainComposer = new Author();
-                    mainComposer.setName(newAuthor);
-                    mainComposer = authorRepository.save(mainComposer);
-                    composerAlias = new AuthorAlias(mainComposer,newAuthor);
-                    composerAlias = authorAliasRepository.save(composerAlias);
-                } else {
-                    Author author = authorRepository.findById(Integer.valueOf(authorId)).get();
-                    if (mainAliasId.startsWith("NEW")) {
-                        String newAlias = mainAliasId.replace("NEW-", "");
-                        composerAlias = new AuthorAlias(author,newAlias);
-                        composerAlias = authorAliasRepository.save(composerAlias);
-                    } else {
-                        composerAlias = authorAliasRepository.findById(Integer.valueOf(mainAliasId)).get();
-                    }
-                }
-                AuthorSong authorSong = new AuthorSong();
-                authorSong.setSong(songSubgroup.getSong());
-                authorSong.setAuthorAlias(composerAlias);
-                authorSong.setRole(Role.COMPOSER);
-                authorSongRepository.save(authorSong);
-                boolean feat = (boolean) objectMapper.get("feat");
-                boolean subcomposer = (boolean) objectMapper.get("subcomposer");
-                boolean remix = (boolean) objectMapper.get("remix");
-                songSubgroup.setInstrumental(Instrumental.fromBoolean(instrumental));
-                songSubgroup.setRemix(Remix.fromBoolean(remix));
-                if (subcomposer) {
-                    List<String> comingSubcomposers = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerSelect")).collect(Collectors.toList());
-                    Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("subcomposerConcatInput")).collect(Collectors.toList()).iterator();
-                    for (String comingFeat : comingSubcomposers) {
-                        String concatVal = null;
-                        if (comingConcats.hasNext()) {
-                            concatVal = (String) objectMapper.get(comingConcats.next());
-                        }
-                        String keySubcomposer = comingFeat;
-                        String subcomposerValue = (String) objectMapper.get(keySubcomposer);
-                        if (subcomposerValue.startsWith("NEW")) {
-                            String actualSubcomposerValue = subcomposerValue.replace("NEW-", "");
-                            saveNewFeatOrRemixer(actualSubcomposerValue, songSubgroup, Role.SUBCOMPOSER, concatVal);
-                        } else {
-                            saveNewAssignmentOfExistingFeatRemixer(subcomposerValue, songSubgroup, Role.SUBCOMPOSER, concatVal);
-                        }
-                    }
-                }
-                if (feat) {
-                    List<String> comingFeats = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("featSelect")).collect(Collectors.toList());
-                    Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("featConcatInput")).collect(Collectors.toList()).iterator();
-                    for (String comingFeat : comingFeats) {
-                        String concatVal = null;
-                        if (comingConcats.hasNext()) {
-                            concatVal = (String) objectMapper.get(comingConcats.next());
-                        }
-                        String keyFeat = comingFeat;
-                        String featValue = (String) objectMapper.get(keyFeat);
-                        if (featValue.startsWith("NEW")) {
-                            String actualFeatValue = featValue.replace("NEW-", "");
-                            saveNewFeatOrRemixer(actualFeatValue, songSubgroup, Role.FEAT, concatVal);
-                        } else {
-                            saveNewAssignmentOfExistingFeatRemixer(featValue, songSubgroup, Role.FEAT, concatVal);
-                        }
-                    }
-                }
-                if (remix) {
-                    List<String> comingRemixes = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("remixSelect")).collect(Collectors.toList());
-                    Iterator<String> comingConcats = (Iterator<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("remixConcatInput")).collect(Collectors.toList()).iterator();
-                    for (String comingRemix : comingRemixes) {
-                        String concatVal = null;
-                        if (comingConcats.hasNext()) {
-                            concatVal = (String) objectMapper.get(comingConcats.next());
-                        }
-                        String keyRemix = comingRemix;
-                        String remixValue = (String) objectMapper.get(keyRemix);
-                        if (remixValue.startsWith("NEW")) {
-                            String actualRemixValue = remixValue.replace("NEW-", "");
-                            saveNewFeatOrRemixer(actualRemixValue, songSubgroup, Role.REMIX, concatVal);
-                        } else {
-                            saveNewAssignmentOfExistingFeatRemixer(remixValue, songSubgroup, Role.REMIX, concatVal);
-                        }
-                    }
-                }
-                List<String> comingGenres = (List<String>) objectMapper.keySet().stream().filter(o -> o.toString().contains("genreSelect")).collect(Collectors.toList());
-                for (String comingGenre : comingGenres) {
-                    String keyGenre = comingGenre;
-                    String genreValue = (String) objectMapper.get(keyGenre);
-                    if (genreValue.startsWith("NEW")) {
-                        String actualGenreValue = genreValue.replace("NEW-", "");
-                        Genre genre = new Genre();
-                        genre.setGenreName(actualGenreValue);
-                        genre = genreRepository.save(genre);
-                        SongGenre songGenre = new SongGenre();
-                        songGenre.setSong(songSubgroup.getSong());
-                        songGenre.setGenre(genre);
-                        songGenreRepository.save(songGenre);
-                    } else {
-                        saveNewAssignmentOfExistingGenre(genreValue,songSubgroup.getSong());
-                    }
-                }
-                songSubgroup.setLyrics(lyrics);
-                songSubgroupRepository.save(songSubgroup);
-            }
-            return new ObjectMapper().writeValueAsString("OK");
-        } catch (Exception exp) {
-            return null;
-        }
-    }
+	@PostMapping(value = "/post/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	String postNewSong(@PathVariable("subgroupId") int subgroupId, @RequestBody String formData) {
+		try {
+			Subgroup subgroup = subgroupService.findById(subgroupId).orElseThrow(() -> new Exception("No song " +
+					"subgroup found with id " + subgroupId));
+			ObjectMapper songSubgroupObjectMapper = new ObjectMapper();
+			SimpleModule subgroupModule = new SimpleModule();
+			subgroupModule.addDeserializer(SongSubgroup.class, songSubgroupDeserializer);
+			songSubgroupObjectMapper.registerModule(subgroupModule);
+			SongSubgroup songSubgroup = songSubgroupObjectMapper.readValue(formData, SongSubgroup.class);
+			songSubgroup.setSubgroup(subgroup);
+			Map<String, String> objectMapper = new ObjectMapper().readValue(formData,
+					TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class));
+			String mainAliasId = objectMapper.get("aliasId");
+			String authorId = objectMapper.get("authorId");
+			if (songSubgroup.getSong() != null) {
+				songSubgroupService.save(songSubgroup);
+			} else {
+				ObjectMapper songObjectMapper = new ObjectMapper();
+				SimpleModule songModule = new SimpleModule();
+				songModule.addDeserializer(Song.class, songDeserializer);
+				songObjectMapper.registerModule(songModule);
+				Song song = songObjectMapper.readValue(formData, Song.class);
+				song = songService.save(song);
+				songSubgroup.setSong(song);
+				Author mainComposer;
+				AuthorAlias composerAlias;
+				if (authorId.startsWith("NEW")) {
+					String newAuthor = authorId.replace("NEW-", "");
+					mainComposer = new Author();
+					mainComposer.setName(newAuthor);
+					mainComposer = authorService.save(mainComposer);
+					composerAlias = new AuthorAlias(mainComposer, newAuthor);
+					composerAlias = authorAliasService.save(composerAlias);
+				} else {
+					Author author = authorService.findById(Integer.parseInt(authorId))
+							.orElseThrow(() -> new Exception("No author with id found " + authorId));
+					if (mainAliasId.startsWith("NEW")) {
+						String newAlias = mainAliasId.replace("NEW-", "");
+						composerAlias = new AuthorAlias(author, newAlias);
+						composerAlias = authorAliasService.save(composerAlias);
+					} else {
+						composerAlias = authorAliasService.findById(Integer.parseInt(mainAliasId))
+								.orElseThrow(() -> new Exception("No alias found with id " + mainAliasId));
+					}
+				}
+				AuthorSong authorSong = new AuthorSong(composerAlias, songSubgroup.getSong(), Role.COMPOSER);
+				authorSongService.save(authorSong);
+				boolean feat = Boolean.parseBoolean(objectMapper.get("feat"));
+				boolean subcomposer = Boolean.parseBoolean(objectMapper.get("subcomposer"));
+				boolean remix = Boolean.parseBoolean(objectMapper.get("remix"));
+				if (subcomposer) {
+					songSubgroupService.updateFeat(objectMapper, "subcomposerSelect", "subcomposerConcatInput",
+							songSubgroup, Role.SUBCOMPOSER, song);
+				}
+				if (feat) {
+					songSubgroupService.updateFeat(objectMapper, "featSelect", "featConcatInput",
+							songSubgroup, Role.FEAT, song);
+				}
+				if (remix) {
+					songSubgroupService.updateFeat(objectMapper, "remixSelect", "remixConcatInput",
+							songSubgroup, Role.REMIX, song);
+				}
+				List<String> comingGenres = objectMapper.keySet().stream().filter(
+						o -> o.contains("genreSelect")).toList();
+				for (String comingGenre : comingGenres) {
+					String keyGenre = comingGenre;
+					String genreValue = objectMapper.get(keyGenre);
+					if (genreValue.startsWith("NEW")) {
+						String actualGenreValue = genreValue.replace("NEW-", "");
+						Genre genre = new Genre();
+						genre.setGenreName(actualGenreValue);
+						genre = genreService.save(genre);
+						SongGenre songGenre = new SongGenre(song, genre);
+						songGenreService.save(songGenre);
+					} else {
+						songService.saveNewAssignmentOfExistingGenre(genreValue, songSubgroup.getSong());
+					}
+				}
+				songSubgroupService.save(songSubgroup);
+			}
+			return new ObjectMapper().writeValueAsString("OK");
+		} catch (Exception exp) {
+			return null;
+		}
+	}
 }

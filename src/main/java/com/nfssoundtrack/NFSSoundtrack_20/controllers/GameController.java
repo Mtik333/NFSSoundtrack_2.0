@@ -10,51 +10,61 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(path = "/gamedb")
 public class GameController extends BaseControllerWithErrorHandling {
 
-    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
+	private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
-    @Autowired
-    GameDeserializer newGameDeserializer;
+	@Autowired
+	GameDeserializer newGameDeserializer;
 
-    @Autowired
-    GameEditSerializer gameEditSerializer;
+	@Autowired
+	GameEditSerializer gameEditSerializer;
 
-    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String saveNewGame(@RequestBody String formData) throws Exception {
-        SimpleModule module = new SimpleModule();
-        ObjectMapper objectMapper = new ObjectMapper();
-        module.addDeserializer(Game.class, newGameDeserializer);
-        objectMapper.registerModule(module);
-        Game newGame = objectMapper.readValue(formData, Game.class);
-        gameService.save(newGame);
-        return new ObjectMapper().writeValueAsString("OK");
-    }
+	@PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	String saveNewGame(@RequestBody String formData) throws Exception {
+		SimpleModule module = new SimpleModule();
+		ObjectMapper objectMapper = new ObjectMapper();
+		module.addDeserializer(Game.class, newGameDeserializer);
+		objectMapper.registerModule(module);
+		Game newGame = objectMapper.readValue(formData, Game.class);
+		gameService.save(newGame);
+		return new ObjectMapper().writeValueAsString("OK");
+	}
 
-    @GetMapping(value = "/read/{gameId}")
-    public @ResponseBody String gameGroupManage(@PathVariable("gameId") int gameId) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule simpleModule = new SimpleModule();
-        Game game = gameService.findById(gameId).orElseThrow(() -> new Exception("No game found with id " + gameId));
-        simpleModule.addSerializer(Game.class, gameEditSerializer);
-        objectMapper.registerModule(simpleModule);
-        String result = objectMapper.writeValueAsString(game);
-        return result;
-    }
+	@GetMapping(value = "/read/{gameId}")
+	public @ResponseBody
+	String gameGroupManage(@PathVariable("gameId") int gameId) throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper();
+		SimpleModule simpleModule = new SimpleModule();
+		Game game = gameService.findById(gameId).orElseThrow(() -> new Exception("No game found with id " + gameId));
+		simpleModule.addSerializer(Game.class, gameEditSerializer);
+		objectMapper.registerModule(simpleModule);
+		String result = objectMapper.writeValueAsString(game);
+		return result;
+	}
 
-    @PutMapping(value = "/put/{gameId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String modifyGame(@RequestBody String formData, @PathVariable("gameId") int gameId) throws Exception {
-        SimpleModule module = new SimpleModule();
-        ObjectMapper objectMapper = new ObjectMapper();
-        module.addDeserializer(Game.class, newGameDeserializer);
-        objectMapper.registerModule(module);
-        Game gameToEdit = gameService.findById(gameId).orElseThrow(() -> new Exception("No game with id found " + gameId));
-        gameToEdit = objectMapper.readerForUpdating(gameToEdit).readValue(formData, Game.class);
-        gameService.save(gameToEdit);
-        return new ObjectMapper().writeValueAsString("OK");
-    }
+	@PutMapping(value = "/put/{gameId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	String modifyGame(@RequestBody String formData, @PathVariable("gameId") int gameId) throws Exception {
+		SimpleModule module = new SimpleModule();
+		ObjectMapper objectMapper = new ObjectMapper();
+		module.addDeserializer(Game.class, newGameDeserializer);
+		objectMapper.registerModule(module);
+		Game gameToEdit = gameService.findById(gameId).orElseThrow(
+				() -> new Exception("No game with id found " + gameId));
+		gameToEdit = objectMapper.readerForUpdating(gameToEdit).readValue(formData, Game.class);
+		gameService.save(gameToEdit);
+		return new ObjectMapper().writeValueAsString("OK");
+	}
 }

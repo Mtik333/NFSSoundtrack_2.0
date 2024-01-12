@@ -3,7 +3,20 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.nfssoundtrack.NFSSoundtrack_20.services.*;
+import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorAliasService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorCountryService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorSongService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.ContentService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.CountryService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.GameService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.GenreService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.MainGroupService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.SerieService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.SongGenreService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.SongService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.SongSubgroupService;
+import com.nfssoundtrack.NFSSoundtrack_20.services.SubgroupService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +44,10 @@ public class BaseControllerWithErrorHandling implements ErrorController {
 	@Autowired
 	GameService gameService;
 
-    @Autowired
-    GenreService genreService;
+	@Autowired
+	GenreService genreService;
 
-    @Autowired
+	@Autowired
 	SongSubgroupService songSubgroupService;
 
 	@Autowired
@@ -82,7 +95,8 @@ public class BaseControllerWithErrorHandling implements ErrorController {
 		return mav;
 	}
 
-	public <T> ObjectMapper getObjectMapper(Class<? extends T> type, JsonSerializer<T> ser) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+	public <T> ObjectMapper getObjectMapper(Class<? extends T> type, JsonSerializer<T> ser)
+			throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		SimpleModule simpleModule = new SimpleModule();
 		simpleModule.addSerializer(type, ser);

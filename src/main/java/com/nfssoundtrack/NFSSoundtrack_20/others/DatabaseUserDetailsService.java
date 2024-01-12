@@ -12,19 +12,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DatabaseUserDetailsService implements UserDetailsService {
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseUserDetailsService.class);
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseUserDetailsService.class);
 
-    @Autowired
-    UserRepository userRepository;
+	@Autowired
+	UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User userAccount = userRepository.findByLogin(username);
-        if (userAccount == null) {
-            throw new UsernameNotFoundException("User with username [" + username + "] not found in the system");
-        }
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		User userAccount = userRepository.findByLogin(username);
+		if (userAccount == null) {
+			throw new UsernameNotFoundException("User with username [" + username + "] not found in the system");
+		}
 //        return new org.springframework.security.core.userdetails.User(userAccount.getLogin(), userAccount.getPass(),
 //                Collections.singleton( new SimpleGrantedAuthority("ADMIN")));
-        return new MyUserDetails(userAccount);
-    }
+		return new MyUserDetails(userAccount);
+	}
 }

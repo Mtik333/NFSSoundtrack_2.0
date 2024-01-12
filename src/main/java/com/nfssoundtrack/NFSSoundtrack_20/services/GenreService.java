@@ -14,15 +14,23 @@ public class GenreService {
 	@Autowired
 	GenreRepository genreRepository;
 
-	public Optional<Genre> findById(int id){
+	public Optional<Genre> findById(int id) {
 		return genreRepository.findById(id);
 	}
 
-	public Optional<Genre> findByGenreName(String genreName){
+	public Optional<Genre> findByGenreName(String genreName) {
 		return genreRepository.findByGenreName(genreName);
 	}
 
-	public List<Genre> findByGenreNameContains(String genreName){
+	public List<Genre> findByGenreNameContains(String genreName) {
 		return genreRepository.findByGenreNameContains(genreName);
+	}
+
+	public void deleteAll(List<Genre> genres) {
+		genreRepository.deleteAll();
+	}
+
+	public Genre save(Genre genre) {
+		return genreRepository.save(genre);
 	}
 }

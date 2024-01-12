@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ContentRepository extends JpaRepository<Content, Integer> {
 
-    Content findByContentShort(String content_short);
+	Content findByContentShort(String content_short);
 }

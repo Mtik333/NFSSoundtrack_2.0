@@ -2,7 +2,20 @@ package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,165 +25,180 @@ import java.util.List;
 @NamedEntityGraph(name = "Song.authorSongList", attributeNodes = @NamedAttributeNode("authorSongList"))
 public class Song implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
-    @Column(name = "officialdisplayband")
-    private String officialDisplayBand;
+	@Column(name = "officialdisplayband")
+	private String officialDisplayBand;
 
-    @Column(name = "officialdisplaytitle")
-    private String officialDisplayTitle;
+	@Column(name = "officialdisplaytitle")
+	private String officialDisplayTitle;
 
-    @Column(name = "src_id")
-    private String srcId;
+	@Column(name = "src_id")
+	private String srcId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "multi_concat")
-    private MultiConcat multiConcat;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "multi_concat")
+	private MultiConcat multiConcat;
 
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "lyrics")
-    private String lyrics;
+	@Basic(fetch = FetchType.LAZY)
+	@Column(name = "lyrics")
+	private String lyrics;
 
-    @Column(name = "spotify_id")
-    private String spotifyId;
+	@Column(name = "spotify_id")
+	private String spotifyId;
 
-    @Column(name = "deezer_id")
-    private String deezerId;
+	@Column(name = "deezer_id")
+	private String deezerId;
 
-    @Column(name = "itunes_link")
-    private String itunesLink;
+	@Column(name = "itunes_link")
+	private String itunesLink;
 
-    @Column(name = "tidal_link")
-    private String tidalLink;
+	@Column(name = "tidal_link")
+	private String tidalLink;
 
-    @Column(name = "soundcloud_link")
-    private String soundcloudLink;
+	@Column(name = "soundcloud_link")
+	private String soundcloudLink;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "song", fetch = FetchType.LAZY)
-    private List<AuthorSong> authorSongList = new ArrayList<>();
+	@JsonManagedReference
+	@OneToMany(mappedBy = "song", fetch = FetchType.LAZY)
+	private List<AuthorSong> authorSongList = new ArrayList<>();
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "song")
-    private List<SongGenre> songGenreList = new ArrayList<>();
+	@JsonManagedReference
+	@OneToMany(mappedBy = "song")
+	private List<SongGenre> songGenreList = new ArrayList<>();
 
-    @JsonBackReference
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basesong_id")
-    private Song baseSong;
+	@JsonBackReference
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "basesong_id")
+	private Song baseSong;
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getOfficialDisplayBand() {
-        return officialDisplayBand;
-    }
+	public String getOfficialDisplayBand() {
+		return officialDisplayBand;
+	}
 
-    public void setOfficialDisplayBand(String officialDisplayBand) {
-        this.officialDisplayBand = officialDisplayBand;
-    }
+	public void setOfficialDisplayBand(String officialDisplayBand) {
+		this.officialDisplayBand = officialDisplayBand;
+	}
 
-    public String getOfficialDisplayTitle() {
-        return officialDisplayTitle;
-    }
+	public String getOfficialDisplayTitle() {
+		return officialDisplayTitle;
+	}
 
-    public void setOfficialDisplayTitle(String officialDisplayTitle) {
-        this.officialDisplayTitle = officialDisplayTitle;
-    }
+	public void setOfficialDisplayTitle(String officialDisplayTitle) {
+		this.officialDisplayTitle = officialDisplayTitle;
+	}
 
-    public String getSrcId() {
-        return srcId;
-    }
+	public String getSrcId() {
+		return srcId;
+	}
 
-    public void setSrcId(String srcId) {
-        this.srcId = srcId;
-    }
+	public void setSrcId(String srcId) {
+		this.srcId = srcId;
+	}
 
-    public MultiConcat getMultiConcat() {
-        return multiConcat;
-    }
+	public MultiConcat getMultiConcat() {
+		return multiConcat;
+	}
 
-    public void setMultiConcat(MultiConcat multiConcat) {
-        this.multiConcat = multiConcat;
-    }
+	public void setMultiConcat(MultiConcat multiConcat) {
+		this.multiConcat = multiConcat;
+	}
 
-    public List<AuthorSong> getAuthorSongList() {
-        return authorSongList;
-    }
+	public List<AuthorSong> getAuthorSongList() {
+		return authorSongList;
+	}
 
-    public void setAuthorSongList(List<AuthorSong> authorSongList) {
-        this.authorSongList = authorSongList;
-    }
+	public void setAuthorSongList(List<AuthorSong> authorSongList) {
+		this.authorSongList = authorSongList;
+	}
 
-    public String getLyrics() {
-        return lyrics;
-    }
+	public String getLyrics() {
+		return lyrics;
+	}
 
-    public void setLyrics(String lyrics) {
-        this.lyrics = lyrics;
-    }
+	public void setLyrics(String lyrics) {
+		this.lyrics = lyrics;
+	}
 
-    public List<SongGenre> getSongGenreList() {
-        return songGenreList;
-    }
+	public List<SongGenre> getSongGenreList() {
+		return songGenreList;
+	}
 
-    public void setSongGenreList(List<SongGenre> songGenreList) {
-        this.songGenreList = songGenreList;
-    }
+	public void setSongGenreList(List<SongGenre> songGenreList) {
+		this.songGenreList = songGenreList;
+	}
 
-    public String getSpotifyId() {
-        return spotifyId;
-    }
+	public String getSpotifyId() {
+		return spotifyId;
+	}
 
-    public void setSpotifyId(String spotifyId) {
-        this.spotifyId = spotifyId;
-    }
+	public void setSpotifyId(String spotifyId) {
+		this.spotifyId = spotifyId;
+	}
 
-    public String getDeezerId() {
-        return deezerId;
-    }
+	public String getDeezerId() {
+		return deezerId;
+	}
 
-    public void setDeezerId(String deezerId) {
-        this.deezerId = deezerId;
-    }
+	public void setDeezerId(String deezerId) {
+		this.deezerId = deezerId;
+	}
 
-    public String getItunesLink() {
-        return itunesLink;
-    }
+	public String getItunesLink() {
+		return itunesLink;
+	}
 
-    public void setItunesLink(String itunesLink) {
-        this.itunesLink = itunesLink;
-    }
+	public void setItunesLink(String itunesLink) {
+		this.itunesLink = itunesLink;
+	}
 
-    public String getTidalLink() {
-        return tidalLink;
-    }
+	public String getTidalLink() {
+		return tidalLink;
+	}
 
-    public void setTidalLink(String tidalLink) {
-        this.tidalLink = tidalLink;
-    }
+	public void setTidalLink(String tidalLink) {
+		this.tidalLink = tidalLink;
+	}
 
-    public String getSoundcloudLink() {
-        return soundcloudLink;
-    }
+	public String getSoundcloudLink() {
+		return soundcloudLink;
+	}
 
-    public void setSoundcloudLink(String soundcloudLink) {
-        this.soundcloudLink = soundcloudLink;
-    }
+	public void setSoundcloudLink(String soundcloudLink) {
+		this.soundcloudLink = soundcloudLink;
+	}
 
-    public Song getBaseSong() {
-        return baseSong;
-    }
+	public Song getBaseSong() {
+		return baseSong;
+	}
 
-    public void setBaseSong(Song baseSong) {
-        this.baseSong = baseSong;
-    }
+	public void setBaseSong(Song baseSong) {
+		this.baseSong = baseSong;
+	}
+
+	public Song() {
+	}
+
+	public Song(String officialDisplayBand, String officialDisplayTitle, String srcId, String lyrics, String spotifyId, String deezerId, String itunesLink, String tidalLink, String soundcloudLink) {
+		this.officialDisplayBand = officialDisplayBand;
+		this.officialDisplayTitle = officialDisplayTitle;
+		this.srcId = srcId;
+		this.lyrics = lyrics;
+		this.spotifyId = spotifyId;
+		this.deezerId = deezerId;
+		this.itunesLink = itunesLink;
+		this.tidalLink = tidalLink;
+		this.soundcloudLink = soundcloudLink;
+	}
 }

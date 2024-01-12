@@ -13,15 +13,15 @@ public class GameService {
 	@Autowired
 	GameRepository gameRepository;
 
-	public Game findByGameShort(String gameShort){
+	public Game findByGameShort(String gameShort) {
 		return gameRepository.findByGameShort(gameShort);
 	}
 
-	public Optional<Game> findById(int id){
+	public Optional<Game> findById(int id) {
 		return gameRepository.findById(id);
 	}
 
-	public Game save(Game game){
+	public Game save(Game game) {
 		return gameRepository.save(game);
 	}
 }

@@ -14,23 +14,27 @@ public class AuthorService {
 	@Autowired
 	AuthorRepository authorRepository;
 
-	public Optional<Author> findById(int authorId){
+	public Optional<Author> findById(int authorId) {
 		return authorRepository.findById(authorId);
 	}
 
-	public Optional<Author> findByName(String name){
+	public Optional<Author> findByName(String name) {
 		return authorRepository.findByName(name);
 	}
 
-	public List<Author> findByNameContains(String name){
+	public List<Author> findByNameContains(String name) {
 		return authorRepository.findByNameContains(name);
 	}
 
-	public void delete(Author author){
-		 authorRepository.delete(author);
+	public void delete(Author author) {
+		authorRepository.delete(author);
 	}
 
-	public Author save(Author author){
+	public void deleteAll(List<Author> authors) {
+		authorRepository.deleteAll(authors);
+	}
+
+	public Author save(Author author) {
 		return authorRepository.save(author);
 	}
 }

@@ -14,19 +14,19 @@ public class CountryService {
 	@Autowired
 	CountryRepository countryRepository;
 
-	public Optional<Country> findById(int id){
+	public Optional<Country> findById(int id) {
 		return countryRepository.findById(id);
 	}
 
-	public List<Country> findAll(){
+	public List<Country> findAll() {
 		return countryRepository.findAll();
 	}
 
-	public Optional<Country> findByCountryName(String countryName){
+	public Optional<Country> findByCountryName(String countryName) {
 		return countryRepository.findByCountryName(countryName);
 	}
 
-	public List<Country> findByCountryNameContains(String countryName){
+	public List<Country> findByCountryNameContains(String countryName) {
 		return countryRepository.findByCountryNameContains(countryName);
 	}
 }

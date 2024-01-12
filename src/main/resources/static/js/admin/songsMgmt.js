@@ -120,7 +120,7 @@ $(document).ready(function () {
         $.ajax({
             async: false,
             type: "GET",
-            url: "/songSubgroup/read/" + songId,
+            url: "/songSubgroup/read/" + Number(songId),
             success: function (ooo) {
                 console.log("e");
                 songSubgroup = JSON.parse(ooo);
@@ -251,7 +251,7 @@ $(document).ready(function () {
         $.ajax({
             async: false,
             type: "GET",
-            url: "/songSubgroup/read/" + songId,
+            url: "/songSubgroup/read/" + Number(songId),
             success: function (ooo) {
                 console.log("e");
                 songSubgroup = JSON.parse(ooo);
@@ -413,7 +413,7 @@ $(document).ready(function () {
     $(document).on('click', 'a.songItem', function (e) {
         $("#subgroupsDropdown").text($(this).text());
         var subgroupId = Number($(this).attr('data-subgroupId'));
-        currentSubgroup = subgroupId;
+        currentSubgroup = Number(subgroupId);
         var groupId = Number($(this).attr('data-groupId'));
         var subgroupSongs;
         for (let i = 0; i < fullScopeOfEdit.length; i++) {
@@ -1131,7 +1131,7 @@ $(document).ready(function () {
             async: false,
             type: "PUT",
             data: JSON.stringify(songToSave),
-            url: "/songSubgroup/put/" + currentSongSubgroup.id + '',
+            url: "/songSubgroup/put/" + Number(currentSongSubgroup.id),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
@@ -1184,7 +1184,7 @@ $(document).ready(function () {
             async: false,
             type: "PUT",
             data: JSON.stringify(songGloballyToSave),
-            url: "/songSubgroup/putGlobally/" + currentSongSubgroup.id + '',
+            url: "/songSubgroup/putGlobally/" + Number(currentSongSubgroup.id),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
@@ -1311,7 +1311,7 @@ $(document).ready(function () {
             async: false,
             type: "POST",
             data: JSON.stringify(songToSave),
-            url: "/songSubgroup/post/" + currentSubgroup + '',
+            url: "/songSubgroup/post/" + currentSubgroup,
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {

@@ -14,15 +14,15 @@ public class AuthorCountryService {
 	@Autowired
 	AuthorCountryRepository authorCountryRepository;
 
-	public void deleteAll(List<AuthorCountry> authorCountryList){
+	public void deleteAll(List<AuthorCountry> authorCountryList) {
 		authorCountryRepository.deleteAll(authorCountryList);
 	}
 
-	public void deleteAll(Set<AuthorCountry> authorCountryList){
+	public void deleteAll(Set<AuthorCountry> authorCountryList) {
 		authorCountryRepository.deleteAll(authorCountryList);
 	}
 
-	public List<AuthorCountry> saveAll(List<AuthorCountry> authorCountryList){
+	public List<AuthorCountry> saveAll(List<AuthorCountry> authorCountryList) {
 		return authorCountryRepository.saveAll(authorCountryList);
 	}
 

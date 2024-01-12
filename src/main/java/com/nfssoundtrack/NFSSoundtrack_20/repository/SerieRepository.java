@@ -10,14 +10,14 @@ import java.util.List;
 
 public interface SerieRepository extends JpaRepository<Serie, Integer> {
 
-    List<Serie> findAll();
+	List<Serie> findAll();
 
-    @EntityGraph(value = "Serie.games")
-    List<Serie> findByIdNotNull();
+	@EntityGraph(value = "Serie.games")
+	List<Serie> findByIdNotNull();
 
-    @Cacheable("series")
-    @EntityGraph(attributePaths = {"games"})
-    List<Serie> findAll(Sort sort);
+	@Cacheable("series")
+	@EntityGraph(attributePaths = {"games"})
+	List<Serie> findAll(Sort sort);
 //
 //    @EntityGraph(attributePaths = {"games"})
 //    List<Serie> findAll();

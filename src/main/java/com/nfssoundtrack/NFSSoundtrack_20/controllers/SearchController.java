@@ -1,13 +1,10 @@
 package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorAlias;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Genre;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.AuthorAliasRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.SongRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,48 +20,55 @@ import java.util.Optional;
 @RequestMapping(path = "/search")
 public class SearchController extends BaseControllerWithErrorHandling {
 
-    private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
-    @Value("${spring.application.name}")
-    String appName;
+	private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
 
-    @GetMapping(value = "/basic")
-    public String searchStuff(Model model, @RequestParam("searchData") String searchData) {
-        List<AuthorAlias> authorAliases = new ArrayList<>();
-        List<Song> songTitleList = new ArrayList<>();
-        List<Song> songLyricsList = new ArrayList<>();
-        if (searchData.isEmpty()) {
-            System.out.println("well...");
-        } else if (searchData.length() <= 3) {
-            //treat as exact input
-            Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(searchData.trim());
-            if (authorAlias.isPresent()) {
-                authorAliases.add(authorAlias.get());
-            }
-            songTitleList = songService.findByOfficialDisplayTitle(searchData.trim());
-            songLyricsList = songService.findByLyrics(searchData.trim());
-        } else {
-            boolean fullPhraseSearch = searchData.contains("\"");
-            if (fullPhraseSearch) {
-                searchData = searchData.replaceAll("\"", "");
-                Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(searchData.trim());
-                if (authorAlias.isPresent()) {
-                    authorAliases.add(authorAlias.get());
-                }
-                songTitleList = songService.findByOfficialDisplayTitle(searchData.trim());
-                songLyricsList = songService.findByLyrics(searchData.trim());
-            } else {
-                authorAliases = authorAliasService.findByAliasContains(searchData.trim());
-                songTitleList = songService.findByOfficialDisplayTitleContains(searchData.trim());
-                songLyricsList = songService.findByLyricsContains(searchData.trim());
-            }
-        }
-        model.addAttribute("appName", appName);
-        model.addAttribute("series", serieService.findAllSortedByPositionAsc());
-        model.addAttribute("authorAliases", authorAliases);
-        model.addAttribute("songTitleList", songTitleList);
-        model.addAttribute("songLyricsList", songLyricsList);
-        model.addAttribute("search", true);
-        model.addAttribute("searchPhrase", searchData);
-        return "index";
-    }
+	@Value("${spring.application.name}")
+	String appName;
+
+	@GetMapping(value = "/basic")
+	public String searchStuff(Model model, @RequestParam("searchData") String searchData) {
+		List<AuthorAlias> authorAliases = new ArrayList<>();
+		List<Song> songTitleList = new ArrayList<>();
+		List<Song> songLyricsList = new ArrayList<>();
+		List<Genre> genreList = new ArrayList<>();
+		String query = searchData.trim();
+		if (searchData.isEmpty()) {
+			System.out.println("well...");
+		} else if (searchData.length() <= 3) {
+			//treat as exact input
+			Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(query);
+			authorAlias.ifPresent(authorAliases::add);
+			songTitleList = songService.findByOfficialDisplayTitle(query);
+			songLyricsList = songService.findByLyrics(query);
+			Optional<Genre> genre = genreService.findByGenreName(query);
+			genre.ifPresent(genreList::add);
+		} else {
+			boolean fullPhraseSearch = query.contains("\"");
+			if (fullPhraseSearch) {
+				query = query.replaceAll("\"", "").trim();
+				Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(query);
+				if (authorAlias.isPresent()) {
+					authorAliases.add(authorAlias.get());
+				}
+				songTitleList = songService.findByOfficialDisplayTitle(query);
+				songLyricsList = songService.findByLyrics(query);
+				genreList = genreService.findByGenreNameContains(query);
+
+			} else {
+				authorAliases = authorAliasService.findByAliasContains(query);
+				songTitleList = songService.findByOfficialDisplayTitleContains(query);
+				songLyricsList = songService.findByLyricsContains(query);
+				genreList = genreService.findByGenreNameContains(query);
+			}
+		}
+		model.addAttribute("appName", appName);
+		model.addAttribute("series", serieService.findAllSortedByPositionAsc());
+		model.addAttribute("authorAliases", authorAliases);
+		model.addAttribute("songTitleList", songTitleList);
+		model.addAttribute("songLyricsList", songLyricsList);
+		model.addAttribute("genreList", genreList);
+		model.addAttribute("search", true);
+		model.addAttribute("searchPhrase", searchData);
+		return "index";
+	}
 }

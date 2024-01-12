@@ -1,15 +1,10 @@
 package com.nfssoundtrack.NFSSoundtrack_20.others;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.SpringHandlerInstantiator;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,59 +23,59 @@ import java.util.Locale;
 @EnableWebSecurity
 public class WebSecurityConfig implements WebMvcConfigurer {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
-    @Autowired
-    private DatabaseUserDetailsService databaseUserDetailsService;
+	private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
+	@Autowired
+	private DatabaseUserDetailsService databaseUserDetailsService;
 
-    @Bean
-    public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/manage/manage", "/manage/manage#", "/serie/**", "/country/**",
-                                "/maingroup/**", "/songSubgroup/**", "/subgroup/**", "/gamedb/**")
-                        .hasAuthority("ADMIN"))
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
-                                "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
-                                "/custom/playlist", "/song/**", "/songinfo/**", "/favicon.ico").permitAll()
-                )
-                .formLogin((form) -> form
-                        .loginPage("/login")
-                        .failureUrl("/content/donate")
-                        .defaultSuccessUrl("/content/home", true)
-                )
-                .logout((logout) -> logout
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()).userDetailsService(databaseUserDetailsService);
-        return http.build();
-    }
+	@Bean
+	public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {
+		http
+				.cors(AbstractHttpConfigurer::disable)
+				.csrf(AbstractHttpConfigurer::disable)
+				.authorizeHttpRequests((requests) -> requests
+						.requestMatchers("/manage/manage", "/manage/manage#", "/serie/**", "/country/**",
+								"/maingroup/**", "/songSubgroup/**", "/subgroup/**", "/gamedb/**")
+						.hasAuthority("ADMIN"))
+				.authorizeHttpRequests((requests) -> requests
+						.requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
+								"/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
+								"/custom/playlist", "/song/**", "/songinfo/**", "/favicon.ico").permitAll()
+				)
+				.formLogin((form) -> form
+						.loginPage("/login")
+						.failureUrl("/content/donate")
+						.defaultSuccessUrl("/content/home", true)
+				)
+				.logout((logout) -> logout
+						.invalidateHttpSession(true)
+						.deleteCookies("JSESSIONID")
+						.permitAll()).userDetailsService(databaseUserDetailsService);
+		return http.build();
+	}
 
-    @Bean
-    public LocaleResolver localeResolver() {
-        SessionLocaleResolver slr = new SessionLocaleResolver();
-        slr.setDefaultLocale(Locale.US);
-        return slr;
-    }
+	@Bean
+	public LocaleResolver localeResolver() {
+		SessionLocaleResolver slr = new SessionLocaleResolver();
+		slr.setDefaultLocale(Locale.US);
+		return slr;
+	}
 
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
-        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-        lci.setParamName("lang");
-        return lci;
-    }
+	@Bean
+	public LocaleChangeInterceptor localeChangeInterceptor() {
+		LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+		lci.setParamName("lang");
+		return lci;
+	}
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(localeChangeInterceptor());
-    }
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(localeChangeInterceptor());
+	}
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder(12);
+	}
 
 
 }

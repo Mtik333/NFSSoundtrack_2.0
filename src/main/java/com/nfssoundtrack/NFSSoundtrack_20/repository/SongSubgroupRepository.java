@@ -10,11 +10,11 @@ import java.util.List;
 
 public interface SongSubgroupRepository extends JpaRepository<SongSubgroup, Integer> {
 
-    List<SongSubgroup> findBySong(Song song);
+	List<SongSubgroup> findBySong(Song song);
 
-    List<SongSubgroup> findBySongIn(List<Song> songs, Sort sort);
+	List<SongSubgroup> findBySongIn(List<Song> songs, Sort sort);
 
-    SongSubgroup findBySongAndSubgroup(Song song, Subgroup subgroup);
+	SongSubgroup findBySongAndSubgroup(Song song, Subgroup subgroup);
 
-    List<SongSubgroup> findBySubgroupIdIn(List<Subgroup> subgroups);
+	List<SongSubgroup> findBySubgroupIdIn(List<Subgroup> subgroups);
 }

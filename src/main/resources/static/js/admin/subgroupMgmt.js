@@ -195,7 +195,7 @@ $(document).ready(function () {
             type: "PUT",
             data: JSON.stringify(modifiedSubgroupSongArray),
             contentType: 'application/json; charset=utf-8',
-            url: "/subgroup/put/" + currentSubgroupId,
+            url: "/subgroup/put/" + Number(currentSubgroupId),
             success: function (ooo) {
                 console.log("eee");
                 $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
