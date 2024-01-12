@@ -10,7 +10,8 @@ function GamePositionDef(gameId, position) {
 
 var currentlyEditedSerieId;
 $(document).ready(function () {
-    $('#success-alert').hide();
+    $(successAlertHtml).hide();
+    $(failureAlertHtml).hide();
 
     function getAllSeriesAndDisplay() {
         $.ajax({
@@ -22,6 +23,7 @@ $(document).ready(function () {
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
                 divToAppend.append(successAlertHtml);
+                divToAppend.append(failureAlertHtml);
                 var rowDiv = $('<div class="row">');
                 var leftCellDiv = $('<div class="col">');
                 var rightCellDiv = $('<div class="col">');
@@ -38,13 +40,11 @@ $(document).ready(function () {
                 divToAppend.append(tableToFill);
             },
             error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
-
     }
 
     function displayAllSerie(series) {
@@ -83,6 +83,7 @@ $(document).ready(function () {
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
                 divToAppend.append(successAlertHtml);
+                divToAppend.append(failureAlertHtml);
                 var serieNameDiv = $('<div class="form-group serieDiv" id="serieDiv">');
                 var serieInputName = $('<input class="form-control" id="serieName" value="' + serieName + '"/>');
                 serieNameDiv.append('<label for="serieName">Serie name</label>');
@@ -105,11 +106,10 @@ $(document).ready(function () {
                 divToAppend.append(tableToFill);
             },
             error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
 
     });
@@ -143,6 +143,7 @@ $(document).ready(function () {
         var divToAppend = $('#nfs-content');
         divToAppend.empty();
         divToAppend.append(successAlertHtml);
+        divToAppend.append(failureAlertHtml);
         var serieNameDiv = $('<div class="form-group newSerieDiv" id="newSerieDiv">');
         var serieInputName = $('<input class="form-control" id="newSerieName"/>');
         serieNameDiv.append('<label for="newSerieName">New serie name</label>');
@@ -165,20 +166,18 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
-                console.log("eee");
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500);
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500);
                     getAllSeriesAndDisplay();
                 });
             },
             error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                    getAllSeriesAndDisplay();
+                });
 
             },
-            done: function (ooo) {
-                console.log("e3");
-
-            }
         });
     });
 
@@ -205,18 +204,18 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             url: "/serie/updatePositions",
             success: function (ooo) {
-                console.log("eee");
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500, function () {
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
                         getAllSeriesAndDisplay();
                     });
                 });
             }, error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500, function () {
+                        getAllSeriesAndDisplay();
+                    });
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
     });
 
@@ -240,18 +239,18 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             url: "/serie/updateGames",
             success: function (ooo) {
-                console.log("eee");
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500, function () {
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
                         getAllSeriesAndDisplay();
                     });
                 });
             }, error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500, function () {
+                        getAllSeriesAndDisplay();
+                    });
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
 
     });

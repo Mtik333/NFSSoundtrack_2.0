@@ -157,10 +157,12 @@
                                 </td>
                                 <td class="actions">
                                     <div class="play_icondiv">
-                                        <th:block th:if="${songSubgroup.srcId!=null or songSubgroup.song.srcId!=null}">
+                                        <!--<th:block th:if="${songSubgroup.srcId!=null or songSubgroup.song.srcId!=null}">-->
+                                        <th:block th:if="${songSubgroup.srcId!=null}">
+                                            <!--th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"-->
                                             <img class="play_icon img-responsive" data-bs-toggle="modal"
                                                 data-bs-target="#videoModal"
-                                                th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
+                                                th:attr="data-tagVideo='https://www.youtube.com/embed/'+${songSubgroup.srcId}"
                                                 th:src="@{/images/znakwodny.png}" width="25" height="25">
                                         </th:block>
                                         <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>

@@ -9,7 +9,8 @@ var currentSubgroup;
 var newSong = false;
 $(document).ready(function () {
 
-    $("#success-alert").hide();
+    $(successAlertHtml).hide();
+    $(failureAlertHtml).hide();
     function getSubgroupsFromGame() {
         $.ajax({
             async: false,
@@ -20,6 +21,7 @@ $(document).ready(function () {
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
                 divToAppend.append(successAlertHtml);
+                divToAppend.append(failureAlertHtml);
                 var rowDiv = $('<div class="row p-1">');
                 var leftCellDiv = $('<div class="col">');
                 var rightCellDiv = $('<div class="col">');
@@ -54,9 +56,12 @@ $(document).ready(function () {
                 }
                 divToAppend.append(tableToFill);
                 $(divToAppend).find("a").first().click();
-            }
-
-
+            },
+            error: function (ooo) {
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
+            },
         });
     }
 
@@ -104,10 +109,14 @@ $(document).ready(function () {
             success: function (ooo) {
                 console.log("e");
                 getSubgroupsFromGame();
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500);
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500);
                 });
-            }
+            }, error: function (ooo) {
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
+            },
         });
     });
 
@@ -122,19 +131,16 @@ $(document).ready(function () {
             type: "GET",
             url: "/songSubgroup/read/" + Number(songId),
             success: function (ooo) {
-                console.log("e");
                 songSubgroup = JSON.parse(ooo);
                 currentSongSubgroup = songSubgroup;
                 renderEditCreateSong(divToAppend, songSubgroup);
             },
             error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
-
     });
 
     function renderEditCreateSong(divToAppend, songSubgroup) {
@@ -275,7 +281,11 @@ $(document).ready(function () {
                 divToAppend.append(officialDisplayDiv);
                 divToAppend.append(genreDisplayDiv);
                 divToAppend.append(spotifyOthersDiv);
-            }
+            }, error: function (ooo) {
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
+            },
         });
     });
 
@@ -293,11 +303,10 @@ $(document).ready(function () {
                         }
                     },
                     error: function (ooo) {
-                        console.log("e2");
+                        $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                            $(failureAlertHtml).slideUp(500);
+                        });
                     },
-                    done: function (ooo) {
-                        console.log("e3");
-                    }
                 });
             },
             select: function (event, ui) {
@@ -313,7 +322,7 @@ $(document).ready(function () {
                     }
                 }
             },
-            minLength: 0
+            minLength: 1
         });
     }
 
@@ -331,11 +340,10 @@ $(document).ready(function () {
                         }
                     },
                     error: function (ooo) {
-                        console.log("e2");
+                        $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                            $(failureAlertHtml).slideUp(500);
+                        });
                     },
-                    done: function (ooo) {
-                        console.log("e3");
-                    }
                 });
             },
             select: function (event, ui) {
@@ -344,7 +352,7 @@ $(document).ready(function () {
                 $(mySelect).text(ui.item.label);
                 $(mySelectHidden).val(ui.item.value);
             },
-            minLength: 0
+            minLength: 1
         });
     }
 
@@ -362,11 +370,10 @@ $(document).ready(function () {
                         }
                     },
                     error: function (ooo) {
-                        console.log("e2");
+                        $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                            $(failureAlertHtml).slideUp(500);
+                        });
                     },
-                    done: function (ooo) {
-                        console.log("e3");
-                    }
                 });
             },
             select: function (event, ui) {
@@ -375,7 +382,7 @@ $(document).ready(function () {
                 $(mySelect).text(ui.item.label);
                 $(mySelectHidden).val(ui.item.value);
             },
-            minLength: 0
+            minLength: 1
         });
     }
 
@@ -393,11 +400,10 @@ $(document).ready(function () {
                         }
                     },
                     error: function (ooo) {
-                        console.log("e2");
+                        $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                            $(failureAlertHtml).slideUp(500);
+                        });
                     },
-                    done: function (ooo) {
-                        console.log("e3");
-                    }
                 });
             },
             select: function (event, ui) {
@@ -406,7 +412,7 @@ $(document).ready(function () {
                 $(mySelect).text(ui.item.label);
                 $(mySelectHidden).val(ui.item.value);
             },
-            minLength: 0
+            minLength: 1
         });
     }
 
@@ -434,8 +440,6 @@ $(document).ready(function () {
             var songId = subgroupSongs[i].song.id;
             var songToMark = $("#songs-table").find('tr[data-songId="' + songId + '"][data-songsubgroupid="' + subgroupSongs[i].id + '"]').first();
             songToMark.attr("data-songSubgroupId", subgroupSongs[i].id);
-
-
             songToMark.removeClass("visually-hidden");
         };
         console.log("e");
@@ -485,7 +489,7 @@ $(document).ready(function () {
         var ingameInfo = $(`<input class="form-control" id="ingameInfo"/>`);
         if (songSubgroup != null) {
             ingameBand.val(songSubgroup.ingameDisplayBand);
-            ingameBand.val(songSubgroup.ingameDisplayBand);
+            ingameSrcId.val(songSubgroup.srcId);
             ingameTitle.val(songSubgroup.ingameDisplayTitle);
             ingameInfo.val(songSubgroup.info);
         }
@@ -613,7 +617,7 @@ $(document).ready(function () {
             } else {
                 setupAutocompleteAlias(featSelect, featSelectHidden, "");
             }
-            featDiv.append('<h4>Feat. display</h4>')
+            featDiv.append('<h4>Feat. display</h4>');
             featInputColDiv.append('<label for="featSelect-1">Feat.</label>');
             featInputColDiv.append(featSelect);
             featInputColDiv.append(featSelectHidden);
@@ -962,8 +966,9 @@ $(document).ready(function () {
                 // dataType: 'json',
                 success: function (ooo) {
                     var existingSong = JSON.parse(ooo);
-                    if (existingSong != "[]") {
+                    if (existingSong) {
                         $("#existingSongId").val(existingSong.id);
+                        $("#officialBand").val(existingSong.officialDisplayTitle);
                         $("#itunesInput").val(existingSong.itunesLink);
                         $("#spotifyInput").val(existingSong.spotifyId);
                         $("#soundcloudInput").val(existingSong.soundcloudLink);
@@ -974,19 +979,11 @@ $(document).ready(function () {
                     }
                 },
                 error: function (ooo) {
-                    console.log("e2");
-
+                    $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                        $(failureAlertHtml).slideUp(500);
+                    });
                 },
-                done: function (ooo) {
-                    console.log("e3");
-
-                }
             });
-            // var hiddenVal = $("#authorSelectHidden-0").val();
-            // if (hiddenVal == "") {
-            //     $("#aliasSelect-0").val($(this).val());
-            //     $("#officialBand").val($(this).val());
-            // }
         }
     });
 
@@ -1012,7 +1009,6 @@ $(document).ready(function () {
         } else {
             $(this).next().hide();
         }
-
     });
 
     $(document).on('focusout', '#ingameSrcId', function (e) {
@@ -1043,6 +1039,7 @@ $(document).ready(function () {
 
     $(document).on('click', '#save-song', function (e) {
         var divToAppend = $('#nfs-content');
+        songToSave = new Object();
         if ($("#authorSelectHidden-0").val() == "") {
             songToSave.authorId = "NEW-" + $("#authorSelect-0").val();
         } else {
@@ -1135,20 +1132,16 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
-                console.log("eee");
                 getSubgroupsFromGame();
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500);
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500);
                 });
             },
             error: function (ooo) {
-                console.log("e2");
-
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-
-            }
         });
     });
 
@@ -1190,19 +1183,16 @@ $(document).ready(function () {
             success: function (ooo) {
                 console.log("eee");
                 getSubgroupsFromGame();
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500);
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500);
                     divToAppend.empty();
                 });
             },
             error: function (ooo) {
-                console.log("e2");
-
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-
-            }
         });
     });
 
@@ -1307,6 +1297,12 @@ $(document).ready(function () {
                 }
             }
         }
+        songToSave.lyrics = $("#lyrics").val();
+        songToSave.spotify = $("#spotifyInput").val();
+        songToSave.itunes = $("#itunesInput").val();
+        songToSave.soundcloud = $("#soundcloudInput").val();
+        songToSave.deezer = $("#deezerInput").val();
+        songToSave.tidal = $("#tidalInput").val();
         $.ajax({
             async: false,
             type: "POST",
@@ -1317,18 +1313,17 @@ $(document).ready(function () {
             success: function (ooo) {
                 console.log("eee");
                 getSubgroupsFromGame();
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500);
-                    divToAppend.empty();
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500);
+                    $('#nfs-content').empty();
                 });
             },
             error: function (ooo) {
-                console.log("e2");
-
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                    $('#nfs-content').empty();
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
     });
 });

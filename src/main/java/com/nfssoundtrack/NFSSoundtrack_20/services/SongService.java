@@ -39,6 +39,12 @@ public class SongService {
 				officialDisplayTitle);
 	}
 
+	public List<Song> findByOfficialDisplayBandAndOfficialDisplayTitleContains(String officialDisplayBand,
+																			   String officialDisplayTitle) {
+		return songRepository.findByOfficialDisplayBandAndOfficialDisplayTitleContains(officialDisplayBand,
+				officialDisplayTitle);
+	}
+
 	public List<Song> findByLyrics(String lyrics) {
 		return songRepository.findByLyrics(lyrics);
 	}

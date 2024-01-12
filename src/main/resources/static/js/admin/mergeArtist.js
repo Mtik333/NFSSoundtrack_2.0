@@ -1,4 +1,3 @@
-var successAlertHtml = '<div class="alert alert-success" id="success-alert" style="display: none;"><strong>Success!</strong></div>';
 var foundArtist;
 
 $(document).ready(function () {
@@ -6,11 +5,10 @@ $(document).ready(function () {
         var divToAppend = $('#nfs-content');
         divToAppend.empty();
         divToAppend.append(successAlertHtml);
+        divToAppend.append(failureAlertHtml);
         var buttonDiv = $('<div class="row p-1">');
         var buttonCol = $('<div class="col">');
         var rowDiv = $('<div class="row p-1">');
-        //var countriesRowDiv = $('<div id="countriesRow" class="row p-1">');
-        //var aliasesRow = $('<div id="aliasesRow" class="row p-1">');
         var leftCellDiv = $('<div class="col">');
         var rightCellDiv = $('<div class="col">');
         divToAppend.append(rowDiv);
@@ -34,17 +32,16 @@ $(document).ready(function () {
         rowDiv.append(leftCellDiv);
         rowDiv.append(rightCellDiv);
         divToAppend.append(rowDiv);
-        //divToAppend.append(aliasesRow);
-        //divToAppend.append(countriesRowDiv);
     });
 
     $(document).on('click', "#merge-artist", function (e) {
         var authorToMerge = $("#authorMergeInputHidden").val();
         var targetAuthor = $("#targetAuthorInputHidden").val();
         var objToSubmit = new Object();
-        objToSubmit.authorToMergeId=Number(authorToMerge);
-        objToSubmit.targetAuthorId=Number(targetAuthor);
-        $('#success-alert').hide();
+        objToSubmit.authorToMergeId = Number(authorToMerge);
+        objToSubmit.targetAuthorId = Number(targetAuthor);
+        $(successAlertHtml).hide();
+        $(failureAlertHtml).hide();
         $.ajax({
             async: false,
             type: "PUT",
@@ -52,19 +49,20 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             url: "/author/merge",
             success: function (ooo) {
-                console.log("eee");
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500, function () {
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
                         var divToAppend = $('#nfs-content');
                         divToAppend.empty();
                     });
                 });
             }, error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500, function () {
+                        var divToAppend = $('#nfs-content');
+                        divToAppend.empty();
+                    });
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
     });
 });
@@ -77,17 +75,16 @@ function setupAutocompleteMergeArtist(mySelect, mySelectHidden, valueToSet) {
                 type: "GET",
                 url: "/author/authorNameMgmt/" + $(mySelect).val(),
                 success: function (ooo) {
-                        var foundArtist = JSON.parse(ooo);
-                        if (result){
-                            response(foundArtist);
-                        }
+                    var foundArtist = JSON.parse(ooo);
+                    if (foundArtist) {
+                        response(foundArtist);
+                    }
                 },
                 error: function (ooo) {
-                    console.log("e2");
+                    $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                        $(failureAlertHtml).slideUp(500);
+                    });
                 },
-                done: function (ooo) {
-                    console.log("e3");
-                }
             });
         },
         select: function (event, ui) {
@@ -95,8 +92,7 @@ function setupAutocompleteMergeArtist(mySelect, mySelectHidden, valueToSet) {
             $(mySelect).val(ui.item.label);
             $(mySelect).text(ui.item.label);
             $(mySelectHidden).val(ui.item.value);
-
         },
-        minLength: 0
+        minLength: 1
     });
 }

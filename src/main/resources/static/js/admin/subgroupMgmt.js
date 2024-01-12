@@ -13,7 +13,8 @@ function ModifiedSubgroupSongPositionDef(songSubgroupId, position) {
 }
 
 $(document).ready(function () {
-    $("#success-alert").hide();
+    $(successAlertHtml).hide();
+    $(failureAlertHtml).hide();
     function getSubgroupsFromGame() {
         $.ajax({
             async: false,
@@ -24,6 +25,7 @@ $(document).ready(function () {
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
                 divToAppend.append(successAlertHtml);
+                divToAppend.append(failureAlertHtml);
                 var rowDiv = $('<div class="row">');
                 var leftCellDiv = $('<div class="col">');
                 var rightCellDiv = $('<div class="col">');
@@ -59,7 +61,12 @@ $(document).ready(function () {
                 }
                 divToAppend.append(tableToFill);
                 $(divToAppend).find("a").first().click();
-            }
+            },
+            error: function (ooo) {
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
+            },
         });
     }
 
@@ -198,24 +205,24 @@ $(document).ready(function () {
             url: "/subgroup/put/" + Number(currentSubgroupId),
             success: function (ooo) {
                 console.log("eee");
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500, function () {
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
                         getSubgroupsFromGame();
                     });
                 });
                 modifiedSubgroupSongArray.length = 0;
             }, error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500, function (){
+                        getSubgroupsFromGame();
+                    });
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
     });
 
     $(document).on('click', '#recounterPositions', function (e) {
         $("#subgroups-table").find("tr").filter(function (index) {
-            var cps = $($(this).find("input")[0]).prop('checked')
             return $($(this).find("input")[0]).prop('checked') == true;
         }).each(function (index) {
             $($(this).find("input")[1]).val((index + 1) * 10);
@@ -242,19 +249,19 @@ $(document).ready(function () {
             url: "/songSubgroup/positions/" + currentSubgroupId,
             success: function (ooo) {
                 console.log("eee");
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500, function () {
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
                         getSubgroupsFromGame();
                     });
                 });
             }, error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500, function (){
+                        getSubgroupsFromGame();
+                    });
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
-
     });
 
     $(document).on('focusout', '.songSubgroupPosition', sortTable);

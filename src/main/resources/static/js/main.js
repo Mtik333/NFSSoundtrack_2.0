@@ -40,7 +40,7 @@ $(document).ready(function () {
     $("#flexSwitchCheckDefault").change(function (e) {
         localStorage.setItem("dark-mode", $(this).prop("checked"));
         changeStuffForDarkMode();
-        if (DISQUS != undefined) {
+        if (typeof DISQUS != "undefined") {
             DISQUS.reset({ reload: true });
         }
     });
@@ -131,6 +131,19 @@ $(document).ready(function () {
                 newTd.append(clearDiv);
                 newTr.append(newTd)
                 newTr.insertAfter(parentTr);
+            }
+        } else {
+            $("#lyricsCollapse").empty()
+            var lyricsTxt = $(this).next().text();
+            if (lyricsTxt == "null" || lyricsTxt == "") {
+                $("#showLyrics").text("Lyrics not found");
+                $("#showLyrics").prop("disabled", true);
+            } else if (lyricsTxt == "0.0") {
+                $("#showLyrics").text("This is instrumental, no lyrics");
+                $("#showLyrics").prop("disabled", true);
+            } else {
+                $("#lyricsCollapse").append(lyricsTxt);
+                $("#showLyrics").prop("disabled", false);
             }
         }
 
@@ -672,7 +685,7 @@ $(document).ready(function () {
     $(document).on("click", "img.info-about-song", function () {
         var trElem = $(this).parent().parent();
         var songIdAttr = $(trElem).attr("data-song_id");
-        $("#getAllUsages").attr("href", "/song/" + songIdAttr);
+        $("#getAllUsages").attr("href", "/song/" + Number(songIdAttr));
         $.ajax({
             async: false,
             type: "GET",
@@ -701,6 +714,9 @@ $(document).ready(function () {
                         $(songInfo.featArtists[i]).insertAfter($("#featArtists"));
                     }
                 }
+                if (songInfo.youtube != null) {
+                    $(songInfo.youtube).insertAfter("#externalLinks");
+                }
                 if (songInfo.spotify != null) {
                     $(songInfo.spotify).insertAfter("#externalLinks");
                 }
@@ -717,7 +733,6 @@ $(document).ready(function () {
                 $("#infoSongModal").modal('show');
             },
             error: function (ooo) {
-                songsAsFeat
                 console.log("e2");
             },
             done: function (ooo) {

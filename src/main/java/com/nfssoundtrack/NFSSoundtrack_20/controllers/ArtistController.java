@@ -47,8 +47,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	ArtistSerializer artistSerializer;
 
 	@GetMapping(value = "/authorAlias/{input}")
-	public @ResponseBody
-	String readAliasesFromArtist(@PathVariable("input") int input) throws Exception {
+	public @ResponseBody String readAliasesFromArtist(@PathVariable("input") int input)
+			throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
 		SimpleModule simpleModule = new SimpleModule();
 		simpleModule.addSerializer(AuthorAlias.class, authorAliasSerializer);
@@ -62,10 +62,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	}
 
 	@GetMapping(value = "/aliasName/{input}")
-	public @ResponseBody
-	String readAliases(@PathVariable("input") String input)
-			throws JsonProcessingException, InvocationTargetException, NoSuchMethodException, InstantiationException,
-			IllegalAccessException {
+	public @ResponseBody String readAliases(@PathVariable("input") String input)
+			throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		SimpleModule simpleModule = new SimpleModule();
 		simpleModule.addSerializer(AuthorAlias.class, authorAliasSerializer);
@@ -93,8 +91,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	@GetMapping(value = "/authorName/{input}")
 	public @ResponseBody
 	String readSpecialArtists(@PathVariable("input") String input)
-			throws JsonProcessingException, InvocationTargetException, NoSuchMethodException, InstantiationException,
-			IllegalAccessException {
+			throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		SimpleModule simpleModule = new SimpleModule();
 		simpleModule.addSerializer(Author.class, artistSerializer);
@@ -118,14 +115,13 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 
 	@GetMapping(value = "/authorNameMgmt/{input}")
 	public @ResponseBody
-	String readArtistsForMgmt(@PathVariable("input") String input)
-			throws JsonProcessingException, InvocationTargetException, NoSuchMethodException, InstantiationException,
-			IllegalAccessException {
+	String readArtistsForMgmt(@PathVariable(name="input", required = false) String input)
+			throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		SimpleModule simpleModule = new SimpleModule();
 		simpleModule.addSerializer(Author.class, artistMgmtSerializer);
 		objectMapper.registerModule(simpleModule);
-		if (input.isEmpty()) {
+		if (input==null || input.isEmpty()) {
 			return objectMapper.writeValueAsString(null);
 		}
 		if (input.length() <= 3) {
@@ -146,8 +142,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	}
 
 	@PutMapping(value = "/merge", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody
-	String mergeArtists(@RequestBody String formData) throws Exception {
+	public @ResponseBody String mergeArtists(@RequestBody String formData)
+			throws Exception {
 		Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
 		int authorToMerge = (int) mergeInfo.get("authorToMergeId");
 		int targetAuthor = (int) mergeInfo.get("targetAuthorId");
@@ -176,8 +172,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	}
 
 	@PutMapping(value = "/put", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody
-	String updateArtist(@RequestBody String formData) throws Exception {
+	public @ResponseBody String updateArtist(@RequestBody String formData)
+			throws Exception {
 		Map<String, ?> mergeInfo = new ObjectMapper().readValue(formData,
 				TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class));
 		String authorId = (String) mergeInfo.get("authorId");

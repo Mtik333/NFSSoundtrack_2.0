@@ -73,7 +73,7 @@ public class SongController extends BaseControllerWithErrorHandling {
 		}
 		String band = (String) mergeInfo.get("band");
 		String title = (String) mergeInfo.get("title");
-		List<Song> matchingSongs = songService.findByOfficialDisplayBandAndOfficialDisplayTitle(band, title);
+		List<Song> matchingSongs = songService.findByOfficialDisplayBandAndOfficialDisplayTitleContains(band, title);
 		if (!matchingSongs.isEmpty()) {
 			return objectMapper.writeValueAsString(matchingSongs.get(0));
 		} else {

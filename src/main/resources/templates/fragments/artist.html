@@ -13,12 +13,12 @@
     <img class="img-responsive" th:src="@{/images/spotify.png}" width="25" height="25">
     <img class="img-responsive" th:src="@{/images/itunes2.png}" width="25" height="25">
 </div>
-<h4 th:text="#{allAliases}"></h4>
+<h5 th:text="#{allAliases}"></h5>
 <th:block th:each="singleAlias,iter : ${allAliases}">
-    <h5 class="d-inline" th:text="${singleAlias.alias}"></h5><span th:remove="tag"
+    <h6 class="d-inline" th:text="${singleAlias.alias}"></h6><span th:remove="tag"
         th:text="${!iter.last ? ', ' : ''}"></span>
 </th:block>
-<h4 th:text="#{associatedCountries}"></h4>
+<h5 th:text="#{associatedCountries}"></h5>
 <th:block th:each="authorCountry : ${author?.authorCountries}">
     <img class="country-img" th:src="${authorCountry.country.countryLink}">
 </th:block>

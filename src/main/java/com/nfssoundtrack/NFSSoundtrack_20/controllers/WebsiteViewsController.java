@@ -111,7 +111,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 		return "index";
 	}
 
-	@RequestMapping(value = "/songInfo/{songId}")
+	@GetMapping(value = "/songInfo/{songId}")
 	public @ResponseBody
 	String provideSongModalInfo(@PathVariable("songId") int songId) throws Exception {
 		Song song = songService.findById(songId).orElseThrow(() -> new Exception("No song with id found " + songId));
@@ -126,10 +126,11 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 		return result;
 	}
 
-	@RequestMapping(value = "/song/{songId}")
-	public String provideSongInfo(Model model, @PathVariable("songId") int songId) throws Exception {
-		Song song = songService.findById(songId).orElseThrow(() -> new Exception("No song found with id " + songId));
-		model.addAttribute("appName", "Custom playlist - NFSSoundtrack.com");
+	@GetMapping(value = "/song/{songId}")
+	public String provideSongInfo(Model model, @PathVariable("songId") String songId) throws Exception {
+		Song song = songService.findById(Integer.valueOf(songId)).orElseThrow(() -> new Exception("No song found with id " + songId));
+		model.addAttribute("appName", song.getOfficialDisplayBand()
+				+ " - " + song.getOfficialDisplayTitle() + " - " + appName);
 		model.addAttribute("series", serieService.findAllSortedByPositionAsc());
 		model.addAttribute("songToCheck", song);
 		model.addAttribute("songUsages", songSubgroupService.findBySong(song));

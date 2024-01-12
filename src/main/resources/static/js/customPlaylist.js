@@ -61,6 +61,5 @@ $(document).on("click", "#truncate_playlist", function () {
 });
 
 $('#playlistTruncated').on('hidden.bs.modal', function (e) {
-		
 	$("#spotifyVideo").attr('src', '');
 })

@@ -3,7 +3,8 @@ var gameToEdit;
 $(document).ready(function () {
     $(document).on('click', "a.edit-game", function (e) {
         var gameId = $(this).attr("data-gameid");
-        $('#success-alert').hide();
+        $(successAlertHtml).hide();
+        $(failureAlertHtml).hide();
         $.ajax({
             async: false,
             type: "GET",
@@ -13,6 +14,7 @@ $(document).ready(function () {
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
                 divToAppend.append(successAlertHtml);
+                divToAppend.append(failureAlertHtml);
                 var newGameDiv = $('<div class="form-group newGameDiv" id="newGameDiv">');
                 var firstRowDiv = $('<div class="row">');
                 var gameTitleColDiv = $('<div class="col">');
@@ -98,21 +100,20 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
-                console.log("eee");
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500);
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500);
                     var divToAppend = $('#nfs-content');
                     divToAppend.empty();
                 });
             },
             error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                    var divToAppend = $('#nfs-content');
+                    divToAppend.empty();
+                });
 
             },
-            done: function (ooo) {
-                console.log("e3");
-
-            }
         });
     });
 });

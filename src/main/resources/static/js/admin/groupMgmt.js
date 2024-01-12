@@ -2,10 +2,13 @@ var gameId;
 var fullScopeOfEdit;
 var editedGroup;
 var groupIndex;
-
-var successAlertHtml = '<div class="alert alert-success" id="success-alert" style="display: none;"><strong>Success!</strong></div>';
+var successAlertHtml = $('<div class="alert alert-success" id="success-alert" style="display: none;"><strong>Success!</strong></div>');
+var failureAlertHtml = $('<div class="alert alert-danger" id="failure-alert" style="display: none;"><strong>Failure! Check the logs</strong></div>');
 $(document).ready(function () {
-    $('#success-alert').hide();
+    $("body").append(successAlertHtml);
+    $("body").append(failureAlertHtml);
+    successAlertHtml.hide();
+    failureAlertHtml.hide();
     function getGroupsFromGame() {
         $.ajax({
             async: false,
@@ -16,6 +19,7 @@ $(document).ready(function () {
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
                 divToAppend.append(successAlertHtml);
+                divToAppend.append(failureAlertHtml);
                 var newGroupSpan = $('<h2><button data-gameId=' + gameId + ' id="new-group-' + gameId + '" class="new-group btn btn-success">New group</button></h2>');
                 if (fullScopeOfEdit.length > 0) {
                     var tableApp = $('<table class="table-bordered">');
@@ -23,7 +27,6 @@ $(document).ready(function () {
                     divToAppend.append(tableApp);
                     for (let i = 0; i < fullScopeOfEdit.length; i++) {
                         var groupName = fullScopeOfEdit[i].groupName;
-                        var groupId = fullScopeOfEdit[i].id;
                         var trElem = $('<tr>');
                         trElem.append('<td class="w-75"><h4><span>' + groupName + '</span></h4></td>');
                         trElem.append('<td class="text-right"><button type="button" id="edit-group" data-groupId="' + fullScopeOfEdit[i].id + '" class="btn btn-warning">Edit</button></td>');
@@ -32,14 +35,12 @@ $(document).ready(function () {
                     }
                     divToAppend.append('</table>');
                 }
-                console.log("e1");
             },
             error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
     }
     $('a.manage-groups').click(function (e) {
@@ -62,6 +63,7 @@ $(document).ready(function () {
         formAppend.append('<button id="submit-group" type="submit" class="btn btn-primary">Submit</button>');
         formAppend.append('<button id="cancel-group" type="submit" class="btn btn-primary">Cancel</button>');
         divToAppend.append(successAlertHtml);
+        divToAppend.append(failureAlertHtml);
     });
 
     $(document).on('click', '#cancel-group', function (e) {
@@ -112,12 +114,12 @@ $(document).ready(function () {
             divWithCols.append(inputRowDiv);
             divWithCols.append('<div class="col-sm"><input type="text" class="group-position" value="' + groupToEdit.subgroups[i].position + '"><button id="add-subgroup" type="submit" data-subgroupPosition="' + groupToEdit.subgroups[i].position + '" class="btn btn-success">+</button><button type="button" id="delete-subgroup" data-subGroupId="' + groupToEdit.subgroups[i].id + '" class="btn btn-danger">X</button></div>');
             formAppend.append(divWithCols);
-            //text-decoration-line-through
         }
         formAppend.append('<div class="form-group">');
         formAppend.append('<button id="update-subgroups" data-groupId="' + groupToEdit.id + '" type="submit" class="btn btn-primary">Submit</button>');
         formAppend.append('<button id="cancel-group" type="submit" class="btn btn-primary">Cancel</button>');
         divToAppend.append(successAlertHtml);
+        divToAppend.append(failureAlertHtml);
     });
 
     $(document).on('focusout', '.group-position', function (e) {
@@ -151,23 +153,17 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
-                console.log("eee");
                 getGroupsFromGame();
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500);
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500);
                 });
             },
             error: function (ooo) {
-                console.log("e2");
-
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-
-            }
         });
-        //event.preventDefault();
-        //return false;
     });
 
     $(document).on('click', '#update-subgroups', function (e) {
@@ -195,23 +191,17 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
-                console.log("eee");
                 getGroupsFromGame();
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500);
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500);
                 });
             },
             error: function (ooo) {
-                console.log("e2");
-
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-
-            }
         });
-        //event.preventDefault();
-        //return false;
     });
 
     $(document).on('click', '#delete-group', function (e) {
@@ -221,22 +211,16 @@ $(document).ready(function () {
             type: "DELETE",
             url: "/maingroup/delete/" + Number(groupId),
             success: function (ooo) {
-                console.log("eee");
                 getGroupsFromGame();
-                $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                    $('#success-alert').slideUp(500);
+                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500);
                 });
-
             },
             error: function (ooo) {
-                console.log("e2");
+                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
             },
-            done: function (ooo) {
-                console.log("e3");
-
-            }
         });
-
     });
-
 });

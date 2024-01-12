@@ -1,4 +1,3 @@
-var successAlertHtml = '<div class="alert alert-success" id="success-alert" style="display: none;"><strong>Success!</strong></div>';
 var foundArtist;
 
 $(document).ready(function () {
@@ -6,6 +5,7 @@ $(document).ready(function () {
         var divToAppend = $('#nfs-content');
         divToAppend.empty();
         divToAppend.append(successAlertHtml);
+        divToAppend.append(failureAlertHtml);
         var rowDiv = $('<div class="row p-1">');
         var leftCellDiv = $('<div class="col">');
         var rightCellDiv = $('<div class="col">');
@@ -39,17 +39,16 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
                 type: "GET",
                 url: "/author/authorNameMgmt/" + $(mySelect).val(),
                 success: function (ooo) {
-                        foundArtist = JSON.parse(ooo);
-                        if (foundArtist){
-                            response(foundArtist);
-                        }
+                    foundArtist = JSON.parse(ooo);
+                    if (foundArtist) {
+                        response(foundArtist);
+                    }
                 },
                 error: function (ooo) {
-                    console.log("e2");
+                    $(failureAlertHtml).show().fadeTo(2000, 500).slideUp(500, function () {
+                        $(failureAlertHtml).slideUp(500).hide();
+                    });
                 },
-                done: function (ooo) {
-                    console.log("e3");
-                }
             });
         },
         select: function (event, ui) {
@@ -71,7 +70,7 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
                 }
             }
         },
-        minLength: 0
+        minLength: 1
     });
 }
 
@@ -124,7 +123,7 @@ $(document).on('click', 'button.add-country', function (e) {
     var rowCol = col.parent();
     var divCol = rowCol.parent();
     var thisId = Number($(this).attr("id").replace("add-country-", ""));
-    generateCountryDiv((thisId+1),null,divCol);
+    generateCountryDiv((thisId + 1), null, divCol);
 });
 
 $(document).on('click', 'button.add-alias', function (e) {
@@ -132,7 +131,7 @@ $(document).on('click', 'button.add-alias', function (e) {
     var rowCol = col.parent();
     var divCol = rowCol.parent();
     var thisId = Number($(this).attr("id").replace("add-alias-", ""));
-    generateAliasDiv((thisId+1),null,divCol);
+    generateAliasDiv((thisId + 1), null, divCol);
 });
 
 $(document).on('click', '#save-artist', function (e) {
@@ -142,7 +141,7 @@ $(document).on('click', '#save-artist', function (e) {
     } else {
         artistToSave.authorId = $("#authorInputHidden").val();
     }
-    artistToSave.authorName=$("#authorInput").val();
+    artistToSave.authorName = $("#authorInput").val();
     var countries = $("#country-info").find("input.countryInfo");
     for (let i = 0; i < countries.length; i++) {
         var countryInput = countries[i];
@@ -166,7 +165,7 @@ $(document).on('click', '#save-artist', function (e) {
                 if ($(aliasInput).hasClass("text-decoration-line-through")) {
                     artistToSave[aliasInput.id] = "DELETE-" + $(aliasInput).next().val();
                 } else {
-                    artistToSave[aliasInput.id] = "EXISTING-"+$(aliasInput).next().val()+"-VAL-"+$(aliasInput).val();
+                    artistToSave[aliasInput.id] = "EXISTING-" + $(aliasInput).next().val() + "-VAL-" + $(aliasInput).val();
                 }
             } else {
                 artistToSave[aliasInput.id] = "NEW-" + $(aliasInput).val();
@@ -181,20 +180,19 @@ $(document).on('click', '#save-artist', function (e) {
         contentType: 'application/json; charset=utf-8',
         // dataType: 'json',
         success: function (ooo) {
-            $('#success-alert').fadeTo(2000, 500).slideUp(500, function () {
-                $('#success-alert').slideUp(500);
+            $(successAlertHtml).show().fadeTo(2000, 500).slideUp(500, function () {
+                $(successAlertHtml).slideUp(500).hide();
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
             });
         },
         error: function (ooo) {
-            console.log("e2");
-
+            $(failureAlertHtml).show().fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).slideUp(500).hide();
+                var divToAppend = $('#nfs-content');
+                divToAppend.empty();
+            });
         },
-        done: function (ooo) {
-            console.log("e3");
-
-        }
     });
 });
 
@@ -230,19 +228,19 @@ function generateAliasDiv(i, alias, aliasesDiv) {
     var buttonsDiv = $('<div class="col">');
     inputDiv.append('<label for="aliasInfo-' + i + '">Alias</label>');
     var aliasSelect = $('<input class="form-control aliasInfo" id="aliasInfo-' + i + '">');
-    if (alias!=undefined){
+    if (alias != undefined) {
         aliasSelect.val(alias.aliasName);
     }
     inputDiv.append(aliasSelect);
     var aliasSelectHidden = $('<input type="hidden" id="aliasInfoHidden-' + i + '"/>');
-    if (alias!=undefined){
+    if (alias != undefined) {
         aliasSelectHidden.val(alias.aliasId);
     }
     inputDiv.append(aliasSelectHidden);
     var addAliasButton = $('<button id="add-alias-' + i + '" type="submit" class="btn btn-primary add-alias">+</button>');
     var deleteAliasButton = $('<button id="delete-alias-' + i + '" type="submit" class="btn btn-danger delete-alias">-</button>');
-    if (i==0){
-        $("#delete-alias-0").prop("disabled",true);
+    if (i == 0) {
+        $("#delete-alias-0").prop("disabled", true);
     }
     buttonsDiv.append(addAliasButton);
     buttonsDiv.append(deleteAliasButton);
@@ -260,17 +258,16 @@ function setupAutocompleteCountry(mySelect, mySelectHidden, valueToSet) {
                 type: "GET",
                 url: "/country/countryName/" + $(mySelect).val(),
                 success: function (ooo) {
-                        var result = JSON.parse(ooo);
-                        if (result){
-                            response(result);
-                        }
+                    var result = JSON.parse(ooo);
+                    if (result) {
+                        response(result);
+                    }
                 },
                 error: function (ooo) {
-                    console.log("e2");
+                    $(failureAlertHtml).show().fadeTo(2000, 500).slideUp(500, function () {
+                        $(failureAlertHtml).slideUp(500).hide();
+                    });
                 },
-                done: function (ooo) {
-                    console.log("e3");
-                }
             });
         },
         select: function (event, ui) {
@@ -278,9 +275,8 @@ function setupAutocompleteCountry(mySelect, mySelectHidden, valueToSet) {
             $(mySelect).val(ui.item.label);
             $(mySelect).text(ui.item.label);
             $(mySelectHidden).val(ui.item.value);
-
         },
-        minLength: 0
+        minLength: 1
     });
 }
 
@@ -292,17 +288,16 @@ function setupAutocompleteAliasArtistMgmt(mySelect, mySelectHidden, valueToSet) 
                 type: "GET",
                 url: "/author/aliasName/" + $(mySelect).val(),
                 success: function (ooo) {
-                        var result = JSON.parse(ooo);
-                        if (result){
-                            response(result);
-                        }
+                    var result = JSON.parse(ooo);
+                    if (result) {
+                        response(result);
+                    }
                 },
                 error: function (ooo) {
-                    console.log("e2");
+                    $(failureAlertHtml).show().fadeTo(2000, 500).slideUp(500, function () {
+                        $(failureAlertHtml).slideUp(500).hide();
+                    });
                 },
-                done: function (ooo) {
-                    console.log("e3");
-                }
             });
         },
         select: function (event, ui) {
@@ -311,6 +306,6 @@ function setupAutocompleteAliasArtistMgmt(mySelect, mySelectHidden, valueToSet) 
             $(mySelect).text(ui.item.label);
             $(mySelectHidden).val(ui.item.value);
         },
-        minLength: 0
+        minLength: 1
     });
 }
