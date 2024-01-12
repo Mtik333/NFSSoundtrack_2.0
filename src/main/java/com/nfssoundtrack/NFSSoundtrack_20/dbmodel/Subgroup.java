@@ -72,4 +72,17 @@ public class Subgroup implements Serializable {
     public void setSongSubgroupList(List<SongSubgroup> songSubgroupList) {
         this.songSubgroupList = songSubgroupList;
     }
+
+    public Subgroup() {
+    }
+
+    public Subgroup(String subgroupName, Integer position, MainGroup mainGroup) {
+        this.subgroupName = subgroupName;
+        this.position = position;
+        this.mainGroup = mainGroup;
+    }
+
+    public Subgroup(Subgroup subgroup){
+        this(subgroup.subgroupName,subgroup.position,subgroup.mainGroup);
+    }
 }

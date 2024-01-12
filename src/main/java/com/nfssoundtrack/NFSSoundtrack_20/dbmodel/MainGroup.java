@@ -61,4 +61,16 @@ public class MainGroup implements Serializable {
     public void setSubgroups(List<Subgroup> subgroups) {
         this.subgroups = subgroups;
     }
+
+    public MainGroup(){
+
+    }
+    public MainGroup(String groupName, Game game) {
+        this.groupName = groupName;
+        this.game = game;
+    }
+
+    public MainGroup(MainGroup mainGroup){
+        this(mainGroup.groupName,mainGroup.game);
+    }
 }

@@ -27,4 +27,8 @@ public class SerieService {
 		return serieRepository.findById(id);
 	}
 
+	public Serie save(Serie serie){
+		return serieRepository.save(serie);
+	}
+
 }

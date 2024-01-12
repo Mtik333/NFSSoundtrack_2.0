@@ -58,4 +58,12 @@ public class Serie implements Serializable {
     public void setGames(Set<Game> games) {
         this.games = games;
     }
+
+    public Serie() {
+    }
+
+    public Serie(Long position, String name) {
+        this.position = position;
+        this.name = name;
+    }
 }

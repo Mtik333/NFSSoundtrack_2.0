@@ -346,6 +346,10 @@ tr.rolegroup-separator{
     background-color: #ECEEC7;
 }
 
+html[data-bs-theme="dark"] .preferences {
+  background-color: #858E03;
+}
+
 @media screen and (min-width: 1080px) {
     .lyrics_main{
     width:65%;

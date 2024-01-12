@@ -43,7 +43,7 @@ $(document).ready(function () {
         });
     }
     $('a.manage-groups').click(function (e) {
-        gameId = e.target.attributes["data-gameid"].value;
+        gameId = Number(e.target.attributes["data-gameid"].value);
         getGroupsFromGame();
     });
     $(document).on('click', 'button.new-group', function (e) {
@@ -191,7 +191,7 @@ $(document).ready(function () {
             async: false,
             type: "PUT",
             data: JSON.stringify(formData),
-            url: "/maingroup/put/" + groupId,
+            url: "/maingroup/put/" + Number(groupId),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
@@ -219,7 +219,7 @@ $(document).ready(function () {
         $.ajax({
             async: false,
             type: "DELETE",
-            url: "/maingroup/delete/" + groupId,
+            url: "/maingroup/delete/" + Number(groupId),
             success: function (ooo) {
                 console.log("eee");
                 getGroupsFromGame();

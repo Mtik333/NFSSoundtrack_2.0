@@ -1,17 +1,9 @@
 package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
-import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorAliasService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorCountryService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorSongService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.ContentService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.CountryService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.GameService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.GenreService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.SerieService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.SongGenreService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.SongService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.SongSubgroupService;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.nfssoundtrack.NFSSoundtrack_20.services.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class BaseControllerWithErrorHandling implements ErrorController {
 
@@ -64,6 +58,12 @@ public class BaseControllerWithErrorHandling implements ErrorController {
 	@Autowired
 	AuthorCountryService authorCountryService;
 
+	@Autowired
+	MainGroupService mainGroupService;
+
+	@Autowired
+	SubgroupService subgroupService;
+
 	@RequestMapping(value = "/{otherval}")
 	public String nonExistingPagee(Model model, @PathVariable("otherval") String otherval) throws Exception {
 		throw new Exception("Tried to access non-existing page: " + otherval);
@@ -80,5 +80,13 @@ public class BaseControllerWithErrorHandling implements ErrorController {
 		mav.addObject("appName", "Error NFSSoundtrack.com");
 		mav.addObject("series", serieService.findAllSortedByPositionAsc());
 		return mav;
+	}
+
+	public <T> ObjectMapper getObjectMapper(Class<? extends T> type, JsonSerializer<T> ser) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		SimpleModule simpleModule = new SimpleModule();
+		simpleModule.addSerializer(type, ser);
+		objectMapper.registerModule(simpleModule);
+		return objectMapper;
 	}
 }

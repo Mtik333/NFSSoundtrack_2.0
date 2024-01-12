@@ -123,20 +123,12 @@ public class Application implements CommandLineRunner {
                         }
                         if (band.equals("unknown")) {
                             if (tempGroup == null) {
-                                tempGroup = new MainGroup();
-                                tempGroup.setGame(game);
-                                tempGroup.setGroupName("Custom");
+                                tempGroup = new MainGroup("Custom", game);
                                 tempGroup = mainGroupRepository.saveAndFlush(tempGroup);
-                                tempSubgroup = new Subgroup();
-                                tempSubgroup.setPosition(1);
-                                tempSubgroup.setSubgroupName("All");
-                                tempSubgroup.setMainGroup(tempGroup);
+                                tempSubgroup = new Subgroup("All",1,tempGroup);
                                 tempSubgroup = subgroupRepository.saveAndFlush(tempSubgroup);
                             }
-                            tempSubgroup = new Subgroup();
-                            tempSubgroup.setPosition(Math.toIntExact(position) * 10);
-                            tempSubgroup.setSubgroupName(title);
-                            tempSubgroup.setMainGroup(tempGroup);
+                            tempSubgroup = new Subgroup(title, Math.toIntExact(position) * 10, tempGroup);
                             tempSubgroup = subgroupRepository.saveAndFlush(tempSubgroup);
                         } else {
                             Author existingBand=null;
@@ -152,14 +144,18 @@ public class Application implements CommandLineRunner {
                                     authorCountry.setAuthor(existingBand);
                                     authorCountryRepository.saveAndFlush(authorCountry);
                                 }
+                            } else {
+                                existingBand = optionalExistingBand.get();
                             }
                             AuthorAlias authorAliasToPersist=null;
                             Optional<AuthorAlias> authorAlias = authorAliasRepository.findByAlias(band);
                             if (authorAlias.isEmpty()) {
                                 AuthorAlias authorAlias1 = new AuthorAlias(existingBand,band);
                                 authorAliasToPersist = authorAliasRepository.saveAndFlush(authorAlias1);
+                            } else {
+                                authorAliasToPersist=authorAlias.get();
                             }
-                            Song mySong = null;
+                            Song mySong;
                             List<Song> alreadyExistingSongs = songRepository.findByOfficialDisplayBandAndOfficialDisplayTitle(band, title);
                             if (alreadyExistingSongs.isEmpty()) {
                                 mySong = new Song();
@@ -174,11 +170,14 @@ public class Application implements CommandLineRunner {
                                 mySong = alreadyExistingSongs.get(0);
                             }
                             if (genre != null && !genre.isEmpty()) {
-                                Genre myGenre = genreRepository.findByGenreName(genre);
-                                if (myGenre == null) {
+                                Genre myGenre;
+                                Optional<Genre> optionalGenre = genreRepository.findByGenreName(genre);
+                                if (optionalGenre.isEmpty()) {
                                     myGenre = new Genre();
                                     myGenre.setGenreName(genre);
                                     genreRepository.saveAndFlush(myGenre);
+                                } else {
+                                    myGenre=optionalGenre.get();
                                 }
                                 List<SongGenre> songGenres = songGenreRepository.findBySong(mySong);
                                 if (songGenres.isEmpty()) {
@@ -286,29 +285,16 @@ public class Application implements CommandLineRunner {
                                 tempGroup.getSubgroups().sort(Comparator.comparing(Subgroup::getPosition));
                                 tempSubgroup = tempGroup.getSubgroups().get(tempGroup.getSubgroups().size() - 1);
                             } else {
-                                MainGroup allGroup = new MainGroup();
-                                allGroup.setGroupName("All");
-                                allGroup.setGame(game);
+                                MainGroup allGroup = new MainGroup("All",game);
                                 mainGroupRepository.save(allGroup);
-                                Subgroup allSubgroup = new Subgroup();
-                                allSubgroup.setSubgroupName("All");
-                                allSubgroup.setMainGroup(allGroup);
-                                allSubgroup.setPosition(1);
+                                Subgroup allSubgroup = new Subgroup("All",1,allGroup);
                                 subgroupRepository.save(allSubgroup);
                                 gameTraversedNow = Math.toIntExact(game_id);
-                                tempGroup = new MainGroup();
-                                tempGroup.setGroupName("Custom");
-                                tempGroup.setGame(game);
+                                tempGroup = new MainGroup("Custom",game);
                                 tempGroup = mainGroupRepository.save(tempGroup);
-                                tempSubgroup = new Subgroup();
-                                tempSubgroup.setSubgroupName("All");
-                                tempSubgroup.setMainGroup(tempGroup);
-                                tempSubgroup.setPosition(1);
+                                tempSubgroup = new Subgroup("All",1,tempGroup);
                                 subgroupRepository.save(tempSubgroup);
-                                tempSubgroup = new Subgroup();
-                                tempSubgroup.setSubgroupName("Ungrouped");
-                                tempSubgroup.setMainGroup(tempGroup);
-                                tempSubgroup.setPosition(2);
+                                tempSubgroup = new Subgroup("Ungrouped",2,tempGroup);
                                 subgroupRepository.save(tempSubgroup);
                             }
 //                            tempSubgroup=null;
@@ -317,10 +303,7 @@ public class Application implements CommandLineRunner {
                             band = band + "game_id" + game_id;
                         }
                         if (band.equals("unknown")) {
-                            tempSubgroup = new Subgroup();
-                            tempSubgroup.setPosition(Math.toIntExact(position) * 10);
-                            tempSubgroup.setSubgroupName(title);
-                            tempSubgroup.setMainGroup(tempGroup);
+                            tempSubgroup = new Subgroup(title,Math.toIntExact(position) * 10,tempGroup);
                             tempSubgroup = subgroupRepository.saveAndFlush(tempSubgroup);
                         } else {
                             Author existingBand=null;
@@ -407,11 +390,14 @@ public class Application implements CommandLineRunner {
                                 mySong = alreadyExistingSongs.get(0);
                             }
                             if (genre != null && !genre.isEmpty()) {
-                                Genre myGenre = genreRepository.findByGenreName(genre);
-                                if (myGenre == null) {
+                                Genre myGenre;
+                                Optional<Genre> optionalGenre = genreRepository.findByGenreName(genre);
+                                if (optionalGenre.isEmpty()) {
                                     myGenre = new Genre();
                                     myGenre.setGenreName(genre);
                                     genreRepository.saveAndFlush(myGenre);
+                                } else {
+                                    myGenre = optionalGenre.get();
                                 }
                                 List<SongGenre> songGenres = songGenreRepository.findBySong(mySong);
                                 if (songGenres.isEmpty()) {

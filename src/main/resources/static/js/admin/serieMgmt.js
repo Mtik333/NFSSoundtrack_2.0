@@ -76,7 +76,7 @@ $(document).ready(function () {
         $.ajax({
             async: false,
             type: "GET",
-            url: "/serie/read/" + serieId,
+            url: "/serie/read/" + Number(serieId),
             success: function (ooo) {
                 var fullGamesScope = JSON.parse(ooo);
                 currentlyEditedSerieId = serieId;
@@ -94,7 +94,7 @@ $(document).ready(function () {
                 divToAppend.append(rowDiv);
                 rowDiv.append(leftCellDiv);
                 rowDiv.append(rightCellDiv);
-                rightCellDiv.append('<button id="updateGamePositionsInDb" type="submit" class="btn btn-primary">Update positions in DB</button>');
+                rightCellDiv.append('<button id="updateGamePositionsInDb" type="submit" class="btn btn-primary">Update positions in DB / Save name change</button>');
                 rightCellDiv.append('<button id="recounterGamePositions" type="submit" class="btn btn-primary">Recounter positions</button>');
                 leftCellDiv.append('<button id="newGame" type="submit" class="btn btn-success">New game</button>');
                 leftCellDiv.append('<button id="cancelNewGame" type="submit" class="btn btn-primary">Cancel</button>');

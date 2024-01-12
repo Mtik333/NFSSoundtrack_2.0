@@ -5,21 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
+import com.nfssoundtrack.NFSSoundtrack_20.objectmappers.AuthorMgmtObjectMapper;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.ArtistMgmtSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.ArtistSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.AuthorAliasSerializer;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(path = "/author")
@@ -28,33 +26,37 @@ public class ArtistController extends BaseControllerWithErrorHandling {
     private static final Logger logger = LoggerFactory.getLogger(ArtistController.class);
 
     @Autowired
-    AuthorAliasRepository authorAliasRepository;
+    ArtistMgmtSerializer artistMgmtSerializer;
 
+    @Autowired
+    AuthorAliasSerializer authorAliasSerializer;
+
+    @Autowired
+    ArtistSerializer artistSerializer;
 
     @GetMapping(value = "/authorAlias/{input}")
-    public @ResponseBody String readAliasesFromArtist(Model model, @PathVariable("input") int input) throws Exception {
+    public @ResponseBody String readAliasesFromArtist(@PathVariable("input") int input) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(AuthorAlias.class, authorAliasSerializer);
+        objectMapper.registerModule(simpleModule);
         AuthorSong authorSong = authorSongService.findById(input).orElseThrow(() -> new Exception("No alias with id " +
                 "found " + input));
         Author author = authorSong.getAuthorAlias().getAuthor();
         List<AuthorAlias> authorAliases = authorAliasService.findByAuthor(author);
-        simpleModule.addSerializer(AuthorAlias.class, new AuthorAliasSerializer(AuthorAlias.class));
-        objectMapper.registerModule(simpleModule);
         String result = objectMapper.writeValueAsString(authorAliases);
         return result;
     }
 
-
     @GetMapping(value = "/aliasName/{input}")
-    public @ResponseBody String readAliases(Model model, @PathVariable("input") String input) throws JsonProcessingException {
+    public @ResponseBody String readAliases(@PathVariable("input") String input) throws JsonProcessingException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(AuthorAlias.class, authorAliasSerializer);
+        objectMapper.registerModule(simpleModule);
         if (input.isEmpty()) {
             return objectMapper.writeValueAsString(null);
         }
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(AuthorAlias.class, new AuthorAliasSerializer(AuthorAlias.class));
-        objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
             Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(input);
             if (authorAlias.isEmpty()) {
@@ -73,10 +75,10 @@ public class ArtistController extends BaseControllerWithErrorHandling {
     }
 
     @GetMapping(value = "/authorName/{input}")
-    public @ResponseBody String readSpecialArtists(Model model, @PathVariable("input") String input) throws JsonProcessingException {
+    public @ResponseBody String readSpecialArtists(@PathVariable("input") String input) throws JsonProcessingException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Author.class, new ArtistSerializer(Author.class));
+        simpleModule.addSerializer(Author.class, artistSerializer);
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
             Optional<Author> author = authorService.findByName(input);
@@ -96,16 +98,14 @@ public class ArtistController extends BaseControllerWithErrorHandling {
     }
 
     @GetMapping(value = "/authorNameMgmt/{input}")
-    public @ResponseBody String readArtistsForMgmt(Model model, @PathVariable("input") String input) throws JsonProcessingException {
+    public @ResponseBody String readArtistsForMgmt(@PathVariable("input") String input) throws JsonProcessingException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(Author.class, artistMgmtSerializer);
+        objectMapper.registerModule(simpleModule);
         if (input.isEmpty()) {
             return objectMapper.writeValueAsString(null);
         }
-        SimpleModule simpleModule = new SimpleModule();
-        ArtistMgmtSerializer artistMgmtSerializer = new ArtistMgmtSerializer(Author.class);
-        ArtistMgmtSerializer.authorAliasRepository = authorAliasRepository;
-        simpleModule.addSerializer(Author.class, artistMgmtSerializer);
-        objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
             Optional<Author> author = authorService.findByName(input);
             if (author.isEmpty()) {
@@ -130,13 +130,13 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         int targetAuthor = (int) mergeInfo.get("targetAuthorId");
         Author authorToDelete =
                 authorService.findById(authorToMerge).orElseThrow(() -> new Exception("No author " +
-                        "with id found" + authorToMerge ));
+                        "with id found" + authorToMerge));
         AuthorAlias existingAuthorAlias =
                 authorAliasService.findByAlias(authorToDelete.getName()).orElseThrow(() -> new Exception("No alias " +
                         "with input found " + authorToDelete.getName()));
         Author authorToUpdate = authorService.findById(targetAuthor).orElseThrow(() -> new Exception("No author with " +
                 "id found " + targetAuthor));
-        AuthorAlias authorAlias = new AuthorAlias(authorToUpdate,authorToDelete.getName());
+        AuthorAlias authorAlias = new AuthorAlias(authorToUpdate, authorToDelete.getName());
         authorAlias = authorAliasService.save(authorAlias);
         List<AuthorSong> songsToReassign =
                 authorSongService.findByAuthorAlias(existingAuthorAlias);
@@ -174,7 +174,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 String actualCountryId = valueToGet.replace("DELETE-", "");
                 Optional<AuthorCountry> authorCountryToDelete =
                         existingCountries.stream().filter(authorCountry -> authorCountry.getCountry().getId()
-                        .equals(Long.parseLong(actualCountryId))).findFirst();
+                                .equals(Long.parseLong(actualCountryId))).findFirst();
                 authorCountryToDelete.ifPresent(countriesToUnlink::add);
             } else {
                 String countryId = (String) mergeInfo.get(countryInfo);
@@ -183,8 +183,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                         .equals(Long.parseLong(countryId))).findFirst();
                 if (optionalAuthorCountry.isEmpty()) {
                     Optional<Country> country = countryService.findById(Integer.parseInt(countryId));
-                    if (country.isPresent()){
-                        AuthorCountry authorCountry = new AuthorCountry(author,country.get());
+                    if (country.isPresent()) {
+                        AuthorCountry authorCountry = new AuthorCountry(author, country.get());
                         countriesToCreate.add(authorCountry);
                     }
                 }
@@ -213,7 +213,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 authorAliasService.delete(authorAlias);
             } else if (valueToGet.contains("NEW")) {
                 String actualNewAlias = valueToGet.replace("NEW-", "");
-                AuthorAlias authorAlias = new AuthorAlias(author,actualNewAlias);
+                AuthorAlias authorAlias = new AuthorAlias(author, actualNewAlias);
                 authorAliasService.save(authorAlias);
             } else if (valueToGet.contains("EXISTING")) {
                 String[] existingAlias = valueToGet.split("-VAL-");
@@ -222,7 +222,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                         authorAliasService.findById(Integer.parseInt(existingId)).orElseThrow(() -> new Exception("No" +
                                 " authoralias with id found " + existingId));
                 authorAlias.setAlias(existingAlias[1]);
-                authorAliasRepository.save(authorAlias);
+                authorAliasService.save(authorAlias);
             }
         }
         authorService.save(author);

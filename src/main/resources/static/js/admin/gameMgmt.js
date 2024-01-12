@@ -94,7 +94,7 @@ $(document).ready(function () {
             async: false,
             type: "PUT",
             data: JSON.stringify(formData),
-            url: "/gamedb/put",
+            url: "/gamedb/put/"+Number(gameToEdit.id),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {

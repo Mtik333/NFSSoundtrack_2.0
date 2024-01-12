@@ -40,7 +40,7 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
                 url: "/author/authorNameMgmt/" + $(mySelect).val(),
                 success: function (ooo) {
                         foundArtist = JSON.parse(ooo);
-                        if (result){
+                        if (foundArtist){
                             response(foundArtist);
                         }
                 },

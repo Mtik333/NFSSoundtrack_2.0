@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Country;
+import com.nfssoundtrack.NFSSoundtrack_20.deserializers.GameDeserializer;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.CountrySerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.CountryRepository;
 import org.slf4j.Logger;
@@ -27,6 +28,9 @@ public class CountryController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(CountryController.class);
 
+    @Autowired
+    CountrySerializer countrySerializer;
+
     @GetMapping(value = "/readAll")
     public @ResponseBody String readAliases(Model model) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -38,7 +42,7 @@ public class CountryController extends BaseControllerWithErrorHandling {
     public @ResponseBody String readCountries(Model model, @PathVariable("input") String input) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Country.class, new CountrySerializer(Country.class));
+        simpleModule.addSerializer(Country.class, countrySerializer);
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
             Optional<Country> country = countryService.findByCountryName(input);

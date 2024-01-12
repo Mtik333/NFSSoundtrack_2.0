@@ -1,10 +1,15 @@
 package com.nfssoundtrack.NFSSoundtrack_20.others;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.SpringHandlerInstantiator;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -33,7 +38,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/manage/manage", "/manage/manage#","/serie/**","/country/**",
+                        .requestMatchers("/manage/manage", "/manage/manage#", "/serie/**", "/country/**",
                                 "/maingroup/**", "/songSubgroup/**", "/subgroup/**", "/gamedb/**")
                         .hasAuthority("ADMIN"))
                 .authorizeHttpRequests((requests) -> requests

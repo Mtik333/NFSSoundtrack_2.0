@@ -100,7 +100,7 @@ $(document).ready(function () {
         $.ajax({
             async: false,
             type: "DELETE",
-            url: "/songSubgroup/delete/" + songId,
+            url: "/songSubgroup/delete/" + Number(songId),
             success: function (ooo) {
                 console.log("e");
                 getSubgroupsFromGame();

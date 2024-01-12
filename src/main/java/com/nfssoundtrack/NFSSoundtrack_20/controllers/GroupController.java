@@ -1,21 +1,15 @@
 package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.MainGroup;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.MainGroupRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.SongSubgroupRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.SubgroupRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -28,78 +22,55 @@ import java.util.Optional;
 public class GroupController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(GroupController.class);
-    @Autowired
-    private GameRepository gameRepository;
-
-    @Autowired
-    private MainGroupRepository mainGroupRepository;
-
-    @Autowired
-    private SongSubgroupRepository songSubgroupRepository;
-
-    @Autowired
-    private SubgroupRepository subgroupRepository;
 
     @GetMapping(value = "/read/{gameId}")
-    public @ResponseBody String gameGroupManage(Model model, @PathVariable("gameId") String gameId) throws JsonProcessingException {
+    public @ResponseBody String gameGroupManage(@PathVariable("gameId") int gameId) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        Game game = gameRepository.findById(Integer.valueOf(gameId)).get();
+        Game game = gameService.findById(gameId).orElseThrow(() -> new Exception("no game found with id " + gameId));
         List<MainGroup> mainGroups = game.getMainGroups();
-//        for (MainGroup mainGroup : mainGroups) {
-//            List<Subgroup> subgroups = mainGroup.getSubgroups();
-//            for (Subgroup subgroup : subgroups) {
-//                List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
-//                for (SongSubgroup songSubgroup : songSubgroupList) {
-//                    songSubgroup.getSong();
-//                    break;
-//                }
-//                break;
-//            }
-//            mainGroup.getSubgroups().sort(Comparator.comparing(Subgroup::getPosition));
-//        }
         return objectMapper.writeValueAsString(mainGroups);
     }
 
     @PostMapping(value = "/save/{gameId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String saveNewGroup(@PathVariable("gameId") String gameId, @RequestBody String formData) throws JsonProcessingException {
-        HashMap<?, ?> objectMapper = new ObjectMapper().readValue(formData, HashMap.class);
-        MainGroup mainGroup = new MainGroup();
-        mainGroup.setGroupName(String.valueOf(objectMapper.get("groupName")));
-        mainGroup.setGame(gameRepository.findById(Integer.valueOf(gameId)).get());
-        mainGroup = mainGroupRepository.save(mainGroup);
+    public @ResponseBody String saveNewGroup(@PathVariable("gameId") int gameId, @RequestBody String formData) throws Exception {
+        HashMap<String, Object> objectMapper = new ObjectMapper().readValue(formData,
+                TypeFactory.defaultInstance().constructMapType(HashMap.class, String.class, Object.class));
+        Game game = gameService.findById(gameId).orElseThrow(() -> new Exception("No game with id found " + gameId));
+        String groupName = objectMapper.get("groupName").toString();
+        MainGroup mainGroup = new MainGroup(groupName, game);
+        mainGroup = mainGroupService.save(mainGroup);
         List<String> subgroups = (List<String>) objectMapper.get("subgroupsNames");
         for (String subgroup : subgroups) {
             if (!subgroup.isEmpty()) {
-                Subgroup targetSubgroup = new Subgroup();
                 String[] subgroupNamePosition = subgroup.split("_POS_");
-                targetSubgroup.setSubgroupName(subgroupNamePosition[0]);
-                targetSubgroup.setMainGroup(mainGroup);
-                targetSubgroup.setPosition(Integer.valueOf(subgroupNamePosition[1]));
-                subgroupRepository.save(targetSubgroup);
+                Subgroup targetSubgroup = new Subgroup(subgroupNamePosition[0],
+                        Integer.valueOf(subgroupNamePosition[1]), mainGroup);
+                subgroupService.save(targetSubgroup);
             }
         }
         ObjectMapper objectMapper2 = new ObjectMapper();
-        return objectMapper2.writeValueAsString(mainGroupRepository.getReferenceById(Math.toIntExact(mainGroup.getId())));
+        return objectMapper2.writeValueAsString(mainGroup);
     }
 
     @DeleteMapping(value = "/delete/{groupId}")
-    public @ResponseBody String deleteGroup(@PathVariable("groupId") String groupId) {
-        MainGroup mainGroup = mainGroupRepository.findById(Integer.valueOf(groupId)).get();
+    public @ResponseBody String deleteGroup(@PathVariable("groupId") int groupId) throws Exception {
+        MainGroup mainGroup = mainGroupService.findById(groupId).orElseThrow(() -> new Exception("no group found with id " + groupId));
         List<Subgroup> subgroups = mainGroup.getSubgroups();
         for (Subgroup subgroup : subgroups) {
             List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
-            songSubgroupRepository.deleteAllInBatch(songSubgroupList);
+            songSubgroupService.deleteAllInBatch(songSubgroupList);
         }
-        subgroupRepository.deleteAllInBatch(subgroups);
-        mainGroupRepository.delete(mainGroup);
+        subgroupService.deleteAllInBatch(subgroups);
+        mainGroupService.delete(mainGroup);
         return "Delete successful";
     }
 
     @PutMapping(value = "/put/{groupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String putGroup(@PathVariable("groupId") String groupId, @RequestBody String formData) throws JsonProcessingException {
-        MainGroup mainGroup = mainGroupRepository.findById(Integer.valueOf(groupId)).get();
+    public @ResponseBody String putGroup(@PathVariable("groupId") int groupId, @RequestBody String formData) throws Exception {
+        MainGroup mainGroup = mainGroupService.findById(groupId).orElseThrow(() -> new Exception("no group with id found " + groupId));
         List<Subgroup> subgroups = mainGroup.getSubgroups();
-        HashMap<?, ?> objectMapper = new ObjectMapper().readValue(formData, HashMap.class);
+        HashMap<?, ?> objectMapper = new ObjectMapper().readValue(formData,
+                TypeFactory.defaultInstance().constructMapType(HashMap.class, String.class, Object.class));
         mainGroup.setGroupName(String.valueOf(objectMapper.get("groupName")));
         List<String> updatedSubgroups = (List<String>) objectMapper.get("subgroupsNames");
         List<Subgroup> subgroupsToDelete = new ArrayList<>();
@@ -122,24 +93,21 @@ public class GroupController extends BaseControllerWithErrorHandling {
                     subgroupsToUpdate.add(subgroupOptional.get());
                 }
             } else {
-                Subgroup newSubgroup = new Subgroup();
                 String[] subgroupNamePosition = subgroup.split("_POS_");
-                newSubgroup.setSubgroupName(subgroupNamePosition[0]);
-                newSubgroup.setMainGroup(mainGroup);
-                newSubgroup.setPosition(Integer.valueOf(subgroupNamePosition[1]));
-                subgroupRepository.save(newSubgroup);
+                Subgroup newSubgroup = new Subgroup(subgroupNamePosition[0], Integer.valueOf(subgroupNamePosition[1]), mainGroup);
+                subgroupService.save(newSubgroup);
             }
         }
         for (Subgroup subgroup : subgroupsToUpdate) {
-            subgroupRepository.save(subgroup);
+            subgroupService.save(subgroup);
         }
         for (Subgroup subgroup : subgroupsToDelete) {
             List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
-            songSubgroupRepository.deleteAllInBatch(songSubgroupList);
+            songSubgroupService.deleteAllInBatch(songSubgroupList);
         }
-        subgroupRepository.deleteAllInBatch(subgroupsToDelete);
+        subgroupService.deleteAllInBatch(subgroupsToDelete);
         ObjectMapper objectMapper2 = new ObjectMapper();
-        mainGroup = mainGroupRepository.save(mainGroup);
+        mainGroup = mainGroupService.save(mainGroup);
         return objectMapper2.writeValueAsString(mainGroup);
     }
 }

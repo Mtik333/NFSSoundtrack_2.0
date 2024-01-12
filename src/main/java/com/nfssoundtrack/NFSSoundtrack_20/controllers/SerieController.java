@@ -7,12 +7,9 @@ import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Serie;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.GameSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.SerieSerializer;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
-import com.nfssoundtrack.NFSSoundtrack_20.repository.SerieRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,63 +25,60 @@ public class SerieController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(SerieController.class);
     @Autowired
-    SerieRepository serieRepository;
-
+    GameSerializer gameSerializer;
     @Autowired
-    GameRepository gameRepository;
+    SerieSerializer serieSerializer;
 
     @GetMapping(value = "/readAll")
     public @ResponseBody String readSeries(Model model) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Serie.class, new SerieSerializer(Serie.class));
+        simpleModule.addSerializer(Serie.class, serieSerializer);
         objectMapper.registerModule(simpleModule);
-        List<Serie> series = serieRepository.findAll(Sort.by(Sort.Direction.ASC, "position"));
+        List<Serie> series = serieService.findAllSortedByPositionAsc();
         return objectMapper.writeValueAsString(series);
     }
 
     @GetMapping(value = "/read/{serieId}")
-    public @ResponseBody String readGamesFromSerie(@PathVariable("serieId") String serieId, Model model) throws JsonProcessingException {
+    public @ResponseBody String readGamesFromSerie(@PathVariable("serieId") int serieId, Model model) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Game.class, new GameSerializer(Game.class));
+        simpleModule.addSerializer(Game.class, gameSerializer);
         objectMapper.registerModule(simpleModule);
-        Serie serie = serieRepository.findById(Integer.valueOf(serieId)).get();
+        Serie serie = serieService.findById(serieId).orElseThrow(() -> new Exception("No serie found with id " + serieId));
         return objectMapper.writeValueAsString(serie.getGames());
     }
 
     @PutMapping(value = "/updatePositions", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String putSeriePositions(@RequestBody String formData) throws JsonProcessingException {
-        System.out.println("???");
+    public @ResponseBody String putSeriePositions(@RequestBody String formData) throws Exception {
         List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
         for (Object obj : objectMapper) {
             LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
             Long serieId = Long.parseLong(String.valueOf(linkedHashMap.get("serieId")));
             Long position = Long.parseLong(String.valueOf(linkedHashMap.get("position")));
-            Serie serie = serieRepository.findById(Math.toIntExact(serieId)).get();
+            Serie serie = serieService.findById(Math.toIntExact(serieId)).orElseThrow(() -> new Exception("no serie with id found " + serieId));
             serie.setPosition(position);
-            serieRepository.save(serie);
+            serieService.save(serie);
         }
         return new ObjectMapper().writeValueAsString("OK");
     }
 
     @PutMapping(value = "/updateGames", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String putGamesPositions(@RequestBody String formData) throws JsonProcessingException {
-        System.out.println("???");
+    public @ResponseBody String putGamesPositions(@RequestBody String formData) throws Exception {
         Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
         String serieId = (String) objectMapper.get("serieId");
         String serieName = (String) objectMapper.get("serieName");
         List<?> arrayOfGames = (List<?>) objectMapper.get("arrayOfGames");
-        Serie serie = serieRepository.findById(Integer.valueOf(serieId)).get();
+        Serie serie = serieService.findById(Integer.parseInt(serieId)).orElseThrow(() -> new Exception("no serie with id found " + serieId));
         serie.setName(serieName);
-        serieRepository.save(serie);
+        serieService.save(serie);
         for (Object obj : arrayOfGames) {
             LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
             Long gameId = Long.parseLong(String.valueOf(linkedHashMap.get("gameId")));
             Long position = Long.parseLong(String.valueOf(linkedHashMap.get("position")));
-            Game game = gameRepository.findById(Math.toIntExact(gameId)).get();
+            Game game = gameService.findById(Math.toIntExact(gameId)).get();
             game.setPosition(position);
-            gameRepository.save(game);
+            gameService.save(game);
         }
         return new ObjectMapper().writeValueAsString("OK");
     }
@@ -92,10 +86,8 @@ public class SerieController extends BaseControllerWithErrorHandling {
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String saveNewSerie(@RequestBody String formData) throws JsonProcessingException {
         String newSerieName = new ObjectMapper().readValue(formData, String.class);
-        Serie serie = new Serie();
-        serie.setPosition(10000L);
-        serie.setName(newSerieName);
-        serieRepository.save(serie);
+        Serie serie = new Serie(10000L, newSerieName);
+        serieService.save(serie);
         return new ObjectMapper().writeValueAsString("OK");
     }
 

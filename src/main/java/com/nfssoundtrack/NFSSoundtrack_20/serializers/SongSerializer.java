@@ -1,6 +1,7 @@
 package com.nfssoundtrack.NFSSoundtrack_20.serializers;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorSong;
@@ -8,18 +9,16 @@ import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Role;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SongSerializer extends StdSerializer<Song> {
+@JsonComponent
+public class SongSerializer extends JsonSerializer<Song> {
 
     private static final Logger logger = LoggerFactory.getLogger(SongSerializer.class);
-
-    public SongSerializer(Class<Song> t) {
-        super(t);
-    }
 
     @Override
     public void serialize(Song song, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {

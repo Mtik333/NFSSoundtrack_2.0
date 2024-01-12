@@ -32,6 +32,10 @@ public class SongSubgroupService {
 		return songSubgroupRepository.findBySongIn(songs, Sort.by(Sort.Direction.ASC, "id"));
 	}
 
+	public void deleteAllInBatch(List<SongSubgroup> songSubgroupList){
+		songSubgroupRepository.deleteAllInBatch(songSubgroupList);
+	}
+
 	public List<SongSubgroup> fetchFromGame(Game game){
 		List<SongSubgroup> allSongs = new ArrayList<>();
 		for (MainGroup mainGroup : game.getMainGroups()) {

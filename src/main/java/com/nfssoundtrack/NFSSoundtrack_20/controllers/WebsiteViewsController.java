@@ -17,6 +17,7 @@ import com.nfssoundtrack.NFSSoundtrack_20.others.JustSomeHelper;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.SongSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -38,6 +40,9 @@ import java.util.Map;
 public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebsiteViewsController.class);
+
+	@Autowired
+	SongSerializer songSerializer;
 
 	@Value("${spring.application.name}")
 	String appName;
@@ -92,7 +97,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 		if (customPlaylist == null || customPlaylist.isEmpty()) {
 			logger.error("do something");
 		} else {
-			String result = URLDecoder.decode(customPlaylist, StandardCharsets.UTF_8.name());
+			String result = URLDecoder.decode(customPlaylist, StandardCharsets.UTF_8);
 			String basicallyArray = result.replace("customPlaylist=", "");
 			List<String> finalList = new ObjectMapper().readValue(basicallyArray,
 					TypeFactory.defaultInstance().constructCollectionType(List.class, String.class));
@@ -110,12 +115,13 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
 	@RequestMapping(value = "/songInfo/{songId}")
 	public @ResponseBody
-	String provideSongModalInfo(@PathVariable("songId") int songId) throws JsonProcessingException {
+	String provideSongModalInfo(@PathVariable("songId") int songId) throws Exception {
+		Song song = songService.findById(songId).orElseThrow(() -> new Exception("No song with id found " + songId));
 		ObjectMapper objectMapper = new ObjectMapper();
 		SimpleModule simpleModule = new SimpleModule();
-		simpleModule.addSerializer(Song.class, new SongSerializer(Song.class));
+		simpleModule.addSerializer(Song.class, songSerializer);
 		objectMapper.registerModule(simpleModule);
-		String result = objectMapper.writeValueAsString(songService.findById(songId));
+		String result = objectMapper.writeValueAsString(song);
 		if (logger.isDebugEnabled()) {
 			logger.debug("result " + result);
 		}
