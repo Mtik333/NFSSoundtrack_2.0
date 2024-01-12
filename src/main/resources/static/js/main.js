@@ -518,25 +518,27 @@ $(document).ready(function () {
     }
 
     $('#disqusModal').on('show.bs.modal', function (e) {
-        if ($("#disqus_thread").children().length == 0) {
-            var disqusLink = $("#disqusModal").attr("data-disqusLink");
-            var script = document.createElement('script');
-            script.innerHTML = "var disqus_config = function () {     this.page.url = '"+disqusLink+"';  }; (function () {  var d = document, s = d.createElement('script'); s.src = 'https://nfssoundtrack.disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date());(d.head || d.body).appendChild(s);})();";
-            var noscript = document.createElement('noscript');
-            noscript.innerHTML = 'Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>';
-            $(this).append(script);
-            $(this).append(noscript);
+        var disqusTarget = e.target.id;
+        var linkToUse;
+        if (disqusTarget == "newDisqusLink") {
+            linkToUse = window.location.href;
+        } else {
+            linkToUse = $("#disqusModal").attr("data-disqusLink");
         }
-    });
-
-    $('#newDisqusModal').on('show.bs.modal', function (e) {
         if ($("#disqus_thread").children().length == 0) {
             var script = document.createElement('script');
-            script.innerHTML = "var disqus_config = function () {     this.page.url = '"+window.location.href +"';  }; (function () {  var d = document, s = d.createElement('script'); s.src = 'https://nfssoundtrack.disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date());(d.head || d.body).appendChild(s);})();";
+            script.innerHTML = "var disqus_config = function () {     this.page.url = '" + linkToUse + "';  }; (function () {  var d = document, s = d.createElement('script'); s.src = 'https://nfssoundtrack.disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date());(d.head || d.body).appendChild(s);})();";
             var noscript = document.createElement('noscript');
             noscript.innerHTML = 'Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>';
             $(this).append(script);
             $(this).append(noscript);
+        } else {
+            DISQUS.reset({
+                reload: true,
+                config: function () {
+                    this.page.url = linkToUse;
+                }
+            });
         }
     });
 
@@ -726,9 +728,9 @@ $(document).ready(function () {
                 if (songInfo.itunes != null) {
                     $(songInfo.itunes).insertAfter("#externalLinks");
                 }
-                if (songInfo.baseSongId != null){
+                if (songInfo.baseSongId != null) {
                     $(songInfo.baseSongId).insertAfter("#baseSong");
-                    $("#baseSongDiv").css("display","");
+                    $("#baseSongDiv").css("display", "");
                 }
                 $("#infoSongModal").modal('show');
             },
@@ -770,7 +772,7 @@ $(document).ready(function () {
         $("#baseSong").parent().find("a").each(function () {
             $(this).remove();
         })
-        $("#baseSongDiv").css("display","none");
+        $("#baseSongDiv").css("display", "none");
 
     });
 
@@ -944,12 +946,12 @@ $(document).ready(function () {
                 $("#artistStuff").find("tr[data-aliasid='" + aliasValue + "']").each(function () {
                     var trToCheck = $(this);
                     var trRoleVal = $(this).attr("data-role");
-                    if (isActiveAllGroup){
+                    if (isActiveAllGroup) {
                         trToCheck.addClass('visually-hidden');
                     } else {
-                        activeGroups.each(function(){
+                        activeGroups.each(function () {
                             var aliasSubgroupId = $(this).attr("data-authorcontribution");
-                            if (trRoleVal==aliasSubgroupId){
+                            if (trRoleVal == aliasSubgroupId) {
                                 trToCheck.addClass('visually-hidden');
                             }
                         });

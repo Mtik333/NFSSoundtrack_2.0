@@ -70,6 +70,7 @@
 
 <table id="artistStuff" class="table table-hover table-striped playlist_table">
     <thead><tr>
+        <th scope="col"></th>
         <th scope="col" th:text="#{subgroup}"></th>
         <th scope="col" th:text="#{group}"></th>
         <th scope="col" th:text="#{game}"></th>
@@ -81,12 +82,12 @@
     <tbody>
         <th:block th:each="mapEntry : ${songsAsComposer}">
             <tr class="all composer rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id},data-role='composer'">
-                <td colspan="6" th:text="${mapEntry.key.alias}+' - Composer'"></td>
+                <td colspan="7" th:text="${mapEntry.key.alias}+' - Composer'"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup composer"
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='composer'">
-                    <td colspan="6">
+                    <td colspan="7">
                         <th:block
                             th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
@@ -143,6 +144,9 @@
 
                 <tr class="all composer" th:attr="data-aliasid=${mapEntry.key.id},data-role='composer'"
                     th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+                    <td class="info_button">
+                        <img class="img-responsive add-to-custom-playlist" data-toggle="tooltip" data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/plus.png}">
+                    </td>
                     <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
                     </td>
                     <td class="songtitle" style="display: none"
@@ -194,12 +198,12 @@
         <th:block th:each="mapEntry : ${songsAsSubcomposer}">
             <tr class="all subcomposer rolegroup-separator"
                 th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer'">
-                <td colspan="6" th:text="${mapEntry.key.alias}+' - Subcomposer'"></td>
+                <td colspan="7" th:text="${mapEntry.key.alias}+' - Subcomposer'"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup subcomposer"
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer'">
-                    <td colspan="6">
+                    <td colspan="7">
                         <span
                             th:text="${songToSongSubgroupMap.key.officialDisplayBand} + ' - ' + ${songToSongSubgroupMap.key.officialDisplayTitle}"></span>
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
@@ -213,6 +217,9 @@
                 </tr>
                 <tr class="all subcomposer" th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer'"
                     th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+                    <td class="info_button">
+                        <img class="img-responsive add-to-custom-playlist" data-toggle="tooltip" data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/plus.png}">
+                    </td>
                     <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
                     </td>
                     <td class="songtitle" style="display: none"
@@ -263,12 +270,12 @@
         </th:block>
         <th:block th:each="mapEntry : ${songsRemixed}">
             <tr class="all remix rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id},data-role='remix'">
-                <td colspan="6" th:text="${mapEntry.key.alias}+' - Remixer'"></td>
+                <td colspan="7" th:text="${mapEntry.key.alias}+' - Remixer'"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup remix"
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='remix'">
-                    <td colspan="6">
+                    <td colspan="7">
                         <span
                             th:text="${songToSongSubgroupMap.key.officialDisplayBand} + ' - ' + ${songToSongSubgroupMap.key.officialDisplayTitle}"></span>
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
@@ -282,6 +289,9 @@
                 </tr>
                 <tr class="all remix" th:attr="data-aliasid=${mapEntry.key.id},data-role='remix'"
                     th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+                    <td class="info_button">
+                        <img class="img-responsive add-to-custom-playlist" data-toggle="tooltip" data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/plus.png}">
+                    </td>
                     <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
                     </td>
                     <td class="songtitle" style="display: none"
@@ -332,12 +342,12 @@
         </th:block>
         <th:block th:each="mapEntry : ${songsAsFeat}">
             <tr class="all feat rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id},data-role='feat'">
-                <td colspan="6" th:text="${mapEntry.key.alias}+' - Feat.'"></td>
+                <td colspan="7" th:text="${mapEntry.key.alias}+' - Feat.'"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup feat"
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='feat'">
-                    <td colspan="6">
+                    <td colspan="7">
                         <span
                             th:text="${songToSongSubgroupMap.key.officialDisplayBand} + ' - ' + ${songToSongSubgroupMap.key.officialDisplayTitle}"></span>
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
@@ -351,6 +361,9 @@
                 </tr>
                 <tr class="all feat" th:attr="data-aliasid=${mapEntry.key.id},data-role='feat'"
                     th:each="songSubgroup : ${songToSongSubgroupMap.value}">
+                    <td class="info_button">
+                        <img class="img-responsive add-to-custom-playlist" data-toggle="tooltip" data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/plus.png}">
+                    </td>
                     <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
                     </td>
                     <td class="songtitle" style="display: none"

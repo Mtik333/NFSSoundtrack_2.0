@@ -103,7 +103,7 @@ public class SongSerializer extends JsonSerializer<Song> {
 		}
 		if (song.getSrcId() != null) {
 			jsonGenerator.writeStringField("youtube", "<a class='p-2' href='https://www.youtube.com/watch?v=" + song.getSrcId() +
-					"' style='text-decoration:none;' target='_blank'><img class='img-responsive' src='/images/youtube.png' width='25' height='25'></a>");
+					"' style='text-decoration:none;' target='_blank'><img class='img-responsive' src='/images/youtube2.png' width='25' height='25'></a>");
 		}
 		jsonGenerator.writeEndObject();
 	}
