@@ -1,37 +1,35 @@
 <th:block th:if="${songSubgroups!=null && !songSubgroups.isEmpty()}">
+    <h2 th:text="${game.displayTitle}"></h2>
+    <hr>
     <div class="form-group pb-2 pt-2">
-        <span id="playlist_init" class="nfs-top-item p-2 d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+        <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
             data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
         <th:block th:if="${game.spotifyId!=null && game.spotifyId!=''}">
-            <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+            <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal"
                 data-bs-target="#spotifyModal" id="spotifyLink" th:attr="data-tagVideo=${game.spotifyId}"
                 th:text="#{launchSpotify}"></span>
         </th:block>
         <th:block th:if="${game.tidalId!=null && game.tidalId!=''}">
-            <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
-                data-bs-target="#tidalModal" id="tidalLink" th:attr="data-tagVideo=${game.tidalId}"
-                th:text="#{launchTidal}"></span>
+            <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal" data-bs-target="#tidalModal"
+                id="tidalLink" th:attr="data-tagVideo=${game.tidalId}" th:text="#{launchTidal}"></span>
         </th:block>
         <th:block th:if="${game.deezerId!=null && game.deezerId!=''}">
-            <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
-                data-bs-target="#deezerModal" id="deezerLink" th:attr="data-tagVideo=${game.deezerId}"
-                th:text="#{launchDeezer}"></span>
+            <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal" data-bs-target="#deezerModal"
+                id="deezerLink" th:attr="data-tagVideo=${game.deezerId}" th:text="#{launchDeezer}"></span>
         </th:block>
         <th:block th:if="${game.soundcloudId!=null && game.soundcloudId!=''}">
-            <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
+            <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal"
                 data-bs-target="#soundcloudModal" id="soundcloudLink" th:attr="data-tagVideo=${game.soundcloudId}"
                 th:text="#{launchSoundcloud}"></span>
         </th:block>
-        
-        <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
-            data-bs-target="#disqusModal" id="disqusLink" th:text="#{showDisqus}"></span>
-        <span class="p-2 nfs-top-item d-inline-block" style="cursor:pointer;" data-bs-toggle="modal"
-              data-bs-target="#disqusModal" id="newDisqusLink" th:text="#{showNewDisqus}"></span>
+        <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal" data-bs-target="#disqusModal"
+            id="disqusLink" th:text="#{showDisqus}"></span>
+        <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal" data-bs-target="#disqusModal"
+            id="newDisqusLink" th:text="#{showNewDisqus}"></span>
     </div>
     <div class="form-group">
         <span>
-            <input id="filter_songs" maxlength="15" class="p-2 mb-2" style="width: 100%"
-                th:placeholder="#{filterSongs}">
+            <input id="filter_songs" maxlength="15" class="p-2 mb-2" th:placeholder="#{filterSongs}">
         </span>
     </div>
     <div class="tabbable boxed parentTabs">
@@ -57,18 +55,18 @@
         </th:block>
         <table id="game_stuff" class="table table-hover table-striped playlist_table">
             <colgroup>
-                <col class="info_button"/>
-                <col class="countries"/>
-                <col class="band"/>
-                <col class="songtitle"/>
-                <col class="genre"/>
-                <col class="actions"/>
-                <col class="infowarn"/>
+                <col class="info_button" />
+                <col class="countries" />
+                <col class="band" />
+                <col class="songtitle" />
+                <col class="genre" />
+                <col class="actions" />
+                <col class="infowarn" />
             </colgroup>
             <thead>
                 <tr>
                     <th class="game_content_th" scope="col"></th>
-                    <th class="game_content_th" scope="col" th:text="#{country}"></th>
+                    <th class="game_content_th countries" scope="col" th:text="#{country}"></th>
                     <th class="game_content_th" scope="col" th:text="#{band}"></th>
                     <th class="game_content_th" scope="col" th:text="#{song}"></th>
                     <th class="game_content_th" scope="col" th:text="#{genre}"></th>
@@ -89,22 +87,18 @@
                             <tr th:each="songSubgroup : ${subgroup.songSubgroupList}"
                                 th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
                                 <td class="info_button">
-                                    <img class="img-responsive add-to-custom-playlist" data-toggle="tooltip" data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/plus.png}">
-                                    <img class="img-responsive info-about-song" data-toggle="tooltip" data-placement="right" th:title="#{showInfo}" th:src="@{/images/info.png}">
-                                    <!-- data-bs-toggle="modal" data-bs-target="#infoSongModal"  -->
-
+                                    <img class="img-responsive-row-icon add-to-custom-playlist pointable"
+                                        data-toggle="tooltip" data-placement="right" th:title="#{addToPlaylist}"
+                                        th:src="@{/images/fullres/plus_big.png}">
+                                    <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
+                                        data-placement="right" th:title="#{showInfo}"
+                                        th:src="@{/images/fullres/info_big.png}">
                                 </td>
                                 <td class="countries">
-                                    <!--
-                                    <th:block th:each="country : ${songSubgroup.song.countrySet}">
-                                        <img th:src="${country.countryLink}">
-                                    </th:block>
-                                -->
-
                                     <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
                                         <th:block
                                             th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
-                                            <img class="country-img" th:src="${authorCountry.country.countryLink}">
+                                            <img class="img-country" th:src="${authorCountry.country.countryLink}">
                                         </th:block>
                                     </th:block>
 
@@ -160,28 +154,28 @@
                                         <!--<th:block th:if="${songSubgroup.srcId!=null or songSubgroup.song.srcId!=null}">-->
                                         <th:block th:if="${songSubgroup.srcId!=null}">
                                             <!--th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"-->
-                                            <img class="play_icon img-responsive" data-bs-toggle="modal"
-                                                data-bs-target="#videoModal"
+                                            <img class="play_icon img-responsive-row-icon pointable"
+                                                data-bs-toggle="modal" data-bs-target="#videoModal"
                                                 th:attr="data-tagVideo='https://www.youtube.com/embed/'+${songSubgroup.srcId}"
-                                                th:src="@{/images/znakwodny.png}" width="25" height="25">
+                                                th:src="@{/images/znakwodny.png}">
                                         </th:block>
                                         <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
                                         <th:block th:if="${songSubgroup.spotifyId != null}">
-                                            <a th:href="${songSubgroup.spotifyId}" style="text-decoration:none;">
-                                                <img class="img-responsive" th:src="@{/images/spotify.png}" width="25"
-                                                    height="25">
+                                            <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">
+                                                <img class="img-responsive-row-icon"
+                                                    th:src="@{/images/fullres/spotify_big.png}">
                                             </a>
                                         </th:block>
                                         <th:block th:if="${songSubgroup.deezerId != null}">
-                                            <a th:href="${songSubgroup.deezerId}" style="text-decoration:none;">
-                                                <img class="img-responsive" th:src="@{/images/deezer.png}" width="25"
-                                                    height="25">
+                                            <a class="a-external-music-link" th:href="${songSubgroup.deezerId}">
+                                                <img class="img-responsive-row-icon"
+                                                    th:src="@{/images/fullres/deezer_big.png}">
                                             </a>
                                         </th:block>
                                         <th:block th:if="${songSubgroup.itunesLink != null}">
-                                            <a th:href="${songSubgroup.itunesLink}" style="text-decoration:none;">
-                                                <img class="img-responsive" th:src="@{/images/itunes2.png}" width="25"
-                                                    height="25">
+                                            <a class="a-external-music-link" th:href="${songSubgroup.itunesLink}">
+                                                <img class="img-responsive-row-icon"
+                                                    th:src="@{/images/fullres/itunes_big.png}">
                                             </a>
                                         </th:block>
                                     </div>
@@ -189,7 +183,7 @@
                                 <td class="infowarn">
                                     <th:block th:if="${songSubgroup.info!=null && songSubgroup.info!=''}">
                                         <a data-toggle="tooltip" data-placement="left" th:title="${songSubgroup.info}">
-                                            <img class="img-responsive" th:src="@{/images/warn1.png}">
+                                            <img class="img-responsive-row-icon" th:src="@{/images/warn1.png}">
                                         </a>
                                     </th:block>
                                 </td>
@@ -212,7 +206,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="ratio ratio-16x9" style="height: 75vh;">
+                            <div class="ratio ratio-16x9">
                                 <iframe src="" id="spotifyVideo" frameborder="0" allowtransparency="true"
                                     allow="encrypted-media"></iframe>
                             </div>
@@ -233,7 +227,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="ratio ratio-16x9" style="height: 75vh;">
+                            <div class="ratio ratio-16x9">
                                 <iframe src="" id="soundcloudVideo" width="100%" height="300" scrolling="no"
                                     frameborder="no" allow="autoplay"></iframe>
                             </div>
@@ -255,7 +249,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="ratio ratio-16x9" style="height: 75vh;">
+                            <div class="ratio ratio-16x9">
                                 <iframe src="" id="tidalVideo" allowfullscreen="allowfullscreen"
                                     frameborder="0"></iframe>
                             </div>
@@ -276,7 +270,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="ratio ratio-16x9" style="height: 75vh;">
+                            <div class="ratio ratio-16x9">
                                 <iframe title="deezer-widget" src="" id="deezerVideo" frameborder="0"
                                     allowtransparency="true" allow="encrypted-media; clipboard-write"></iframe>
                             </div>
@@ -287,7 +281,8 @@
         </div>
     </div>
     <th:block th:insert="~{fragments/playlistModal.html}"></th:block>
-    <div class="modal fade" id="disqusModal" th:attr="data-disqusLink=${game.disqusLink}" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="disqusModal" th:attr="data-disqusLink=${game.disqusLink}" role="dialog"
+        data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -307,22 +302,21 @@
     <th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
 </th:block>
 <th:block th:if="${songSubgroups!=null && songSubgroups.isEmpty()}">
-    <h2>No songs found, that's quite odd. Would you like to report it? Click the "Report problem" button from the top
-        menu to proceed</h2>
+    <h2 th:text="#{gameNoSongs}"></h2>
 </th:block>
-<div class="success-container" aria-hidden="true">
+<div class="success-container info-container" aria-hidden="true">
     <div id="successAddToCustomPlaylist" class="alert alert-success fade show" role="alert">
         <span th:text="#{addedToCustomPlaylist}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 </div>
-<div class="error-container" aria-hidden="true">
+<div class="error-container info-container" aria-hidden="true">
     <div id="errorThing" class="alert alert-danger fade show" role="alert">
         <span th:text="#{nothingToPlay}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 </div>
-<div class="remove-from-playlist-container" aria-hidden="true">
+<div class="remove-from-playlist-container info-container" aria-hidden="true">
     <div id="successRemoveFromCustomPlaylist" class="alert alert-success fade show" role="alert">
         <span th:text="#{removedFromPlaylist}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

@@ -1,9 +1,8 @@
 <th:block th:if="${home}">
     [(${htmlToInject})]
-    <a href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModalHome" id="disqusLink">You can share your opinions
-        about the site.</a>
-    <div class="modal fade" id="disqusModalHome" role="dialog"
-        data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <a href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModalHome" id="disqusLink" th:text="#{shareOpinions}"></a>
+    <div class="modal fade" id="disqusModalHome" role="dialog" data-bs-keyboard="false" tabindex="-1"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">

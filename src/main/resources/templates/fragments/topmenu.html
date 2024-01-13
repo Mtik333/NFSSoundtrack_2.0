@@ -25,13 +25,13 @@
                     <a class="nav-link d-inline p-1" id="nightModeSwitch" href="#" th:text="#{night}"></a>
                 </div>
             </li>
-            <li class="btn nav-item nfs-top-item d-inline-block p-1" data-toggle="tooltip" data-placement="top" title="Work in progress">
+            <li class="btn nav-item nfs-top-item d-inline-block p-1" data-toggle="tooltip" data-placement="top"
+                title="Work in progress">
                 <a class="nav-link d-inline p-1" href="#" th:text="#{advancedSearch}"></a>
             </li>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
                 <a class="nav-link d-inline p-1 preferences" href="#" data-bs-toggle="modal"
-                   data-bs-target="#preferencesModal"
-                    th:text="#{preferences}"></a>
+                    data-bs-target="#preferencesModal" th:text="#{preferences}"></a>
             </li>
             <th:block sec:authorize="isAuthenticated()">
                 <li class="btn nav-item nfs-top-item d-inline-block p-1">
@@ -49,10 +49,11 @@
                 </form>
             </li>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
-                <a class="nav-link d-inline p-1" href="#" th:text="#{problem}" data-toggle="tooltip" data-placement="top" title="Work in progress"></a>
+                <a class="nav-link d-inline p-1" href="#" th:text="#{problem}" data-toggle="tooltip"
+                    data-placement="top" title="Work in progress"></a>
             </li>
             <li class="btn d-inline-block p-1">
-                <form th:action="@{/search/basic}" method="get" class="d-inline p-1" style="display:flex !important; justify-content:center;align-items:center">
+                <form id="topsearch" th:action="@{/search/basic}" method="get" class="d-inline p-1">
                     <input class="form-control me-2 d-inline" name="searchData" id="searchStuff" type="search"
                         th:attr="data-tooltip=#{searchTooltip}" th:placeholder="#{search}"><button
                         class="btn btn-outline-success nav-item nfs-top-item" type="submit"
@@ -64,7 +65,7 @@
 </nav>
 <script>
     changeStuffForDarkMode();
-    $("#flexSwitchCheckDefault").prop("checked", localStorage.getItem("dark-mode")=="true");
+    $("#flexSwitchCheckDefault").prop("checked", localStorage.getItem("dark-mode") == "true");
 </script>
 <div class="modal fade" id="preferencesModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -76,7 +77,7 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <label for="lang-select">Select language</label>
+                        <label for="lang-select" th:text="#{selectLang}"></label>
                     </div>
                     <div class="col-md-6">
                         <select class="form-select" id="lang-select" aria-label="Set language">
@@ -87,7 +88,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <label for="scrolling-stuff">Disable automatic scrolling of menu</label>
+                        <label for="scrolling-stuff" th:text="#{disableScrolling}"></label>
                     </div>
                     <div class="col-md-6">
                         <div class="form-check">
@@ -97,7 +98,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <label for="video-rendering-stuff">Render stuff in "old" way via row</label>
+                        <label for="video-rendering-stuff" th:text="#{renderStuff}"></label>
                     </div>
                     <div class="col-md-6">
                         <div class="form-check">
@@ -107,7 +108,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <label for="expandable-width">Width of expandable menu</label>
+                        <label for="expandable-width" th:text="#{menuWidth}"></label>
                     </div>
                     <div class="col-md-6">
                         <select class="form-select" id="expandable-width" aria-label="Set language">
@@ -119,7 +120,7 @@
                 </div>
                 <div class="row p-3">
                     <button type="button" class="btn btn-success" id="save-preferences" data-bs-dismiss="modal"
-                        aria-label="Save preferences">Save preferences</button>
+                        aria-label="Save preferences" th:text="#{savePreferences}"></button>
                 </div>
             </div>
         </div>

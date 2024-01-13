@@ -1,20 +1,27 @@
-<h3 th:text="#{usagesOfSong}+' '+${songToCheck?.officialDisplayBand}+' - '+${songToCheck?.officialDisplayTitle}"></h3>
-<table id="songTable" class="table table-hover table-striped playlist_table">
-    <thead><tr>
-        <th scope="col" th:text="#{id}"></th>
-        <th scope="col" th:text="#{remix}"></th>
-        <th scope="col" th:text="#{instrumental}"></th>
-        <th scope="col" th:text="#{subgroup}"></th>
-        <th scope="col" th:text="#{group}"></th>
-        <th scope="col" th:text="#{game}"></th>
-        <th scope="col" class="no-sort" th:text="#{actions}"></th>
-    </tr>
+<h2 th:text="#{usagesOfSong}+' '+${songToCheck?.officialDisplayBand}+' - '+${songToCheck?.officialDisplayTitle}"></h2>
+<table id="songTable" class="table table-hover table-striped playlist_table sortable-table">
+    <colgroup>
+        <col class="song-id" />
+        <col class="song-instrumental" />
+        <col class="song-subgroup" />
+        <col class="song-group" />
+        <col class="song-game" />
+        <col class="song-actions" />
+    </colgroup>
+    <thead>
+        <tr>
+            <th scope="col" th:text="#{id}"></th>
+            <th scope="col" th:text="#{instrumental}"></th>
+            <th scope="col" th:text="#{subgroup}"></th>
+            <th scope="col" th:text="#{group}"></th>
+            <th scope="col" th:text="#{game}"></th>
+            <th scope="col" class="no-sort"></th>
+        </tr>
     </thead>
     <tbody>
         <tr th:each="songSubgroup, iter1 : ${songUsages}"
             th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id}">
             <td th:text="${iter1.count}"></td>
-            <td th:text="${songSubgroup.remix.value}"></td>
             <td th:text="${songSubgroup.instrumental.value}"></td>
             <td th:text="${songSubgroup.subgroup.subgroupName}"></td>
             <td th:text="${songSubgroup.subgroup.mainGroup.groupName}"></td>
@@ -22,24 +29,25 @@
                     th:href="'/game/'+${songSubgroup.subgroup.mainGroup.game.gameShort}"></a></td>
             <td>
                 <div class="play_icondiv">
-                    <img class="play_icon img-responsive" data-bs-toggle="modal" data-bs-target="#videoModal"
+                    <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
+                        data-bs-target="#videoModal"
                         th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
-                        th:src="@{/images/znakwodny.png}" width="25" height="25">
+                        th:src="@{/images/znakwodny.png}">
                     </img>
                     <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
                     <th:block th:if="${songSubgroup.spotifyId != null}">
-                        <a th:href="${songSubgroup.spotifyId}" style="text-decoration:none;">
-                            <img class="img-responsive" th:src="@{/images/spotify.png}" width="25" height="25">
+                        <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}">
                         </a>
                     </th:block>
                     <th:block th:if="${songSubgroup.deezerId != null}">
-                        <a th:href="${songSubgroup.deezerId}" style="text-decoration:none;">
-                            <img class="img-responsive" th:src="@{/images/deezer.png}" width="25" height="25">
+                        <a class="a-external-music-link" th:href="${songSubgroup.deezerId}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}">
                         </a>
                     </th:block>
                     <th:block th:if="${songSubgroup.itunesLink != null}">
-                        <a th:href="${songSubgroup.itunesLink}" style="text-decoration:none;">
-                            <img class="img-responsive" th:src="@{/images/itunes2.png}" width="25" height="25">
+                        <a class="a-external-music-link" th:href="${songSubgroup.itunesLink}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}">
                         </a>
                     </th:block>
                 </div>

@@ -50,9 +50,6 @@ $(document).ready(function () {
         localStorage.setItem("dark-mode", !$(this).prev().prop("checked"));
         $(this).prev().click();
     });
-    /*$(document).find("span.display-text").each(function(e){
-        $(this).text().trim();
-    })*/
     var currentGame = window.location.href.replace(document.location.origin, "");
     if (currentGame.indexOf("custom/playlist") > -1) {
         $("#customPlaylistSubmit").parent().parent().addClass("nfs-top-item-active");
@@ -90,23 +87,6 @@ $(document).ready(function () {
         $("#nfs-top-home").parent().addClass("nfs-top-item-active");
     }
 
-    // $(".play_icon").on("click", function () {
-    //     $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
-    //     baseVideoSrc = $(this).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
-    //     $("#lyricsCollapse").empty()
-    //     var lyricsTxt = $(this).next().text();
-    //     if (lyricsTxt == "null" || lyricsTxt == "") {
-    //         $("#showLyrics").text("Lyrics not found");
-    //         $("#showLyrics").prop("disabled", true);
-    //     } else if (lyricsTxt == "0.0") {
-    //         $("#showLyrics").text("This is instrumental, no lyrics");
-    //         $("#showLyrics").prop("disabled", true);
-    //     } else {
-    //         $("#lyricsCollapse").append(lyricsTxt);
-    //         $("#showLyrics").prop("disabled", false);
-    //     }
-    // });
-
     $(".play_icon").on("click", function () {
         var useRowDisplay = localStorage.getItem("video-rendering-stuff");
         if (useRowDisplay == undefined || useRowDisplay == "true") {
@@ -120,7 +100,7 @@ $(document).ready(function () {
                 var newTr = $('<tr id="listen-music">');
                 var newTd = $('<td colspan="7" id="listen-music-id">');
                 var iframeToPut = $('<iframe id="ytrow" frameborder="0">');
-                var lyricsDiv = $('<div class="lyrics_main">');
+                var lyricsDiv = $('<div id="lyrics_main">');
                 var clearDiv = $('<div style="clear:both;">');
                 var pElem = $('<p>');
                 iframeToPut.attr("src", videoToUse + "?autoplay=1&amp;autohide=0&amp;theme=light&amp;wmode=transparent");
@@ -584,9 +564,9 @@ $(document).ready(function () {
                     var youtubeLink = youtubePlayIcon.attr("data-tagvideo")
                         .replace("https://www.youtube.com/embed/", "");
                     var trElem = $('<tr id="' + localI + '" rel="' + youtubeLink + '"></tr>');
-                    trElem.append('<td class="playlist_play_it"><img width="25" height="25" src="/images/znakwodny.png" style="background-color: transparent"></td>');
+                    trElem.append('<td class="playlist_play_it"><img class="img-responsive-playlist-modal-icon pointable" src="/images/znakwodny.png"></td>');
                     trElem.append('<td class="playlist_row">' + bandText + ' - ' + titleText + '</td>');
-                    trElem.append('<td class="playlist_disable_song"><img width="25" height="25" src="/images/trashcan3.png" style="background-color: transparent"></td>');
+                    trElem.append('<td class="playlist_disable_song"><img class="img-responsive-playlist-modal-icon pointable" src="/images/fullres/trashcan_big.png"></td>');
                     $("#playlist_progress").append(trElem);
                     localI++;
                 }

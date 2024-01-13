@@ -90,20 +90,20 @@ public class SongSerializer extends JsonSerializer<Song> {
 		}
 		jsonGenerator.writeEndArray();
 		if (song.getSpotifyId() != null) {
-			jsonGenerator.writeStringField("spotify", "<a class='p-2' href='" + song.getSpotifyId() +
-					"' style='text-decoration:none;'><img class='img-responsive' src='/images/spotify.png' width='25' height='25'></a>");
+			jsonGenerator.writeStringField("spotify", "<a href='" + song.getSpotifyId() +
+					"'><img class='img-responsive-song-info' src='/images/fullres/spotify_big.png'></a>");
 		}
 		if (song.getDeezerId() != null) {
-			jsonGenerator.writeStringField("deezer", "<a class='p-2' href='" + song.getDeezerId() +
-					"' style='text-decoration:none;'><img class='img-responsive' src='/images/deezer.png' width='25' height='25'></a>");
+			jsonGenerator.writeStringField("deezer", "<a href='" + song.getDeezerId() +
+					"'><img class='img-responsive-song-info' src='/images/fullres/deezer_big.png'></a>");
 		}
 		if (song.getItunesLink() != null) {
-			jsonGenerator.writeStringField("itunes", "<a class='p-2' href='" + song.getItunesLink() +
-					"' style='text-decoration:none;' target='_blank'><img class='img-responsive' src='/images/itunes2.png' width='25' height='25'></a>");
+			jsonGenerator.writeStringField("itunes", "<a href='" + song.getItunesLink() +
+					"' target='_blank'><img class='img-responsive-song-info' src='/images/fullres/itunes_big.png'></a>");
 		}
 		if (song.getSrcId() != null) {
-			jsonGenerator.writeStringField("youtube", "<a class='p-2' href='https://www.youtube.com/watch?v=" + song.getSrcId() +
-					"' style='text-decoration:none;' target='_blank'><img class='img-responsive' src='/images/youtube2.png' width='25' height='25'></a>");
+			jsonGenerator.writeStringField("youtube", "<a href='https://www.youtube.com/watch?v=" + song.getSrcId() +
+					"' target='_blank'><img class='img-responsive-song-info' src='/images/fullres/youtube_big.png'></a>");
 		}
 		jsonGenerator.writeEndObject();
 	}

@@ -1,6 +1,6 @@
-<h2 th:text="'Search results for phrase: ' + ${searchPhrase}"></h2>
+<h2 th:text="#{searchResultsPre} + ' ' + ${searchPhrase}"></h2>
 <hr>
-<h3>All found authors / aliases</h3>
+<h3 th:text="#{allFoundAuthors}"></h3>
 <th:block th:each="authorAlias : ${authorAliases}">
     <th:block th:if="${authorAlias.author.name == authorAlias.alias}">
         <a class="table_link" th:href="'/author/'+${authorAlias.author.id}"
@@ -13,7 +13,7 @@
     </th:block>
 </th:block>
 <hr>
-<h3>All found song titles</h3>
+<h3 th:text="#{allFoundSongTitles}"></h3>
 <th:block th:each="song : ${songTitleList}">
     <th:block th:each="authorSong,iter : ${song.authorSongList}">
         <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
@@ -37,7 +37,7 @@
     <br>
 </th:block>
 <hr>
-<h3>All found lyrics with this phrase</h3>
+<h3 th:text="#{allFoundLyrics}"></h3>
 <th:block th:each="song : ${songLyricsList}">
     <th:block th:each="authorSong,iter : ${song.authorSongList}">
         <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
@@ -60,8 +60,8 @@
     </th:block>
     <br>
 </th:block>
-<h3>All found genres with this phrase</h3>
+<h3 th:text="#{allFoundGenres}"></h3>
 <th:block th:each="genre : ${genreList}">
-            <a class="table_link" th:href="'/genre/'+${genre.id}" th:text="${genre.genreName} "></a>
+    <a class="table_link" th:href="'/genre/'+${genre.id}" th:text="${genre.genreName} "></a>
     <br>
 </th:block>

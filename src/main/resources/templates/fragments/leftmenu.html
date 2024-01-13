@@ -1,13 +1,11 @@
-<div class="offcanvas offcanvas-start" id="offcanvas" tabindex="-1" data-bs-keyboard="false"
-    data-bs-backdrop="false">
+<div class="offcanvas offcanvas-start" id="offcanvas" tabindex="-1" data-bs-keyboard="false" data-bs-backdrop="false">
     <div class="offcanvas-header">
         <h6 class="offcanvas-title d-sm-block" th:text="#{menu}"></h6>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body py-0 px-0">
         <div class="accordion" id="accordionExample">
-            <input class="form-control mt-2 mb-3" id="filter_games_menu" maxlength="15" th:placeholder="#{filterGames}"
-                style="width: 100%">
+            <input class="form-control mt-2 mb-3" id="filter_games_menu" maxlength="15" th:placeholder="#{filterGames}">
             <th:block th:each="serie: ${series}">
                 <div class="accordion-item">
                     <h2 class="accordion-header" th:attr="id='heading-'+${serie.id}">
