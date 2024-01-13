@@ -12,6 +12,7 @@ import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Role;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongGenre;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
+import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.others.JustSomeHelper;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.SongSerializer;
 import org.slf4j.Logger;
@@ -142,6 +143,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 		Author author =
 				authorService.findById(authorId).orElseThrow(
 						() -> new Exception("No author found with id " + authorId));
+		DiscoGSObj discoGSObj = authorService.fetchInfoFromMap(author);
 		List<AuthorAlias> allAliases = authorAliasService.findByAuthor(author);
 //        authorSongRepository.findByAuthorAlias(allAliases.get(0));
 		Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsAsComposer = new HashMap<>();
@@ -163,6 +165,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 						songSubgroupList);
 			}
 		}
+		model.addAttribute("discoGSObj", discoGSObj);
 		model.addAttribute("author", author);
 		model.addAttribute("songsAsComposer", songsAsComposer);
 		model.addAttribute("songsAsSubcomposer", songsAsSubcomposer);

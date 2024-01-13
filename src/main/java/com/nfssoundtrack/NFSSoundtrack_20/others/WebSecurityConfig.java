@@ -1,8 +1,10 @@
 package com.nfssoundtrack.NFSSoundtrack_20.others;
 
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,7 +19,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -39,7 +43,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 				.authorizeHttpRequests((requests) -> requests
 						.requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
 								"/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
-								"/custom/playlist", "/song/**", "/songinfo/**", "/favicon.ico").permitAll()
+								"/custom/playlist", "/song/**", "/songinfo/**",
+								"/favicon.ico", "/nfssoundtrack.ico",
+								"favicon.ico", "nfssoundtrack.ico").permitAll()
 				)
 				.formLogin((form) -> form
 						.loginPage("/login")
@@ -77,5 +83,10 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 		return new BCryptPasswordEncoder(12);
 	}
 
-
+	@Bean
+	@Cacheable("discoGSMap")
+	public Map<Author, DiscoGSObj> discoGSObjMap(){
+		Map<Author, DiscoGSObj> cachedMap = new HashMap<>();
+		return cachedMap;
+	}
 }

@@ -199,37 +199,9 @@
                 </th:block>
             </tbody>
         </table>
-
     </div>
 
-    <div class="modal fade" id="videoModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="videoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" id="showLyrics" class="btn btn-outline-info"
-                        th:attr="data-lyricsMissing=#{lyricsMissing},data-instrumental=#{thisIsInstrumental}"
-                        th:text="#{lyrics}"></button>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="ratio ratio-16x9" style="height: 75vh;">
-                                <iframe src="" id="video" allow="autoplay;" allowscriptaccess="always"
-                                    allowfullscreen></iframe>
-                            </div>
-                        </div>
-                        <div class="overflow-scroll" style="display: none;">
-                            <div id="lyricsCollapse">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <th:block th:insert="~{fragments/ytVideoModal.html}"></th:block>
     <div class="modal fade" id="spotifyModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -314,30 +286,7 @@
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="playlistModeModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 th:text="#{playlistMode}"></h3>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div id="playlistModePlayer" class="ratio ratio-16x9">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-bordered table-hover table-sm" id="playlist_progress"></table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <th:block th:insert="~{fragments/playlistModal.html}"></th:block>
     <div class="modal fade" id="disqusModal" th:attr="data-disqusLink=${game.disqusLink}" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -355,9 +304,7 @@
             </div>
         </div>
     </div>
-
-<th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
-
+    <th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
 </th:block>
 <th:block th:if="${songSubgroups!=null && songSubgroups.isEmpty()}">
     <h2>No songs found, that's quite odd. Would you like to report it? Click the "Report problem" button from the top

@@ -1,40 +1,158 @@
 package com.nfssoundtrack.NFSSoundtrack_20.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
+import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
-import java.util.Optional;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Service
 public class AuthorService {
 
-	@Autowired
-	AuthorRepository authorRepository;
+    @Autowired
+    AuthorRepository authorRepository;
 
-	public Optional<Author> findById(int authorId) {
-		return authorRepository.findById(authorId);
-	}
+    @Value("${discogs.key}")
+    private String discogsKey;
 
-	public Optional<Author> findByName(String name) {
-		return authorRepository.findByName(name);
-	}
+    @Value("${discogs.secret}")
+    private String discogsSecret;
 
-	public List<Author> findByNameContains(String name) {
-		return authorRepository.findByNameContains(name);
-	}
+    @Autowired
+    Map<Author, DiscoGSObj> discoGSObjMap;
 
-	public void delete(Author author) {
-		authorRepository.delete(author);
-	}
+    public Optional<Author> findById(int authorId) {
+        return authorRepository.findById(authorId);
+    }
 
-	public void deleteAll(List<Author> authors) {
-		authorRepository.deleteAll(authors);
-	}
+    public Optional<Author> findByName(String name) {
+        return authorRepository.findByName(name);
+    }
 
-	public Author save(Author author) {
-		return authorRepository.save(author);
-	}
+    public List<Author> findByNameContains(String name) {
+        return authorRepository.findByNameContains(name);
+    }
+
+    public void delete(Author author) {
+        authorRepository.delete(author);
+    }
+
+    public void deleteAll(List<Author> authors) {
+        authorRepository.deleteAll(authors);
+    }
+
+    public Author save(Author author) {
+        return authorRepository.save(author);
+    }
+
+
+    @CachePut(value = "discoGSMap")
+    public DiscoGSObj fetchInfoFromMap(Author author) throws JsonProcessingException {
+        DiscoGSObj discoGSObj = discoGSObjMap.get(author);
+        if (discoGSObj == null) {
+            Integer artistDiscogsId = retrieveArtistId(author.getName());
+            if (artistDiscogsId != null) {
+                discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
+                discoGSObjMap.put(author, discoGSObj);
+            } else {
+                discoGSObj = new DiscoGSObj(null, author.getName() + " not found in DiscoGS database");
+                discoGSObjMap.put(author, discoGSObj);
+            }
+            return discoGSObj;
+        } else {
+            return discoGSObj;
+        }
+    }
+
+    private Integer retrieveArtistId(String authorName) throws JsonProcessingException {
+        RestTemplate restTemplate = new RestTemplate();
+        String uri = "https://api.discogs.com/database/search"; // or any other uri
+        HttpEntity<String> entity = entityToGet();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(uri)
+                .queryParam("q", URLEncoder.encode(authorName, StandardCharsets.UTF_8))
+                .queryParam("type", "artist")
+                .queryParam("key", discogsKey)
+                .queryParam("secret", discogsSecret)
+                .queryParam("per_page", 5)
+                .queryParam("page", 1);
+        HttpEntity<String> response1 = restTemplate.exchange(
+                builder.toUriString(),
+                HttpMethod.GET, entity, String.class);
+        String body1 = response1.getBody();
+        ObjectMapper objectMapper1 = new ObjectMapper();
+        Map<?, ?> something1 = objectMapper1.readValue(body1, Map.class);
+        List<?> results = (List<?>) something1.get("results");
+        if (!results.isEmpty()) {
+            LinkedHashMap<?, ?> resultsMap = (LinkedHashMap<?, ?>) results.get(0);
+            String artistName = String.valueOf(resultsMap.get("title"));
+            if (artistName.contentEquals(authorName)) {
+                return (Integer) resultsMap.get("id");
+            }
+        } else {
+            return null;
+        }
+        return null;
+    }
+
+    private DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws JsonProcessingException {
+        RestTemplate restTemplate = new RestTemplate();
+        String uri2 = "https://api.discogs.com/artists/" + id;
+        HttpEntity<String> entity = entityToGet();
+        UriComponentsBuilder builder2 = UriComponentsBuilder.fromHttpUrl(uri2);
+        HttpEntity<String> response = restTemplate.exchange(
+                builder2.toUriString(),
+                HttpMethod.GET, entity, String.class);
+        String body = response.getBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<?, ?> something = objectMapper.readValue(body, Map.class);
+        DiscoGSObj discoGSObj = new DiscoGSObj();
+        String linkToArtist = String.valueOf(something.get("uri"));
+        discoGSObj.setUri(linkToArtist);
+        String profile = String.valueOf(something.get("profile"));
+        if (profile.isEmpty()) {
+            profile = authorName + " has no profile description at DiscoGS";
+        }
+        discoGSObj.setProfile(profile);
+        List<String> urls = (List<String>) something.get("urls");
+        if (urls != null && !urls.isEmpty()) {
+            for (String localUrl : urls) {
+                if (localUrl.contains("facebook")) {
+                    discoGSObj.setFacebook(localUrl);
+                } else if (localUrl.contains("twitter")) {
+                    discoGSObj.setTwitter(localUrl);
+                } else if (localUrl.contains("instagram")) {
+                    discoGSObj.setInstagram(localUrl);
+                } else if (localUrl.contains("soundcloud")) {
+                    discoGSObj.setSoundcloud(localUrl);
+                } else if (localUrl.contains("myspace")) {
+                    discoGSObj.setMyspace(localUrl);
+                } else if (localUrl.contains("wikipedia")) {
+                    discoGSObj.setWikipedia(localUrl);
+                }
+            }
+        }
+        return discoGSObj;
+    }
+
+    private HttpEntity<String> entityToGet() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.add("user-agent", "NFSSoundtrack/1.0 +https://nfssoundtrack.com");
+        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+        return entity;
+    }
 }

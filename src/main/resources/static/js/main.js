@@ -518,7 +518,7 @@ $(document).ready(function () {
     }
 
     $('#disqusModal').on('show.bs.modal', function (e) {
-        var disqusTarget = e.target.id;
+        var disqusTarget = e.relatedTarget.id;
         var linkToUse;
         if (disqusTarget == "newDisqusLink") {
             linkToUse = window.location.href;
