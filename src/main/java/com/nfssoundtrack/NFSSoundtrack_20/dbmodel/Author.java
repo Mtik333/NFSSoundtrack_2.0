@@ -46,4 +46,13 @@ public class Author implements Serializable {
     public void setAuthorCountries(List<AuthorCountry> authorCountries) {
         this.authorCountries = authorCountries;
     }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Author author)) {
+            return false;
+        }
+        return (long) author.getId() == id;
+    }
 }

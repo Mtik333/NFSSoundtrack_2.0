@@ -2,7 +2,6 @@ package com.nfssoundtrack.NFSSoundtrack_20.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nfssoundtrack.NFSSoundtrack_20.controllers.ArtistController;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
 import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.AuthorRepository;
@@ -67,15 +66,47 @@ public class AuthorService {
 
     @CachePut(value = "discoGSMap")
     public DiscoGSObj fetchInfoFromMap(Author author) throws JsonProcessingException {
-        DiscoGSObj discoGSObj = discoGSObjMap.get(author);
-        if (discoGSObj == null) {
+        Optional<Author> authorAlreadyThere =
+                discoGSObjMap.keySet().stream().filter(author::equals).findFirst();
+        DiscoGSObj discoGSObj;
+        if (authorAlreadyThere.isPresent()) {
+            discoGSObj = discoGSObjMap.get(authorAlreadyThere.get());
+            if (discoGSObj == null) {
+                Integer artistDiscogsId = retrieveArtistId(author.getName());
+                if (artistDiscogsId != null) {
+                    discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
+                    if (discoGSObj == null) {
+                        discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, "There was some internal error " +
+                                "- you might reach out to admin so he can double check");
+                    }
+                    discoGSObjMap.put(author, discoGSObj);
+                } else {
+                    discoGSObj = new DiscoGSObj(true, 0, null,
+                            author.getName() + " not found in DiscoGS database");
+                    discoGSObjMap.put(author, discoGSObj);
+                }
+            } else {
+                if (!discoGSObj.isNotInDiscogs()) {
+                    discoGSObj = obtainArtistLinkAndProfile(author.getName(), discoGSObj.getArtistId());
+                    if (discoGSObj == null) {
+                        discoGSObj = new DiscoGSObj(null, "There was some internal error " +
+                                "- you might reach out to admin so he can double check");
+                    }
+                    discoGSObjMap.put(author, discoGSObj);
+                }
+            }
+        } else {
             Integer artistDiscogsId = retrieveArtistId(author.getName());
             if (artistDiscogsId != null) {
                 discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
+                if (discoGSObj == null) {
+                    discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, "There was some internal error " +
+                            "- you might reach out to admin so he can double check");
+                }
                 discoGSObjMap.put(author, discoGSObj);
             } else {
-                discoGSObj = new DiscoGSObj(null, author.getName() + " not found in DiscoGS database " +
-                        "or there was some internal error - you might reach out to admin so he can double check");
+                discoGSObj = new DiscoGSObj(true, 0, null,
+                        author.getName() + " not found in DiscoGS database");
                 discoGSObjMap.put(author, discoGSObj);
             }
         }
@@ -114,44 +145,44 @@ public class AuthorService {
 
     private DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws JsonProcessingException {
         try {
-        RestTemplate restTemplate = new RestTemplate();
-        String uri2 = "https://api.discogs.com/artists/" + id;
-        HttpEntity<String> entity = entityToGet();
-        UriComponentsBuilder builder2 = UriComponentsBuilder.fromHttpUrl(uri2);
-        HttpEntity<String> response = restTemplate.exchange(
-                builder2.toUriString(),
-                HttpMethod.GET, entity, String.class);
-        String body = response.getBody();
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<?, ?> something = objectMapper.readValue(body, Map.class);
-        DiscoGSObj discoGSObj = new DiscoGSObj();
-        String linkToArtist = String.valueOf(something.get("uri"));
-        discoGSObj.setUri(linkToArtist);
-        String profile = String.valueOf(something.get("profile"));
-        if (profile.isEmpty()) {
-            profile = authorName + " has no profile description at DiscoGS";
-        }
-        discoGSObj.setProfile(profile);
-        List<String> urls = (List<String>) something.get("urls");
-        if (urls != null && !urls.isEmpty()) {
-            for (String localUrl : urls) {
-                if (localUrl.contains("facebook")) {
-                    discoGSObj.setFacebook(localUrl);
-                } else if (localUrl.contains("twitter")) {
-                    discoGSObj.setTwitter(localUrl);
-                } else if (localUrl.contains("instagram")) {
-                    discoGSObj.setInstagram(localUrl);
-                } else if (localUrl.contains("soundcloud")) {
-                    discoGSObj.setSoundcloud(localUrl);
-                } else if (localUrl.contains("myspace")) {
-                    discoGSObj.setMyspace(localUrl);
-                } else if (localUrl.contains("wikipedia")) {
-                    discoGSObj.setWikipedia(localUrl);
+            RestTemplate restTemplate = new RestTemplate();
+            String uri2 = "https://api.discogs.com/artists/" + id;
+            HttpEntity<String> entity = entityToGet();
+            UriComponentsBuilder builder2 = UriComponentsBuilder.fromHttpUrl(uri2);
+            HttpEntity<String> response = restTemplate.exchange(
+                    builder2.toUriString(),
+                    HttpMethod.GET, entity, String.class);
+            String body = response.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<?, ?> something = objectMapper.readValue(body, Map.class);
+            DiscoGSObj discoGSObj = new DiscoGSObj();
+            String linkToArtist = String.valueOf(something.get("uri"));
+            discoGSObj.setUri(linkToArtist);
+            String profile = String.valueOf(something.get("profile"));
+            if (profile.isEmpty()) {
+                profile = authorName + " has no profile description at DiscoGS";
+            }
+            discoGSObj.setProfile(profile);
+            List<String> urls = (List<String>) something.get("urls");
+            if (urls != null && !urls.isEmpty()) {
+                for (String localUrl : urls) {
+                    if (localUrl.contains("facebook")) {
+                        discoGSObj.setFacebook(localUrl);
+                    } else if (localUrl.contains("twitter")) {
+                        discoGSObj.setTwitter(localUrl);
+                    } else if (localUrl.contains("instagram")) {
+                        discoGSObj.setInstagram(localUrl);
+                    } else if (localUrl.contains("soundcloud")) {
+                        discoGSObj.setSoundcloud(localUrl);
+                    } else if (localUrl.contains("myspace")) {
+                        discoGSObj.setMyspace(localUrl);
+                    } else if (localUrl.contains("wikipedia")) {
+                        discoGSObj.setWikipedia(localUrl);
+                    }
                 }
             }
-            }
             return discoGSObj;
-        } catch (Exception exp){
+        } catch (Exception exp) {
             logger.error("what exception? " + exp.getMessage());
             exp.printStackTrace();
             return null;

@@ -2,6 +2,9 @@ package com.nfssoundtrack.NFSSoundtrack_20.others;
 
 public class DiscoGSObj {
 
+    private boolean notInDiscogs;
+
+    private Integer artistId;
     private String uri;
     private String profile;
 
@@ -20,6 +23,13 @@ public class DiscoGSObj {
     }
 
     public DiscoGSObj(String uri, String profile) {
+        this.uri = uri;
+        this.profile = profile;
+    }
+
+    public DiscoGSObj(boolean notInDiscogs, Integer artistId, String uri, String profile) {
+        this.notInDiscogs = notInDiscogs;
+        this.artistId = artistId;
         this.uri = uri;
         this.profile = profile;
     }
@@ -86,5 +96,21 @@ public class DiscoGSObj {
 
     public void setWikipedia(String wikipedia) {
         this.wikipedia = wikipedia;
+    }
+
+    public boolean isNotInDiscogs() {
+        return notInDiscogs;
+    }
+
+    public void setNotInDiscogs(boolean notInDiscogs) {
+        this.notInDiscogs = notInDiscogs;
+    }
+
+    public Integer getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(Integer artistId) {
+        this.artistId = artistId;
     }
 }
