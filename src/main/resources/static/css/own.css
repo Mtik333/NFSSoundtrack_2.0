@@ -126,6 +126,7 @@ html tr.rolegroup-separator:nth-of-type(odd) {
 
 #filter_songs {
   border-bottom: 0.15vw solid #8ba2b5;
+  width: 100%;
 }
 
 a.table_link {
@@ -242,6 +243,16 @@ div.ratio {
   display: flex !important;
   justify-content: center;
   align-items: center;
+}
+
+#filter_games_menu {
+  width: 100%;
+}
+
+footer div{
+    width: 98.5%;
+    margin: 0vw auto;
+    padding: 1vw;
 }
 
 @media screen and (max-width: 600px) {
@@ -499,6 +510,21 @@ div.ratio {
     width: 28vw;
     height: 36vw;
   }
+
+    footer div{
+        width: 90%;
+        margin: 0vw auto;
+        padding: 1vw;
+        font-size: 2.5vw;
+    }
+
+    td.band{
+    word-wrap: break-word;
+    }
+
+    td.songtitle{
+    word-wrap: break-word;
+    }
 
 }
 
