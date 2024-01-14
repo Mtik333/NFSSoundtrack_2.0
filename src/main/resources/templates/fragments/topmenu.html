@@ -126,16 +126,4 @@
         </div>
     </div>
 </div>
-<script>
-    $(document).on("click", "#save-preferences", function () {
-        localStorage.setItem("expandable-width", $("#expandable-width").val());
-        localStorage.setItem("scrolling-stuff", $("#scrolling-stuff").prop("checked"));
-        localStorage.setItem("video-rendering-stuff", $("#video-rendering-stuff").prop("checked"));
-        var langAlreadyThere = window.location.toString().indexOf("?lang") > -1;
-        if (langAlreadyThere) {
-            window.location.search = "?lang=" + $("#lang-select").val();
-        } else {
-            window.location = window.location + "?lang=" + $("#lang-select").val();
-        }
-    });
-</script>
+<script th:src="@{/js/topmenu.js}" type="application/javascript"></script>

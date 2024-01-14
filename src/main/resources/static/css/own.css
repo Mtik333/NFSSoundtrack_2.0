@@ -220,7 +220,7 @@ a.preferences {
 }
 
 html[data-bs-theme="dark"] .preferences {
-  background-color: #858E03;
+  background-color: #4A4F03;
 }
 
 #lyrics_main {
@@ -238,6 +238,11 @@ html[data-bs-theme="dark"] .preferences {
 div.ratio {
   height: 75vh;
 }
+
+iframe.externalIframe {
+  height: 75vh;
+}
+
 
 #topsearch {
   display: flex !important;

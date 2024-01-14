@@ -1,5 +1,3 @@
-var foundArtist;
-
 $(document).ready(function () {
     $("#merge-alias-with-artist").click(function (e) {
         var divToAppend = $('#nfs-content');
@@ -37,7 +35,7 @@ $(document).ready(function () {
     $(document).on('click', "#merge-artist", function (e) {
         var authorToMerge = $("#authorMergeInputHidden").val();
         var targetAuthor = $("#targetAuthorInputHidden").val();
-        var objToSubmit = new Object();
+        var objToSubmit = {};
         objToSubmit.authorToMergeId = Number(authorToMerge);
         objToSubmit.targetAuthorId = Number(targetAuthor);
         $(successAlertHtml).hide();

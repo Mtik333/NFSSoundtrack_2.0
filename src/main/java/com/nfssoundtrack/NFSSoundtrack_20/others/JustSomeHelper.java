@@ -12,13 +12,6 @@ import java.util.Map;
 
 public class JustSomeHelper {
 
-	//	public static <T> ObjectMapper getObjectMapper(Class<? extends T> type, JsonSerializer<T> ser) {
-//		ObjectMapper objectMapper = new ObjectMapper();
-//		SimpleModule simpleModule = new SimpleModule();
-//		simpleModule.addSerializer(type, ser);
-//		objectMapper.registerModule(simpleModule);
-//		return objectMapper;
-//	}
 	public static String returnProperValueToDb(String value) {
 		if ("".equals(value) || "null".equals(value) || "undefined".equals(value)) {
 			return null;

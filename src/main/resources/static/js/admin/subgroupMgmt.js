@@ -1,4 +1,4 @@
-var modifiedSubgroupSongArray = new Array();
+var modifiedSubgroupSongArray = [];
 var currentSubgroupId;
 
 function ModifiedSubgroupSongDef(subgroup_id, song_id, state) {
@@ -38,11 +38,11 @@ $(document).ready(function () {
                 var dropdownDiv = $('<div id="selectSubgroup" class="dropdown">');
                 dropdownDiv.append('<button class="btn btn-secondary dropdown-toggle" type="button" id="subgroupsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">All</button>');
                 leftCellDiv.append(dropdownDiv);
-                var allSongSubgroups = new Array();
+                var allSongSubgroups = [];
                 for (let i = 0; i < fullScopeOfEdit.length; i++) {
-                    var group = fullScopeOfEdit[i];
+                    const group = fullScopeOfEdit[i];
                     for (let j = 0; j < group.subgroups.length; j++) {
-                        allSongSubgroups = allSongSubgroups.concat(fullScopeOfEdit[i].subgroups[j].songSubgroupList)
+                        allSongSubgroups = allSongSubgroups.concat(fullScopeOfEdit[i].subgroups[j].songSubgroupList);
                     }
                 }
                 var tableToFill;
@@ -50,7 +50,7 @@ $(document).ready(function () {
                     var dropdownMenuDiv = $('<div class="dropdown-menu" aria-labelledby="subgroupsDropdown">');
                     tableToFill = displayAllSongs(allSongSubgroups, dropdownDiv);
                     for (let i = 0; i < fullScopeOfEdit.length; i++) {
-                        var group = fullScopeOfEdit[i];
+                        const group = fullScopeOfEdit[i];
                         var groupName = fullScopeOfEdit[i].groupName;
                         for (let j = 0; j < group.subgroups.length; j++) {
                             var subgroup = group.subgroups[j];
@@ -145,11 +145,11 @@ $(document).ready(function () {
             var songId = subgroupSongs[i].song.id;
             var songToMark = $("#subgroups-table").find('tr[data-songId="' + songId + '"]').first();
             songToMark.attr("data-songSubgroupId", subgroupSongs[i].id);
-            var inputToMark = songToMark.find("input")
+            var inputToMark = songToMark.find("input");
             $(inputToMark[0]).prop('checked', true);
             $(inputToMark[0]).val('EXISTS');
             $(inputToMark[1]).val(subgroupSongs[i].position);
-        };
+        }
         console.log("e");
         if ($(this).text() == "(All) from group [All]") {
             $("#updateSubgroupSongs").prop('disabled', true);
@@ -161,7 +161,6 @@ $(document).ready(function () {
 
     $(document).on('change', '.songSubgroupRow', function (e) {
         var mySubgroupChange;
-        var backToOriginalState = false;
         var tr = $(this).parent().parent();
         var songId = $(tr).attr("data-songid");
         if ($(this).is(":checked")) {
@@ -231,7 +230,7 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#updatePositionsInDb', function (e) {
-        var arrayOfModifiedSubgroupSongPositionDef = new Array();
+        var arrayOfModifiedSubgroupSongPositionDef = [];
         $("#subgroups-table").find("tr").each(function (index) {
             var isRowChecked = $($(this).find("input")[0]).prop('checked');
             if (isRowChecked) {

@@ -1,7 +1,5 @@
 var gameId;
 var fullScopeOfEdit;
-var editedGroup;
-var groupIndex;
 var successAlertHtml = $('<div class="alert alert-success" id="success-alert" style="display: none;"><strong>Success!</strong></div>');
 var failureAlertHtml = $('<div class="alert alert-danger" id="failure-alert" style="display: none;"><strong>Failure! Check the logs</strong></div>');
 $(document).ready(function () {
@@ -83,7 +81,7 @@ $(document).ready(function () {
     $(document).on('click', '#edit-group', function (e) {
         var groupToEdit;
         for (let i = 0; i < fullScopeOfEdit.length; i++) {
-            var groupId = fullScopeOfEdit[i].id
+            var groupId = fullScopeOfEdit[i].id;
             if (groupId == $(this).attr('data-groupId')) {
                 groupToEdit = fullScopeOfEdit[i];
                 break;
@@ -110,7 +108,7 @@ $(document).ready(function () {
             if (subgroupInput.val() == "All") {
                 subgroupInput.prop("disabled", true);
             }
-            inputRowDiv.append(subgroupInput)
+            inputRowDiv.append(subgroupInput);
             divWithCols.append(inputRowDiv);
             divWithCols.append('<div class="col-sm"><input type="text" class="group-position" value="' + groupToEdit.subgroups[i].position + '"><button id="add-subgroup" type="submit" data-subgroupPosition="' + groupToEdit.subgroups[i].position + '" class="btn btn-success">+</button><button type="button" id="delete-subgroup" data-subGroupId="' + groupToEdit.subgroups[i].id + '" class="btn btn-danger">X</button></div>');
             formAppend.append(divWithCols);

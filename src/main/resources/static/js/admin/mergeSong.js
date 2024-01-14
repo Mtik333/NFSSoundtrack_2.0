@@ -1,5 +1,3 @@
-var foundArtist;
-
 $(document).ready(function () {
     $("#merge-songs").click(function (e) {
         var divToAppend = $('#nfs-content');
@@ -27,7 +25,7 @@ $(document).ready(function () {
     $(document).on('click', "#merge-song", function (e) {
         var songToMerge = $("#songMergeInput").val();
         var targetSong = $("#targetSongInput").val();
-        var objToSubmit = new Object();
+        var objToSubmit = {};
         objToSubmit.songToMergeId=songToMerge;
         objToSubmit.targetSongId=targetSong;
         $(successAlertHtml).hide();

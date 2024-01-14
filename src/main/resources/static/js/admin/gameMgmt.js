@@ -80,7 +80,7 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#saveEditGame', function (e) {
-        var formData = new Object();
+        var formData = {};
         formData.id = gameToEdit.id;
         formData.gameTitle = $("#gameTitle").val();
         formData.displayTitle = $("#gameDisplay").val();

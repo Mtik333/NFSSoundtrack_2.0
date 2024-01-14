@@ -1,23 +1,20 @@
 var current_id = 0;
-
+var activeSubgroups;
+var baseVideoSrc;
 $(document).ready(function () {
-
     var newWidth = localStorage.getItem("expandable-width");
+    if (window.location.href.indexOf("/home") > -1) {
+        $("#nfs-top-home").parent().addClass("nfs-top-item-active");
+    }
     if (newWidth != undefined) {
         $("#offcanvas").removeClass("w-25");
         $("#offcanvas").removeClass("w-35");
         $("#offcanvas").removeClass("w-50");
         $("#offcanvas").addClass("w-" + newWidth);
     }
-    // else {
-    //     $("#offcanvas").removeClass("w-25");
-    //     $("#offcanvas").removeClass("w-35");
-    //     $("#offcanvas").removeClass("w-50");
-    //     $("#offcanvas").addClass("w-25");
-    // }
     if (localStorage.getItem("custom-playlist") != undefined) {
         var customPlaylistArrayTrigger = JSON.parse(localStorage.getItem("custom-playlist"));
-        var jsonEdArrayTrigger = JSON.stringify(customPlaylistArrayTrigger)
+        var jsonEdArrayTrigger = JSON.stringify(customPlaylistArrayTrigger);
         localStorage.setItem("custom-playlist", jsonEdArrayTrigger);
         $("#playlistContent").val(jsonEdArrayTrigger);
     } else {
@@ -37,19 +34,6 @@ $(document).ready(function () {
     $("#searchStuff").tooltip({ 'trigger': 'focus', 'title': $("#searchStuff").attr("data-tooltip") });
     $("#filter_games_menu").val("");
     $('[data-toggle="tooltip"]').tooltip();
-    $("#flexSwitchCheckDefault").change(function (e) {
-        localStorage.setItem("dark-mode", $(this).prop("checked"));
-        changeStuffForDarkMode();
-        if (typeof DISQUS != "undefined") {
-            DISQUS.reset({ reload: true });
-        }
-    });
-
-    $("#nightModeSwitch").click(function (e) {
-        e.preventDefault();
-        localStorage.setItem("dark-mode", !$(this).prev().prop("checked"));
-        $(this).prev().click();
-    });
     var currentGame = window.location.href.replace(document.location.origin, "");
     if (currentGame.indexOf("custom/playlist") > -1) {
         $("#customPlaylistSubmit").parent().parent().addClass("nfs-top-item-active");
@@ -66,26 +50,25 @@ $(document).ready(function () {
             }
         });
     }
+    //when loading list of songs, we want to trigger main group by default
+    var firstGameGroup = $('a.gamegroup:first')[0];
+    if (firstGameGroup != null) {
+        $(firstGameGroup).first().click();
+        //we have to hit first subgroup in main group to have stuff displayed
+    }
+
     $(document).find("td.countries").each(function () {
         var imgsOfCountries = $(this).children();
-        var arrayOfLinks = new Array();
-        // var duplicatesToRemove = new Array();
+        var arrayOfLinks = [];
         for (let i = 0; i < imgsOfCountries.length; i++) {
             var srcOfImg = imgsOfCountries[i].src;
             if (arrayOfLinks.indexOf(srcOfImg) == -1) {
                 arrayOfLinks.push(srcOfImg);
             } else {
-                // duplicatesToRemove.push(imgsOfCountries[i]);
                 $(imgsOfCountries[i]).remove();
             }
         }
     });
-    var activeSubgroups;
-    var baseVideoSrc;
-    var lyricsToDisplay;
-    if (window.location.href.indexOf("/home") > -1) {
-        $("#nfs-top-home").parent().addClass("nfs-top-item-active");
-    }
 
     $(".play_icon").on("click", function () {
         var useRowDisplay = localStorage.getItem("video-rendering-stuff");
@@ -109,11 +92,11 @@ $(document).ready(function () {
                 newTd.append(iframeToPut);
                 newTd.append(lyricsDiv);
                 newTd.append(clearDiv);
-                newTr.append(newTd)
+                newTr.append(newTd);
                 newTr.insertAfter(parentTr);
             }
         } else {
-            $("#lyricsCollapse").empty()
+            $("#lyricsCollapse").empty();
             var lyricsTxt = $(this).next().text();
             if (lyricsTxt == "null" || lyricsTxt == "") {
                 $("#showLyrics").text("Lyrics not found");
@@ -136,132 +119,13 @@ $(document).ready(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
     });
 
-    $(document).find("div.accordion-collapse").each(function () {
-        $(this).on('shown.bs.collapse', function () {
-            var unscrollableMenu = localStorage.getItem("scrolling-stuff");
-            if (!unscrollableMenu) {
-                //i think i should fix this somehow
-                if ($("#filter_games_menu").val() == "" || $("#filter_games_menu").val().length < 3) {
-                    console.log($(this).offset());
-                    var currentScroll = $('div.offcanvas-body').scrollTop();
-                    var origTop = $('div.offcanvas-body').offset().top;
-                    var thisTop = $(this).offset().top;
-                    if (currentScroll > 0) {
-                        var scrollTop = currentScroll + thisTop - origTop - $(this).parent().children().first().height();
-                    } else {
-                        var scrollTop = thisTop - origTop - $(this).parent().children().first().height();
-                    }
-                    $('div.offcanvas-body').animate({
-                        scrollTop: scrollTop
-                    }, 500);
-                }
-            }
-        });
-    });
-    // $(document).on('click', 'button.gamegroup-button', function (e) { 
-    //     $('div.offcanvas-body ').animate({
-    //         scrollTop: $(this).offset().top
-    //     }, 1000);
-    // });
-
-    $("#filter_games_menu").on("keyup", function () {
-        var searchValue = $(this).val().toLowerCase();
-        if (searchValue.length > 3) {
-            $(document).find("button.gamegroup-button").filter(function () {
-                var divId = $(this).attr("data-bs-target");
-                if ($(divId).hasClass("show")) {
-                    $(this).click();
-                    //actually should listen to event of collapsing this shit and then show all filtered stuff
-                }
-            });
-            setTimeout(function () {
-                funcToShowOnlyFilteredGames(searchValue);
-            }, 400);
-        } else {
-            var buttonToClick;
-            var divToShow;
-            $(document).find("button.gamegroup-button").filter(function () {
-                var divId = $(this).attr("data-bs-target");
-                if ($(divId).find("a.active").length > 0) {
-                    $(divId).find("a").filter(function () {
-                        $(this).show();
-                    });
-                    $(divId).parent().show();
-                    $(divId).collapse('show');
-                } else {
-                    $(this).collapse('hide');
-                    $(divId).find("a").filter(function () {
-                        $(this).show();
-                    });
-                    $(divId).parent().show();
-                    $(divId).collapse('hide');
-                    if ($(divId).find("a.active").length > 0) {
-                        buttonToClick = $(this);
-                        divToShow = divId;
-                    }
-                }
-            });
-            if (divToShow != undefined) {
-                $($(this).attr("data-bs-target")).parent().show();
-                if ($(divToShow).hasClass("collapsed")) {
-                    buttonToClick.click();
-                }
-                //$(this).show();
-            }
-
-        }
-    });
-
-
-    function funcToShowOnlyFilteredGames(searchValue) {
-        $(document).find("button.gamegroup-button").filter(function () {
-            var divId = $(this).attr("data-bs-target");
-            if ($(this).text().toLowerCase() > -1 && !$(divId).hasClass("show")) {
-                $(this).click();
-            } else {
-                var allA = $(divId).find("a");
-                var somethingFound = false;
-                for (let i = 0; i < allA.length; i++) {
-                    if ($(allA[i]).text().toLowerCase().indexOf(searchValue) > -1) {
-                        somethingFound = true;
-                        $(allA[i]).show();
-                    } else {
-                        $(allA[i]).hide();
-                    }
-                }
-                if (somethingFound) {
-                    // if ($(divId).find("a.active").length > 0) {
-                    //     $(divId).parent().show();
-                    //     $(this).removeClass("collapsed");
-                    //     console.log("???");
-                    // } else {
-                    if (!$(divId).is(":visible")) {
-                        $(divId).parent().show();
-                    }
-                    if (!$(divId).hasClass("show")) {
-                        $(this).click();
-                        $(this).removeClass("collapsed");
-                    }
-                    // }
-                } else {
-                    $(divId).parent().hide();
-                    $(divId).removeClass("show");
-                }
-            }
-        });
-    }
-
     $("#filter_songs").on("keyup", function () {
         var searchValue = $(this).val().toLowerCase();
         if (searchValue.length > 3) {
             $("table").find("tr:has(td):not(.subgroup-separator)").filter(function () {
-                if ($(this).find("td.band").text().toLowerCase().indexOf(searchValue) > -1
-                    || $(this).find("td.songtitle").text().toLowerCase().indexOf(searchValue) > -1) {
+                if ($(this).find("td.band").text().toLowerCase().indexOf(searchValue) > -1 || $(this).find("td.songtitle").text().toLowerCase().indexOf(searchValue) > -1) {
                     $(this).show();
                 }
-                // if ($(this).text().toLowerCase().indexOf(searchValue) > -1) {
-                //     $(this).show();
-                // } 
                 else {
                     $(this).hide();
                 }
@@ -273,164 +137,12 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('click', '#showLyrics', function (e) {
-        var divWithLyrics = $("#lyricsCollapse");
-        var divContainer = divWithLyrics.parent();
-        var videoContainer = divContainer.prev();
-        var iframeContainer = videoContainer.children().first();
-        if ($(divContainer).hasClass("col-md-6")) {
-            $(divContainer).removeAttr("style");
-            $(divContainer).removeClass("col-md-6");
-            $(divContainer).css("display", "none");
-            videoContainer.removeClass("col-md-6");
-            videoContainer.addClass("col-md-12");
-            $(divContainer).css("display", none);
-            divWithLyrics.empty();
-        } else {
-            $(divContainer).removeAttr("style");
-            $(divContainer).addClass("col-md-6");
-            videoContainer.addClass("col-md-6");
-            videoContainer.removeClass("col-md-12");
-            $(divContainer).css("max-height", iframeContainer.height());
-            $(divContainer).css("overflow-y", "auto");
-            divWithLyrics.append(lyricsToDisplay);
-        }
-    });
-
-    $(document).on('click', 'a.gamegroup', function (e) {
-        console.log("jesus");
-        e.preventDefault();
-        $('.gamegroup.active').each(function () {
-            $(this).removeClass('active');
-            //we get rid of any previously active groups
-        });
-        $(this).addClass('active');
-        var aId = $(this).attr('data-el_id');
-        $(document).find('ul.subgroup[data-el_id="' + aId + '"]').each(function () {
-            $(this).removeClass('visually-hidden');
-            //we remove visually-hidden class from subgroups that belong to this group
-        });
-        $(document).find('ul.subgroup:not([data-el_id="' + aId + '"])').each(function () {
-            $(this).addClass('visually-hidden');
-            //and we hide subgroups that belong to other groups
-        });
-        $(this).removeClass('visually-hidden');
-        var div = $($(this).attr('href'))[0];
-        $(div).addClass('active');
-        $(div).removeClass('visually-hidden');
-        $(div).find("button").first().click();
-        activeSubgroups = 1;
-    });
-    $(document).on('click', 'button.subgroup', function (e) {
-        //handling clicking on subgroup
-        e.preventDefault();
-        var groupId = $(this).attr('data-group_id');
-        if ($(this).text() == "All") {
-            $('.subgroup.active').each(function () {
-                $(this).removeClass('active');
-                //we again remove active mark from any active subgroup
-            });
-            // $(document).find('tr:has(td)').each(function () {
-            //     $(this).removeClass('visually-hidden');
-            //     //first we hide all rows
-            // });
-            if ($(this).attr("data-gameGroupTxt") == "All") {
-                $(document).find('tr').each(function () {
-                    $(this).removeClass('visually-hidden');
-                    //first we hide all rows
-                });
-            } else {
-                if (groupId != undefined) {
-                    $(document).find('tr:has(td):not([data-group_id="' + groupId + '"])').each(function () {
-                        $(this).addClass('visually-hidden');
-                        //first we hide all rows
-                    });
-                    $(document).find('tr:has(td)[data-group_id="' + groupId + '"]').each(function () {
-                        $(this).removeClass('visually-hidden');
-                        //first we hide all rows
-                    });
-                }
-            }
-            activeSubgroups = 1;
-        } else {
-            var aId = $(this).attr('id');
-            var allSubgroup = $(this).parent().parent().find("button[data-subgroupTxt='All']").first();
-            if (allSubgroup.hasClass('active')) {
-                allSubgroup.removeClass('active');
-                //$(document).find('tr[data-group_id="' + aId + '"]');
-                /*
-                $(document).find('tr:has(td)').each(function () {
-                    $(this).addClass('visually-hidden');
-                    //first we hide all rows
-                });
-                */
-                $(document).find('tr:has(td):not([data-el_id="' + aId + '"])').each(function () {
-                    $(this).addClass('visually-hidden');
-                    //first we hide all rows
-                });
-                activeSubgroups--;
-                //DODAC GROUP ID DO TYCH SEPARATOROW
-            }
-            if ($(this).hasClass("active")) {
-                $(this).removeClass('active');
-                $(document).find('tr:has(td)[data-el_id="' + aId + '"]').each(function () {
-                    $(this).addClass('visually-hidden');
-                });
-                activeSubgroups--;
-            } else {
-                $(this).addClass('active');
-                $(document).find('tr:has(td)[data-el_id="' + aId + '"]').each(function () {
-                    $(this).removeClass('visually-hidden');
-                });
-                activeSubgroups++
-            }
-            if (activeSubgroups == 0) {
-                var allSubgroup = $(this).parent().parent().find("button[data-subgroupTxt='All']").first();
-                $(allSubgroup).click();
-                activeSubgroups == 1;
-                return;
-            }
-        }
-        if ($(e.target).text() == "All" && $(e.target).attr("data-gameGroupTxt") == "All") {
-            $(this).addClass('active');
-        }
-        if ($(e.target).text() == "All" && $(e.target).attr("data-gameGroupTxt") != "All") {
-            //we are in not-root subgroup as i call it
-            console.log('zonk');
-            $(document).find('tr:has(td)').not('.subgroup-separator').each(function () {
-                $(this).addClass('visually-hidden');
-                //first we hide all rows
-            });
-            $(e.target.parentElement.parentElement).find("button").each(function () {
-                //then for each subgroup we remove this hidden class
-                var aId = $(this).attr('id');
-                $(document).find('tr[data-el_id="' + aId + '"]').each(function () {
-                    $(this).removeClass('visually-hidden');
-                });
-                var aText = $(this).text();
-
-            });
-            $(this).addClass('active');
-        } else {
-            //we're in main group and main subgroup so we just make basically everything visible
-            /*
-            var aId = $(this).attr('id');
-            $(document).find('tr[data-el_id="' + aId + '"]').each(function () {
-                $(this).removeClass('visually-hidden');
-            });
-            $(document).find('tr:has(td):not([data-el_id=' + aId + '])').each(function () {
-                $(this).addClass('visually-hidden');
-            });
-            */
-        }
-    });
-
     $('#videoModal').on('show.bs.modal', function (e) {
         // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
         var myImgSource = e.relatedTarget;
         $(myImgSource).attr("src", $(myImgSource).attr("src").replace("znakwodny2", "znakwodny"));
         baseVideoSrc = $(myImgSource).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
-        $("#lyricsCollapse").empty()
+        $("#lyricsCollapse").empty();
         var lyricsTxt = $(myImgSource).next().text();
         if (lyricsTxt == "null" || lyricsTxt == "") {
             $("#showLyrics").text($("#showLyrics").attr("data-lyricsMissing"));
@@ -443,59 +155,11 @@ $(document).ready(function () {
             $("#showLyrics").prop("disabled", false);
         }
         $("#video").attr('src', baseVideoSrc);
-    })
+    });
 
     $('#videoModal').on('hide.bs.modal', function (e) {
         $("#video").attr('src', '');
-    })
-
-    $('#spotifyModal').on('show.bs.modal', function (e) {
-        // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
-        $("#spotifyVideo").attr('src', "https://open.spotify.com/embed/playlist/" + $("#spotifyLink").attr('data-tagVideo'));
-        $("#spotify-ext").attr('href', "spotify:playlist:" + $("#spotifyLink").attr('data-tagVideo'));
-    })
-
-    $('#spotifyModal').on('hide.bs.modal', function (e) {
-        $("#spotifyVideo").attr('src', '');
-    })
-
-    $('#soundcloudModal').on('show.bs.modal', function (e) {
-        // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
-        $("#soundcloudVideo").attr('src', "https://w.soundcloud.com/player/?url=https%253A//api.soundcloud.com/playlists/" + $("#soundcloudLink").attr('data-tagVideo')
-            + "&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true");
-    })
-
-    $('#soundcloudModal').on('hide.bs.modal', function (e) {
-        $("#spotifyVideo").attr('src', '');
-    })
-
-    $('#tidalModal').on('show.bs.modal', function (e) {
-        // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
-        $("#tidalVideo").attr('src', "https://embed.tidal.com/playlists/" + $("#tidalLink").attr('data-tagVideo'));
-        $("#tidal-ext").attr('href', "https://listen.tidal.com/playlist/" + $("#tidalLink").attr('data-tagVideo'));
-    })
-
-    $('#tidalModal').on('hide.bs.modal', function (e) {
-        $("#tidalVideo").attr('src', '');
-    })
-
-    $('#deezerModal').on('show.bs.modal', function (e) {
-        // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
-        $("#deezerVideo").attr('src', "https://widget.deezer.com/widget/auto/playlist/" + $("#deezerLink").attr('data-tagVideo'));
-        $("#deezer-ext").attr('href', "deezer://www.deezer.com/playlist/" + $("#deezerLink").attr('data-tagVideo'));
-    })
-
-    $('#deezerModal').on('hide.bs.modal', function (e) {
-        $("#deezerVideo").attr('src', '');
-    })
-
-    //when loading list of songs, we want to trigger main group by default
-    console.log("freeman");
-    var firstGameGroup = $('a.gamegroup:first')[0];
-    if (firstGameGroup != null) {
-        $(firstGameGroup).first().click();
-        //we have to hit first subgroup in main group to have stuff displayed
-    }
+    });
 
     $('#disqusModal').on('show.bs.modal', function (e) {
         var disqusTarget = e.relatedTarget.id;
@@ -546,6 +210,15 @@ $(document).ready(function () {
         }
     }
 
+    function onPlayerReady(event) {
+        event.target.playVideo();
+    }
+    function onPlayerStateChange(event) {
+        if (event.data === 0) {
+            initPlayer(current_id + 1);
+        }
+    }
+
     function initPlayer(changeId) {
         disablePlayer(false);
         // var tbody = $('#playlistModePlayer').append("<tbody>");
@@ -593,14 +266,7 @@ $(document).ready(function () {
             initPlayer(current_id + 1);
         } else {
             $('#playlistModePlayer').html('<iframe id="player" type="text/html" src="https://www.youtube.com/embed/' + data_song[current_id] + '?enablejsapi=1&autoplay=1&autohide=0&theme=light&wmode=transparent" frameborder="0"></iframe>');
-            function onPlayerReady(event) {
-                event.target.playVideo();
-            }
-            function onPlayerStateChange(event) {
-                if (event.data === 0) {
-                    initPlayer(current_id + 1);
-                }
-            }
+
             var player = new YT.Player('player', {
                 events: {
                     'onReady': onPlayerReady,
@@ -628,7 +294,7 @@ $(document).ready(function () {
         if (!$(this).parent().hasClass("disabled")) {
             initPlayer(this.parentNode.id);
         }
-    })
+    });
 
     $(document).on("click", "td.playlist_disable_song", function () {
         if ($(this).parent().hasClass("disabled")) {
@@ -641,7 +307,7 @@ $(document).ready(function () {
     $(document).on("click", "img.add-to-custom-playlist", function () {
         var customPlaylistArray = localStorage.getItem("custom-playlist");
         if (customPlaylistArray == undefined) {
-            customPlaylistArray = new Array();
+            customPlaylistArray = [];
         }
         else if (customPlaylistArray != undefined) {
             customPlaylistArray = JSON.parse(customPlaylistArray);
@@ -652,7 +318,6 @@ $(document).ready(function () {
         var jsonEdArray = JSON.stringify(customPlaylistArray);
         localStorage.setItem("custom-playlist", jsonEdArray);
         $("#playlistContent").val(jsonEdArray);
-        var parentDiv = $("#disqusModal").parent();
         $("#customPlaylistSubmit").prop("disabled", false);
         $("#customPlaylistSubmit").parent().parent().tooltip('dispose');
         $("#successAddToCustomPlaylist").parent().fadeIn(500, function () {
@@ -661,7 +326,6 @@ $(document).ready(function () {
             }, 3000);
         });
     });
-
 
 
     $(document).on("click", "img.info-about-song", function () {
@@ -722,245 +386,5 @@ $(document).ready(function () {
             }
         });
     });
-
-    $('#infoSongModal').on('hide.bs.modal', function (e) {
-        $("#officialArtist").contents().filter(function () {
-            return this.nodeType === 3; //Node.TEXT_NODE
-        }).each(function () {
-            $(this).remove();
-        });
-        $("#officialTitle").contents().filter(function () {
-            return this.nodeType === 3;
-        }).each(function () {
-            $(this).remove();
-        });
-        $("#composers").parent().find("a").each(function () {
-            $(this).remove();
-        })
-        $("#subcomposers").parent().find("a").each(function () {
-            $(this).remove();
-        })
-        $("#remixers").parent().find("a").each(function () {
-            $(this).remove();
-        })
-        $("#featArtists").parent().find("a").each(function () {
-            $(this).remove();
-        })
-        $("#externalLinks").parent().find("a").each(function () {
-            $(this).remove();
-        })
-        $("#baseSong").parent().find("a").each(function () {
-            $(this).remove();
-        })
-        $("#baseSongDiv").css("display", "none");
-
-    });
-
-    var activeArtistGroups = new Array();
-    var activeAliastSubgroups = new Array();
-    //this is for artist.html
-    $(document).on('click', 'a.artistgroup', function (e) {
-        console.log("jesus");
-        e.preventDefault();
-        var howManyActiveAlready = $('.artistgroup.active').length;
-        var isActive = $(this).hasClass("active");
-        var isAllGroupActive = $('a[data-authorcontribution="all"]').hasClass("active");
-        var contributionType = $(this).attr('data-authorcontribution');
-        var activeSubgroups = $('.aliassubgroup.active');
-        var isActiveAllSubgroup = $("#allaliases").hasClass("active");
-        if (contributionType == 'all') {
-            if (!isActive) {
-                $('.artistgroup.active').each(function () {
-                    $(this).removeClass('active');
-                    //we get rid of any previously active groups
-                });
-                $(this).addClass('active');
-                $("#artistStuff").find("tr.all").each(function () {
-                    var trToCheck = $(this);
-                    var trAliasId = $(this).attr("data-aliasid");
-                    if (isActiveAllSubgroup) {
-                        trToCheck.removeClass('visually-hidden');
-                    } else {
-                        activeSubgroups.each(function () {
-                            var aliasSubgroupId = $(this).attr("data-aliassubgroupid");
-                            if (trAliasId == aliasSubgroupId) {
-                                trToCheck.removeClass('visually-hidden');
-                            }
-                        });
-                    }
-                });
-            }
-        } else {
-            if (!isActive) {
-                //we activate
-                $(this).addClass('active');
-                if (isAllGroupActive) {
-                    $('tr.all').each(function () {
-                        $(this).addClass('visually-hidden');
-                        //we get rid of any previously active groups
-                    });
-                    $('a[data-authorcontribution="all"]').each(function () {
-                        $(this).removeClass('active');
-                        //we get rid of any previously active groups
-                    });
-                }
-                $("#artistStuff").find("tr." + contributionType).each(function () {
-                    var trToCheck = $(this);
-                    var trAliasId = $(this).attr("data-aliasid");
-                    if (isActiveAllSubgroup) {
-                        trToCheck.removeClass('visually-hidden');
-                    } else {
-                        activeSubgroups.each(function () {
-                            var aliasSubgroupId = $(this).attr("data-aliassubgroupid");
-                            if (trAliasId == aliasSubgroupId) {
-                                trToCheck.removeClass('visually-hidden');
-                            }
-                        });
-                    }
-                    // $(this).removeClass('visually-hidden');
-                });
-            } else {
-                $(this).removeClass('active');
-                $("#artistStuff").find("tr." + contributionType).each(function () {
-                    var trToCheck = $(this);
-                    var trAliasId = $(this).attr("data-aliasid");
-                    if (isActiveAllSubgroup) {
-                        trToCheck.addClass('visually-hidden');
-                    } else {
-                        activeSubgroups.each(function () {
-                            var aliasSubgroupId = $(this).attr("data-aliassubgroupid");
-                            if (trAliasId == aliasSubgroupId) {
-                                trToCheck.addClass('visually-hidden');
-                            }
-                        });
-                    }
-                    // $(this).addClass('visually-hidden');
-                });
-                howManyActiveAlready = $('.artistgroup.active').length;
-                if (howManyActiveAlready == 0) {
-                    $('a[data-authorcontribution="all"]').each(function () {
-                        $(this).addClass('active');
-                        //we get rid of any previously active groups
-                    });
-                    $("#artistStuff").find("tr.all").each(function () {
-                        var trToCheck = $(this);
-                        var trAliasId = $(this).attr("data-aliasid");
-                        if (isActiveAllSubgroup) {
-                            trToCheck.removeClass('visually-hidden');
-                        } else {
-                            activeSubgroups.each(function () {
-                                var aliasSubgroupId = $(this).attr("data-aliassubgroupid");
-                                if (trAliasId == aliasSubgroupId) {
-                                    trToCheck.removeClass('visually-hidden');
-                                }
-                            });
-                        }
-                    });
-                }
-            }
-
-        }
-    });
-
-    $(document).on('click', 'button.aliassubgroup', function (e) {
-        console.log("jesus");
-        e.preventDefault();
-        var howManyActiveAlready = $('.aliassubgroup.active').length;
-        var isActive = $(this).hasClass("active");
-        var isAllSubgroupActive = $('button[data-aliassubgroupid="all"]').hasClass("active");
-        var aliasValue = $(this).attr('data-aliassubgroupid');
-        var activeGroups = $('.artistgroup.active');
-        var isActiveAllGroup = $("#allartistgroup").hasClass("active");
-        if (aliasValue == 'all') {
-            if (!isActive) {
-                $('.aliassubgroup.active').each(function () {
-                    $(this).removeClass('active');
-                    //we get rid of any previously active groups
-                });
-                $(this).addClass('active');
-                $("#artistStuff").find("tr.all").each(function () {
-                    var trToCheck = $(this);
-                    var trRoleVal = $(this).attr("data-role");
-                    if (isActiveAllGroup) {
-                        trToCheck.removeClass('visually-hidden');
-                    } else {
-                        activeGroups.each(function () {
-                            var aliasSubgroupId = $(this).attr("data-authorcontribution");
-                            if (trRoleVal == aliasSubgroupId) {
-                                trToCheck.removeClass('visually-hidden');
-                            }
-                        });
-                    }
-                });
-            }
-        } else {
-            if (!isActive) {
-                //we activate
-                $(this).addClass('active');
-                if (isAllSubgroupActive) {
-                    $('tr.all').each(function () {
-                        $(this).addClass('visually-hidden');
-                        //we get rid of any previously active groups
-                    });
-                    $('button[data-authoralias="all"]').each(function () {
-                        $(this).removeClass('active');
-                        //we get rid of any previously active groups
-                    });
-                }
-                $("#artistStuff").find("tr[data-aliasid='" + aliasValue + "']").each(function () {
-                    var trToCheck = $(this);
-                    var trRoleVal = $(this).attr("data-role");
-                    if (isActiveAllGroup) {
-                        trToCheck.removeClass('visually-hidden');
-                    } else {
-                        activeGroups.each(function () {
-                            var aliasSubgroupId = $(this).attr("data-authorcontribution");
-                            if (trRoleVal == aliasSubgroupId) {
-                                trToCheck.removeClass('visually-hidden');
-                            }
-                        });
-                    }
-                });
-            } else {
-                $(this).removeClass('active');
-                $("#artistStuff").find("tr[data-aliasid='" + aliasValue + "']").each(function () {
-                    var trToCheck = $(this);
-                    var trRoleVal = $(this).attr("data-role");
-                    if (isActiveAllGroup) {
-                        trToCheck.addClass('visually-hidden');
-                    } else {
-                        activeGroups.each(function () {
-                            var aliasSubgroupId = $(this).attr("data-authorcontribution");
-                            if (trRoleVal == aliasSubgroupId) {
-                                trToCheck.addClass('visually-hidden');
-                            }
-                        });
-                    }
-                });
-                howManyActiveAlready = $('.aliassubgroup.active').length;
-                if (howManyActiveAlready == 0) {
-                    $('button[data-authoralias="all"]').each(function () {
-                        $(this).addClass('active');
-                        //we get rid of any previously active groups
-                    });
-                    $("#artistStuff").find("tr.all").each(function () {
-                        var trToCheck = $(this);
-                        var trRoleVal = $(this).attr("data-role");
-                        if (isActiveAllGroup) {
-                            trToCheck.removeClass('visually-hidden');
-                        } else {
-                            activeGroups.each(function () {
-                                var aliasSubgroupId = $(this).attr("data-authorcontribution");
-                                if (trRoleVal == aliasSubgroupId) {
-                                    trToCheck.removeClass('visually-hidden');
-                                }
-                            });
-                        }
-                    });
-                }
-            }
-        }
-    });
-
 
 });

@@ -59,7 +59,7 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
             $("#country-info").empty();
             $("#alias-info").empty();
             if (foundArtist.length == 1) {
-                setupCountryAndAliasFields(foundArtist[0])
+                setupCountryAndAliasFields(foundArtist[0]);
             } else {
                 for (let i = 0; i < foundArtist.length; i++) {
                     var foundArtistId = foundArtist[i].value;

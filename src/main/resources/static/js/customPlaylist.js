@@ -1,17 +1,17 @@
 function TableComparer(index) {
-	return function(a, b) {
+	return function (a, b) {
 		var val_a = TableCellValue(a, index);
 		var val_b = TableCellValue(b, index);
 		var result = ($.isNumeric(val_a) && $.isNumeric(val_b)) ? val_a - val_b : val_a.toString().localeCompare(val_b);
 
 		return result;
-	}
+	};
 }
 function TableCellValue(row, index) {
 	return $(row).children("td").eq(index).text();
 }
 
-$(document).on("click", "#customPlaylistStuff thead tr th:not(.no-sort)", function() {
+$(document).on("click", "#customPlaylistStuff thead tr th:not(.no-sort)", function () {
 	var table = $(this).parents("#customPlaylistStuff");
 	var rows = $(this).parents("#customPlaylistStuff").find("tbody tr").toArray().sort(TableComparer($(this).index()));
 	var dir = ($(this).hasClass("sort-asc")) ? "desc" : "asc";
@@ -32,14 +32,14 @@ $(document).on("click", "img.remove-from-playlist", function () {
 	var tbody = relatedTr.parent();
 	var songSubgroupId = $(relatedTr).attr("data-songSubgroup-id");
 	var songToRemoveIndex = customPlaylistArray.indexOf(songSubgroupId);
-	customPlaylistArray.splice(songToRemoveIndex,1);
+	customPlaylistArray.splice(songToRemoveIndex, 1);
 	var jsonEdArray = JSON.stringify(customPlaylistArray);
 	localStorage.setItem("custom-playlist", jsonEdArray);
 	$(relatedTr).remove();
 	var remainingTrs = $(tbody).find("tr");
-	for (let i=0; i<remainingTrs.length; i++){
+	for (let i = 0; i < remainingTrs.length; i++) {
 		var tdToReindex = remainingTrs[i].children[0];
-		$(tdToReindex).html((i+1));
+		$(tdToReindex).html((i + 1));
 	}
 	$("#successRemoveFromCustomPlaylist").parent().fadeIn(500, function () {
 		setTimeout(function () {
@@ -53,7 +53,7 @@ $(document).on("click", "#truncate_playlist", function () {
 	$(document).find("tbody").empty();
 	$("#playlistTruncated").parent().fadeIn(500, function () {
 		setTimeout(function () {
-			$("#playlistTruncated").parent().fadeOut(500, function(){
+			$("#playlistTruncated").parent().fadeOut(500, function () {
 				window.location.href = window.location.href.replace("custom/playlist", "");
 			});
 		}, 2000);
@@ -62,4 +62,4 @@ $(document).on("click", "#truncate_playlist", function () {
 
 $('#playlistTruncated').on('hidden.bs.modal', function (e) {
 	$("#spotifyVideo").attr('src', '');
-})
+});

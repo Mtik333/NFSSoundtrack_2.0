@@ -190,7 +190,7 @@ $(document).ready(function () {
 
 
     $(document).on('click', '#updateSeriePositionsInDb', function (e) {
-        var arrayOfSeries = new Array();
+        var arrayOfSeries = [];
         $("#series-table").find("tr").each(function (index) {
             var rowPositionValue = $($(this).find("input")[0]).val();
             var serieId = $(this).attr("data-serieid");
@@ -221,10 +221,10 @@ $(document).ready(function () {
 
 
     $(document).on('click', '#updateGamePositionsInDb', function (e) {
-        var objToSend = new Object();
+        var objToSend = {};
         objToSend.serieId = currentlyEditedSerieId;
         objToSend.serieName = $("#serieName").val();
-        var arrayOfGames = new Array();
+        var arrayOfGames = [];
         $("#games-table").find("tr").each(function (index) {
             var rowPositionValue = $($(this).find("input")[0]).val();
             var gameId = $(this).attr("data-gameid");
@@ -325,7 +325,7 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#saveNewGame', function (e) {
-        var formData = new Object();
+        var formData = {};
         formData.serieId = currentlyEditedSerieId;
         formData.gameTitle = $("#gameTitle").val();
         formData.displayTitle = $("#gameDisplay").val();

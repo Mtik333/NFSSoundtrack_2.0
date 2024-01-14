@@ -1,9 +1,3 @@
-function SubmitSongChange(subgroup_id, song_id, state) {
-    this.subgroup_id = subgroup_id;
-    this.song_id = song_id;
-    this.state = state;
-}
-
 var currentSongSubgroup;
 var currentSubgroup;
 var newSong = false;
@@ -34,11 +28,11 @@ $(document).ready(function () {
                 leftCellDiv.append(dropdownDiv);
                 rightCellDiv.append(newGroupSpan);
                 var tableToFill;
-                var allSongSubgroups = new Array();
+                var allSongSubgroups = [];
                 for (let i = 0; i < fullScopeOfEdit.length; i++) {
                     var group = fullScopeOfEdit[i];
                     for (let j = 0; j < group.subgroups.length; j++) {
-                        allSongSubgroups = allSongSubgroups.concat(fullScopeOfEdit[i].subgroups[j].songSubgroupList)
+                        allSongSubgroups = allSongSubgroups.concat(fullScopeOfEdit[i].subgroups[j].songSubgroupList);
                     }
                 }
                 if (fullScopeOfEdit.length > 0) {
@@ -176,7 +170,6 @@ $(document).ready(function () {
         var subcomposerInputColDiv = $('<div class="col">');
         var subcomposerConcatColDiv = $('<div class="col">');
         var subcomposerButtonColDiv = $('<div class="col">');
-        var lyricsDiv = $('<div class="form-group lyrics_edit" id="lyrics_edit">');
         var featSelect = $('<input class="form-control feat-select" id="featSelect-1"/>');
         var featSelectHidden = $('<input type="hidden" id="featSelectHidden-1"/>');
         var subcomposerSelect = $('<input class="form-control subcomposer-select" id="subcomposerSelect-1"/>');
@@ -1038,7 +1031,6 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#save-song', function (e) {
-        var divToAppend = $('#nfs-content');
         songToSave = new Object();
         if ($("#authorSelectHidden-0").val() == "") {
             songToSave.authorId = "NEW-" + $("#authorSelect-0").val();

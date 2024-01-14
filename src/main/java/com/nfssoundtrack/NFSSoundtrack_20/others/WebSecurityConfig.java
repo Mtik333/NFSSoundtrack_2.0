@@ -27,66 +27,67 @@ import java.util.Map;
 @EnableWebSecurity
 public class WebSecurityConfig implements WebMvcConfigurer {
 
-	private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
-	@Autowired
-	private DatabaseUserDetailsService databaseUserDetailsService;
+    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
+    @Autowired
+    private DatabaseUserDetailsService databaseUserDetailsService;
 
-	@Bean
-	public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {
-		http
-				.cors(AbstractHttpConfigurer::disable)
-				.csrf(AbstractHttpConfigurer::disable)
-				.authorizeHttpRequests((requests) -> requests
-						.requestMatchers("/manage/manage", "/manage/manage#", "/serie/**", "/country/**",
-								"/maingroup/**", "/songSubgroup/**", "/subgroup/**", "/gamedb/**")
-						.hasAuthority("ADMIN"))
-				.authorizeHttpRequests((requests) -> requests
-						.requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
-								"/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
-								"/custom/playlist", "/song/**", "/songinfo/**",
-								"/favicon.ico", "/nfssoundtrack.ico",
-								"favicon.ico", "nfssoundtrack.ico").permitAll()
-				)
-				.formLogin((form) -> form
-						.loginPage("/login")
-						.failureUrl("/content/donate")
-						.defaultSuccessUrl("/content/home", true)
-				)
-				.logout((logout) -> logout
-						.invalidateHttpSession(true)
-						.deleteCookies("JSESSIONID")
-						.permitAll()).userDetailsService(databaseUserDetailsService);
-		return http.build();
-	}
+    @Bean
+    public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/manage/manage", "/manage/manage#", "/serie/**", "/country/**",
+                                "/maingroup/**", "/songSubgroup/**", "/subgroup/**", "/gamedb/**")
+                        .hasAuthority("ADMIN"))
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
+                                "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
+                                "/custom/playlist", "/song/**", "/songinfo/**",
+                                "/favicon.ico", "/nfssoundtrack.ico",
+                                "favicon.ico", "nfssoundtrack.ico").permitAll()
+                )
+                .formLogin((form) -> form
+                        .loginPage("/login")
+                        .failureUrl("/content/donate")
+                        .defaultSuccessUrl("/content/home", true)
+                )
+                .logout((logout) -> logout
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()).userDetailsService(databaseUserDetailsService);
+        return http.build();
+    }
 
-	@Bean
-	public LocaleResolver localeResolver() {
-		SessionLocaleResolver slr = new SessionLocaleResolver();
-		slr.setDefaultLocale(Locale.US);
-		return slr;
-	}
+    @Bean
+    public LocaleResolver localeResolver() {
+        SessionLocaleResolver slr = new SessionLocaleResolver();
+        slr.setDefaultLocale(Locale.US);
+        return slr;
+    }
 
-	@Bean
-	public LocaleChangeInterceptor localeChangeInterceptor() {
-		LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-		lci.setParamName("lang");
-		return lci;
-	}
+    @Bean
+    public LocaleChangeInterceptor localeChangeInterceptor() {
+        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+        lci.setParamName("lang");
+        return lci;
+    }
 
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(localeChangeInterceptor());
-	}
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(localeChangeInterceptor());
+    }
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder(12);
-	}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);
+    }
 
-	@Bean
-	@Cacheable("discoGSMap")
-	public Map<Author, DiscoGSObj> discoGSObjMap(){
-		Map<Author, DiscoGSObj> cachedMap = new HashMap<>();
-		return cachedMap;
-	}
+    @Bean
+    @Cacheable("discoGSMap")
+    public Map<Author, DiscoGSObj> discoGSObjMap() {
+        Map<Author, DiscoGSObj> cachedMap = new HashMap<>();
+        return cachedMap;
+    }
+
 }
