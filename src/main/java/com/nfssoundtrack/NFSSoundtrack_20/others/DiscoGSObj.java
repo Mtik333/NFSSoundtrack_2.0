@@ -1,7 +1,5 @@
 package com.nfssoundtrack.NFSSoundtrack_20.others;
 
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
-
 public class DiscoGSObj {
 
     private String uri;

@@ -11,11 +11,11 @@ import java.util.Optional;
 
 public interface AuthorSongRepository extends JpaRepository<AuthorSong, Integer> {
 
-	List<AuthorSong> findByAuthorAlias(AuthorAlias authorAlias);
+    List<AuthorSong> findByAuthorAlias(AuthorAlias authorAlias);
 
-	List<AuthorSong> findBySong(Song song);
+    List<AuthorSong> findBySong(Song song);
 
-	List<AuthorSong> findByAuthorAliasAndRole(AuthorAlias authorAlias, Role role);
+    List<AuthorSong> findByAuthorAliasAndRole(AuthorAlias authorAlias, Role role);
 
-	Optional<AuthorSong> findByAuthorAliasAndSong(AuthorAlias authorAlias, Song song);
+    Optional<AuthorSong> findByAuthorAliasAndSong(AuthorAlias authorAlias, Song song);
 }

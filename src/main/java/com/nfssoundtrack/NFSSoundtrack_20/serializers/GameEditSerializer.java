@@ -13,23 +13,23 @@ import java.io.IOException;
 @JsonComponent
 public class GameEditSerializer extends JsonSerializer<Game> {
 
-	private static final Logger logger = LoggerFactory.getLogger(GameSerializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(GameSerializer.class);
 
-	@Override
-	public void serialize(Game game, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-			throws IOException {
-		jsonGenerator.writeStartObject();
-		jsonGenerator.writeNumberField("id", game.getId());
-		jsonGenerator.writeStringField("gametitle", game.getGameTitle());
-		jsonGenerator.writeStringField("displayTitle", game.getDisplayTitle());
-		jsonGenerator.writeStringField("gameshort", game.getGameShort());
-		jsonGenerator.writeStringField("prefix", game.getPrefix());
-		jsonGenerator.writeStringField("status", game.getGameStatus().value());
-		jsonGenerator.writeStringField("spotify_id", game.getSpotifyId());
-		jsonGenerator.writeStringField("deezer_id", game.getDeezerId());
-		jsonGenerator.writeStringField("tidal_id", game.getTidalId());
-		jsonGenerator.writeStringField("soundcloud_id", game.getSoundcloudId());
-		jsonGenerator.writeStringField("youtube_id", game.getYoutubeId());
-		jsonGenerator.writeEndObject();
-	}
+    @Override
+    public void serialize(Game game, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+            throws IOException {
+        jsonGenerator.writeStartObject();
+        jsonGenerator.writeNumberField("id", game.getId());
+        jsonGenerator.writeStringField("gametitle", game.getGameTitle());
+        jsonGenerator.writeStringField("displayTitle", game.getDisplayTitle());
+        jsonGenerator.writeStringField("gameshort", game.getGameShort());
+        jsonGenerator.writeStringField("prefix", game.getPrefix());
+        jsonGenerator.writeStringField("status", game.getGameStatus().value());
+        jsonGenerator.writeStringField("spotify_id", game.getSpotifyId());
+        jsonGenerator.writeStringField("deezer_id", game.getDeezerId());
+        jsonGenerator.writeStringField("tidal_id", game.getTidalId());
+        jsonGenerator.writeStringField("soundcloud_id", game.getSoundcloudId());
+        jsonGenerator.writeStringField("youtube_id", game.getYoutubeId());
+        jsonGenerator.writeEndObject();
+    }
 }

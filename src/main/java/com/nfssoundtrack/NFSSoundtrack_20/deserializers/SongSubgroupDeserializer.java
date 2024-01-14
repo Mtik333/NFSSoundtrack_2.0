@@ -20,61 +20,61 @@ import java.util.Optional;
 @JsonComponent
 public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
 
-	@Autowired
-	SongService songService;
+    @Autowired
+    SongService songService;
 
-	@Override
-	public SongSubgroup deserialize(JsonParser jsonParser, DeserializationContext ctxt, SongSubgroup intoValue)
-			throws IOException, JacksonException {
-		JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-		intoValue.setSpotifyId(JustSomeHelper.returnProperValueToDb(node.get("spotify").asText()));
-		intoValue.setItunesLink(JustSomeHelper.returnProperValueToDb(node.get("itunes").asText()));
-		intoValue.setDeezerId(JustSomeHelper.returnProperValueToDb(node.get("deezer").asText()));
-		intoValue.setTidalLink(JustSomeHelper.returnProperValueToDb(node.get("tidal").asText()));
-		intoValue.setSoundcloudLink(JustSomeHelper.returnProperValueToDb(node.get("soundcloud").asText()));
-		intoValue.setIngameDisplayBand(JustSomeHelper.returnProperValueToDb(node.get("ingameBand").asText()));
-		intoValue.setIngameDisplayTitle(JustSomeHelper.returnProperValueToDb(node.get("ingameTitle").asText()));
-		intoValue.setSrcId(JustSomeHelper.returnProperValueToDb(node.get("ingameSrcId").asText()));
-		intoValue.setInstrumental(Instrumental.fromBoolean(node.get("instrumental").asBoolean()));
-		intoValue.setRemix(Remix.fromBoolean(node.get("remix").asBoolean()));
-		intoValue.setInfo(JustSomeHelper.returnProperValueToDb(node.get("info").asText()));
-		intoValue.setLyrics(JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText()));
-		return intoValue;
-	}
+    @Override
+    public SongSubgroup deserialize(JsonParser jsonParser, DeserializationContext ctxt, SongSubgroup intoValue)
+            throws IOException {
+        JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+        intoValue.setSpotifyId(JustSomeHelper.returnProperValueToDb(node.get("spotify").asText()));
+        intoValue.setItunesLink(JustSomeHelper.returnProperValueToDb(node.get("itunes").asText()));
+        intoValue.setDeezerId(JustSomeHelper.returnProperValueToDb(node.get("deezer").asText()));
+        intoValue.setTidalLink(JustSomeHelper.returnProperValueToDb(node.get("tidal").asText()));
+        intoValue.setSoundcloudLink(JustSomeHelper.returnProperValueToDb(node.get("soundcloud").asText()));
+        intoValue.setIngameDisplayBand(JustSomeHelper.returnProperValueToDb(node.get("ingameBand").asText()));
+        intoValue.setIngameDisplayTitle(JustSomeHelper.returnProperValueToDb(node.get("ingameTitle").asText()));
+        intoValue.setSrcId(JustSomeHelper.returnProperValueToDb(node.get("ingameSrcId").asText()));
+        intoValue.setInstrumental(Instrumental.fromBoolean(node.get("instrumental").asBoolean()));
+        intoValue.setRemix(Remix.fromBoolean(node.get("remix").asBoolean()));
+        intoValue.setInfo(JustSomeHelper.returnProperValueToDb(node.get("info").asText()));
+        intoValue.setLyrics(JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText()));
+        return intoValue;
+    }
 
-	@Override
-	public SongSubgroup deserialize(JsonParser jsonParser, DeserializationContext ctxt)
-			throws IOException, JacksonException {
-		JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-		String spotifyLink = JustSomeHelper.returnProperValueToDb(node.get("spotify").asText());
-		String itunesLink = JustSomeHelper.returnProperValueToDb(node.get("itunes").asText());
-		String soundcloudLink = JustSomeHelper.returnProperValueToDb(node.get("soundcloud").asText());
-		String deezerLink = JustSomeHelper.returnProperValueToDb(node.get("deezer").asText());
-		String tidalink = JustSomeHelper.returnProperValueToDb(node.get("tidal").asText());
-		String ingameBand = JustSomeHelper.returnProperValueToDb(node.get("ingameBand").asText());
-		String ingameTitle = JustSomeHelper.returnProperValueToDb(node.get("ingameTitle").asText());
-		String ingameSrcId = JustSomeHelper.returnProperValueToDb(node.get("ingameSrcId").asText());
-		String lyrics = JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText());
-		String info = JustSomeHelper.returnProperValueToDb(node.get("info").asText());
-		Instrumental instrumental = Instrumental.fromBoolean(node.get("instrumental").asBoolean());
-		Remix remix = Remix.fromBoolean(node.get("remix").asBoolean());
-		SongSubgroup songSubgroup = new SongSubgroup(instrumental, remix, ingameSrcId, spotifyLink, deezerLink,
-				itunesLink
-				, tidalink, soundcloudLink, ingameBand, ingameTitle, 10000L, lyrics, info);
-		JsonNode existingSongNode = node.get("existingSongId");
-		if (existingSongNode.isInt()) {
-			Integer existingSongId = existingSongNode.asInt();
-			Optional<Song> existingSong = songService.findById(existingSongId);
-			if (existingSong.isPresent()) {
-				songSubgroup.setSong(existingSong.get());
-				if (existingSong.get().getBaseSong() != null) {
-					songSubgroup.setRemix(Remix.YES);
-				} else {
-					songSubgroup.setRemix(Remix.NO);
-				}
-			}
-		}
-		return songSubgroup;
-	}
+    @Override
+    public SongSubgroup deserialize(JsonParser jsonParser, DeserializationContext ctxt)
+            throws IOException {
+        JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+        String spotifyLink = JustSomeHelper.returnProperValueToDb(node.get("spotify").asText());
+        String itunesLink = JustSomeHelper.returnProperValueToDb(node.get("itunes").asText());
+        String soundcloudLink = JustSomeHelper.returnProperValueToDb(node.get("soundcloud").asText());
+        String deezerLink = JustSomeHelper.returnProperValueToDb(node.get("deezer").asText());
+        String tidalink = JustSomeHelper.returnProperValueToDb(node.get("tidal").asText());
+        String ingameBand = JustSomeHelper.returnProperValueToDb(node.get("ingameBand").asText());
+        String ingameTitle = JustSomeHelper.returnProperValueToDb(node.get("ingameTitle").asText());
+        String ingameSrcId = JustSomeHelper.returnProperValueToDb(node.get("ingameSrcId").asText());
+        String lyrics = JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText());
+        String info = JustSomeHelper.returnProperValueToDb(node.get("info").asText());
+        Instrumental instrumental = Instrumental.fromBoolean(node.get("instrumental").asBoolean());
+        Remix remix = Remix.fromBoolean(node.get("remix").asBoolean());
+        SongSubgroup songSubgroup = new SongSubgroup(instrumental, remix, ingameSrcId, spotifyLink, deezerLink,
+                itunesLink
+                , tidalink, soundcloudLink, ingameBand, ingameTitle, 10000L, lyrics, info);
+        JsonNode existingSongNode = node.get("existingSongId");
+        if (existingSongNode.isInt()) {
+            Integer existingSongId = existingSongNode.asInt();
+            Optional<Song> existingSong = songService.findById(existingSongId);
+            if (existingSong.isPresent()) {
+                songSubgroup.setSong(existingSong.get());
+                if (existingSong.get().getBaseSong() != null) {
+                    songSubgroup.setRemix(Remix.YES);
+                } else {
+                    songSubgroup.setRemix(Remix.NO);
+                }
+            }
+        }
+        return songSubgroup;
+    }
 }
 

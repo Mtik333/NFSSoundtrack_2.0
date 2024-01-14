@@ -1,29 +1,43 @@
+/**
+ * id of currently used video in playlist mode
+ */
 var current_id = 0;
+/**
+ * variable to track active subgroups in game's soundtrack page
+ */
 var activeSubgroups;
+/**
+ * curently played video in video modal
+ */
 var baseVideoSrc;
 $(document).ready(function () {
-    var newWidth = localStorage.getItem("expandable-width");
+    //we make top menu button active
     if (window.location.href.indexOf("/home") > -1) {
         $("#nfs-top-home").parent().addClass("nfs-top-item-active");
     }
+    //we modify width of the left-side menu depending on what's saved in local storage due to change in preferences
+    var newWidth = localStorage.getItem("expandable-width");
     if (newWidth != undefined) {
         $("#offcanvas").removeClass("w-25");
         $("#offcanvas").removeClass("w-35");
         $("#offcanvas").removeClass("w-50");
         $("#offcanvas").addClass("w-" + newWidth);
     }
+    //pushing content of custom playlist from local storage to related input as it is always rendered by server
     if (localStorage.getItem("custom-playlist") != undefined) {
         var customPlaylistArrayTrigger = JSON.parse(localStorage.getItem("custom-playlist"));
         var jsonEdArrayTrigger = JSON.stringify(customPlaylistArrayTrigger);
         localStorage.setItem("custom-playlist", jsonEdArrayTrigger);
         $("#playlistContent").val(jsonEdArrayTrigger);
     } else {
+        //if playlist is empty, we have to make it disabled and show tooltip to user about the reason
         $("#customPlaylistSubmit").prop("disabled", true);
         $("#customPlaylistSubmit").parent().parent().attr("data-toggle", "tooltip");
         $("#customPlaylistSubmit").parent().parent().attr("data-placement", "top");
         $("#customPlaylistSubmit").parent().parent().attr("data-bs-original-title", "Custom playlist is empty");
         $("#customPlaylistSubmit").parent().parent().tooltip();
     }
+    //if user does not want 'modal' render then we disable this modal
     var useRowDisplay = localStorage.getItem("video-rendering-stuff");
     if (useRowDisplay == undefined || useRowDisplay == "true") {
         $(document).find(".play_icon").each(function (e) {
@@ -31,13 +45,18 @@ $(document).ready(function () {
             $(this).removeAttr("data-bs-toggle");
         });
     }
+    //making tooltip for 'search' as user will not know by default about using of quotation marks
     $("#searchStuff").tooltip({ 'trigger': 'focus', 'title': $("#searchStuff").attr("data-tooltip") });
+    //resetting value of game filtering
     $("#filter_games_menu").val("");
+    //triggering all declared tooltips to show up
     $('[data-toggle="tooltip"]').tooltip();
+    //if we are in custom playlist mode then we make button active
     var currentGame = window.location.href.replace(document.location.origin, "");
     if (currentGame.indexOf("custom/playlist") > -1) {
         $("#customPlaylistSubmit").parent().parent().addClass("nfs-top-item-active");
     } else {
+        //then depending on value we active top menu
         $(document).find("a[href='" + currentGame + "']").each(function (e) {
             if (!$(this).hasClass("nav-link")) {
                 if ($(this).hasClass("genreLink")) {
@@ -51,6 +70,9 @@ $(document).ready(function () {
         });
     }
 
+    /**
+     * method to remove duplicate countries from column because i couldn't develop it on backend in a way to return only distinct countries
+     */
     $(document).find("td.countries").each(function () {
         var imgsOfCountries = $(this).children();
         var arrayOfLinks = [];
@@ -64,13 +86,19 @@ $(document).ready(function () {
         }
     });
 
+    /**
+     * method to handle clicking on 'play' button
+     */
     $(".play_icon").on("click", function () {
         var useRowDisplay = localStorage.getItem("video-rendering-stuff");
+        //if user wants to have video in a 'row'
         if (useRowDisplay == undefined || useRowDisplay == "true") {
+            //if there was already video active we have to remove such row
             var existingTr = $("#listen-music");
             if (existingTr.length != 0) {
                 existingTr.remove();
             } else {
+                //then we create row with video and lyris
                 var videoToUse = $(this).attr("data-tagvideo");
                 var lyricsText = $(this).next().text();
                 var parentTr = $(this).parent().parent().parent();
@@ -90,15 +118,19 @@ $(document).ready(function () {
                 newTr.insertAfter(parentTr);
             }
         } else {
+            //otherwise we render modal with video and show lyrics if there are any
             $("#lyricsCollapse").empty();
             var lyricsTxt = $(this).next().text();
+            //if lyrics value is null or empty, then there's nothing
             if (lyricsTxt == "null" || lyricsTxt == "") {
                 $("#showLyrics").text("Lyrics not found");
                 $("#showLyrics").prop("disabled", true);
+            //if lyrics value is 0 then it is instrumental
             } else if (lyricsTxt == "0.0") {
                 $("#showLyrics").text("This is instrumental, no lyrics");
                 $("#showLyrics").prop("disabled", true);
             } else {
+                //otherwise just show lyrics
                 $("#lyricsCollapse").append(lyricsTxt);
                 $("#showLyrics").prop("disabled", false);
             }
@@ -106,6 +138,9 @@ $(document).ready(function () {
 
     });
 
+    /**
+     * method to show 'active' and 'unactive' play button
+     */
     $('.play_icon').mouseover(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
         // }
@@ -113,9 +148,13 @@ $(document).ready(function () {
         $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
     });
 
+    /**
+     * method to filter songs in table
+     */
     $("#filter_songs").on("keyup", function () {
         var searchValue = $(this).val().toLowerCase();
         if (searchValue.length > 3) {
+            //if filter input is over 3 letters, then we check if band or songtitle matches the input and keep row visible
             $("table").find("tr:has(td):not(.subgroup-separator)").filter(function () {
                 if ($(this).find("td.band").text().toLowerCase().indexOf(searchValue) > -1 || $(this).find("td.songtitle").text().toLowerCase().indexOf(searchValue) > -1) {
                     $(this).show();
@@ -125,17 +164,22 @@ $(document).ready(function () {
                 }
             });
         } else {
+            //otherwise for less-equal to 3 letters we show everything again
             $("table").find("tr:has(td)").filter(function () {
                 $(this).show();
             });
         }
     });
 
+    /**
+     * function when youtube video modal gets show trigger
+     */
     $('#videoModal').on('show.bs.modal', function (e) {
-        // set the video src to autoplay and not to show related video. Youtube related video is like a box of chocolates... you never know what you're gonna get
         var myImgSource = e.relatedTarget;
+        //we set play image back to the normal one and push video id to the variable
         $(myImgSource).attr("src", $(myImgSource).attr("src").replace("znakwodny2", "znakwodny"));
         baseVideoSrc = $(myImgSource).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
+        //then we do the same stuff with lyrics situation
         $("#lyricsCollapse").empty();
         var lyricsTxt = $(myImgSource).next().text();
         if (lyricsTxt == "null" || lyricsTxt == "") {
@@ -148,21 +192,32 @@ $(document).ready(function () {
             $("#lyricsCollapse").append(lyricsTxt);
             $("#showLyrics").prop("disabled", false);
         }
+        //and we apply the embed src video attribute to the modal
         $("#video").attr('src', baseVideoSrc);
     });
 
+    /**
+     * function to unload video modal when hiding it
+     */
     $('#videoModal').on('hide.bs.modal', function (e) {
         $("#video").attr('src', '');
     });
 
+    /**
+     * function to load disqus comments
+     */
     $('#disqusModal').on('show.bs.modal', function (e) {
         var disqusTarget = e.relatedTarget.id;
         var linkToUse;
+        //for the beginning legacy time, there will be link to new and old disqus stuff so we have to handle that one might want to render archived or new comments
         if (disqusTarget == "newDisqusLink") {
             linkToUse = window.location.href;
         } else {
             linkToUse = $("#disqusModal").attr("data-disqusLink");
         }
+        /**
+         * if disqus was not yet loaded we load it by injecting this javascript inside
+         */
         if ($("#disqus_thread").children().length == 0) {
             var script = document.createElement('script');
             script.innerHTML = "var disqus_config = function () {     this.page.url = '" + linkToUse + "';  }; (function () {  var d = document, s = d.createElement('script'); s.src = 'https://nfssoundtrack.disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date());(d.head || d.body).appendChild(s);})();";
@@ -171,6 +226,7 @@ $(document).ready(function () {
             $(this).append(script);
             $(this).append(noscript);
         } else {
+            //otherwise we reload it just for safety to be sure the right link is used
             DISQUS.reset({
                 reload: true,
                 config: function () {
@@ -180,10 +236,16 @@ $(document).ready(function () {
         }
     });
 
+    /**
+     * function to initialize playlist mode when modal starts showing up
+     */
     $('#playlistModeModal').on('show.bs.modal', function (e) {
         initPlayer(0);
     });
 
+    /**
+     * function to handle modal width/height then modal has been loaded
+     */
     $('#playlistModeModal').on('shown.bs.modal', function (e) {
         var divWithVideo = $("#playlistModePlayer");
         var divContainer = divWithVideo.parent();
@@ -195,8 +257,8 @@ $(document).ready(function () {
     $('#playlistModeModal').on('hide.bs.modal', function (e) {
         disablePlayer(true);
     });
-    //this is some youtube player stuff below
 
+    //this is some youtube player stuff below
     function disablePlayer(cleanDiv) {
         $('#playlistModePlayer').html('');
         if (cleanDiv) {
@@ -204,15 +266,27 @@ $(document).ready(function () {
         }
     }
 
+    /**
+     * function to play video when it is ready
+     * @param {yt event} event 
+     */
     function onPlayerReady(event) {
         event.target.playVideo();
     }
+    /**
+     * function to go to next video in playlist
+     * @param {yt event} event 
+     */
     function onPlayerStateChange(event) {
         if (event.data === 0) {
             initPlayer(current_id + 1);
         }
     }
 
+    /**
+     * function to render playlist mode
+     * @param {id of video} changeId 
+     */
     function initPlayer(changeId) {
         disablePlayer(false);
         // var tbody = $('#playlistModePlayer').append("<tbody>");
@@ -284,12 +358,19 @@ $(document).ready(function () {
             currentTr.find("td.playlist_row").attr("colspan", 3);
         }
     }
+
+    /**
+     * function to trigger playing specific video from playlist if it is not disabled
+     */
     $(document).on("click", "td.playlist_play_it", function () {
         if (!$(this).parent().hasClass("disabled")) {
             initPlayer(this.parentNode.id);
         }
     });
 
+    /**
+     * function to mark song as disabled when in playlist mode
+     */
     $(document).on("click", "td.playlist_disable_song", function () {
         if ($(this).parent().hasClass("disabled")) {
             $(this).parent().removeClass("disabled");
@@ -298,7 +379,11 @@ $(document).ready(function () {
         }
     });
 
+    /**
+     * function to handle adding song to custom playlist
+     */
     $(document).on("click", "img.add-to-custom-playlist", function () {
+        //fetching custom playlist info from local storage
         var customPlaylistArray = localStorage.getItem("custom-playlist");
         if (customPlaylistArray == undefined) {
             customPlaylistArray = [];
@@ -306,10 +391,12 @@ $(document).ready(function () {
         else if (customPlaylistArray != undefined) {
             customPlaylistArray = JSON.parse(customPlaylistArray);
         }
+        //we check the id of song we want to add to custom playlist
         var relatedTr = $(this).parent().parent();
         var songSubgroupId = $(relatedTr).attr("data-songSubgroup-id");
         customPlaylistArray.push(songSubgroupId);
         var jsonEdArray = JSON.stringify(customPlaylistArray);
+        //and then we simply store it in playlist + show confirmation alert that it worked
         localStorage.setItem("custom-playlist", jsonEdArray);
         $("#playlistContent").val(jsonEdArray);
         $("#customPlaylistSubmit").prop("disabled", false);
@@ -321,10 +408,18 @@ $(document).ready(function () {
         });
     });
 
+    $(document).on("click", "button.justHideAlert", function(e){
+        e.preventDefault();
+        $(this).parent().parent().fadeOut(100);
+    });
 
+    /**
+     * function to render modal with song information
+     */
     $(document).on("click", "img.info-about-song", function () {
         var trElem = $(this).parent().parent();
         var songIdAttr = $(trElem).attr("data-song_id");
+        //we have to call server to provide info about the song
         $("#getAllUsages").attr("href", "/song/" + Number(songIdAttr));
         $.ajax({
             async: false,
@@ -332,6 +427,7 @@ $(document).ready(function () {
             url: "/songInfo/" + songIdAttr,
             success: function (ooo) {
                 var songInfo = JSON.parse(ooo);
+                //if all good then we dynamically fill this modal with received information
                 $("#officialArtist").append(document.createTextNode(songInfo.officialArtist));
                 $("#officialTitle").append(document.createTextNode(songInfo.officialTitle));
                 if (songInfo.composers.length != 0) {
@@ -370,14 +466,13 @@ $(document).ready(function () {
                     $(songInfo.baseSongId).insertAfter("#baseSong");
                     $("#baseSongDiv").css("display", "");
                 }
+                //and we finally show the modal
                 $("#infoSongModal").modal('show');
             },
             error: function (ooo) {
                 console.log("e2");
+                console.log(ooo);
             },
-            done: function (ooo) {
-                console.log("e3");
-            }
         });
     });
 

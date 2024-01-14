@@ -11,22 +11,22 @@ import java.util.Optional;
 @Service
 public class CountryService {
 
-	@Autowired
-	CountryRepository countryRepository;
+    @Autowired
+    CountryRepository countryRepository;
 
-	public Optional<Country> findById(int id) {
-		return countryRepository.findById(id);
-	}
+    public Optional<Country> findById(int id) {
+        return countryRepository.findById(id);
+    }
 
-	public List<Country> findAll() {
-		return countryRepository.findAll();
-	}
+    public List<Country> findAll() {
+        return countryRepository.findAll();
+    }
 
-	public Optional<Country> findByCountryName(String countryName) {
-		return countryRepository.findByCountryName(countryName);
-	}
+    public Optional<Country> findByCountryName(String countryName) {
+        return countryRepository.findByCountryName(countryName);
+    }
 
-	public List<Country> findByCountryNameContains(String countryName) {
-		return countryRepository.findByCountryNameContains(countryName);
-	}
+    public List<Country> findByCountryNameContains(String countryName) {
+        return countryRepository.findByCountryNameContains(countryName);
+    }
 }

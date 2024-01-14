@@ -13,15 +13,15 @@ import java.io.IOException;
 @JsonComponent
 public class GameSerializer extends JsonSerializer<Game> {
 
-	private static final Logger logger = LoggerFactory.getLogger(GameSerializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(GameSerializer.class);
 
-	@Override
-	public void serialize(Game game, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-			throws IOException {
-		jsonGenerator.writeStartObject();
-		jsonGenerator.writeNumberField("id", game.getId());
-		jsonGenerator.writeNumberField("position", game.getPosition());
-		jsonGenerator.writeStringField("displayTitle", game.getDisplayTitle());
-		jsonGenerator.writeEndObject();
-	}
+    @Override
+    public void serialize(Game game, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+            throws IOException {
+        jsonGenerator.writeStartObject();
+        jsonGenerator.writeNumberField("id", game.getId());
+        jsonGenerator.writeNumberField("position", game.getPosition());
+        jsonGenerator.writeStringField("displayTitle", game.getDisplayTitle());
+        jsonGenerator.writeEndObject();
+    }
 }

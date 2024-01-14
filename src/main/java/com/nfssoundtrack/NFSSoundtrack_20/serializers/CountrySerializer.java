@@ -11,12 +11,12 @@ import java.io.IOException;
 @JsonComponent
 public class CountrySerializer extends JsonSerializer<Country> {
 
-	@Override
-	public void serialize(Country country, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-			throws IOException {
-		jsonGenerator.writeStartObject();
-		jsonGenerator.writeNumberField("value", country.getId());
-		jsonGenerator.writeStringField("label", country.getCountryName());
-		jsonGenerator.writeEndObject();
-	}
+    @Override
+    public void serialize(Country country, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+            throws IOException {
+        jsonGenerator.writeStartObject();
+        jsonGenerator.writeNumberField("value", country.getId());
+        jsonGenerator.writeStringField("label", country.getCountryName());
+        jsonGenerator.writeEndObject();
+    }
 }

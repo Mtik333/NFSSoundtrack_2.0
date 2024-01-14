@@ -23,40 +23,38 @@ import java.util.Optional;
 @RequestMapping(path = "/country")
 public class CountryController extends BaseControllerWithErrorHandling {
 
-	private static final Logger logger = LoggerFactory.getLogger(CountryController.class);
+    private static final Logger logger = LoggerFactory.getLogger(CountryController.class);
 
-	@Autowired
-	CountrySerializer countrySerializer;
+    @Autowired
+    CountrySerializer countrySerializer;
 
-	@GetMapping(value = "/readAll")
-	public @ResponseBody
-	String readAliases(Model model) throws JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		List<Country> countries = countryService.findAll();
-		return objectMapper.writeValueAsString(countries);
-	}
+    @GetMapping(value = "/readAll")
+    public @ResponseBody
+    String readAliases(Model model) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<Country> countries = countryService.findAll();
+        return objectMapper.writeValueAsString(countries);
+    }
 
-	@GetMapping(value = "/countryName/{input}")
-	public @ResponseBody
-	String readCountries(Model model, @PathVariable("input") String input) throws JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		SimpleModule simpleModule = new SimpleModule();
-		simpleModule.addSerializer(Country.class, countrySerializer);
-		objectMapper.registerModule(simpleModule);
-		if (input.length() <= 3) {
-			Optional<Country> country = countryService.findByCountryName(input);
-			if (country.isEmpty()) {
-				return objectMapper.writeValueAsString(null);
-			}
-			String result = objectMapper.writeValueAsString(Collections.singleton(country));
-			return result;
-		} else {
-			List<Country> countryList = countryService.findByCountryNameContains(input);
-			if (countryList.isEmpty()) {
-				return objectMapper.writeValueAsString(null);
-			}
-			String result = objectMapper.writeValueAsString(countryList);
-			return result;
-		}
-	}
+    @GetMapping(value = "/countryName/{input}")
+    public @ResponseBody
+    String readCountries(Model model, @PathVariable("input") String input) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(Country.class, countrySerializer);
+        objectMapper.registerModule(simpleModule);
+        if (input.length() <= 3) {
+            Optional<Country> country = countryService.findByCountryName(input);
+            if (country.isEmpty()) {
+                return objectMapper.writeValueAsString(null);
+            }
+            return objectMapper.writeValueAsString(Collections.singleton(country));
+        } else {
+            List<Country> countryList = countryService.findByCountryNameContains(input);
+            if (countryList.isEmpty()) {
+                return objectMapper.writeValueAsString(null);
+            }
+            return objectMapper.writeValueAsString(countryList);
+        }
+    }
 }

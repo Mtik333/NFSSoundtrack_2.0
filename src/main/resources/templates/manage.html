@@ -16,6 +16,7 @@
 
 <body>
     <script>
+        //to make night mode run flawlessly it must be first in the body
         function changeStuffForDarkMode() {
             if (localStorage.getItem("dark-mode") == "true") {
                 $(document).find("html").attr("data-bs-theme", "dark");

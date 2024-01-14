@@ -10,18 +10,18 @@ import java.util.Optional;
 @Service
 public class MainGroupService {
 
-	@Autowired
-	MainGroupRepository mainGroupRepository;
+    @Autowired
+    MainGroupRepository mainGroupRepository;
 
-	public MainGroup save(MainGroup mainGroup) {
-		return mainGroupRepository.save(mainGroup);
-	}
+    public MainGroup save(MainGroup mainGroup) {
+        return mainGroupRepository.save(mainGroup);
+    }
 
-	public Optional<MainGroup> findById(int id) {
-		return mainGroupRepository.findById(id);
-	}
+    public Optional<MainGroup> findById(int id) {
+        return mainGroupRepository.findById(id);
+    }
 
-	public void delete(MainGroup mainGroup) {
-		mainGroupRepository.delete(mainGroup);
-	}
+    public void delete(MainGroup mainGroup) {
+        mainGroupRepository.delete(mainGroup);
+    }
 }

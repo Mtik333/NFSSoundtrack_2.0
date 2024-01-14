@@ -20,55 +20,55 @@ import java.util.Optional;
 @RequestMapping(path = "/search")
 public class SearchController extends BaseControllerWithErrorHandling {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
 
-	@Value("${spring.application.name}")
-	String appName;
+    @Value("${spring.application.name}")
+    String appName;
 
-	@GetMapping(value = "/basic")
-	public String searchStuff(Model model, @RequestParam("searchData") String searchData) {
-		List<AuthorAlias> authorAliases = new ArrayList<>();
-		List<Song> songTitleList = new ArrayList<>();
-		List<Song> songLyricsList = new ArrayList<>();
-		List<Genre> genreList = new ArrayList<>();
-		String query = searchData.trim();
-		if (searchData.isEmpty()) {
-			System.out.println("well...");
-		} else if (searchData.length() <= 3) {
-			//treat as exact input
-			Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(query);
-			authorAlias.ifPresent(authorAliases::add);
-			songTitleList = songService.findByOfficialDisplayTitle(query);
-			songLyricsList = songService.findByLyrics(query);
-			Optional<Genre> genre = genreService.findByGenreName(query);
-			genre.ifPresent(genreList::add);
-		} else {
-			boolean fullPhraseSearch = query.contains("\"");
-			if (fullPhraseSearch) {
-				query = query.replaceAll("\"", "").trim();
-				Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(query);
-				if (authorAlias.isPresent()) {
-					authorAliases.add(authorAlias.get());
-				}
-				songTitleList = songService.findByOfficialDisplayTitle(query);
-				songLyricsList = songService.findByLyrics(query);
-				genreList = genreService.findByGenreNameContains(query);
+    @GetMapping(value = "/basic")
+    public String searchStuff(Model model, @RequestParam("searchData") String searchData) {
+        List<AuthorAlias> authorAliases = new ArrayList<>();
+        List<Song> songTitleList = new ArrayList<>();
+        List<Song> songLyricsList = new ArrayList<>();
+        List<Genre> genreList = new ArrayList<>();
+        String query = searchData.trim();
+        if (searchData.isEmpty()) {
+            System.out.println("well...");
+        } else if (searchData.length() <= 3) {
+            //treat as exact input
+            Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(query);
+            authorAlias.ifPresent(authorAliases::add);
+            songTitleList = songService.findByOfficialDisplayTitle(query);
+            songLyricsList = songService.findByLyrics(query);
+            Optional<Genre> genre = genreService.findByGenreName(query);
+            genre.ifPresent(genreList::add);
+        } else {
+            boolean fullPhraseSearch = query.contains("\"");
+            if (fullPhraseSearch) {
+                query = query.replaceAll("\"", "").trim();
+                Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(query);
+                if (authorAlias.isPresent()) {
+                    authorAliases.add(authorAlias.get());
+                }
+                songTitleList = songService.findByOfficialDisplayTitle(query);
+                songLyricsList = songService.findByLyrics(query);
+                genreService.findByGenreName(query).ifPresent(genreList::add);
 
-			} else {
-				authorAliases = authorAliasService.findByAliasContains(query);
-				songTitleList = songService.findByOfficialDisplayTitleContains(query);
-				songLyricsList = songService.findByLyricsContains(query);
-				genreList = genreService.findByGenreNameContains(query);
-			}
-		}
-		model.addAttribute("appName", appName);
-		model.addAttribute("series", serieService.findAllSortedByPositionAsc());
-		model.addAttribute("authorAliases", authorAliases);
-		model.addAttribute("songTitleList", songTitleList);
-		model.addAttribute("songLyricsList", songLyricsList);
-		model.addAttribute("genreList", genreList);
-		model.addAttribute("search", true);
-		model.addAttribute("searchPhrase", searchData);
-		return "index";
-	}
+            } else {
+                authorAliases = authorAliasService.findByAliasContains(query);
+                songTitleList = songService.findByOfficialDisplayTitleContains(query);
+                songLyricsList = songService.findByLyricsContains(query);
+                genreList = genreService.findByGenreNameContains(query);
+            }
+        }
+        model.addAttribute("appName", appName);
+        model.addAttribute("series", serieService.findAllSortedByPositionAsc());
+        model.addAttribute("authorAliases", authorAliases);
+        model.addAttribute("songTitleList", songTitleList);
+        model.addAttribute("songLyricsList", songLyricsList);
+        model.addAttribute("genreList", genreList);
+        model.addAttribute("search", true);
+        model.addAttribute("searchPhrase", searchData);
+        return "index";
+    }
 }

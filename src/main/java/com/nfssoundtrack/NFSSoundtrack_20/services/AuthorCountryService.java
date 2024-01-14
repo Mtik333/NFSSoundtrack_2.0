@@ -11,19 +11,19 @@ import java.util.Set;
 @Service
 public class AuthorCountryService {
 
-	@Autowired
-	AuthorCountryRepository authorCountryRepository;
+    @Autowired
+    AuthorCountryRepository authorCountryRepository;
 
-	public void deleteAll(List<AuthorCountry> authorCountryList) {
-		authorCountryRepository.deleteAll(authorCountryList);
-	}
+    public void deleteAll(List<AuthorCountry> authorCountryList) {
+        authorCountryRepository.deleteAll(authorCountryList);
+    }
 
-	public void deleteAll(Set<AuthorCountry> authorCountryList) {
-		authorCountryRepository.deleteAll(authorCountryList);
-	}
+    public void deleteAll(Set<AuthorCountry> authorCountryList) {
+        authorCountryRepository.deleteAll(authorCountryList);
+    }
 
-	public List<AuthorCountry> saveAll(List<AuthorCountry> authorCountryList) {
-		return authorCountryRepository.saveAll(authorCountryList);
-	}
+    public List<AuthorCountry> saveAll(List<AuthorCountry> authorCountryList) {
+        return authorCountryRepository.saveAll(authorCountryList);
+    }
 
 }

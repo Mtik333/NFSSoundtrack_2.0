@@ -12,14 +12,14 @@ import java.io.IOException;
 
 @JsonComponent
 public class ArtistSerializer extends JsonSerializer<Author> {
-	private static final Logger logger = LoggerFactory.getLogger(ArtistSerializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(ArtistSerializer.class);
 
-	@Override
-	public void serialize(Author author, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-			throws IOException {
-		jsonGenerator.writeStartObject();
-		jsonGenerator.writeNumberField("value", author.getId());
-		jsonGenerator.writeStringField("label", author.getName());
-		jsonGenerator.writeEndObject();
-	}
+    @Override
+    public void serialize(Author author, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+            throws IOException {
+        jsonGenerator.writeStartObject();
+        jsonGenerator.writeNumberField("value", author.getId());
+        jsonGenerator.writeStringField("label", author.getName());
+        jsonGenerator.writeEndObject();
+    }
 }

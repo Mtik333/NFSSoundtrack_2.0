@@ -13,14 +13,14 @@ import java.io.IOException;
 @JsonComponent
 public class AuthorAliasSerializer extends JsonSerializer<AuthorAlias> {
 
-	private static final Logger logger = LoggerFactory.getLogger(AuthorAliasSerializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthorAliasSerializer.class);
 
-	@Override
-	public void serialize(AuthorAlias authorAlias, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-			throws IOException {
-		jsonGenerator.writeStartObject();
-		jsonGenerator.writeNumberField("value", authorAlias.getId());
-		jsonGenerator.writeStringField("label", authorAlias.getAlias());
-		jsonGenerator.writeEndObject();
-	}
+    @Override
+    public void serialize(AuthorAlias authorAlias, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+            throws IOException {
+        jsonGenerator.writeStartObject();
+        jsonGenerator.writeNumberField("value", authorAlias.getId());
+        jsonGenerator.writeStringField("label", authorAlias.getAlias());
+        jsonGenerator.writeEndObject();
+    }
 }

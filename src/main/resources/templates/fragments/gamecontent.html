@@ -201,7 +201,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <a href="" id="spotify-ext" class="btn btn-outline-info" th:text="#{launchInSpotify}"></a>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -222,7 +222,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -244,7 +244,7 @@
                 <div class="modal-header">
                     <a href="" id="tidal-ext" target="_blank" class="btn btn-outline-info"
                         th:text="#{launchInTidal}"></a>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -265,7 +265,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <a href="" id="deezer-ext" class="btn btn-outline-info" th:text="#{launchInDeezer}"></a>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -286,7 +286,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -307,19 +307,19 @@
 <div class="success-container info-container" aria-hidden="true">
     <div id="successAddToCustomPlaylist" class="alert alert-success fade show" role="alert">
         <span th:text="#{addedToCustomPlaylist}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close justHideAlert" data-bs-theme="light" data-bs-hide="alert" aria-label="Close"></button>
     </div>
 </div>
 <div class="error-container info-container" aria-hidden="true">
     <div id="errorThing" class="alert alert-danger fade show" role="alert">
         <span th:text="#{nothingToPlay}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close justHideAlert" data-bs-theme="light" data-bs-hide="alert" aria-label="Close"></button>
     </div>
 </div>
 <div class="remove-from-playlist-container info-container" aria-hidden="true">
     <div id="successRemoveFromCustomPlaylist" class="alert alert-success fade show" role="alert">
         <span th:text="#{removedFromPlaylist}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close justHideAlert" data-bs-theme="light" data-bs-hide="alert" aria-label="Close"></button>
     </div>
 </div>
 <script th:src="@{/js/gamecontent.js}" type="application/javascript"></script>

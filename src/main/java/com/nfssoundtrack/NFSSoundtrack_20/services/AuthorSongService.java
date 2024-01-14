@@ -13,38 +13,38 @@ import java.util.Optional;
 @Service
 public class AuthorSongService {
 
-	@Autowired
-	AuthorSongRepository authorSongRepository;
+    @Autowired
+    AuthorSongRepository authorSongRepository;
 
-	public List<AuthorSong> findByAuthorAlias(AuthorAlias authorAlias) {
-		return authorSongRepository.findByAuthorAlias(authorAlias);
-	}
+    public List<AuthorSong> findByAuthorAlias(AuthorAlias authorAlias) {
+        return authorSongRepository.findByAuthorAlias(authorAlias);
+    }
 
-	public List<AuthorSong> findBySong(Song song) {
-		return authorSongRepository.findBySong(song);
-	}
+    public List<AuthorSong> findBySong(Song song) {
+        return authorSongRepository.findBySong(song);
+    }
 
-	public Optional<AuthorSong> findById(int id) {
-		return authorSongRepository.findById(id);
-	}
+    public Optional<AuthorSong> findById(int id) {
+        return authorSongRepository.findById(id);
+    }
 
-	public Optional<AuthorSong> findByAuthorAliasAndSong(AuthorAlias authorAlias, Song song) {
-		return authorSongRepository.findByAuthorAliasAndSong(authorAlias, song);
-	}
+    public Optional<AuthorSong> findByAuthorAliasAndSong(AuthorAlias authorAlias, Song song) {
+        return authorSongRepository.findByAuthorAliasAndSong(authorAlias, song);
+    }
 
-	public AuthorSong save(AuthorSong authorSong) {
-		return authorSongRepository.save(authorSong);
-	}
+    public AuthorSong save(AuthorSong authorSong) {
+        return authorSongRepository.save(authorSong);
+    }
 
-	public void delete(AuthorSong authorSong) {
-		authorSongRepository.delete(authorSong);
-	}
+    public void delete(AuthorSong authorSong) {
+        authorSongRepository.delete(authorSong);
+    }
 
-	public List<AuthorSong> saveAll(List<AuthorSong> authorSongs) {
-		return authorSongRepository.saveAll(authorSongs);
-	}
+    public List<AuthorSong> saveAll(List<AuthorSong> authorSongs) {
+        return authorSongRepository.saveAll(authorSongs);
+    }
 
-	public void deleteAll(List<AuthorSong> authorSongs) {
-		authorSongRepository.deleteAll(authorSongs);
-	}
+    public void deleteAll(List<AuthorSong> authorSongs) {
+        authorSongRepository.deleteAll(authorSongs);
+    }
 }

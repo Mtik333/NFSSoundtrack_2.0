@@ -11,26 +11,26 @@ import java.util.Optional;
 @Service
 public class GenreService {
 
-	@Autowired
-	GenreRepository genreRepository;
+    @Autowired
+    GenreRepository genreRepository;
 
-	public Optional<Genre> findById(int id) {
-		return genreRepository.findById(id);
-	}
+    public Optional<Genre> findById(int id) {
+        return genreRepository.findById(id);
+    }
 
-	public Optional<Genre> findByGenreName(String genreName) {
-		return genreRepository.findByGenreName(genreName);
-	}
+    public Optional<Genre> findByGenreName(String genreName) {
+        return genreRepository.findByGenreName(genreName);
+    }
 
-	public List<Genre> findByGenreNameContains(String genreName) {
-		return genreRepository.findByGenreNameContains(genreName);
-	}
+    public List<Genre> findByGenreNameContains(String genreName) {
+        return genreRepository.findByGenreNameContains(genreName);
+    }
 
-	public void deleteAll(List<Genre> genres) {
-		genreRepository.deleteAll();
-	}
+    public void deleteAll(List<Genre> genres) {
+        genreRepository.deleteAll();
+    }
 
-	public Genre save(Genre genre) {
-		return genreRepository.save(genre);
-	}
+    public Genre save(Genre genre) {
+        return genreRepository.save(genre);
+    }
 }

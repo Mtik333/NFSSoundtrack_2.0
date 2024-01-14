@@ -9,12 +9,10 @@ import java.util.Optional;
 
 public interface AuthorRepository extends JpaRepository<Author, Integer> {
 
-	Optional<Author> findByName(String name);
+    Optional<Author> findByName(String name);
 
-	List<Author> findByNameContains(String name);
+    List<Author> findByNameContains(String name);
 
-	List<Author> findAll();
-
-	@EntityGraph(value = "Author.authorCountries")
-	List<Author> findByIdNotNull();
+    @EntityGraph(value = "Author.authorCountries")
+    List<Author> findByIdNotNull();
 }

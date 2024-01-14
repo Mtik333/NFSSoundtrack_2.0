@@ -10,18 +10,18 @@ import java.util.Optional;
 @Service
 public class GameService {
 
-	@Autowired
-	GameRepository gameRepository;
+    @Autowired
+    GameRepository gameRepository;
 
-	public Game findByGameShort(String gameShort) {
-		return gameRepository.findByGameShort(gameShort);
-	}
+    public Game findByGameShort(String gameShort) {
+        return gameRepository.findByGameShort(gameShort);
+    }
 
-	public Optional<Game> findById(int id) {
-		return gameRepository.findById(id);
-	}
+    public Optional<Game> findById(int id) {
+        return gameRepository.findById(id);
+    }
 
-	public Game save(Game game) {
-		return gameRepository.save(game);
-	}
+    public Game save(Game game) {
+        return gameRepository.save(game);
+    }
 }

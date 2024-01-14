@@ -12,34 +12,34 @@ import java.util.Optional;
 @Service
 public class AuthorAliasService {
 
-	@Autowired
-	AuthorAliasRepository authorAliasRepository;
+    @Autowired
+    AuthorAliasRepository authorAliasRepository;
 
-	public Optional<AuthorAlias> findById(int id) {
-		return authorAliasRepository.findById(id);
-	}
+    public Optional<AuthorAlias> findById(int id) {
+        return authorAliasRepository.findById(id);
+    }
 
-	public List<AuthorAlias> findByAuthor(Author author) {
-		return authorAliasRepository.findByAuthor(author);
-	}
+    public List<AuthorAlias> findByAuthor(Author author) {
+        return authorAliasRepository.findByAuthor(author);
+    }
 
-	public Optional<AuthorAlias> findByAlias(String alias) {
-		return authorAliasRepository.findByAlias(alias);
-	}
+    public Optional<AuthorAlias> findByAlias(String alias) {
+        return authorAliasRepository.findByAlias(alias);
+    }
 
-	public List<AuthorAlias> findByAliasContains(String alias) {
-		return authorAliasRepository.findByAliasContains(alias);
-	}
+    public List<AuthorAlias> findByAliasContains(String alias) {
+        return authorAliasRepository.findByAliasContains(alias);
+    }
 
-	public AuthorAlias save(AuthorAlias authorAlias) {
-		return authorAliasRepository.save(authorAlias);
-	}
+    public AuthorAlias save(AuthorAlias authorAlias) {
+        return authorAliasRepository.save(authorAlias);
+    }
 
-	public void delete(AuthorAlias authorAlias) {
-		authorAliasRepository.delete(authorAlias);
-	}
+    public void delete(AuthorAlias authorAlias) {
+        authorAliasRepository.delete(authorAlias);
+    }
 
-	public void deleteAll(List<AuthorAlias> authorAliases) {
-		authorAliasRepository.deleteAll(authorAliases);
-	}
+    public void deleteAll(List<AuthorAlias> authorAliases) {
+        authorAliasRepository.deleteAll(authorAliases);
+    }
 }

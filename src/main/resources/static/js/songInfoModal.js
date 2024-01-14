@@ -1,5 +1,9 @@
 $(document).ready(function () {
+    /**
+     * method to remove all info appended to modal when modal is closed
+     */
     $('#infoSongModal').on('hide.bs.modal', function (e) {
+        //we just iterate over stuff and remove elements depending on type
         $("#officialArtist").contents().filter(function () {
             return this.nodeType === 3; //Node.TEXT_NODE
         }).each(function () {

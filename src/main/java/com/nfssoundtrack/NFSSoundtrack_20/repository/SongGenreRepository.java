@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface SongGenreRepository extends JpaRepository<SongGenre, Integer> {
 
-	List<SongGenre> findBySong(Song id);
+    List<SongGenre> findBySong(Song id);
 
-	List<SongGenre> findByGenre(Genre genre);
+    List<SongGenre> findByGenre(Genre genre);
 
-	List<SongGenre> findByGenre(Genre genre, Pageable pageable);
+    List<SongGenre> findByGenre(Genre genre, Pageable pageable);
 }

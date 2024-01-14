@@ -1,106 +1,65 @@
 package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorAliasService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorCountryService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.AuthorSongService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.ContentService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.CountryService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.GameService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.GenreService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.MainGroupService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.SerieService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.SongGenreService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.SongService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.SongSubgroupService;
-import com.nfssoundtrack.NFSSoundtrack_20.services.SubgroupService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.nfssoundtrack.NFSSoundtrack_20.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.FileNotFoundException;
 
 public class BaseControllerWithErrorHandling implements ErrorController {
 
-	private static final Logger logger = LoggerFactory.getLogger(BaseControllerWithErrorHandling.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseControllerWithErrorHandling.class);
 
-	@Autowired
-	SerieService serieService;
+    @Autowired
+    SerieService serieService;
 
-	@Autowired
-	ContentService contentService;
+    @Autowired
+    ContentService contentService;
 
-	@Autowired
-	GameService gameService;
+    @Autowired
+    GameService gameService;
 
-	@Autowired
-	GenreService genreService;
+    @Autowired
+    GenreService genreService;
 
-	@Autowired
-	SongSubgroupService songSubgroupService;
+    @Autowired
+    SongSubgroupService songSubgroupService;
 
-	@Autowired
-	SongService songService;
+    @Autowired
+    SongService songService;
 
-	@Autowired
-	AuthorService authorService;
+    @Autowired
+    AuthorService authorService;
 
-	@Autowired
-	AuthorAliasService authorAliasService;
+    @Autowired
+    AuthorAliasService authorAliasService;
 
-	@Autowired
-	AuthorSongService authorSongService;
+    @Autowired
+    AuthorSongService authorSongService;
 
-	@Autowired
-	SongGenreService songGenreService;
+    @Autowired
+    SongGenreService songGenreService;
 
-	@Autowired
-	CountryService countryService;
+    @Autowired
+    CountryService countryService;
 
-	@Autowired
-	AuthorCountryService authorCountryService;
+    @Autowired
+    AuthorCountryService authorCountryService;
 
-	@Autowired
-	MainGroupService mainGroupService;
+    @Autowired
+    MainGroupService mainGroupService;
 
-	@Autowired
-	SubgroupService subgroupService;
+    @Autowired
+    SubgroupService subgroupService;
 
-	@RequestMapping(value = "/{otherval}")
-	public String nonExistingPagee(Model model, @PathVariable("otherval") String otherval) throws Exception {
-		throw new Exception("Tried to access non-existing page: " + otherval);
-	}
+    @RequestMapping(value = "/{otherval}")
+    public String nonExistingPagee(Model model, @PathVariable("otherval") String otherval) throws Exception {
+        throw new FileNotFoundException("Tried to access non-existing page: " + otherval);
+    }
 
-	@ExceptionHandler
-	@ResponseBody
-	public ModelAndView handleException(HttpServletRequest req, Exception ex) {
-		ModelAndView mav = new ModelAndView();
-		mav.addObject("exception", ex);
-		mav.addObject("stacktrace", ex.getStackTrace());
-		mav.addObject("url", req.getRequestURL());
-		mav.setViewName("error");
-		mav.addObject("appName", "Error NFSSoundtrack.com");
-		mav.addObject("series", serieService.findAllSortedByPositionAsc());
-		return mav;
-	}
-
-	public <T> ObjectMapper getObjectMapper(Class<? extends T> type, JsonSerializer<T> ser)
-			throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		SimpleModule simpleModule = new SimpleModule();
-		simpleModule.addSerializer(type, ser);
-		objectMapper.registerModule(simpleModule);
-		return objectMapper;
-	}
 }

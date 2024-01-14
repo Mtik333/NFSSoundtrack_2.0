@@ -264,6 +264,10 @@ footer div{
     margin: 0vw auto;
     padding: 1vw;
 }
+html[data-bs-theme="dark"] #topNavbar{
+    background-color: #262424 !important;
+}
+
 
 @media screen and (max-width: 600px) {
 
@@ -542,6 +546,13 @@ footer div{
 
 }
 
+@media screen and (max-width: 400px) {
+
+  img.img-responsive-global-logo {
+    max-height: 6vw;
+    margin: 0.3vw;
+  }
+}
 /*
 This is for JQuery Autocomplete stuff
 */

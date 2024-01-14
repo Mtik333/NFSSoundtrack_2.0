@@ -11,19 +11,19 @@ import java.util.Optional;
 @Service
 public class SubgroupService {
 
-	@Autowired
-	SubgroupRepository subgroupRepository;
+    @Autowired
+    SubgroupRepository subgroupRepository;
 
-	public Optional<Subgroup> findById(int id) {
-		return subgroupRepository.findById(id);
-	}
+    public Optional<Subgroup> findById(int id) {
+        return subgroupRepository.findById(id);
+    }
 
-	public Subgroup save(Subgroup subgroup) {
-		return subgroupRepository.save(subgroup);
-	}
+    public Subgroup save(Subgroup subgroup) {
+        return subgroupRepository.save(subgroup);
+    }
 
-	public void deleteAllInBatch(List<Subgroup> songSubgroupList) {
-		subgroupRepository.deleteAllInBatch(songSubgroupList);
-	}
+    public void deleteAllInBatch(List<Subgroup> songSubgroupList) {
+        subgroupRepository.deleteAllInBatch(songSubgroupList);
+    }
 
 }

@@ -86,8 +86,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Bean
     @Cacheable("discoGSMap")
     public Map<Author, DiscoGSObj> discoGSObjMap() {
-        Map<Author, DiscoGSObj> cachedMap = new HashMap<>();
-        return cachedMap;
+        return new HashMap<>();
     }
 
 }

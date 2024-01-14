@@ -13,34 +13,34 @@ import java.util.List;
 @Service
 public class SongGenreService {
 
-	@Autowired
-	SongGenreRepository songGenreRepository;
+    @Autowired
+    SongGenreRepository songGenreRepository;
 
-	public List<SongGenre> findByGenre(Genre genre) {
-		return songGenreRepository.findByGenre(genre);
-	}
+    public List<SongGenre> findByGenre(Genre genre) {
+        return songGenreRepository.findByGenre(genre);
+    }
 
-	public List<SongGenre> findByGenre(Genre genre, int page) {
-		return songGenreRepository.findByGenre(genre, Pageable.ofSize(page));
-	}
+    public List<SongGenre> findByGenre(Genre genre, int page) {
+        return songGenreRepository.findByGenre(genre, Pageable.ofSize(page));
+    }
 
-	public List<SongGenre> findBySong(Song song) {
-		return songGenreRepository.findBySong(song);
-	}
+    public List<SongGenre> findBySong(Song song) {
+        return songGenreRepository.findBySong(song);
+    }
 
-	public SongGenre save(SongGenre songGenre) {
-		return songGenreRepository.save(songGenre);
-	}
+    public SongGenre save(SongGenre songGenre) {
+        return songGenreRepository.save(songGenre);
+    }
 
-	public void delete(SongGenre songGenre) {
-		songGenreRepository.delete(songGenre);
-	}
+    public void delete(SongGenre songGenre) {
+        songGenreRepository.delete(songGenre);
+    }
 
-	public List<SongGenre> saveAll(List<SongGenre> songGenres) {
-		return songGenreRepository.saveAll(songGenres);
-	}
+    public List<SongGenre> saveAll(List<SongGenre> songGenres) {
+        return songGenreRepository.saveAll(songGenres);
+    }
 
-	public void deleteAll(List<SongGenre> songGenres) {
-		songGenreRepository.deleteAll(songGenres);
-	}
+    public void deleteAll(List<SongGenre> songGenres) {
+        songGenreRepository.deleteAll(songGenres);
+    }
 }

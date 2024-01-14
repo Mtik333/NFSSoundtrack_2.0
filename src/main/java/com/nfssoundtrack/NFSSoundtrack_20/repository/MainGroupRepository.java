@@ -10,10 +10,7 @@ import java.util.List;
 @Repository
 public interface MainGroupRepository extends JpaRepository<MainGroup, Integer> {
 
-//    List<MainGroup> findByGameId(Long game);
 
-	List<MainGroup> findAll();
-
-	@EntityGraph(value = "MainGroup.subgroups")
-	List<MainGroup> findByIdNotNull();
+    @EntityGraph(value = "MainGroup.subgroups")
+    List<MainGroup> findByIdNotNull();
 }

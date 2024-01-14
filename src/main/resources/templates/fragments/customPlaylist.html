@@ -13,16 +13,16 @@
     </div>
     <div class="tabbable boxed parentTabs">
         <table id="customPlaylistStuff" class="table table-hover table-striped playlist_table sortable-table">
+            <colgroup>
+                <col class="playlist-id" />
+                <col class="playlist-info_button" />
+                <col class="playlist-countries" />
+                <col class="playlist-band" />
+                <col class="playlist-songtitle" />
+                <col class="playlist-genre" />
+                <col class="playlist-actions" />
+            </colgroup>
             <thead>
-                <colgroup>
-                    <col class="playlist-id" />
-                    <col class="playlist-info_button" />
-                    <col class="playlist-countries" />
-                    <col class="playlist-band" />
-                    <col class="playlist-songtitle" />
-                    <col class="playlist-genre" />
-                    <col class="playlist-actions" />
-                </colgroup>
                 <tr>
                     <th class="game_content_th" scope="col" th:text="#{id}"></th>
                     <th class="game_content_th no-sort"></th>

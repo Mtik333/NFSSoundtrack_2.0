@@ -2,9 +2,12 @@ package com.nfssoundtrack.NFSSoundtrack_20.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nfssoundtrack.NFSSoundtrack_20.controllers.ArtistController;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
 import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.AuthorRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
@@ -22,6 +25,8 @@ import java.util.*;
 
 @Service
 public class AuthorService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthorService.class);
 
     @Autowired
     AuthorRepository authorRepository;
@@ -69,13 +74,12 @@ public class AuthorService {
                 discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
                 discoGSObjMap.put(author, discoGSObj);
             } else {
-                discoGSObj = new DiscoGSObj(null, author.getName() + " not found in DiscoGS database");
+                discoGSObj = new DiscoGSObj(null, author.getName() + " not found in DiscoGS database " +
+                        "or there was some internal error - you might reach out to admin so he can double check");
                 discoGSObjMap.put(author, discoGSObj);
             }
-            return discoGSObj;
-        } else {
-            return discoGSObj;
         }
+        return discoGSObj;
     }
 
     private Integer retrieveArtistId(String authorName) throws JsonProcessingException {
@@ -109,6 +113,7 @@ public class AuthorService {
     }
 
     private DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws JsonProcessingException {
+        try {
         RestTemplate restTemplate = new RestTemplate();
         String uri2 = "https://api.discogs.com/artists/" + id;
         HttpEntity<String> entity = entityToGet();
@@ -144,15 +149,19 @@ public class AuthorService {
                     discoGSObj.setWikipedia(localUrl);
                 }
             }
+            }
+            return discoGSObj;
+        } catch (Exception exp){
+            logger.error("what exception? " + exp.getMessage());
+            exp.printStackTrace();
+            return null;
         }
-        return discoGSObj;
     }
 
     private HttpEntity<String> entityToGet() {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.add("user-agent", "NFSSoundtrack/1.0 +https://nfssoundtrack.com");
-        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-        return entity;
+        return new HttpEntity<>("parameters", headers);
     }
 }

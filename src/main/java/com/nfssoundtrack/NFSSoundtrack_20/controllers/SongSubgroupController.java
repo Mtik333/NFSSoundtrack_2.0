@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import com.nfssoundtrack.NFSSoundtrack_20.deserializers.SongDeserializer;
 import com.nfssoundtrack.NFSSoundtrack_20.deserializers.SongSubgroupDeserializer;
+import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             long songSubgroupId = Long.parseLong(String.valueOf(linkedHashMap.get("songSubgroupId")));
             Long position = Long.parseLong(String.valueOf(linkedHashMap.get("position")));
             SongSubgroup songSubgroup =
-                    songSubgroupService.findById(Math.toIntExact(songSubgroupId)).orElseThrow(() -> new Exception("no" +
+                    songSubgroupService.findById(Math.toIntExact(songSubgroupId)).orElseThrow(() -> new ResourceNotFoundException("no" +
                             " songsubgroup found with id " + subgroupId));
             songSubgroup.setPosition(position);
             songSubgroupService.save(songSubgroup);
@@ -55,7 +56,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
     String putSubgroup(@PathVariable("subgroupId") int subgroupId, @RequestBody String formData)
             throws JsonProcessingException {
         try {
-            SongSubgroup songSubgroup = songSubgroupService.findById(subgroupId).orElseThrow(() -> new Exception(
+            SongSubgroup songSubgroup = songSubgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException(
                     "No songsubgroup found with id " + subgroupId));
             SimpleModule module = new SimpleModule();
             ObjectMapper objectMapper = new ObjectMapper();
@@ -78,9 +79,10 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 mainComposer.setName(newAuthor);
                 mainComposer = authorService.save(mainComposer);
                 composerAlias = new AuthorAlias(mainComposer, newAuthor);
+                authorAliasService.save(composerAlias);
             } else {
                 Author author =
-                        authorService.findById(Integer.parseInt(authorId)).orElseThrow(() -> new Exception("No author" +
+                        authorService.findById(Integer.parseInt(authorId)).orElseThrow(() -> new ResourceNotFoundException("No author" +
                                 " find id found " + authorId));
                 if (mainAliasId.startsWith("NEW")) {
                     String newAlias = mainAliasId.replace("NEW-", "");
@@ -88,7 +90,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                     composerAlias = authorAliasService.save(composerAlias);
                 } else {
                     composerAlias = authorAliasService.findById(Integer.parseInt(mainAliasId)).orElseThrow(
-                            () -> new Exception("No author" +
+                            () -> new ResourceNotFoundException("No author" +
                                     " find id found " + mainAliasId));
                 }
                 List<AuthorSong> authorSongList = relatedSong.getAuthorSongList();
@@ -134,7 +136,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         ObjectMapper objectMapper = new ObjectMapper();
         SongSubgroup songSubgroup =
                 songSubgroupService.findById(songSubgroupId).orElseThrow(() ->
-                        new Exception("No subgroup with id found " + songSubgroupId));
+                        new ResourceNotFoundException("No subgroup with id found " + songSubgroupId));
         return objectMapper.writeValueAsString(songSubgroup);
     }
 
@@ -143,7 +145,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
     String deleteSongSubgroup(@PathVariable("subgroupId") int subgroupId) throws JsonProcessingException {
         try {
             SongSubgroup songSubgroup =
-                    songSubgroupService.findById(subgroupId).orElseThrow(() -> new Exception("No subgroup found " +
+                    songSubgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No subgroup found " +
                             "with id " + subgroupId));
             Song song = songSubgroup.getSong();
             List<SongSubgroup> allSongSubgroupEntries = songSubgroupService.findBySong(song);
@@ -201,7 +203,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
     String putGlobally(@PathVariable("subgroupId") int subgroupId,
                        @RequestBody String formData) throws JsonProcessingException {
         try {
-            SongSubgroup songSubgroup = songSubgroupService.findById(subgroupId).orElseThrow(() -> new Exception(
+            SongSubgroup songSubgroup = songSubgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException(
                     "No song subgroup with id found " + subgroupId));
             Song relatedSong = songSubgroup.getSong();
             SimpleModule module = new SimpleModule();
@@ -214,8 +216,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             List<String> comingGenres = localObjectMapper.keySet().stream().filter(
                     o -> o.contains("genreSelect")).toList();
             for (String comingGenre : comingGenres) {
-                String keyGenre = comingGenre;
-                String genreValue = localObjectMapper.get(keyGenre);
+                String genreValue = localObjectMapper.get(comingGenre);
                 if (genreValue.startsWith("NEW")) {
                     String actualGenreValue = genreValue.replace("NEW-", "");
                     Genre genre = new Genre();
@@ -226,7 +227,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 } else if (genreValue.startsWith("DELETE")) {
                     String deleteGenreId = genreValue.replace("DELETE-", "");
                     Genre genre = genreService.findById(Integer.parseInt(deleteGenreId))
-                            .orElseThrow(() -> new Exception("No genre found with id " + deleteGenreId));
+                            .orElseThrow(() -> new ResourceNotFoundException("No genre found with id " + deleteGenreId));
                     List<SongGenre> existingGenres = songSubgroup.getSong().getSongGenreList();
                     for (SongGenre songGenre : existingGenres) {
                         if (songGenre.getGenre().equals(genre)) {
@@ -248,7 +249,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
     @PostMapping(value = "/post/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     String postNewSong(@PathVariable("subgroupId") int subgroupId, @RequestBody String formData) throws Exception {
-        Subgroup subgroup = subgroupService.findById(subgroupId).orElseThrow(() -> new Exception("No song " +
+        Subgroup subgroup = subgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No song " +
                 "subgroup found with id " + subgroupId));
         ObjectMapper songSubgroupObjectMapper = new ObjectMapper();
         SimpleModule subgroupModule = new SimpleModule();
@@ -281,14 +282,14 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 composerAlias = authorAliasService.save(composerAlias);
             } else {
                 Author author = authorService.findById(Integer.parseInt(authorId))
-                        .orElseThrow(() -> new Exception("No author with id found " + authorId));
+                        .orElseThrow(() -> new ResourceNotFoundException("No author with id found " + authorId));
                 if (mainAliasId.startsWith("NEW")) {
                     String newAlias = mainAliasId.replace("NEW-", "");
                     composerAlias = new AuthorAlias(author, newAlias);
                     composerAlias = authorAliasService.save(composerAlias);
                 } else {
                     composerAlias = authorAliasService.findById(Integer.parseInt(mainAliasId))
-                            .orElseThrow(() -> new Exception("No alias found with id " + mainAliasId));
+                            .orElseThrow(() -> new ResourceNotFoundException("No alias found with id " + mainAliasId));
                 }
             }
             AuthorSong authorSong = new AuthorSong(composerAlias, songSubgroup.getSong(), Role.COMPOSER);
@@ -311,8 +312,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             List<String> comingGenres = objectMapper.keySet().stream().filter(
                     o -> o.contains("genreSelect")).toList();
             for (String comingGenre : comingGenres) {
-                String keyGenre = comingGenre;
-                String genreValue = objectMapper.get(keyGenre);
+                String genreValue = objectMapper.get(comingGenre);
                 if (genreValue.startsWith("NEW")) {
                     String actualGenreValue = genreValue.replace("NEW-", "");
                     Genre genre = new Genre();

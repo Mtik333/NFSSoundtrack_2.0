@@ -21,36 +21,34 @@ import java.util.Optional;
 @RequestMapping(path = "/genre")
 public class GenreController extends BaseControllerWithErrorHandling {
 
-	private static final Logger logger = LoggerFactory.getLogger(GenreController.class);
+    private static final Logger logger = LoggerFactory.getLogger(GenreController.class);
 
-	@Autowired
-	GenreSerializer genreSerializer;
+    @Autowired
+    GenreSerializer genreSerializer;
 
-	@GetMapping(value = "/genreName/{input}")
-	public @ResponseBody
-	String readAliases(@PathVariable("input") String input) throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
-		if (input.isEmpty()) {
-			return objectMapper.writeValueAsString(null);
-		}
-		SimpleModule simpleModule = new SimpleModule();
-		simpleModule.addSerializer(Genre.class, genreSerializer);
-		objectMapper.registerModule(simpleModule);
-		if (input.length() <= 3) {
-			Optional<Genre> genre = genreService.findByGenreName(input);
-			if (genre.isEmpty()) {
-				return objectMapper.writeValueAsString(null);
-			}
-			String result = objectMapper.writeValueAsString(Collections.singleton(genre.get()));
-			return result;
-		} else {
-			List<Genre> genreList = genreService.findByGenreNameContains(input);
-			if (genreList == null) {
-				return objectMapper.writeValueAsString(null);
-			}
-			String result = objectMapper.writeValueAsString(genreList);
-			return result;
-		}
-	}
+    @GetMapping(value = "/genreName/{input}")
+    public @ResponseBody
+    String readAliases(@PathVariable("input") String input) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (input.isEmpty()) {
+            return objectMapper.writeValueAsString(null);
+        }
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(Genre.class, genreSerializer);
+        objectMapper.registerModule(simpleModule);
+        if (input.length() <= 3) {
+            Optional<Genre> genre = genreService.findByGenreName(input);
+            if (genre.isEmpty()) {
+                return objectMapper.writeValueAsString(null);
+            }
+            return objectMapper.writeValueAsString(Collections.singleton(genre.get()));
+        } else {
+            List<Genre> genreList = genreService.findByGenreNameContains(input);
+            if (genreList == null) {
+                return objectMapper.writeValueAsString(null);
+            }
+            return objectMapper.writeValueAsString(genreList);
+        }
+    }
 
 }

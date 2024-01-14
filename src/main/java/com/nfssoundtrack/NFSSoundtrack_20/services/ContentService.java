@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ContentService {
 
-	@Autowired
-	ContentRepository contentRepository;
+    @Autowired
+    ContentRepository contentRepository;
 
-	public Content findByContentShort(String contentShort) {
-		return contentRepository.findByContentShort(contentShort);
-	}
+    public Content findByContentShort(String contentShort) {
+        return contentRepository.findByContentShort(contentShort);
+    }
 }
