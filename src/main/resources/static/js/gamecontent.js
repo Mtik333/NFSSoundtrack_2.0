@@ -142,4 +142,11 @@ $(document).ready(function () {
         $(div).find("button").first().click();
         activeSubgroups = 1;
     });
+
+    //when loading list of songs, we want to trigger main group by default
+    var firstGameGroup = $('a.gamegroup:first')[0];
+    if (firstGameGroup != null) {
+        $(firstGameGroup).first().click();
+        //we have to hit first subgroup in main group to have stuff displayed
+    }
 });

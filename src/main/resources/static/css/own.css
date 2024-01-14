@@ -3,6 +3,11 @@ img.img-responsive-global-logo {
   margin: 0.1vw;
 }
 
+  img.img-responsive-website-logo {
+  max-height: 5vw;
+  margin: 0.1vw;
+  }
+
 img.img-responsive-song-info {
   max-height: 3vw;
   margin: 0.05vw;
@@ -262,8 +267,12 @@ footer div{
 
 @media screen and (max-width: 600px) {
 
+  img.img-responsive-website-logo {
+    max-height: 7vw;
+    margin: 0.3vw;
+  }
   img.img-responsive-global-logo {
-    max-height: 10vw;
+    max-height: 7vw;
     margin: 0.3vw;
   }
 
