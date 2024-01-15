@@ -159,7 +159,7 @@
                                                 th:attr="data-tagVideo='https://www.youtube.com/embed/'+${songSubgroup.srcId}"
                                                 th:src="@{/images/znakwodny.png}">
                                         </th:block>
-                                        <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
+                                        <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                                         <th:block th:if="${songSubgroup.spotifyId != null}">
                                             <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">
                                                 <img class="img-responsive-row-icon"

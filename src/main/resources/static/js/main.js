@@ -10,6 +10,10 @@ var activeSubgroups;
  * curently played video in video modal
  */
 var baseVideoSrc;
+/**
+ * for mobile trying to remember last clicked play button to de-activate it again
+ */
+var lastActivePlayButton;
 $(document).ready(function () {
     //we make top menu button active
     if (window.location.href.indexOf("/home") > -1) {
@@ -90,6 +94,23 @@ $(document).ready(function () {
      * method to handle clicking on 'play' button
      */
     $(".play_icon").on("click", function () {
+        var sameSongClicked = false;
+        if(window.matchMedia("(pointer: coarse)").matches) {
+            let newSrc = $(this).attr("src").replace("znakwodny", "znakwodny2");
+            $(this).attr("src", newSrc);
+        }
+        if (lastActivePlayButton != null) {
+            let lastActiveSrc = lastActivePlayButton.attr("src").replace("znakwodny2", "znakwodny");
+            lastActivePlayButton.attr("src",lastActiveSrc); 
+            if ($(this).attr("data-tagVideo")
+                .localeCompare(lastActivePlayButton.attr("data-tagVideo"))==0) {
+                sameSongClicked = true;
+            }
+            lastActivePlayButton = $(this);
+        }
+        else {
+            lastActivePlayButton = $(this);
+        }
         var useRowDisplay = localStorage.getItem("video-rendering-stuff");
         //if user wants to have video in a 'row'
         if (useRowDisplay == undefined || useRowDisplay == "true") {
@@ -97,7 +118,8 @@ $(document).ready(function () {
             var existingTr = $("#listen-music");
             if (existingTr.length != 0) {
                 existingTr.remove();
-            } else {
+            }
+            if (!sameSongClicked) {
                 //then we create row with video and lyris
                 var videoToUse = $(this).attr("data-tagvideo");
                 var lyricsText = $(this).next().text();
@@ -109,13 +131,17 @@ $(document).ready(function () {
                 var clearDiv = $('<div style="clear:both;">');
                 var pElem = $('<p>');
                 iframeToPut.attr("src", videoToUse + "?autoplay=1&amp;autohide=0&amp;theme=light&amp;wmode=transparent");
-                pElem.text(lyricsText);
+                pElem.append(lyricsText);
                 lyricsDiv.append(pElem);
                 newTd.append(iframeToPut);
                 newTd.append(lyricsDiv);
                 newTd.append(clearDiv);
                 newTr.append(newTd);
                 newTr.insertAfter(parentTr);
+            } else {
+                let newSrc = $(this).attr("src").replace("znakwodny2", "znakwodny");
+                $(this).attr("src", newSrc);
+                lastActivePlayButton=null;
             }
         } else {
             //otherwise we render modal with video and show lyrics if there are any
@@ -125,7 +151,7 @@ $(document).ready(function () {
             if (lyricsTxt == "null" || lyricsTxt == "") {
                 $("#showLyrics").text("Lyrics not found");
                 $("#showLyrics").prop("disabled", true);
-            //if lyrics value is 0 then it is instrumental
+                //if lyrics value is 0 then it is instrumental
             } else if (lyricsTxt == "0.0") {
                 $("#showLyrics").text("This is instrumental, no lyrics");
                 $("#showLyrics").prop("disabled", true);
@@ -142,10 +168,14 @@ $(document).ready(function () {
      * method to show 'active' and 'unactive' play button
      */
     $('.play_icon').mouseover(function () {
-        $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
+        if(!window.matchMedia("(pointer: coarse)").matches) {
+            $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
+        }
         // }
     }).mouseout(function () {
-        $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
+        if(!window.matchMedia("(pointer: coarse)").matches) {
+            $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
+        }
     });
 
     /**
@@ -408,7 +438,7 @@ $(document).ready(function () {
         });
     });
 
-    $(document).on("click", "button.justHideAlert", function(e){
+    $(document).on("click", "button.justHideAlert", function (e) {
         e.preventDefault();
         $(this).parent().parent().fadeOut(100);
     });
@@ -418,6 +448,7 @@ $(document).ready(function () {
      */
     $(document).on("click", "img.info-about-song", function () {
         var trElem = $(this).parent().parent();
+        $(this).tooltip('dispose');
         var songIdAttr = $(trElem).attr("data-song_id");
         //we have to call server to provide info about the song
         $("#getAllUsages").attr("href", "/song/" + Number(songIdAttr));
