@@ -3,7 +3,7 @@
         <ul class="navbar-nav mr-auto d-inline ml-2">
             <button class="btn nfs-top-item d-inline p-1" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"
                 role="button">
-                <span data-bs-toggle="offcanvas" data-bs-target="#offcanvas" th:text="#{menu}"></span>
+                <span id="offcanvasSpan" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" th:text="#{menu}"></span>
             </button>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
                 <a class="nav-link d-inline p-1" id="nfs-top-home" th:href="@{/content/home}" th:text="#{home}"></a>
@@ -116,6 +116,16 @@
                             <option value="50">50%</option>
                             <option value="75">75%</option>
                         </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="static-leftmenu" th:text="#{staticLeftMenu}"></label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="static-leftmenu">
+                        </div>
                     </div>
                 </div>
                 <div class="row p-3">

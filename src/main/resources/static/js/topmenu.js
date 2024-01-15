@@ -6,6 +6,7 @@ $(document).ready(function () {
         //putting all stuff to the localstorage and reloading page as someone might have decided to change language
         localStorage.setItem("expandable-width", $("#expandable-width").val());
         localStorage.setItem("scrolling-stuff", $("#scrolling-stuff").prop("checked"));
+        localStorage.setItem("static-leftmenu", $("#static-leftmenu").prop("checked"));
         localStorage.setItem("video-rendering-stuff", $("#video-rendering-stuff").prop("checked"));
         var langAlreadyThere = window.location.toString().indexOf("?lang") > -1;
         if (langAlreadyThere) {

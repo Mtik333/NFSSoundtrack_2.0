@@ -1,4 +1,13 @@
 $(document).ready(function () {
+    function makeLeftMenuStatic() {
+        if (localStorage.getItem("static-leftmenu") == "true") {
+            $("#offcanvas").removeClass("offcanvas");
+            var headerDiv = $("#offcanvas").find(".offcanvas-header")[0];
+            $(headerDiv).css("display", "none");
+            $("#offcanvasSpan").removeAttr("data-bs-toggle");
+        }
+    }
+    makeLeftMenuStatic();
     /**
      * method to show only games that match input filter
      * @param {value typed by user as game title} searchValue 
