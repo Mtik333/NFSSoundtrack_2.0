@@ -15,6 +15,9 @@ import org.springframework.boot.jackson.JsonComponent;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ *
+ */
 @JsonComponent
 public class ArtistMgmtSerializer extends JsonSerializer<Author> {
 
@@ -49,5 +52,8 @@ public class ArtistMgmtSerializer extends JsonSerializer<Author> {
         }
         jsonGenerator.writeEndArray();
         jsonGenerator.writeEndObject();
+        if (logger.isDebugEnabled()){
+            logger.debug("resulting json: " + jsonGenerator);
+        }
     }
 }

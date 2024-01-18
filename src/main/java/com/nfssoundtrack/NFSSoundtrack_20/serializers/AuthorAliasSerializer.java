@@ -22,5 +22,8 @@ public class AuthorAliasSerializer extends JsonSerializer<AuthorAlias> {
         jsonGenerator.writeNumberField("value", authorAlias.getId());
         jsonGenerator.writeStringField("label", authorAlias.getAlias());
         jsonGenerator.writeEndObject();
+        if (logger.isDebugEnabled()){
+            logger.debug("resulting json: " + jsonGenerator);
+        }
     }
 }

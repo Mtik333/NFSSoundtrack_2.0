@@ -268,6 +268,13 @@ html[data-bs-theme="dark"] #topNavbar{
     background-color: #262424 !important;
 }
 
+td.info_button{
+    min-width: 6vw;
+}
+
+td.actions{
+    width: 11vw;
+}
 
 @media screen and (max-width: 600px) {
 
@@ -544,6 +551,13 @@ html[data-bs-theme="dark"] #topNavbar{
     word-wrap: break-word;
     }
 
+    td.info_button{
+        min-width: 6vw;
+    }
+
+    td.actions{
+        width: 12vw;
+    }
 }
 
 @media screen and (max-width: 400px) {

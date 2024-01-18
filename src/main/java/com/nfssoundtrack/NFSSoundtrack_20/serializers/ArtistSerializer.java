@@ -21,5 +21,8 @@ public class ArtistSerializer extends JsonSerializer<Author> {
         jsonGenerator.writeNumberField("value", author.getId());
         jsonGenerator.writeStringField("label", author.getName());
         jsonGenerator.writeEndObject();
+        if (logger.isDebugEnabled()){
+            logger.debug("resulting json: " + jsonGenerator);
+        }
     }
 }

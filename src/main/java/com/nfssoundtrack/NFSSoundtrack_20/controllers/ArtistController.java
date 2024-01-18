@@ -45,6 +45,9 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 "found " + input));
         Author author = authorSong.getAuthorAlias().getAuthor();
         List<AuthorAlias> authorAliases = authorAliasService.findByAuthor(author);
+        if (logger.isDebugEnabled()){
+            logger.debug("authorSong: " + authorSong + ", author " + author);
+        }
         return objectMapper.writeValueAsString(authorAliases);
     }
 

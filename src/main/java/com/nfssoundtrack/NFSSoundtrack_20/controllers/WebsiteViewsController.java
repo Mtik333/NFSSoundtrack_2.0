@@ -1,5 +1,6 @@
 package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -34,19 +35,30 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     @Value("${spring.application.name}")
     String appName;
 
-    @RequestMapping(value = "/")
-    public String mainPage(Model model) {
+    /**
+     * @return the main 'endpoint' of the website
+     */
+    @GetMapping(value = "/")
+    public String mainPage() {
         return "redirect:/content/home";
     }
 
-    @RequestMapping(value = "/manage/manage")
+    /**
+     * @param model view model
+     * @return endpoint of admin panel
+     */
+    @GetMapping(value = "/manage/manage")
     public String manage(Model model) {
         model.addAttribute("appName", appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         return "manage";
     }
 
-    @RequestMapping(value = "/login")
+    /**
+     * @param model view model
+     * @return endpoint of login
+     */
+    @GetMapping(value = "/login")
     public String login(Model model) {
         model.addAttribute("appName", appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
@@ -54,7 +66,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return "login";
     }
 
-    @RequestMapping(value = "/content/{value}")
+    /**
+     * @param model view model
+     * @param value content_short from 'content' table
+     * @return html for content_short entry
+     */
+    @GetMapping(value = "/content/{value}")
     public String topMenuEntry(Model model, @PathVariable("value") String value) {
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         model.addAttribute("htmlToInject",
@@ -64,7 +81,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return "index";
     }
 
-    @RequestMapping(value = "/game/{gameshort}")
+    /**
+     * @param model     view model
+     * @param gameshort short name from 'game' table
+     * @return whole display of game's soundtrack
+     */
+    @GetMapping(value = "/game/{gameshort}")
     public String game(Model model, @PathVariable("gameshort") String gameshort) {
         Game game = gameService.findByGameShort(gameshort);
         model.addAttribute("endpoint", "/game/" + gameshort);
@@ -76,8 +98,16 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return "index";
     }
 
+    /**
+     * @param model          view model
+     * @param customPlaylist array of song ids, example ["350","357","312","315","410","425","528"]
+     * @return display of custom playlist songs table
+     * @throws ResourceNotFoundException exception when song subgroup not found
+     * @throws JsonProcessingException   exception due to objectmapper
+     */
     @PostMapping(value = "/custom/playlist")
-    public String getCustomPlaylist(Model model, @RequestBody String customPlaylist) throws Exception {
+    public String getCustomPlaylist(Model model, @RequestBody String customPlaylist)
+            throws ResourceNotFoundException, JsonProcessingException {
         List<SongSubgroup> songSubgroupList = new ArrayList<>();
         if (customPlaylist == null || customPlaylist.isEmpty()) {
             logger.error("do something");
@@ -98,9 +128,15 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return "index";
     }
 
+    /**
+     * @param songId id of song to fetch info about
+     * @return whole information about the song
+     * @throws JsonProcessingException   exception due to objectmapper
+     * @throws ResourceNotFoundException when song not found by id
+     */
     @GetMapping(value = "/songInfo/{songId}")
     public @ResponseBody
-    String provideSongModalInfo(@PathVariable("songId") int songId) throws Exception {
+    String provideSongModalInfo(@PathVariable("songId") int songId) throws JsonProcessingException, ResourceNotFoundException {
         Song song = songService.findById(songId).orElseThrow(() -> new ResourceNotFoundException("No song with id found " + songId));
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
@@ -113,8 +149,14 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return result;
     }
 
+    /**
+     * @param model  view model
+     * @param songId id of song to fetch usages of it
+     * @return table with usages of the song across all games
+     * @throws ResourceNotFoundException exception when song is not found
+     */
     @GetMapping(value = "/song/{songId}")
-    public String provideSongInfo(Model model, @PathVariable("songId") String songId) throws Exception {
+    public String provideSongInfo(Model model, @PathVariable("songId") String songId) throws ResourceNotFoundException {
         Song song = songService.findById(Integer.valueOf(songId)).orElseThrow(() -> new ResourceNotFoundException("No song found with id " + songId));
         model.addAttribute("appName", song.getOfficialDisplayBand()
                 + " - " + song.getOfficialDisplayTitle() + " - " + appName);
@@ -124,8 +166,15 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return "index";
     }
 
+    /**
+     * @param model    view model
+     * @param authorId id of author to fetch info about
+     * @return table with all songs where author is being part of
+     * @throws ResourceNotFoundException author not found by id
+     * @throws JsonProcessingException   exception due to objectmapper
+     */
     @GetMapping(value = "/author/{authorId}")
-    public String readAuthor(Model model, @PathVariable("authorId") int authorId) throws Exception {
+    public String readAuthor(Model model, @PathVariable("authorId") int authorId) throws ResourceNotFoundException, JsonProcessingException {
         Author author =
                 authorService.findById(authorId).orElseThrow(
                         () -> new ResourceNotFoundException("No author found with id " + authorId));
@@ -163,8 +212,14 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return "index";
     }
 
+    /**
+     * @param model   view model
+     * @param genreId id of genre
+     * @return table with songs associated with genre (limited to 50 entries)
+     * @throws ResourceNotFoundException when genre with this id not found
+     */
     @GetMapping(value = "/genre/{genreId}")
-    public String readGenreInfo(Model model, @PathVariable("genreId") int genreId) throws Exception {
+    public String readGenreInfo(Model model, @PathVariable("genreId") int genreId) throws ResourceNotFoundException {
         Genre genre =
                 genreService.findById(genreId).orElseThrow(() -> new ResourceNotFoundException("No genre found with id " + genreId));
         List<SongGenre> songGenreList = songGenreService.findByGenre(genre, 50);
@@ -178,8 +233,14 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return "index";
     }
 
+    /**
+     * @param model   view model
+     * @param genreId id of genre
+     * @return table with songs associated with genre
+     * @throws ResourceNotFoundException when genre with this id not found
+     */
     @GetMapping(value = "/genre/readfull/{genreId}")
-    public String readGenreInfoFull(Model model, @PathVariable("genreId") int genreId) throws Exception {
+    public String readGenreInfoFull(Model model, @PathVariable("genreId") int genreId) throws ResourceNotFoundException {
         Genre genre =
                 genreService.findById(genreId).orElseThrow(() -> new ResourceNotFoundException("No genre found with id " + genreId));
         List<SongGenre> songGenreList = songGenreService.findByGenre(genre);
