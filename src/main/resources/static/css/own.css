@@ -1,6 +1,7 @@
 img.img-responsive-global-logo {
   max-height: 5vw;
   margin: 0.1vw;
+  padding: 0.2vw;
 }
 
   img.img-responsive-website-logo {
@@ -276,6 +277,26 @@ td.actions{
     width: 11vw;
 }
 
+div.context_menu_hide{
+    display: none;
+}
+
+/**
+menu.song_item {
+    position:absolute;
+    display:block;
+    left:0px;
+        top:0px;
+        height:20px;
+        width:20px;
+        padding:0;
+        margin:0;
+        border:1px solid;
+        background-color:white;
+        font-weight:normal;
+        white-space:nowrap;
+}
+*/
 @media screen and (max-width: 600px) {
 
   img.img-responsive-website-logo {
@@ -363,8 +384,14 @@ td.actions{
   .tooltip {
     font-size: 2.5vw;
   }
-
+/**
   #game_stuff col.info_button {
+    width: 10%;
+  }
+*/
+
+
+  #game_stuff col.contextButton {
     width: 10%;
   }
 
@@ -387,6 +414,7 @@ td.actions{
   #game_stuff col.infowarn {
     width: 10%;
   }
+
 
   #game_stuff col.countries {
     display: none;
@@ -558,6 +586,23 @@ td.actions{
     td.actions{
         width: 12vw;
     }
+
+    div.context_menu_show{
+        z-index: 1000;
+        position: absolute;
+        display: block;
+        list-style-type: none;
+        list-style: none;
+        border:1px solid;
+    }
+    ul.actions_menu{
+        margin-bottom: 0;
+        padding-left: 0;
+    }
+    .single_action{
+        font-size: 3vw;
+    }
+
 }
 
 @media screen and (max-width: 400px) {

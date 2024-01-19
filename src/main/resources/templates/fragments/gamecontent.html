@@ -55,6 +55,7 @@
         </th:block>
         <table id="game_stuff" class="table table-hover table-striped playlist_table">
             <colgroup>
+                <col class="contextButton"/>
                 <col class="info_button" />
                 <col class="countries" />
                 <col class="band" />
@@ -65,13 +66,14 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th class="game_content_th" scope="col"></th>
+                    <th class="game_content_th contextButton" scope="col"></th>
+                    <th class="game_content_th info_button" scope="col"></th>
                     <th class="game_content_th countries" scope="col" th:text="#{country}"></th>
                     <th class="game_content_th" scope="col" th:text="#{band}"></th>
                     <th class="game_content_th" scope="col" th:text="#{song}"></th>
                     <th class="game_content_th" scope="col" th:text="#{genre}"></th>
                     <th class="game_content_th" scope="col"></th>
-                    <th class="game_content_th" scope="col"></th>
+                    <th class="game_content_th infowarn" scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -80,12 +82,17 @@
                         <th:block th:if="${gamegroup.groupName != 'All'}">
                             <tr class="subgroup-separator table-primary"
                                 th:attr="data-group_id=${gamegroup.id},data-el_id='songSubgroup'+${subgroup.id}">
-                                <td colspan="7"
+                                <td class="subgroup-separator-td" colspan="7"
                                     th:attr="data-el_id='songSubgroup'+${subgroup.id},data-group_id=${gamegroup.id}"
                                     th:text="${gamegroup.groupName} + ' - ' + ${subgroup.subgroupName}"></td>
                             </tr>
                             <tr th:each="songSubgroup : ${subgroup.songSubgroupList}"
                                 th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
+                                <td class="contextButton">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor" class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
+                                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                      </svg>
+                                </td>
                                 <td class="info_button">
                                     <img class="img-responsive-row-icon add-to-custom-playlist pointable"
                                         data-toggle="tooltip" data-placement="right" th:title="#{addToPlaylist}"
@@ -322,4 +329,14 @@
         <button type="button" class="btn-close justHideAlert" data-bs-theme="light" data-bs-hide="alert" aria-label="Close"></button>
     </div>
 </div>
+<div class="dropdown-menu dropdown-menu-sm" id="mobile_context">
+    <ul id="ul_actions_menu" class="actions_menu">
+        <li id="mobileAddToPlaylist" class="dropdown-item single_action" th:text="#{addToPlaylist}"></li>
+        <li id="mobileShowSongInfo" class="dropdown-item single_action" th:text="#{showInfo}"></li>
+        <a id="mobileLaunchSpotify" class="dropdown-item single_action" th:text="#{launchInSpotify}"></a>
+        <a id="mobileLaunchItunes" class="dropdown-item single_action" th:text="#{openITunes}"></a>
+        <a id="mobileLaunchDeezer" class="dropdown-item single_action" th:text="#{launchInDeezer}"></a>
+    </ul>
+</div>
+
 <script th:src="@{/js/gamecontent.js}" type="application/javascript"></script>

@@ -74,6 +74,19 @@ $(document).ready(function () {
         });
     }
 
+    if ('ontouchstart' in window){
+        $("td.info_button").css("display","none");
+        $("th.info_button").css("display","none");
+        $("col.info_button").css("display","none");
+        $("a.a-external-music-link").css("display","none");
+        var currentColspan = $("td.subgroup-separator-td").attr("colspan");
+        $("td.subgroup-separator-td").attr("colspan", currentColspan-1);
+        $("td.info_button").css("display","none");
+    } else {
+        $("td.contextButton").css("display","none");
+        $("th.contextButton").css("display","none");
+        $("col.contextButton").css("display","none");
+    }
     /**
      * method to remove duplicate countries from column because i couldn't develop it on backend in a way to return only distinct countries
      */
@@ -95,15 +108,15 @@ $(document).ready(function () {
      */
     $(".play_icon").on("click", function () {
         var sameSongClicked = false;
-        if(window.matchMedia("(pointer: coarse)").matches) {
+        if (window.matchMedia("(pointer: coarse)").matches) {
             let newSrc = $(this).attr("src").replace("znakwodny", "znakwodny2");
             $(this).attr("src", newSrc);
         }
         if (lastActivePlayButton != null) {
             let lastActiveSrc = lastActivePlayButton.attr("src").replace("znakwodny2", "znakwodny");
-            lastActivePlayButton.attr("src",lastActiveSrc); 
+            lastActivePlayButton.attr("src", lastActiveSrc);
             if ($(this).attr("data-tagVideo")
-                .localeCompare(lastActivePlayButton.attr("data-tagVideo"))==0) {
+                .localeCompare(lastActivePlayButton.attr("data-tagVideo")) == 0) {
                 sameSongClicked = true;
             }
             lastActivePlayButton = $(this);
@@ -141,7 +154,7 @@ $(document).ready(function () {
             } else {
                 let newSrc = $(this).attr("src").replace("znakwodny2", "znakwodny");
                 $(this).attr("src", newSrc);
-                lastActivePlayButton=null;
+                lastActivePlayButton = null;
             }
         } else {
             //otherwise we render modal with video and show lyrics if there are any
@@ -168,12 +181,12 @@ $(document).ready(function () {
      * method to show 'active' and 'unactive' play button
      */
     $('.play_icon').mouseover(function () {
-        if(!window.matchMedia("(pointer: coarse)").matches) {
+        if (!window.matchMedia("(pointer: coarse)").matches) {
             $(this).attr("src", $(this).attr("src").replace("znakwodny", "znakwodny2"));
         }
         // }
     }).mouseout(function () {
-        if(!window.matchMedia("(pointer: coarse)").matches) {
+        if (!window.matchMedia("(pointer: coarse)").matches) {
             $(this).attr("src", $(this).attr("src").replace("znakwodny2", "znakwodny"));
         }
     });
@@ -252,21 +265,25 @@ $(document).ready(function () {
          * if disqus was not yet loaded we load it by injecting this javascript inside
          */
         if ($("#disqus_thread").children().length == 0) {
-            var script = document.createElement('script');
-            script.innerHTML = "var disqus_config = function () {     this.page.url = '" + linkToUse + "';  }; (function () {  var d = document, s = d.createElement('script'); s.src = 'https://"+srcToUse+".disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date());(d.head || d.body).appendChild(s);})();";
-            var noscript = document.createElement('noscript');
-            noscript.innerHTML = 'Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>';
-            $(this).append(script);
-            $(this).append(noscript);
-        } else {
-            //otherwise we reload it just for safety to be sure the right link is used
-            DISQUS.reset({
-                reload: true,
-                config: function () {
-                    this.page.url = linkToUse;
-                }
-            });
+            $("#disqus_thread").empty();
+            $("#disqus_recommendations").remove();
         }
+        var script = document.createElement('script');
+        script.innerHTML = "var disqus_config = function () {     this.page.url = '" + linkToUse + "';  }; (function () {  var d = document, s = d.createElement('script'); s.src = 'https://" + srcToUse + ".disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date());(d.head || d.body).appendChild(s);})();";
+        var noscript = document.createElement('noscript');
+        noscript.innerHTML = 'Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>';
+        $(this).append(script);
+        $(this).append(noscript);
+        // else {
+        //     //otherwise we reload it just for safety to be sure the right link is used
+        //     DISQUS.reset({
+        //         reload: true,
+        //         config: function () {
+        //             this.page.identifier = 'racingsoundtracks'
+        //             this.page.url = linkToUse;
+        //         }
+        //     });
+        // }
     });
 
     /**
@@ -416,7 +433,12 @@ $(document).ready(function () {
      * function to handle adding song to custom playlist
      */
     $(document).on("click", "img.add-to-custom-playlist", function () {
-        //fetching custom playlist info from local storage
+        var relatedTr = $(this).parent().parent();
+        var songSubgroupId = $(relatedTr).attr("data-songSubgroup-id");
+        addToCustomPlaylist(songSubgroupId);
+    });
+
+    function addToCustomPlaylist(songSubgroupId){
         var customPlaylistArray = localStorage.getItem("custom-playlist");
         if (customPlaylistArray == undefined) {
             customPlaylistArray = [];
@@ -425,8 +447,6 @@ $(document).ready(function () {
             customPlaylistArray = JSON.parse(customPlaylistArray);
         }
         //we check the id of song we want to add to custom playlist
-        var relatedTr = $(this).parent().parent();
-        var songSubgroupId = $(relatedTr).attr("data-songSubgroup-id");
         customPlaylistArray.push(songSubgroupId);
         var jsonEdArray = JSON.stringify(customPlaylistArray);
         //and then we simply store it in playlist + show confirmation alert that it worked
@@ -439,7 +459,7 @@ $(document).ready(function () {
                 $("#successAddToCustomPlaylist").parent().fadeOut(500);
             }, 3000);
         });
-    });
+    }
 
     $(document).on("click", "button.justHideAlert", function (e) {
         e.preventDefault();
@@ -453,8 +473,17 @@ $(document).ready(function () {
         var trElem = $(this).parent().parent();
         $(this).tooltip('dispose');
         var songIdAttr = $(trElem).attr("data-song_id");
-        //we have to call server to provide info about the song
+        var additionalInfoA = $(trElem).find("td.infowarn>a");
+        var infoLabel=null;
+        if (additionalInfoA.length>0){
+            infoLabel = additionalInfoA.attr("aria-label");
+        }
+        fetchInfoSong(songIdAttr,infoLabel);
+    });
+
+    function fetchInfoSong(songIdAttr, infoLabel){
         $("#getAllUsages").attr("href", "/song/" + Number(songIdAttr));
+        //we have to call server to provide info about the song
         $.ajax({
             async: false,
             type: "GET",
@@ -487,6 +516,11 @@ $(document).ready(function () {
                 if (songInfo.youtube != null) {
                     $(songInfo.youtube).insertAfter("#externalLinks");
                 }
+                if (infoLabel!=null) {
+                    var infoSpan = $("<span>");
+                    infoSpan.append(infoLabel);
+                    $(infoSpan).insertAfter("#additionalInfo");
+                }
                 if (songInfo.spotify != null) {
                     $(songInfo.spotify).insertAfter("#externalLinks");
                 }
@@ -508,6 +542,104 @@ $(document).ready(function () {
                 console.log(ooo);
             },
         });
+    }
+
+    // $(document).on("contextmenu", "tr", function (e) {
+    //     if ('ontouchstart' in window){
+    //         e.preventDefault();
+    //     }
+    // });
+
+    $(document).on("touchstart", "svg.context_menu_thing", function (e) {
+        e.preventDefault();
+        var trElem = $(this).parent().parent();
+        var songIdAttr = $(trElem).attr("data-song_id");
+        var songSubgroupIdAttr = $(trElem).attr("data-songsubgroup-id");
+        var externalLinks = $(trElem).find("a.a-external-music-link");
+        $("#mobileAddToPlaylist").attr("data-songsubgroup-id", songSubgroupIdAttr);
+        $("#mobileShowSongInfo").attr("data-song_id", songIdAttr);
+        var additionalInfoA = $(trElem).find("td.infowarn>a");
+        var infoLabel=null;
+        if (additionalInfoA.length>0){
+            infoLabel = additionalInfoA.attr("aria-label");
+            $("#mobileShowSongInfo").attr("infoLabel", infoLabel);
+        }
+        var spotifyElem=null;
+        var deezerElem=null;
+        var itunesElem=null;
+        for (let i=0; i<externalLinks.length; i++){
+            var actualAObj = $(externalLinks[i]);
+            if (actualAObj.attr("href").indexOf("spotify:")>-1){
+                spotifyElem = actualAObj;
+            } else if (actualAObj.attr("href").indexOf("deezer")>-1){
+                deezerElem=actualAObj;
+            } else if (actualAObj.attr("href").indexOf("music.apple.com")>-1){
+                itunesElem=actualAObj;
+            }
+        }
+        if (spotifyElem!=null){
+            $("#mobileLaunchSpotify").attr("href", spotifyElem.attr("href"));
+        } else {
+            $("#mobileLaunchSpotify").css("display", "none");
+        }
+        if (deezerElem!=null){
+            $("#mobileLaunchDeezer").attr("href", deezerElem.attr("href"));
+        } else {
+            $("#mobileLaunchDeezer").css("display", "none");
+        }
+        if (itunesElem!=null){
+            $("#mobileLaunchItunes").attr("href", itunesElem.attr("href"));
+        } else {
+            $("#mobileLaunchItunes").css("display", "none");
+        }
+        if ($("#mobile_context").hasClass("show")){
+            $("#mobile_context").removeClass("show").hide();
+            $("#mobileLaunchSpotify").css("display", "");
+            $("#mobileLaunchItunes").css("display", "");
+            $("#mobileLaunchDeezer").css("display", "");
+        } else {
+            var top = e.originalEvent.touches[0].pageY + (window.innerHeight*0.02);
+            var left = e.originalEvent.touches[0].pageX + 15;
+            $("#mobile_context").css({
+                position: "absolute",
+                display: "block",
+                top: top,
+                left: left
+            }).addClass("show");
+            return false; //blocks default Webbrowser right click menu
+        }
     });
 
+    $(document).on("touchstart", "tr", function(e){
+        $("#mobile_context").removeClass("show").hide();
+        $("#mobileLaunchSpotify").css("display", "");
+        $("#mobileLaunchItunes").css("display", "");
+        $("#mobileLaunchDeezer").css("display", "");
+    });
+
+    $("#mobileAddToPlaylist").on("click", function(e){
+        var songSubgroupId = $(this).attr("data-songSubgroup-id");
+        addToCustomPlaylist(songSubgroupId);
+        $("#mobile_context").removeClass("show").hide();
+        $("#mobileLaunchSpotify").css("display", "");
+        $("#mobileLaunchItunes").css("display", "");
+        $("#mobileLaunchDeezer").css("display", "");
+    });
+
+    $("#mobileShowSongInfo").on("click", function(e){
+        var songIdAttr = $(this).attr("data-song_id");
+        var infoLabel = $(this).attr("infoLabel");
+        fetchInfoSong(songIdAttr,infoLabel);
+        $("#mobile_context").removeClass("show").hide();
+        $("#mobileLaunchSpotify").css("display", "");
+        $("#mobileLaunchItunes").css("display", "");
+        $("#mobileLaunchDeezer").css("display", "");
+    });
+
+    $("a.single_action").on("click", function(e){
+        $("#mobile_context").removeClass("show").hide();
+        $("#mobileLaunchSpotify").css("display", "");
+        $("#mobileLaunchItunes").css("display", "");
+        $("#mobileLaunchDeezer").css("display", "");
+    });
 });
