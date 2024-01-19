@@ -4,6 +4,14 @@ $(document).ready(function () {
 	 * @param {*} index 
 	 * @returns result of filtering
 	 */
+
+	if ('ontouchstart' in window){
+        $("td.song-instrumental").css("display","none");
+        $("th.song-instrumental").css("display","none");
+        $("col.song-instrumental").css("display","none");
+		$("#mobileShowSongInfo").css("display","none");
+    }
+
 	function TableComparer(index) {
 		return function (a, b) {
 			var val_a = TableCellValue(a, index);

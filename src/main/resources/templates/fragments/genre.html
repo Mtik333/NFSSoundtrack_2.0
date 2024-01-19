@@ -10,6 +10,7 @@
 </div>
 <table id="genreTable" class="table table-hover table-striped playlist_table sortable-table">
     <colgroup>
+        <col class="contextButton"/>
         <col class="genre-id" />
         <col class="genre-info_button" />
         <col class="genre-band" />
@@ -21,8 +22,9 @@
     </colgroup>
     <thead>
         <tr>
+            <th class="game_content_th no-sort contextButton" scope="col"></th>
             <th class="game_content_th" scope="col" th:text="#{id}"></th>
-            <th class="game_content_th no-sort"></th>
+            <th class="game_content_th info_button no-sort"></th>
             <th class="game_content_th" scope="col" th:text="#{band}"></th>
             <th class="game_content_th" scope="col" th:text="#{song}"></th>
             <th class="game_content_th" scope="col" th:text="#{subgroup}"></th>
@@ -34,6 +36,11 @@
     <tbody>
         <tr th:each="songSubgroup, iter1 : ${songSubgroupList}"
             th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
+            <td class="contextButton">
+                <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor" class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
+                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                  </svg>
+            </td>
             <td th:text="${iter1.count}"></td>
             <td class="info_button">
                 <img class="img-responsive-row-icon add-to-custom-playlist pointable" data-toggle="tooltip"
@@ -104,4 +111,5 @@
 <th:block th:insert="~{fragments/playlistModal.html}"></th:block>
 <th:block th:insert="~{fragments/ytVideoModal.html}"></th:block>
 <th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
+<th:block th:insert="~{fragments/mobileAdditionalDisplay.html}"></th:block>
 <script th:src="@{/js/genre.js}" type="application/javascript"></script>

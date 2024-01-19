@@ -4,6 +4,7 @@ $(document).ready(function () {
 	 * @param {*} index 
 	 * @returns result of filtering
 	 */
+
 	function TableComparer(index) {
 		return function (a, b) {
 			var val_a = TableCellValue(a, index);

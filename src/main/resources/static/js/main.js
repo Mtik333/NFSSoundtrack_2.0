@@ -544,11 +544,16 @@ $(document).ready(function () {
         });
     }
 
-    // $(document).on("contextmenu", "tr", function (e) {
-    //     if ('ontouchstart' in window){
-    //         e.preventDefault();
-    //     }
-    // });
+    $(document).on("touchstart", "td:not(.infowarn)", function (e) {
+        if ('ontouchstart' in window){
+            $(document).find("div.tooltip").hide();
+        }
+    });
+
+    $(document).on("touchstart", "td.infowarn", function(e){
+        e.preventDefault();
+        $(this).children().tooltip('show');
+    });
 
     $(document).on("touchstart", "svg.context_menu_thing", function (e) {
         e.preventDefault();
@@ -557,6 +562,7 @@ $(document).ready(function () {
         var songSubgroupIdAttr = $(trElem).attr("data-songsubgroup-id");
         var externalLinks = $(trElem).find("a.a-external-music-link");
         $("#mobileAddToPlaylist").attr("data-songsubgroup-id", songSubgroupIdAttr);
+        $("#mobileRemoveFromPlaylist").attr("data-songsubgroup-id", songSubgroupIdAttr);
         $("#mobileShowSongInfo").attr("data-song_id", songIdAttr);
         var additionalInfoA = $(trElem).find("td.infowarn>a");
         var infoLabel=null;

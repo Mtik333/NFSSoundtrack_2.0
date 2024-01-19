@@ -4,6 +4,15 @@ $(document).ready(function () {
 	 * @param {*} index 
 	 * @returns result of filtering
 	 */
+
+	if ('ontouchstart' in window){
+        $("td.song-instrumental").css("display","none");
+        $("th.song-instrumental").css("display","none");
+        $("col.song-instrumental").css("display","none");
+		$("#mobileAddToPlaylist").css("display","none");
+		$("#mobileRemoveFromPlaylist").css("display","");
+    }
+
 	function TableComparer(index) {
 		return function (a, b) {
 			var val_a = TableCellValue(a, index);
@@ -45,11 +54,14 @@ $(document).ready(function () {
 		//dispose tooltip to prevent it from staying visib
 		$(this).tooltip('dispose');
 		//we have to check local storage to see what's there now
-		var customPlaylistArray = JSON.parse(localStorage.getItem("custom-playlist"));
 		var relatedTr = $(this).parent().parent();
-		var tbody = relatedTr.parent();
 		var songSubgroupId = $(relatedTr).attr("data-songSubgroup-id");
-		//we need to find index of this song to remove
+		removeSongFromPlaylist(songSubgroupId);
+	});
+
+	function removeSongFromPlaylist(relatedTr, songSubgroupId){
+		var tbody = relatedTr.parent();
+		var customPlaylistArray = JSON.parse(localStorage.getItem("custom-playlist"));
 		var songToRemoveIndex = customPlaylistArray.indexOf(songSubgroupId);
 		//then we obviously remove from local array and push to the local storage
 		customPlaylistArray.splice(songToRemoveIndex, 1);
@@ -60,7 +72,7 @@ $(document).ready(function () {
 		var remainingTrs = $(tbody).find("tr");
 		//we also have to re-index ID value in table
 		for (let i = 0; i < remainingTrs.length; i++) {
-			var tdToReindex = remainingTrs[i].children[0];
+			var tdToReindex = remainingTrs[i].children[1];
 			$(tdToReindex).html((i + 1));
 		}
 		//and show the alert that remove was successful
@@ -69,7 +81,7 @@ $(document).ready(function () {
 				$("#successRemoveFromCustomPlaylist").parent().fadeOut(500);
 			}, 3000);
 		});
-	});
+	}
 
 	/**
 	 * method to wipe out whole table
@@ -95,4 +107,14 @@ $(document).ready(function () {
 	$('#playlistTruncated').on('hidden.bs.modal', function (e) {
 		$("#spotifyVideo").attr('src', '');
 	});
+
+	$("#mobileRemoveFromPlaylist").on("click", function(e){
+        var songSubgroupId = $(this).attr("data-songSubgroup-id");
+		var relatedTr = $("tbody").find("tr[data-songSubgroup-id='"+songSubgroupId+"']");
+		removeSongFromPlaylist(relatedTr,songSubgroupId);
+        $("#mobile_context").removeClass("show").hide();
+        $("#mobileLaunchSpotify").css("display", "");
+        $("#mobileLaunchItunes").css("display", "");
+        $("#mobileLaunchDeezer").css("display", "");
+    });
 });

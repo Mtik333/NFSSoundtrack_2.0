@@ -329,14 +329,5 @@
         <button type="button" class="btn-close justHideAlert" data-bs-theme="light" data-bs-hide="alert" aria-label="Close"></button>
     </div>
 </div>
-<div class="dropdown-menu dropdown-menu-sm" id="mobile_context">
-    <ul id="ul_actions_menu" class="actions_menu">
-        <li id="mobileAddToPlaylist" class="dropdown-item single_action" th:text="#{addToPlaylist}"></li>
-        <li id="mobileShowSongInfo" class="dropdown-item single_action" th:text="#{showInfo}"></li>
-        <a id="mobileLaunchSpotify" class="dropdown-item single_action" th:text="#{launchInSpotify}"></a>
-        <a id="mobileLaunchItunes" class="dropdown-item single_action" th:text="#{openITunes}"></a>
-        <a id="mobileLaunchDeezer" class="dropdown-item single_action" th:text="#{launchInDeezer}"></a>
-    </ul>
-</div>
-
+<th:block th:insert="~{fragments/mobileAdditionalDisplay.html}"></th:block>
 <script th:src="@{/js/gamecontent.js}" type="application/javascript"></script>

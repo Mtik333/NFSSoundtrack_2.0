@@ -428,14 +428,35 @@ menu.song_item {
     display: none;
   }
 
-  #genreTable col.genre-id {
-    width: 4%;
+  #genreTable col.contextButton {
+    width: 7%;
   }
+
+  #genreTable col.genre-id {
+    width: 5%;
+  }
+
 
   #genreTable col.genre-info_button {
-    width: 10%;
+    display: none;
+  }
+/*
+  #genreTable col.genre-band {
+    width: 18%;
   }
 
+  #genreTable col.genre-songtitle {
+    width: 17%;
+  }
+
+  #genreTable col.genre-subgroup {
+    width: 20%;
+  }
+
+  #genreTable col.genre-game {
+    width: 23%;
+  }
+*/
   #genreTable col.genre-actions {
     width: 10%;
   }
@@ -452,8 +473,12 @@ menu.song_item {
     display: none;
   }
 
+  #songTable col.contextButton {
+    width: 7%;
+  }
+
   #songTable col.song-id {
-    width: 4%;
+    width: 6%;
   }
 
   #songTable col.song-actions {
@@ -472,12 +497,16 @@ menu.song_item {
     display: none;
   }
 
+  #artistStuff col.contextButton {
+    display: none;
+  }
+
   #artistStuff col.artist-info_button {
-    width: 8%;
+    width: 7%;
   }
 
   #artistStuff col.artist-subgroup {
-    width: 20%;
+    width: 23%;
   }
 
   #artistStuff col.artist-game {
@@ -493,15 +522,19 @@ menu.song_item {
   }
 
   #artistStuff col.artist-actions {
-    width: 12%;
+    width: 10%;
+  }
+
+  #customPlaylistStuff col.contextButton {
+    width: 7%;
   }
 
   #customPlaylistStuff col.playlist-id {
-    width: 4%;
+    width: 6%;
   }
 
   #customPlaylistStuff col.playlist-info_button {
-    width: 10%;
+    display: none;
   }
 
   #customPlaylistStuff col.playlist-actions {
