@@ -20,6 +20,11 @@ img.img-responsive-row-icon {
   margin: 0.05vw;
 }
 
+img.img-main-icon {
+  max-height: 6vw;
+  margin: 0.35vw;
+}
+
 img.img-responsive-playlist-modal-icon {
   max-height: 2vw;
   margin: 0.05vw;
@@ -37,6 +42,10 @@ img.img-country {
 }
 
 a.a-external-music-link {
+  text-decoration: none;
+}
+
+a.a-main-music-link {
   text-decoration: none;
 }
 
@@ -281,30 +290,23 @@ div.context_menu_hide{
     display: none;
 }
 
-/**
-menu.song_item {
-    position:absolute;
-    display:block;
-    left:0px;
-        top:0px;
-        height:20px;
-        width:20px;
-        padding:0;
-        margin:0;
-        border:1px solid;
-        background-color:white;
-        font-weight:normal;
-        white-space:nowrap;
+iframe.home_frame{
+  width: 35vw;
+  height: 20vw;
 }
-*/
+
+div.centerKeeper{
+  text-align: center;
+}
+
 @media screen and (max-width: 600px) {
 
   img.img-responsive-website-logo {
-    max-height: 7vw;
+    max-height: 8vw;
     margin: 0.3vw;
   }
   img.img-responsive-global-logo {
-    max-height: 7vw;
+    max-height: 8vw;
     margin: 0.3vw;
   }
 
@@ -636,6 +638,15 @@ menu.song_item {
         font-size: 3vw;
     }
 
+    iframe.home_frame{
+      height: 45vw;
+      width: 60vw;
+    }
+
+    img.img-main-icon {
+      max-height: 12vw;
+      margin: 0.35vw;
+    }
 }
 
 @media screen and (max-width: 400px) {

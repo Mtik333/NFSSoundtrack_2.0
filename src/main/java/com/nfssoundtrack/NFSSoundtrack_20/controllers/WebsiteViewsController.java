@@ -72,11 +72,13 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @return html for content_short entry
      */
     @GetMapping(value = "/content/{value}")
-    public String topMenuEntry(Model model, @PathVariable("value") String value) {
+    public String topMenuEntry(Model model, @PathVariable("value") String value) throws ResourceNotFoundException {
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         model.addAttribute("htmlToInject",
                 contentService.findByContentShort(value).getContentData());
-        model.addAttribute("home", value.contains("home"));
+        boolean isHome = value.contains("home");
+        model.addAttribute("home", isHome);
+        model.addAttribute("todayssong", todaysSongService.getTodaysSong());
         model.addAttribute("appName", value + " - " + appName);
         return "index";
     }

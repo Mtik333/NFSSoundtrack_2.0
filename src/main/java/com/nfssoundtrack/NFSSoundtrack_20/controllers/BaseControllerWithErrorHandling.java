@@ -56,6 +56,9 @@ public class BaseControllerWithErrorHandling implements ErrorController {
     @Autowired
     SubgroupService subgroupService;
 
+    @Autowired
+    TodaysSongService todaysSongService;
+
     /**
      *
      * @param otherval invalid input endpoint

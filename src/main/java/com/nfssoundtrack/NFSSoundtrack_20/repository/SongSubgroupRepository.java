@@ -5,6 +5,7 @@ import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -17,4 +18,7 @@ public interface SongSubgroupRepository extends JpaRepository<SongSubgroup, Inte
     SongSubgroup findBySongAndSubgroup(Song song, Subgroup subgroup);
 
     List<SongSubgroup> findBySubgroupIdIn(List<Subgroup> subgroups);
+
+    SongSubgroup findTopByOrderByIdDesc();
 }
+
