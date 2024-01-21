@@ -93,7 +93,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         Game game = gameService.findByGameShort(gameshort);
         model.addAttribute("endpoint", "/game/" + gameshort);
         model.addAttribute("game", game);
-        model.addAttribute("appName", game.getDisplayTitle() + " soundtrack at NFSSoundtrack.com");
+        model.addAttribute("appName", game.getDisplayTitle() + " soundtrack at " + appName);
         model.addAttribute("gamegroups", game.getMainGroups());
         model.addAttribute("songSubgroups", songSubgroupService.fetchFromGame(game));
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
@@ -124,7 +124,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                         "id " + songSubgroupId)));
             }
         }
-        model.addAttribute("appName", "Custom playlist - NFSSoundtrack.com");
+        model.addAttribute("appName", "Custom playlist - " + appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         model.addAttribute("customPlaylist", songSubgroupList);
         return "index";

@@ -55,8 +55,8 @@ $(document).ready(function () {
 		$(this).tooltip('dispose');
 		//we have to check local storage to see what's there now
 		var relatedTr = $(this).parent().parent();
-		var songSubgroupId = $(relatedTr).attr("data-songSubgroup-id");
-		removeSongFromPlaylist(songSubgroupId);
+		var songSubgroupId = $(relatedTr).attr("data-songsubgroup-id");
+		removeSongFromPlaylist(relatedTr,songSubgroupId);
 	});
 
 	function removeSongFromPlaylist(relatedTr, songSubgroupId){
@@ -117,4 +117,6 @@ $(document).ready(function () {
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
     });
+
+	$(document).find("th.id").click();
 });

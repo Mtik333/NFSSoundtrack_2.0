@@ -82,11 +82,10 @@ $(document).ready(function () {
         var currentColspan = $("td.subgroup-separator-td").attr("colspan");
         $("td.subgroup-separator-td").attr("colspan", currentColspan-1);
         $("td.info_button").css("display","none");
-    } else {
-        $("td.contextButton").css("display","none");
-        $("th.contextButton").css("display","none");
-        $("col.contextButton").css("display","none");
-    }
+        $("td.contextButton").css("display","");
+        $("th.contextButton").css("display","");
+        $("col.contextButton").css("display","");
+    } 
     /**
      * method to remove duplicate countries from column because i couldn't develop it on backend in a way to return only distinct countries
      */

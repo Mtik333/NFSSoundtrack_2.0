@@ -9,17 +9,6 @@
             th:text="#{shareOpinions}"></a><br>
         <br>
         <b>
-            <h5 th:text="#{ourPartners}"></h5>
-        </b>
-        <a class="table_link" href="https://nightriderz.world/" target="_blank">
-            <img th:src="@{/images/NFSSTBanner.png}" alt="NIGHTRIDERZ NFS World Server">
-        </a>
-        <br>
-        <a class="table_link" href="https://www.youtube.com/channel/UCSars_35pUP8YxpOYt7Q_gw" target="_blank">
-            <img th:src="@{/images/loud_yt.png}" alt="LOUD YouTube Channel">
-        </a>
-        <br><br>
-        <b>
             <h5 th:text="#{todaySong}"></h5>
         </b>
         <th:block th:each="authorSong,iter : ${todayssong.songSubgroup.song.authorSongList.?[role.value=='COMPOSER']}">

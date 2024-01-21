@@ -299,6 +299,10 @@ div.centerKeeper{
   text-align: center;
 }
 
+img.partners{
+max-width: 20vw;
+}
+
 @media screen and (max-width: 600px) {
 
   img.img-responsive-website-logo {
@@ -646,6 +650,10 @@ div.centerKeeper{
     img.img-main-icon {
       max-height: 12vw;
       margin: 0.35vw;
+    }
+
+    img.partners{
+        max-width: 50vw;
     }
 }
 

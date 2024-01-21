@@ -41,4 +41,6 @@ $(document).ready(function () {
 		table.find("thead tr th").removeClass("sort-asc").removeClass("sort-desc");
 		$(this).removeClass("sort-asc").removeClass("sort-desc").addClass("sort-" + dir);
 	});
+
+	$(document).find("th.id").click();
 });
