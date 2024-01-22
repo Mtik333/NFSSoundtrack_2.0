@@ -134,7 +134,13 @@ $(document).ready(function () {
             if (!sameSongClicked) {
                 //then we create row with video and lyris
                 var videoToUse = $(this).attr("data-tagvideo");
-                var lyricsText = $(this).next().text();
+                var lyricsHtmlElem =$(this).next();
+                var lyricsText = lyricsHtmlElem.text();
+                if (lyricsHtmlElem.attr("data-lyricsState")=="instrumental") {
+                    lyricsText = '<h4>This is instrumental</h4>';
+                } else if (lyricsText == "" || lyricsText == "null") {
+                    lyricsText = '<h4>No lyrics found</h4>';
+                }
                 var parentTr = $(this).parent().parent().parent();
                 var newTr = $('<tr id="listen-music">');
                 var newTd = $('<td colspan="7" id="listen-music-id">');

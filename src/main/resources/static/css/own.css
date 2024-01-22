@@ -303,6 +303,10 @@ img.partners{
 max-width: 20vw;
 }
 
+a.game_class{
+    display: block;
+}
+
 @media screen and (max-width: 600px) {
 
   img.img-responsive-website-logo {

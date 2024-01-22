@@ -25,10 +25,6 @@
                     <a class="nav-link d-inline p-1" id="nightModeSwitch" href="#" th:text="#{night}"></a>
                 </div>
             </li>
-            <li class="btn nav-item nfs-top-item d-inline-block p-1" data-toggle="tooltip" data-placement="top"
-                title="Work in progress">
-                <a class="nav-link d-inline p-1" href="#" th:text="#{advancedSearch}"></a>
-            </li>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
                 <a class="nav-link d-inline p-1 preferences" href="#" data-bs-toggle="modal"
                     data-bs-target="#preferencesModal" th:text="#{preferences}"></a>
@@ -57,7 +53,7 @@
                     <input class="form-control me-2 d-inline" name="searchData" id="searchStuff" type="search"
                         th:attr="data-tooltip=#{searchTooltip}" th:placeholder="#{search}"><button
                         class="btn btn-outline-success nav-item nfs-top-item" type="submit"
-                        th:text="#{search}"></button>
+                        th:text="#{searchButton}"></button>
                 </form>
             </li>
         </ul>

@@ -20,7 +20,19 @@
                         <ul class="btn-toggle-nav list-unstyled fw-normal mb-0 small serie_class">
                             <li th:each="game: ${serie.games}">
                                 <a href="#" class="list-group-item list-group-item-action game_class"
-                                    th:href="'/game/'+${game.gameShort}" th:attr="data-fullTitle=${game.displayTitle}" th:text="${game.gameTitle}"></a>
+                                    th:href="'/game/'+${game.gameShort}" th:attr="data-fullTitle=${game.displayTitle}">
+                                    <span th:text="${game.gameTitle}"></span>
+                                    <br>
+                                    <th:block th:if="${game.gameStatus.value=='CANCELED'}">
+                                        <small th:text="#{canceledGame}"></small>
+                                    </th:block> 
+                                    <th:block th:if="${game.gameStatus.value=='UNPLAYABLE'}">
+                                        <small th:text="#{unplayableGame}"></small>
+                                    </th:block>
+                                    <th:block th:if="${game.gameStatus.value=='UNRELEASED'}">
+                                        <small th:text="#{unreleasedGame}"></small>
+                                    </th:block>
+                                </a>
                             </li>
                         </ul>
                     </div>
