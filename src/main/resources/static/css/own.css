@@ -310,8 +310,9 @@ a.game_class{
 @media screen and (max-width: 600px) {
 
   img.img-responsive-website-logo {
-    max-height: 8vw;
+    max-width: 60vw;
     margin: 0.3vw;
+    max-height: 9vw;
   }
   img.img-responsive-global-logo {
     max-height: 8vw;
@@ -367,7 +368,7 @@ a.game_class{
   }
 
   .nav-link {
-    font-size: 3vw;
+    font-size: 3.5vw;
   }
 
   .nfs-top-item {
@@ -378,6 +379,9 @@ a.game_class{
     font-size: 3vw;
   }
 
+ #searchStuff::placeholder{
+    font-size: 0.75rem;
+ }
   #filter_songs {
     font-size: 2.5vw;
   }
@@ -641,6 +645,9 @@ a.game_class{
     ul.actions_menu{
         margin-bottom: 0;
         padding-left: 0;
+    }
+    ul.navbar-nav{
+        text-align:center;
     }
     .single_action{
         font-size: 3vw;

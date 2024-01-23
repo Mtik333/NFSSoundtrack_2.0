@@ -3,7 +3,11 @@
         <ul class="navbar-nav mr-auto d-inline ml-2">
             <button class="btn nfs-top-item d-inline p-1" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"
                 role="button">
-                <span id="offcanvasSpan" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" th:text="#{menu}"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="7vw" height="7vw" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16" style="display: none;">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                  </svg>
+                <span id="offcanvasSpan" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" th:text="#{menu}">
+                </span>
             </button>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
                 <a class="nav-link d-inline p-1" id="nfs-top-home" th:href="@{/content/home}" th:text="#{home}"></a>
@@ -55,6 +59,10 @@
                         class="btn btn-outline-success nav-item nfs-top-item" type="submit"
                         th:text="#{searchButton}"></button>
                 </form>
+            </li>
+            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+                <a class="nav-link d-inline p-1" id="nfs-top-donate" href="https://racingsoundtracks.com:445/"
+                    th:text="#{oldWebsite}"></a>
             </li>
         </ul>
     </div>

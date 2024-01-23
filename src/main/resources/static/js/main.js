@@ -85,6 +85,8 @@ $(document).ready(function () {
         $("td.contextButton").css("display","");
         $("th.contextButton").css("display","");
         $("col.contextButton").css("display","");
+        $("#offcanvasSpan").text("");
+        $("#offcanvasSpan").prev().css("display","")
     } 
     /**
      * method to remove duplicate countries from column because i couldn't develop it on backend in a way to return only distinct countries
@@ -137,9 +139,9 @@ $(document).ready(function () {
                 var lyricsHtmlElem =$(this).next();
                 var lyricsText = lyricsHtmlElem.text();
                 if (lyricsHtmlElem.attr("data-lyricsState")=="instrumental") {
-                    lyricsText = '<h4>This is instrumental</h4>';
+                    lyricsText = '<h4>'+lyricsHtmlElem.attr("data-instrumental")+'</h4>';
                 } else if (lyricsText == "" || lyricsText == "null") {
-                    lyricsText = '<h4>No lyrics found</h4>';
+                    lyricsText = '<h4>'+lyricsHtmlElem.attr("data-noLyrics")+'</h4>';
                 }
                 var parentTr = $(this).parent().parent().parent();
                 var newTr = $('<tr id="listen-music">');
