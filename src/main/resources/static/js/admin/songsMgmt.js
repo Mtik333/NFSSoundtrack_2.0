@@ -52,7 +52,7 @@ $(document).ready(function () {
                 $(divToAppend).find("a").first().click();
             },
             error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },
@@ -103,11 +103,11 @@ $(document).ready(function () {
             success: function (ooo) {
                 console.log("e");
                 getSubgroupsFromGame();
-                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500);
                 });
             }, error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },
@@ -130,7 +130,7 @@ $(document).ready(function () {
                 renderEditCreateSong(divToAppend, songSubgroup);
             },
             error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },
@@ -275,7 +275,7 @@ $(document).ready(function () {
                 divToAppend.append(genreDisplayDiv);
                 divToAppend.append(spotifyOthersDiv);
             }, error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },
@@ -296,7 +296,7 @@ $(document).ready(function () {
                         }
                     },
                     error: function (ooo) {
-                        $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                        $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                             $(failureAlertHtml).slideUp(500);
                         });
                     },
@@ -333,7 +333,7 @@ $(document).ready(function () {
                         }
                     },
                     error: function (ooo) {
-                        $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                        $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                             $(failureAlertHtml).slideUp(500);
                         });
                     },
@@ -363,7 +363,7 @@ $(document).ready(function () {
                         }
                     },
                     error: function (ooo) {
-                        $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                        $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                             $(failureAlertHtml).slideUp(500);
                         });
                     },
@@ -393,7 +393,7 @@ $(document).ready(function () {
                         }
                     },
                     error: function (ooo) {
-                        $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                        $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                             $(failureAlertHtml).slideUp(500);
                         });
                     },
@@ -604,8 +604,8 @@ $(document).ready(function () {
         featRowDiv, howManyFeats, i, officialArtistName, authorSong) {
         if (howManyFeats == 0) {
             if (authorSong != undefined) {
-                setupAutocompleteAlias(featSelect, featSelectHidden, authorSong.authorAlias.author.id);
-                featSelectHidden.val(authorSong.authorAlias.author.id);
+                setupAutocompleteAlias(featSelect, featSelectHidden, authorSong.authorAlias.id);
+                featSelectHidden.val(authorSong.authorAlias.id);
                 featSelect.val(officialArtistName);
             } else {
                 setupAutocompleteAlias(featSelect, featSelectHidden, "");
@@ -637,8 +637,8 @@ $(document).ready(function () {
             featButtonColDivNext.append('<button id="delete-feat-' + i + '" type="submit" class="btn btn-danger delete-feat">-</button>');
             featRowDivNext.append(featInputColDivNext);
             if (authorSong != undefined) {
-                setupAutocompleteAlias(featSelectNext, featSelectHiddenNext, authorSong.authorAlias.author.id);
-                featSelectHiddenNext.val(authorSong.authorAlias.author.id);
+                setupAutocompleteAlias(featSelectNext, featSelectHiddenNext, authorSong.authorAlias.id);
+                featSelectHiddenNext.val(authorSong.authorAlias.id);
                 featSelectNext.val(officialArtistName);
                 if (authorSong.featConcat != null) {
                     var divNewCol = $('<div class="col"></div>');
@@ -660,8 +660,8 @@ $(document).ready(function () {
         if (howManySubcomposers == 0) {
             var subcomposerConcatInput;
             if (authorSong != undefined) {
-                setupAutocompleteAlias(subcomposerSelect, subcomposerSelectHidden, authorSong.authorAlias.author.id);
-                subcomposerSelectHidden.val(authorSong.authorAlias.author.id);
+                setupAutocompleteAlias(subcomposerSelect, subcomposerSelectHidden, authorSong.authorAlias.id);
+                subcomposerSelectHidden.val(authorSong.authorAlias.id);
                 subcomposerSelect.val(officialArtistName);
                 subcomposerConcatInput = $('<input class="form-control" id="subcomposerConcatInput-1" value="' + authorSong.subcomposerConcat + '"/>');
             } else {
@@ -698,8 +698,8 @@ $(document).ready(function () {
             subcomposerButtonColDivNext.append('<button id="delete-subcomposer-' + i + '" type="submit" class="btn btn-danger delete-subcomposer">-</button>');
             subcomposerRowDivNext.append(subcomposerInputColDivNext);
             if (authorSong != undefined) {
-                setupAutocompleteAlias(subcomposerSelectNext, subcomposerSelectHiddenNext, authorSong.authorAlias.author.id);
-                subcomposerSelectHiddenNext.val(authorSong.authorAlias.author.id);
+                setupAutocompleteAlias(subcomposerSelectNext, subcomposerSelectHiddenNext, authorSong.authorAlias.id);
+                subcomposerSelectHiddenNext.val(authorSong.authorAlias.id);
                 subcomposerSelectNext.val(officialArtistName);
                 if (authorSong.subcomposerConcat != null) {
                     var divNewCol = $('<div class="col"></div>');
@@ -720,8 +720,8 @@ $(document).ready(function () {
     function generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixRowDiv, howManyRemixes, officialArtistName, i, authorSong) {
         if (howManyRemixes == 0) {
             if (authorSong != undefined) {
-                setupAutocompleteAlias(remixSelect, remixSelectHidden, authorSong.authorAlias.author.id);
-                remixSelectHidden.val(authorSong.authorAlias.author.id);
+                setupAutocompleteAlias(remixSelect, remixSelectHidden, authorSong.authorAlias.id);
+                remixSelectHidden.val(authorSong.authorAlias.id);
                 remixSelect.val(officialArtistName);
             } else {
                 setupAutocompleteAlias(remixSelect, remixSelectHidden, "");
@@ -760,8 +760,8 @@ $(document).ready(function () {
             remixButtonColDivNext.append('<button id="delete-remix-' + i + '" type="submit" class="btn btn-danger delete-remix">-</button>');
             remixRowDivNext.append(remixInputColDivNext);
             if (authorSong != undefined) {
-                setupAutocompleteAlias(remixSelectNext, remixSelectHiddenNext, authorSong.authorAlias.author.id);
-                remixSelectHiddenNext.val(authorSong.authorAlias.author.id);
+                setupAutocompleteAlias(remixSelectNext, remixSelectHiddenNext, authorSong.authorAlias.id);
+                remixSelectHiddenNext.val(authorSong.authorAlias.id);
                 remixSelectNext.val(officialArtistName);
                 if (authorSong.remixConcat != null) {
                     var divNewCol = $('<div class="col"></div>');
@@ -972,7 +972,7 @@ $(document).ready(function () {
                     }
                 },
                 error: function (ooo) {
-                    $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                         $(failureAlertHtml).slideUp(500);
                     });
                 },
@@ -1125,12 +1125,12 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (ooo) {
                 getSubgroupsFromGame();
-                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500);
                 });
             },
             error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },
@@ -1175,13 +1175,13 @@ $(document).ready(function () {
             success: function (ooo) {
                 console.log("eee");
                 getSubgroupsFromGame();
-                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500);
                     divToAppend.empty();
                 });
             },
             error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },
@@ -1305,13 +1305,13 @@ $(document).ready(function () {
             success: function (ooo) {
                 console.log("eee");
                 getSubgroupsFromGame();
-                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500);
                     $('#nfs-content').empty();
                 });
             },
             error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                     $('#nfs-content').empty();
                 });

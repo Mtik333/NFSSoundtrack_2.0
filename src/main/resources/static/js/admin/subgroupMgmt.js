@@ -63,7 +63,7 @@ $(document).ready(function () {
                 $(divToAppend).find("a").first().click();
             },
             error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },
@@ -204,14 +204,14 @@ $(document).ready(function () {
             url: "/subgroup/put/" + Number(currentSubgroupId),
             success: function (ooo) {
                 console.log("eee");
-                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500, function () {
                         getSubgroupsFromGame();
                     });
                 });
                 modifiedSubgroupSongArray.length = 0;
             }, error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500, function (){
                         getSubgroupsFromGame();
                     });
@@ -248,13 +248,13 @@ $(document).ready(function () {
             url: "/songSubgroup/positions/" + currentSubgroupId,
             success: function (ooo) {
                 console.log("eee");
-                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500, function () {
                         getSubgroupsFromGame();
                     });
                 });
             }, error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500, function (){
                         getSubgroupsFromGame();
                     });

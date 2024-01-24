@@ -35,7 +35,7 @@ $(document).ready(function () {
                 }
             },
             error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },
@@ -152,12 +152,12 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (ooo) {
                 getGroupsFromGame();
-                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500);
                 });
             },
             error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },
@@ -190,12 +190,12 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (ooo) {
                 getGroupsFromGame();
-                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500);
                 });
             },
             error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },
@@ -210,12 +210,12 @@ $(document).ready(function () {
             url: "/maingroup/delete/" + Number(groupId),
             success: function (ooo) {
                 getGroupsFromGame();
-                $(successAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500);
                 });
             },
             error: function (ooo) {
-                $(failureAlertHtml).fadeTo(2000, 500).slideUp(500, function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                 });
             },

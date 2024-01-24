@@ -45,7 +45,7 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
                     }
                 },
                 error: function (ooo) {
-                    $(failureAlertHtml).show().fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).show().fadeTo(500, 500).slideUp(500, function () {
                         $(failureAlertHtml).slideUp(500).hide();
                     });
                 },
@@ -180,14 +180,14 @@ $(document).on('click', '#save-artist', function (e) {
         contentType: 'application/json; charset=utf-8',
         // dataType: 'json',
         success: function (ooo) {
-            $(successAlertHtml).show().fadeTo(2000, 500).slideUp(500, function () {
+            $(successAlertHtml).show().fadeTo(500, 500).slideUp(500, function () {
                 $(successAlertHtml).slideUp(500).hide();
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
             });
         },
         error: function (ooo) {
-            $(failureAlertHtml).show().fadeTo(2000, 500).slideUp(500, function () {
+            $(failureAlertHtml).show().fadeTo(500, 500).slideUp(500, function () {
                 $(failureAlertHtml).slideUp(500).hide();
                 var divToAppend = $('#nfs-content');
                 divToAppend.empty();
@@ -264,7 +264,7 @@ function setupAutocompleteCountry(mySelect, mySelectHidden, valueToSet) {
                     }
                 },
                 error: function (ooo) {
-                    $(failureAlertHtml).show().fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).show().fadeTo(500, 500).slideUp(500, function () {
                         $(failureAlertHtml).slideUp(500).hide();
                     });
                 },
@@ -294,7 +294,7 @@ function setupAutocompleteAliasArtistMgmt(mySelect, mySelectHidden, valueToSet) 
                     }
                 },
                 error: function (ooo) {
-                    $(failureAlertHtml).show().fadeTo(2000, 500).slideUp(500, function () {
+                    $(failureAlertHtml).show().fadeTo(500, 500).slideUp(500, function () {
                         $(failureAlertHtml).slideUp(500).hide();
                     });
                 },

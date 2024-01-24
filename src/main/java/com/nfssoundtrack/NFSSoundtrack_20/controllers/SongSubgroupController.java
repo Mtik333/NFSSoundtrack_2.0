@@ -106,6 +106,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                         } else {
                             AuthorSong newAuthorSong = new AuthorSong(composerAlias, relatedSong, Role.COMPOSER);
                             authorSongService.save(newAuthorSong);
+                            //case when we completely change the author
+                            authorSongService.delete(authorSong);
                         }
                     }
                 }

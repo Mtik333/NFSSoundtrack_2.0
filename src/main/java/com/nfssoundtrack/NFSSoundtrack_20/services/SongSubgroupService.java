@@ -118,6 +118,13 @@ public class SongSubgroupService {
         for (AuthorSong authorSong : songSubgroup.getSong().getAuthorSongList()) {
             if (authorSong.getAuthorAlias().equals(authorAlias)) {
                 alreadyAssigned = true;
+                if (Role.SUBCOMPOSER.equals(role)){
+                    authorSong.setSubcomposerConcat(concatValue);
+                } else if (Role.REMIX.equals(role)){
+                    authorSong.setRemixConcat(concatValue);
+                } else if (Role.FEAT.equals(role)){
+                    authorSong.setFeatConcat(concatValue);
+                }
                 break;
             }
         }
