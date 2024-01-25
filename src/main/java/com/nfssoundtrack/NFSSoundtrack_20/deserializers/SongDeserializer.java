@@ -1,6 +1,5 @@
 package com.nfssoundtrack.NFSSoundtrack_20.deserializers;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -27,6 +26,9 @@ public class SongDeserializer extends JsonDeserializer<Song> {
         intoValue.setOfficialDisplayTitle(JustSomeHelper.returnProperValueToDb(node.get("officialTitle").asText()));
         intoValue.setSrcId(JustSomeHelper.returnProperValueToDb(node.get("officialSrcId").asText()));
         intoValue.setLyrics(JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText()));
+        if (intoValue.getLyrics() != null) {
+            intoValue.setLyrics(intoValue.getLyrics().replaceAll("\n", "<br>"));
+        }
         return intoValue;
     }
 
@@ -42,6 +44,9 @@ public class SongDeserializer extends JsonDeserializer<Song> {
         String officialTitle = (JustSomeHelper.returnProperValueToDb(node.get("officialTitle").asText()));
         String officialSrcId = (JustSomeHelper.returnProperValueToDb(node.get("officialSrcId").asText()));
         String lyrics = (JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText()));
+        if (lyrics != null) {
+            lyrics = lyrics.replaceAll("\n", "<br>");
+        }
         return new Song(officialBand, officialTitle, officialSrcId, lyrics, spotifyId, deezer, itunes, tidal,
                 soundcloud);
     }
