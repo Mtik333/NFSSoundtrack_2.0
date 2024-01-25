@@ -476,15 +476,24 @@ $(document).ready(function () {
      * function to render modal with song information
      */
     $(document).on("click", "img.info-about-song", function () {
-        var trElem = $(this).parent().parent();
-        $(this).tooltip('dispose');
-        var songIdAttr = $(trElem).attr("data-song_id");
-        var additionalInfoA = $(trElem).find("td.infowarn>a");
-        var infoLabel=null;
-        if (additionalInfoA.length>0){
-            infoLabel = additionalInfoA.attr("aria-label");
+        //handling search case
+        var potentialTd = $(this).parent();
+        if (potentialTd.hasClass("info_button")){
+            var trElem = $(this).parent().parent();
+            $(this).tooltip('dispose');
+            var songIdAttr = $(trElem).attr("data-song_id");
+            var additionalInfoA = $(trElem).find("td.infowarn>a");
+            var infoLabel=null;
+            if (additionalInfoA.length>0){
+                infoLabel = additionalInfoA.attr("aria-label");
+            }
+            fetchInfoSong(songIdAttr,infoLabel);
+        } else {
+            var aWithSongId = $(this).next();
+            $(this).tooltip('dispose');
+            var songIdAttr = $(aWithSongId).attr("data-song_id");
+            fetchInfoSong(songIdAttr,null);
         }
-        fetchInfoSong(songIdAttr,infoLabel);
     });
 
     function fetchInfoSong(songIdAttr, infoLabel){

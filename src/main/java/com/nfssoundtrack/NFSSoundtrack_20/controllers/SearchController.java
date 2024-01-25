@@ -1,8 +1,6 @@
 package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorAlias;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Genre;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,9 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "/search")
@@ -28,8 +24,8 @@ public class SearchController extends BaseControllerWithErrorHandling {
     @GetMapping(value = "/basic")
     public String searchStuff(Model model, @RequestParam("searchData") String searchData) {
         List<AuthorAlias> authorAliases = new ArrayList<>();
-        List<Song> songTitleList = new ArrayList<>();
-        List<Song> songLyricsList = new ArrayList<>();
+        Map<Song,Set<Game>> songTitleList = new HashMap<>();
+        Map<Song,Set<Game>> songLyricsList = new HashMap<>();
         List<Genre> genreList = new ArrayList<>();
         String query = searchData.trim();
         if (searchData.isEmpty()) {
@@ -38,8 +34,24 @@ public class SearchController extends BaseControllerWithErrorHandling {
             //treat as exact input
             Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(query);
             authorAlias.ifPresent(authorAliases::add);
-            songTitleList = songService.findByOfficialDisplayTitle(query);
-            songLyricsList = songService.findByLyrics(query);
+            List<Song> foundSongs = songService.findByOfficialDisplayTitle(query);
+            for (Song song : foundSongs){
+                List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                Set<Game> games = new HashSet<>();
+                for (SongSubgroup songSubgroup : songSubgroupList){
+                    games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
+                }
+                songTitleList.put(song,games);
+            }
+            List<Song> foundLyrics = songService.findByLyrics(query);
+            for (Song song : foundLyrics){
+                List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                Set<Game> games = new HashSet<>();
+                for (SongSubgroup songSubgroup : songSubgroupList){
+                    games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
+                }
+                songLyricsList.put(song,games);
+            }
             Optional<Genre> genre = genreService.findByGenreName(query);
             genre.ifPresent(genreList::add);
         } else {
@@ -50,14 +62,45 @@ public class SearchController extends BaseControllerWithErrorHandling {
                 if (authorAlias.isPresent()) {
                     authorAliases.add(authorAlias.get());
                 }
-                songTitleList = songService.findByOfficialDisplayTitle(query);
-                songLyricsList = songService.findByLyrics(query);
+                List<Song> foundSongs = songService.findByOfficialDisplayTitle(query);
+                for (Song song : foundSongs){
+                    List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                    Set<Game> games = new HashSet<>();
+                    for (SongSubgroup songSubgroup : songSubgroupList){
+                        games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
+                    }
+                    songTitleList.put(song,games);
+                }
+                List<Song> foundLyrics = songService.findByLyrics(query);
+                for (Song song : foundLyrics){
+                    List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                    Set<Game> games = new HashSet<>();
+                    for (SongSubgroup songSubgroup : songSubgroupList){
+                        games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
+                    }
+                    songLyricsList.put(song,games);
+                }
                 genreService.findByGenreName(query).ifPresent(genreList::add);
-
             } else {
                 authorAliases = authorAliasService.findByAliasContains(query);
-                songTitleList = songService.findByOfficialDisplayTitleContains(query);
-                songLyricsList = songService.findByLyricsContains(query);
+                List<Song> foundSongs = songService.findByOfficialDisplayTitleContains(query);
+                for (Song song : foundSongs){
+                    List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                    Set<Game> games = new HashSet<>();
+                    for (SongSubgroup songSubgroup : songSubgroupList){
+                        games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
+                    }
+                    songTitleList.put(song,games);
+                }
+                List<Song> foundLyrics = songService.findByLyricsContains(query);
+                for (Song song : foundLyrics){
+                    List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                    Set<Game> games = new HashSet<>();
+                    for (SongSubgroup songSubgroup : songSubgroupList){
+                        games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
+                    }
+                    songLyricsList.put(song,games);
+                }
                 genreList = genreService.findByGenreNameContains(query);
             }
         }

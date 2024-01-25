@@ -15,48 +15,68 @@
 <hr>
 <h3 th:text="#{allFoundSongTitles}"></h3>
 <th:block th:each="song : ${songTitleList}">
-    <th:block th:each="authorSong,iter : ${song.authorSongList}">
+    <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
+         data-placement="right" th:title="#{showInfo}"
+         th:src="@{/images/fullres/info_big.png}">
+    <th:block th:each="authorSong,iter : ${song.key.authorSongList}">
         <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+               th:attr="data-song_id=${song.key.id}"
                 th:text="${authorSong.authorAlias.alias} "></a>
-            -
-            <span th:text="${song.officialDisplayTitle}"></span>
         </th:block>
     </th:block>
-    <th:block th:each="authorSong,iter : ${song.authorSongList.?[role.value=='FEAT']}">
+    -
+    <span th:text="${song.key.officialDisplayTitle}"></span>
+    <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='FEAT']}">
         <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
             th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a><span
             th:text="${iter.last ? ')' : ''}"></span>
     </th:block>
-    <th:block th:each="authorSong,iter : ${song.authorSongList.?[role.value=='REMIX']}">
+    <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='REMIX']}">
         <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
             th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a>
         <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
         <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+    </th:block>
+    <th:block>
+        <span th:text="' - from '"></span>
+        <th:block th:each="game,iter : ${song.value}">
+            <a class="table_link" th:href="'/game/'+${game.gameShort}" th:text="${game.displayTitle} "></a><span th:text="${!iter.last ? ', ' : ''}"></span>
+        </th:block>
     </th:block>
     <br>
 </th:block>
 <hr>
 <h3 th:text="#{allFoundLyrics}"></h3>
 <th:block th:each="song : ${songLyricsList}">
-    <th:block th:each="authorSong,iter : ${song.authorSongList}">
+    <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
+         data-placement="right" th:title="#{showInfo}"
+         th:src="@{/images/fullres/info_big.png}">
+    <th:block th:each="authorSong,iter : ${song.key.authorSongList}">
         <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                th:text="${authorSong.authorAlias.alias} "></a>
+               th:attr="data-song_id=${song.key.id}"
+                th:text="${authorSong.authorAlias.alias}"></a>
             -
-            <span th:text="${song.officialDisplayTitle}"></span>
+            <span th:text="${song.key.officialDisplayTitle}"></span>
         </th:block>
     </th:block>
-    <th:block th:each="authorSong,iter : ${song.authorSongList.?[role.value=='FEAT']}">
+    <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='FEAT']}">
         <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
             th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a><span
             th:text="${iter.last ? ')' : ''}"></span>
     </th:block>
-    <th:block th:each="authorSong,iter : ${song.authorSongList.?[role.value=='REMIX']}">
+    <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='REMIX']}">
         <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
             th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a>
         <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
         <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+    </th:block>
+    <th:block>
+        <span th:text="' - from '"></span>
+        <th:block th:each="game,iter : ${song.value}">
+            <a class="table_link" th:href="'/game/'+${game.gameShort}" th:text="${game.displayTitle}"></a><span th:text="${!iter.last ? ', ' : ''}"></span>
+        </th:block>
     </th:block>
     <br>
 </th:block>
@@ -65,3 +85,4 @@
     <a class="table_link" th:href="'/genre/'+${genre.id}" th:text="${genre.genreName} "></a>
     <br>
 </th:block>
+<th:block th:insert="~{fragments/songInfoModal.html}"></th:block>

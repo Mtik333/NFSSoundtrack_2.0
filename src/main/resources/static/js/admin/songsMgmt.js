@@ -283,6 +283,7 @@ $(document).ready(function () {
     });
 
     function setupAutocompleteArtist(mySelect, mySelectHidden, valueToSet) {
+        var previousValue = $(mySelect).val();
         mySelect.autocomplete({
             source: function (request, response, url) {
                 $.ajax({
@@ -307,6 +308,11 @@ $(document).ready(function () {
                 $(mySelect).val(ui.item.label);
                 $(mySelect).text(ui.item.label);
                 $(mySelectHidden).val(ui.item.value);
+                if (previousValue!=ui.item.value && !newSong){
+                    $("#aliasSelect-0").val(ui.item.label);
+                    $("#aliasSelect-0").text(ui.item.label);
+                    $("#aliasSelectHidden-0").val(ui.item.value);
+                }
                 if (newSong) {
                     if ($(mySelect).hasClass("authorSelect")) {
                         $("#aliasSelect-0").val(ui.item.label);
