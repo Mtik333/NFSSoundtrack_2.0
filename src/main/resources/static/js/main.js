@@ -145,7 +145,8 @@ $(document).ready(function () {
                 }
                 var parentTr = $(this).parent().parent().parent();
                 var newTr = $('<tr id="listen-music">');
-                var newTd = $('<td colspan="7" id="listen-music-id">');
+                var visibleTh = parentTr.parent().parent().find('th:visible').length;
+                var newTd = $('<td colspan="'+visibleTh+'" id="listen-music-id">');
                 var iframeToPut = $('<iframe id="ytrow" frameborder="0">');
                 var lyricsDiv = $('<div id="lyrics_main">');
                 var clearDiv = $('<div style="clear:both;">');

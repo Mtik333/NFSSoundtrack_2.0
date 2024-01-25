@@ -307,6 +307,11 @@ a.game_class{
     display: block;
 }
 
+#listen-music-id{
+    display: table-cell;
+    width: 80px;
+}
+
 @media screen and (max-width: 600px) {
 
   img.img-responsive-website-logo {
@@ -398,12 +403,6 @@ a.game_class{
   .tooltip {
     font-size: 2.5vw;
   }
-/**
-  #game_stuff col.info_button {
-    width: 10%;
-  }
-*/
-
 
   #game_stuff col.contextButton {
     width: 10%;
@@ -450,27 +449,10 @@ a.game_class{
     width: 5%;
   }
 
-
   #genreTable col.genre-info_button {
     display: none;
   }
-/*
-  #genreTable col.genre-band {
-    width: 18%;
-  }
 
-  #genreTable col.genre-songtitle {
-    width: 17%;
-  }
-
-  #genreTable col.genre-subgroup {
-    width: 20%;
-  }
-
-  #genreTable col.genre-game {
-    width: 23%;
-  }
-*/
   #genreTable col.genre-actions {
     width: 10%;
   }
@@ -564,6 +546,46 @@ a.game_class{
   }
 
   #customPlaylistStuff td.playlist-countries {
+    display: none;
+  }
+
+  #searchSongLyricsTable col.contextButton {
+    width: 7%;
+  }
+
+  #searchSongLyricsTable col.search-info_button {
+    display: none;
+  }
+
+  #searchSongLyricsTable col.search-actions {
+    width: 10%;
+  }
+
+  #searchSongLyricsTable th.info_button {
+    display: none;
+  }
+
+  #searchSongLyricsTable td.info_button {
+    display: none;
+  }
+
+  #searchSongTitlesTable col.contextButton {
+    width: 7%;
+  }
+
+  #searchSongTitlesTable col.search-info_button {
+    display: none;
+  }
+
+  #searchSongTitlesTable col.search-actions {
+    width: 10%;
+  }
+
+  #searchSongTitlesTable th.info_button {
+    display: none;
+  }
+
+  #searchSongTitlesTable td.info_button {
     display: none;
   }
 

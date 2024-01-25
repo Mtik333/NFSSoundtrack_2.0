@@ -48,14 +48,14 @@
                 <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
                     data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
             </td>
+            <td class="band">
             <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
                 <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
-                    <td class="band">
                         <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                             th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
-                    </td>
                 </th:block>
             </th:block>
+            </td>
             <td class="songtitle">
                 <span
                     th:text="${songSubgroup.ingameDisplayTitle!=null} ? ${songSubgroup.ingameDisplayTitle} : ${songSubgroup.song.officialDisplayTitle} "></span>
@@ -87,7 +87,7 @@
                         data-bs-target="#videoModal"
                         th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                         th:src="@{/images/znakwodny.png}">
-                    <textarea th:text="${songSubgroup.lyrics}" hidden></textarea>
+                    <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                     <th:block th:if="${songSubgroup.spotifyId != null}">
                         <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}">
