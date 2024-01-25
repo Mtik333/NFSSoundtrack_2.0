@@ -73,7 +73,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             Song relatedSong = songSubgroup.getSong();
             Author mainComposer;
             AuthorAlias composerAlias;
-            if (authorId.startsWith("NEW")) {
+            if (authorId!=null && authorId.startsWith("NEW")) {
                 String newAuthor = authorId.replace("NEW-", "");
                 mainComposer = new Author();
                 mainComposer.setName(newAuthor);

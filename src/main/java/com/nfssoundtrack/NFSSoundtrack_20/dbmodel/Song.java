@@ -51,6 +51,7 @@ public class Song implements Serializable {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "song", fetch = FetchType.LAZY)
+    @OrderBy("role ASC")
     private List<AuthorSong> authorSongList = new ArrayList<>();
 
     @JsonManagedReference
