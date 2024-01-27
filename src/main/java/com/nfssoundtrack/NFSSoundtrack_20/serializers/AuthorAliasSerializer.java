@@ -19,7 +19,8 @@ public class AuthorAliasSerializer extends JsonSerializer<AuthorAlias> {
     public void serialize(AuthorAlias authorAlias, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
             throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeNumberField("value", authorAlias.getId());
+        jsonGenerator.writeNumberField("value",authorAlias.getAuthor().getId());
+        jsonGenerator.writeNumberField("aliasId", authorAlias.getId());
         jsonGenerator.writeStringField("label", authorAlias.getAlias());
         jsonGenerator.writeEndObject();
         if (logger.isDebugEnabled()){

@@ -311,12 +311,12 @@ $(document).ready(function () {
                 if (previousValue!=ui.item.value && !newSong){
                     $("#aliasSelect-0").val(ui.item.label);
                     $("#aliasSelect-0").text(ui.item.label);
-                    $("#aliasSelectHidden-0").val(ui.item.value);
+                    $("#aliasSelectHidden-0").val(ui.item.aliasId);
                 }
                 if (newSong) {
                     if ($(mySelect).hasClass("authorSelect")) {
                         $("#aliasSelect-0").val(ui.item.label);
-                        $("#aliasSelectHidden-0").val(ui.item.value);
+                        $("#aliasSelectHidden-0").val(ui.item.aliasId);
                         $("#officialBand").val(ui.item.label);
                     }
                 }
@@ -1316,16 +1316,17 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (ooo) {
                 console.log("eee");
-                getSubgroupsFromGame();
                 $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500);
                     $('#nfs-content').empty();
+                    getSubgroupsFromGame();
                 });
             },
             error: function (ooo) {
                 $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
                     $('#nfs-content').empty();
+                    getSubgroupsFromGame();
                 });
             },
         });

@@ -82,16 +82,16 @@ public class ArtistController extends BaseControllerWithErrorHandling {
             throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Author.class, artistSerializer);
+        simpleModule.addSerializer(AuthorAlias.class, authorAliasSerializer);
         objectMapper.registerModule(simpleModule);
         if (input.length() <= 3) {
-            Optional<Author> author = authorService.findByName(input);
+            Optional<AuthorAlias> author = authorAliasService.findByAlias(input);
             if (author.isEmpty()) {
                 return objectMapper.writeValueAsString(null);
             }
             return objectMapper.writeValueAsString(Collections.singleton(author.get()));
         } else {
-            List<Author> authorList = authorService.findByNameContains(input);
+            List<AuthorAlias> authorList = authorAliasService.findByAliasContains(input);
             if (authorList == null) {
                 return objectMapper.writeValueAsString(null);
             }
@@ -131,6 +131,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
         int authorToMerge = (int) mergeInfo.get("authorToMergeId");
         int targetAuthor = (int) mergeInfo.get("targetAuthorId");
+        boolean deleteTargetAlias = (boolean) mergeInfo.get("mergeDeleteAlias");
         Author authorToDelete =
                 authorService.findById(authorToMerge).orElseThrow(() -> new ResourceNotFoundException("No author " +
                         "with id found" + authorToMerge));
@@ -139,8 +140,13 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                         "with input found " + authorToDelete.getName()));
         Author authorToUpdate = authorService.findById(targetAuthor).orElseThrow(() -> new ResourceNotFoundException("No author with " +
                 "id found " + targetAuthor));
-        AuthorAlias authorAlias = new AuthorAlias(authorToUpdate, authorToDelete.getName());
-        authorAlias = authorAliasService.save(authorAlias);
+        AuthorAlias authorAlias;
+        if (!deleteTargetAlias){
+            authorAlias = new AuthorAlias(authorToUpdate, authorToDelete.getName());
+            authorAlias = authorAliasService.save(authorAlias);
+        } else {
+            authorAlias = authorAliasService.findByAuthor(authorToUpdate).get(0);
+        }
         List<AuthorSong> songsToReassign =
                 authorSongService.findByAuthorAlias(existingAuthorAlias);
         for (AuthorSong authorSong : songsToReassign) {

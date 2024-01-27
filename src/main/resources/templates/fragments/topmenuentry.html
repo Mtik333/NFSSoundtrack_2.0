@@ -5,8 +5,11 @@
         <span th:text="#{otherMusicPlatforms}"></span>
         <br>
         [(${htmlToInject})]
-        <a href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModalHome" id="disqusLink"
-            th:text="#{shareOpinions}"></a><br>
+        <a class="table_link" href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModalHome" id="newDisqusLink"
+            th:text="#{shareOpinions}"></a> or
+            <a class="table_link" href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModalHome" id="disqusLink"
+            th:text="#{oldComments}"></a>
+            <br>
         <br>
         <b>
             <h5 th:text="#{todaySong}"></h5>

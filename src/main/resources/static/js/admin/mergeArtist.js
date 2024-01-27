@@ -25,6 +25,7 @@ $(document).ready(function () {
         rightCellDiv.append(targetAuthorSelectSelectHidden);
         setupAutocompleteMergeArtist(targetAuthorSelect, targetAuthorSelectSelectHidden, "");
         buttonCol.append('<button id="merge-artist" type="submit" class="btn btn-primary">Save</button>');
+        buttonCol.append('<input type="checkbox" class="form-check-input m-3" id="mergeDeleteAlias"><label class="form-check-label pl-2 pt-2" for="propagate">Delete alias?</label>');
         buttonDiv.append(buttonCol);
         rowDiv.append(buttonDiv);
         rowDiv.append(leftCellDiv);
@@ -35,9 +36,11 @@ $(document).ready(function () {
     $(document).on('click', "#merge-artist", function (e) {
         var authorToMerge = $("#authorMergeInputHidden").val();
         var targetAuthor = $("#targetAuthorInputHidden").val();
+        var mergeDeleteAlias = $("#mergeDeleteAlias").prop("checked");
         var objToSubmit = {};
         objToSubmit.authorToMergeId = Number(authorToMerge);
         objToSubmit.targetAuthorId = Number(targetAuthor);
+        objToSubmit.mergeDeleteAlias = mergeDeleteAlias;
         $(successAlertHtml).hide();
         $(failureAlertHtml).hide();
         $.ajax({
