@@ -1,7 +1,7 @@
 <th:block th:if="${songSubgroups!=null && !songSubgroups.isEmpty()}">
     <h2 th:text="${game.displayTitle}"></h2>
     <hr>
-    <div class="form-group pb-2 pt-2">
+    <div id="playlistsDiv" class="form-group pb-2 pt-2">
         <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
             data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
         <th:block th:if="${game.spotifyId!=null && game.spotifyId!=''}">

@@ -53,9 +53,18 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
         String soundcloudLink = JustSomeHelper.returnProperValueToDb(node.get("soundcloud").asText());
         String deezerLink = JustSomeHelper.returnProperValueToDb(node.get("deezer").asText());
         String tidalink = JustSomeHelper.returnProperValueToDb(node.get("tidal").asText());
-        String ingameBand = JustSomeHelper.returnProperValueToDb(node.get("ingameBand").asText());
-        String ingameTitle = JustSomeHelper.returnProperValueToDb(node.get("ingameTitle").asText());
-        String ingameSrcId = JustSomeHelper.returnProperValueToDb(node.get("ingameSrcId").asText());
+        String ingameBand=null;
+        if (!node.get("ingameBand").isNull()){
+            ingameBand = JustSomeHelper.returnProperValueToDb(node.get("ingameBand").asText());
+        }
+        String ingameTitle=null;
+        if (!node.get("ingameTitle").isNull()){
+            ingameTitle = JustSomeHelper.returnProperValueToDb(node.get("ingameTitle").asText());
+        }
+        String ingameSrcId=null;
+        if (!node.get("ingameSrcId").isNull()){
+            ingameSrcId = JustSomeHelper.returnProperValueToDb(node.get("ingameSrcId").asText());
+        }
         String lyrics = JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText());
         if (lyrics != null) {
             lyrics = lyrics.replaceAll("\n", "<br>");

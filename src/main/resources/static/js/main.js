@@ -15,6 +15,21 @@ var baseVideoSrc;
  */
 var lastActivePlayButton;
 $(document).ready(function () {
+    if ('ontouchstart' in window){
+        $("td.info_button").css("display","none");
+        $("th.info_button").css("display","none");
+        $("col.info_button").css("display","none");
+        $("a.a-external-music-link").css("display","none");
+        var currentColspan = $("td.subgroup-separator-td").attr("colspan");
+        $("td.subgroup-separator-td").attr("colspan", currentColspan-1);
+        $("td.info_button").css("display","none");
+        $("td.contextButton").css("display","");
+        $("th.contextButton").css("display","");
+        $("col.contextButton").css("display","");
+        $("#offcanvasSpan").text("");
+        $("#offcanvasSpan").prev().css("display","")
+        $(document).find("header").addClass("sticky-top");
+    } 
     //we make top menu button active
     if (window.location.href.indexOf("/home") > -1) {
         $("#nfs-top-home").parent().addClass("nfs-top-item-active");
@@ -74,20 +89,6 @@ $(document).ready(function () {
         });
     }
 
-    if ('ontouchstart' in window){
-        $("td.info_button").css("display","none");
-        $("th.info_button").css("display","none");
-        $("col.info_button").css("display","none");
-        $("a.a-external-music-link").css("display","none");
-        var currentColspan = $("td.subgroup-separator-td").attr("colspan");
-        $("td.subgroup-separator-td").attr("colspan", currentColspan-1);
-        $("td.info_button").css("display","none");
-        $("td.contextButton").css("display","");
-        $("th.contextButton").css("display","");
-        $("col.contextButton").css("display","");
-        $("#offcanvasSpan").text("");
-        $("#offcanvasSpan").prev().css("display","")
-    } 
     /**
      * method to remove duplicate countries from column because i couldn't develop it on backend in a way to return only distinct countries
      */
@@ -138,10 +139,13 @@ $(document).ready(function () {
                 var videoToUse = $(this).attr("data-tagvideo");
                 var lyricsHtmlElem =$(this).next();
                 var lyricsText = lyricsHtmlElem.text();
+                var noLyricsAtAll = false;
                 if (lyricsHtmlElem.attr("data-lyricsState")=="instrumental") {
-                    lyricsText = '<h4>'+lyricsHtmlElem.attr("data-instrumental")+'</h4>';
+                    lyricsText = '<h5 style="word-wrap: break-word;">'+lyricsHtmlElem.attr("data-instrumental")+'</h5>';
+                    noLyricsAtAll=true;
                 } else if (lyricsText == "" || lyricsText == "null") {
-                    lyricsText = '<h4>'+lyricsHtmlElem.attr("data-noLyrics")+'</h4>';
+                    lyricsText = '<h5 style="word-wrap: break-word;">'+lyricsHtmlElem.attr("data-noLyrics")+'</h5>';
+                    noLyricsAtAll=true;
                 }
                 var parentTr = $(this).parent().parent().parent();
                 var newTr = $('<tr id="listen-music">');
@@ -151,6 +155,10 @@ $(document).ready(function () {
                 var lyricsDiv = $('<div id="lyrics_main">');
                 var clearDiv = $('<div style="clear:both;">');
                 var pElem = $('<p>');
+                if (noLyricsAtAll){
+                    lyricsDiv.width("20%");
+                    iframeToPut.width("76%");
+                }
                 iframeToPut.attr("src", videoToUse + "?autoplay=1&amp;autohide=0&amp;theme=light&amp;wmode=transparent");
                 pElem.append(lyricsText);
                 lyricsDiv.append(pElem);

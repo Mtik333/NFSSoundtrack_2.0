@@ -967,7 +967,7 @@ $(document).ready(function () {
                     var existingSong = JSON.parse(ooo);
                     if (existingSong) {
                         $("#existingSongId").val(existingSong.id);
-                        $("#officialBand").val(existingSong.officialDisplayTitle);
+                        $("#officialTitle").val(existingSong.officialDisplayTitle);
                         $("#itunesInput").val(existingSong.itunesLink);
                         $("#spotifyInput").val(existingSong.spotifyId);
                         $("#soundcloudInput").val(existingSong.soundcloudLink);

@@ -27,17 +27,21 @@
                 $(document).find("#topNavbar").addClass("bg-dark");
                 $(document).find("#topNavbar").removeClass("navbar-light");
                 $(document).find("#topNavbar").removeClass("bg-light");
+                $(document).find("#logoDiv").addClass("bg-dark");
+                $(document).find("#logoDiv").removeClass("bg-light");
             } else {
                 $(document).find("html").attr("data-bs-theme", "light");
                 $(document).find("#topNavbar").addClass("navbar-light");
                 $(document).find("#topNavbar").addClass("bg-light");
                 $(document).find("#topNavbar").removeClass("navbar-dark");
                 $(document).find("#topNavbar").removeClass("bg-dark");
+                $(document).find("#logoDiv").removeClass("bg-dark");
+                $(document).find("#logoDiv").addClass("bg-light");
             }
         }
     </script>
     <header>
-        <div class="row mx-auto container-fluid">
+        <div id="logoDiv" class="bg-light row mx-auto container-fluid">
             <div class="col col-sm-8">
                 <a href="https://racingsoundtracks.com">
                     <img class="img-responsive-website-logo" th:src="@{/images/racing_logo2.png}">
@@ -55,9 +59,9 @@
                 </a>
             </div>
         </div>
+        <th:block th:insert="~{fragments/topmenu.html}"></th:block>
     </header>
     <div class="container-fluid">
-        <th:block th:insert="~{fragments/topmenu.html}"></th:block>
         <div class="row mx-auto">
             <th:block th:insert="~{fragments/leftmenu.html}"></th:block>
             <div class="col">

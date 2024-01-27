@@ -373,7 +373,7 @@ a.game_class{
   }
 
   .nav-link {
-    font-size: 3.5vw;
+    font-size: 3vw;
   }
 
   .nfs-top-item {
@@ -622,15 +622,19 @@ a.game_class{
   }
 
   #lyrics_main {
-    width: 65%;
+    width: 48%;
     float: right;
     overflow: auto;
-    height: 36vw;
+    height: 40vw;
+  }
+
+  #playlistsDiv{
+    text-align: center;
   }
 
   #ytrow {
-    width: 28vw;
-    height: 36vw;
+    width: 48%;
+    height: 40vw;
   }
 
     footer div{
