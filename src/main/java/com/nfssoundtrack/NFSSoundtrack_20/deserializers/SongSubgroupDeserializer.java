@@ -54,15 +54,15 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
         String deezerLink = JustSomeHelper.returnProperValueToDb(node.get("deezer").asText());
         String tidalink = JustSomeHelper.returnProperValueToDb(node.get("tidal").asText());
         String ingameBand=null;
-        if (!node.get("ingameBand").isNull()){
+        if (node.get("ingameBand")!=null){
             ingameBand = JustSomeHelper.returnProperValueToDb(node.get("ingameBand").asText());
         }
         String ingameTitle=null;
-        if (!node.get("ingameTitle").isNull()){
+        if (node.get("ingameTitle")!=null){
             ingameTitle = JustSomeHelper.returnProperValueToDb(node.get("ingameTitle").asText());
         }
         String ingameSrcId=null;
-        if (!node.get("ingameSrcId").isNull()){
+        if (node.get("ingameSrcId")!=null){
             ingameSrcId = JustSomeHelper.returnProperValueToDb(node.get("ingameSrcId").asText());
         }
         String lyrics = JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText());
@@ -73,10 +73,9 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
         Instrumental instrumental = Instrumental.fromBoolean(node.get("instrumental").asBoolean());
         Remix remix = Remix.fromBoolean(node.get("remix").asBoolean());
         SongSubgroup songSubgroup = new SongSubgroup(instrumental, remix, ingameSrcId, spotifyLink, deezerLink,
-                itunesLink
-                , tidalink, soundcloudLink, ingameBand, ingameTitle, 10000L, lyrics, info);
+                itunesLink, tidalink, soundcloudLink, ingameBand, ingameTitle, 10000L, lyrics, info);
         JsonNode existingSongNode = node.get("existingSongId");
-        if (existingSongNode.isInt()) {
+        if (existingSongNode!=null && existingSongNode.isInt()) {
             Integer existingSongId = existingSongNode.asInt();
             Optional<Song> existingSong = songService.findById(existingSongId);
             if (existingSong.isPresent()) {

@@ -948,6 +948,12 @@ $(document).ready(function () {
                 $("#aliasSelect-0").val($(this).val());
                 $("#officialBand").val($(this).val());
             }
+            if ($(this).val()=="Somebody"){
+                let somebodyVar = "Somebodygame_id"+gameId;
+                $(this).val(somebodyVar);
+                $("#aliasSelect-0").val(somebodyVar);
+                $("#officialBand").val(somebodyVar);
+            }
         }
     });
 

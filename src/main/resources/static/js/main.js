@@ -155,7 +155,7 @@ $(document).ready(function () {
                 var lyricsDiv = $('<div id="lyrics_main">');
                 var clearDiv = $('<div style="clear:both;">');
                 var pElem = $('<p>');
-                if (noLyricsAtAll){
+                if (noLyricsAtAll && 'ontouchstart' in window){
                     lyricsDiv.width("20%");
                     iframeToPut.width("76%");
                 }
