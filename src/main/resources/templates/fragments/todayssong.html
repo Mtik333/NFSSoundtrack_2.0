@@ -1,0 +1,104 @@
+<h2 th:text="#{archiveSongs}"></h2>
+<div class="form-group pb-2 pt-2">
+    <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
+        data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
+</div>
+<table id="archiveSongsTable" class="table table-hover table-striped playlist_table sortable-table">
+    <colgroup>
+        <col class="contextButton" style="display:none;"/>
+        <col class="archiveSongs-info_button" />
+        <col class="archiveSongs-date" />
+        <col class="archiveSongs-band" />
+        <col class="archiveSongs-songtitle" />
+        <col class="archiveSongs-game" />
+        <col class="archiveSongs-actions" />
+    </colgroup>
+    <thead>
+        <tr>
+            <th class="game_content_th no-sort contextButton" scope="col" style="display:none;"></th>
+            <th class="game_content_th info_button no-sort"></th>
+            <th class="game_content_th" scope="col" th:text="#{date}"></th>
+            <th class="game_content_th" scope="col" th:text="#{band}"></th>
+            <th class="game_content_th" scope="col" th:text="#{song}"></th>
+            <th class="game_content_th" scope="col" th:text="#{game}"></th>
+            <th class="game_content_th no-sort"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="todaysSong, iter1 : ${todays30Songs}"
+            th:attr="data-el_id='songSubgroup'+${todaysSong.songSubgroup.subgroup.id},data-song_id=${todaysSong.songSubgroup.song.id},data-songSubgroup-id=${todaysSong.songSubgroup.id}">
+            <td class="contextButton" style="display:none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor" class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
+                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                  </svg>
+            </td>
+            <td class="info_button">
+                <img class="img-responsive-row-icon add-to-custom-playlist pointable" data-toggle="tooltip"
+                    data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/fullres/plus_big.png}">
+                <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
+                    data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
+            </td>
+            <td th:text="${todaysSong.date}"></td>
+            <td class="band">
+            <th:block th:each="authorSong,iter : ${todaysSong.songSubgroup.song.authorSongList}">
+                <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
+                        <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                            th:text="${todaysSong.songSubgroup.ingameDisplayBand} ? ${todaysSong.songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
+                </th:block>
+            </th:block>
+            </td>
+            <td class="songtitle">
+                <span
+                    th:text="${todaysSong.songSubgroup.ingameDisplayTitle!=null} ? ${todaysSong.songSubgroup.ingameDisplayTitle} : ${todaysSong.songSubgroup.song.officialDisplayTitle} "></span>
+                <th:block th:each="authorSong,iter : ${todaysSong.songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
+                    <span th:text="${iter.first ? '(feat. ' : ''}"></span>
+                    <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                        th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
+                    <th:block th:if="${authorSong.featConcat!=null}">
+                        <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
+                    </th:block>
+                </th:block>
+                <th:block th:if="${todaysSong.songSubgroup.remix.value=='YES'}">
+                    <th:block th:each="authorSong,iter : ${todaysSong.songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
+                        <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+                            th:href="'/author/'+${authorSong.authorAlias.id}"
+                            th:text="${authorSong.authorAlias.alias}"></a>
+                        <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
+                        <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+                    </th:block>
+                </th:block>
+            </td>
+            <td><a class="table_link" th:text="${todaysSong.songSubgroup.subgroup.mainGroup.game.displayTitle}"
+                    th:href="'/game/'+${todaysSong.songSubgroup.subgroup.mainGroup.game.gameShort}"></a></td>
+            <td>
+                <div class="play_icondiv">
+                    <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
+                        data-bs-target="#videoModal"
+                        th:attr="data-tagVideo=${todaysSong.songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${todaysSong.songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${todaysSong.songSubgroup.song.srcId}"
+                        th:src="@{/images/znakwodny.png}">
+                    <textarea th:utext="${todaysSong.songSubgroup.lyrics}" hidden></textarea>
+                    <th:block th:if="${todaysSong.songSubgroup.spotifyId != null}">
+                        <a class="a-external-music-link" th:href="${todaysSong.songSubgroup.spotifyId}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}">
+                        </a>
+                    </th:block>
+                    <th:block th:if="${todaysSong.songSubgroup.deezerId != null}">
+                        <a class="a-external-music-link" th:href="${todaysSong.songSubgroup.deezerId}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}">
+                        </a>
+                    </th:block>
+                    <th:block th:if="${todaysSong.songSubgroup.itunesLink != null}">
+                        <a class="a-external-music-link" th:href="${todaysSong.songSubgroup.itunesLink}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}">
+                        </a>
+                    </th:block>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<th:block th:insert="~{fragments/playlistModal.html}"></th:block>
+<th:block th:insert="~{fragments/ytVideoModal.html}"></th:block>
+<th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
+<th:block th:insert="~{fragments/mobileAdditionalDisplay.html}"></th:block>
+<script th:src="@{/js/genre.js}" type="application/javascript"></script>

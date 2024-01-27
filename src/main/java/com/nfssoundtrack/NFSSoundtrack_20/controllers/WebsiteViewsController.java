@@ -254,4 +254,13 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         return "index";
     }
+
+    @GetMapping(value="/songhistory")
+    public String getTodaysSongHistory(Model model){
+        List<TodaysSong> todays30Songs = todaysSongService.findAllFromLast30Days();
+        model.addAttribute("todays30Songs", todays30Songs);
+        model.addAttribute("appName", appName);
+        model.addAttribute("series", serieService.findAllSortedByPositionAsc());
+        return "index";
+    }
 }

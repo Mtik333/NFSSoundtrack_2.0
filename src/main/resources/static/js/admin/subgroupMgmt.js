@@ -47,7 +47,7 @@ $(document).ready(function () {
                 }
                 var tableToFill;
                 if (fullScopeOfEdit.length > 0) {
-                    var dropdownMenuDiv = $('<div class="dropdown-menu" aria-labelledby="subgroupsDropdown">');
+                    var dropdownMenuDiv = $('<div class="dropdown-menu" style="max-height: 350px; overflow-y: auto;" aria-labelledby="subgroupsDropdown">');
                     tableToFill = displayAllSongs(allSongSubgroups, dropdownDiv);
                     for (let i = 0; i < fullScopeOfEdit.length; i++) {
                         const group = fullScopeOfEdit[i];

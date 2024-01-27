@@ -4,10 +4,10 @@ img.img-responsive-global-logo {
   padding: 0.2vw;
 }
 
-  img.img-responsive-website-logo {
+img.img-responsive-website-logo {
   max-height: 5vw;
   margin: 0.1vw;
-  }
+}
 
 img.img-responsive-song-info {
   max-height: 3vw;
@@ -269,47 +269,48 @@ iframe.externalIframe {
   width: 100%;
 }
 
-footer div{
-    width: 98.5%;
-    margin: 0vw auto;
-    padding: 1vw;
-}
-html[data-bs-theme="dark"] #topNavbar{
-    background-color: #262424 !important;
+footer div {
+  width: 98.5%;
+  margin: 0vw auto;
+  padding: 1vw;
 }
 
-td.info_button{
-    min-width: 6vw;
+html[data-bs-theme="dark"] #topNavbar {
+  background-color: #262424 !important;
 }
 
-td.actions{
-    width: 11vw;
+td.info_button {
+  min-width: 6vw;
 }
 
-div.context_menu_hide{
-    display: none;
+td.actions {
+  width: 11vw;
 }
 
-iframe.home_frame{
+div.context_menu_hide {
+  display: none;
+}
+
+iframe.home_frame {
   width: 35vw;
   height: 20vw;
 }
 
-div.centerKeeper{
+div.centerKeeper {
   text-align: center;
 }
 
-img.partners{
-max-width: 20vw;
+img.partners {
+  max-width: 20vw;
 }
 
-a.game_class{
-    display: block;
+a.game_class {
+  display: block;
 }
 
-#listen-music-id{
-    display: table-cell;
-    width: 80px;
+#listen-music-id {
+  display: table-cell;
+  width: 80px;
 }
 
 @media screen and (max-width: 600px) {
@@ -319,6 +320,7 @@ a.game_class{
     margin: 0.3vw;
     max-height: 9vw;
   }
+
   img.img-responsive-global-logo {
     max-height: 8vw;
     margin: 0.3vw;
@@ -384,9 +386,10 @@ a.game_class{
     font-size: 3vw;
   }
 
- #searchStuff::placeholder{
+  #searchStuff::placeholder {
     font-size: 0.75rem;
- }
+  }
+
   #filter_songs {
     font-size: 2.5vw;
   }
@@ -468,6 +471,19 @@ a.game_class{
   #genreTable td.genre-group {
     display: none;
   }
+
+  #archiveSongsTable col.contextButton {
+    width: 7%;
+  }
+
+  #archiveSongsTable col.archiveSongs-info_button {
+    display: none;
+  }
+
+  #archiveSongsTable col.archiveSongs-actions {
+    width: 10%;
+  }
+
 
   #songTable col.contextButton {
     width: 7%;
@@ -628,7 +644,7 @@ a.game_class{
     height: 40vw;
   }
 
-  #playlistsDiv{
+  #playlistsDiv {
     text-align: center;
   }
 
@@ -637,61 +653,68 @@ a.game_class{
     height: 40vw;
   }
 
-    footer div{
-        width: 90%;
-        margin: 0vw auto;
-        padding: 1vw;
-        font-size: 2.5vw;
-    }
+  footer div {
+    width: 90%;
+    margin: 0vw auto;
+    padding: 1vw;
+    font-size: 2.5vw;
+  }
 
-    td.band{
+  td.band {
     word-wrap: break-word;
-    }
+  }
 
-    td.songtitle{
+  td.songtitle {
     word-wrap: break-word;
-    }
+  }
 
-    td.info_button{
-        min-width: 6vw;
-    }
+  td.info_button {
+    min-width: 6vw;
+  }
 
-    td.actions{
-        width: 12vw;
-    }
+  td.actions {
+    width: 12vw;
+  }
 
-    div.context_menu_show{
-        z-index: 1000;
-        position: absolute;
-        display: block;
-        list-style-type: none;
-        list-style: none;
-        border:1px solid;
-    }
-    ul.actions_menu{
-        margin-bottom: 0;
-        padding-left: 0;
-    }
-    ul.navbar-nav{
-        text-align:center;
-    }
-    .single_action{
-        font-size: 3vw;
-    }
+  div.context_menu_show {
+    z-index: 1000;
+    position: absolute;
+    display: block;
+    list-style-type: none;
+    list-style: none;
+    border: 1px solid;
+  }
 
-    iframe.home_frame{
-      height: 45vw;
-      width: 60vw;
-    }
+  ul.actions_menu {
+    margin-bottom: 0;
+    padding-left: 0;
+  }
 
-    img.img-main-icon {
-      max-height: 12vw;
-      margin: 0.35vw;
-    }
+  ul.navbar-nav {
+    text-align: center;
+  }
 
-    img.partners{
-        max-width: 50vw;
-    }
+  .single_action {
+    font-size: 3vw;
+  }
+
+  iframe.home_frame {
+    height: 45vw;
+    width: 60vw;
+  }
+
+  img.img-main-icon {
+    max-height: 12vw;
+    margin: 0.35vw;
+  }
+
+  img.partners {
+    max-width: 50vw;
+  }
+
+  div.modal-backdrop {
+    z-index: 1010;
+  }
 }
 
 @media screen and (max-width: 400px) {
@@ -701,6 +724,7 @@ a.game_class{
     margin: 0.3vw;
   }
 }
+
 /*
 This is for JQuery Autocomplete stuff
 */

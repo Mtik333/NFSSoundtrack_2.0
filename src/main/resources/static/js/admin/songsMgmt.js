@@ -36,7 +36,7 @@ $(document).ready(function () {
                     }
                 }
                 if (fullScopeOfEdit.length > 0) {
-                    var dropdownMenuDiv = $('<div class="dropdown-menu" aria-labelledby="subgroupsDropdown">');
+                    var dropdownMenuDiv = $('<div class="dropdown-menu" style="max-height: 350px; overflow-y: auto;" aria-labelledby="subgroupsDropdown">');
                     tableToFill = displayAllSongs(allSongSubgroups, dropdownDiv);
                     for (let i = 0; i < fullScopeOfEdit.length; i++) {
                         var group = fullScopeOfEdit[i];
@@ -1236,6 +1236,7 @@ $(document).ready(function () {
         songToSave.subgroup = currentSubgroup;
         if ($("#existingSongId").val() != "") {
             songToSave.existingSongId = $("#existingSongId").val();
+            //fix when there is a remix
         } else {
             var feats = $("#featDiv").find("input.feat-select");
             songToSave.feat = false;

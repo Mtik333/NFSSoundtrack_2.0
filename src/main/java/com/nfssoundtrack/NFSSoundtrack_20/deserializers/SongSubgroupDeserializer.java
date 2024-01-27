@@ -71,7 +71,10 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
         }
         String info = JustSomeHelper.returnProperValueToDb(node.get("info").asText());
         Instrumental instrumental = Instrumental.fromBoolean(node.get("instrumental").asBoolean());
-        Remix remix = Remix.fromBoolean(node.get("remix").asBoolean());
+        Remix remix = Remix.NO;
+        if (node.get("remix")!=null){
+            remix = Remix.fromBoolean(node.get("remix").asBoolean());
+        }
         SongSubgroup songSubgroup = new SongSubgroup(instrumental, remix, ingameSrcId, spotifyLink, deezerLink,
                 itunesLink, tidalink, soundcloudLink, ingameBand, ingameTitle, 10000L, lyrics, info);
         JsonNode existingSongNode = node.get("existingSongId");

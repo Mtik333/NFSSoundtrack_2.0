@@ -51,4 +51,16 @@ public class TodaysSongService {
             return todaysSong;
         }
     }
+
+    public List<TodaysSong> findAllFromLast30Days(){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
+        LocalDate localDate = LocalDate.now();
+        String dateAsString = dtf.format(localDate);
+        Date todayDate = Date.valueOf(dateAsString);
+        LocalDate monthAgo = localDate.minusDays(30);
+        String oldDateAsString = dtf.format(monthAgo);
+        Date monthAgoDate = Date.valueOf(oldDateAsString);
+        List<TodaysSong> todaysSongs = todaysSongRepository.findByDateBetween(monthAgoDate,todayDate, Sort.by(Sort.Direction.DESC, "date"));
+        return todaysSongs;
+    }
 }
