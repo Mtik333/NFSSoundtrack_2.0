@@ -1,16 +1,16 @@
 <h2 th:text="#{songsWithGenre}+' '+${genre?.genreName}"></h2>
 <th:block th:if="${#lists.size(songSubgroupList)>=50 and readFull!=null}">
     <h5 th:text="#{listOfSongsOver50}"></h5>
-    <a th:href="@{/genre/readfull/{genreid}(genreid=${genre.id})}" th:text="#{seeFullGenreList}"></a>
+    <a class="table_link" th:href="@{/genre/readfull/{genreid}(genreid=${genre.id})}" th:text="#{seeFullGenreList}"></a>
     <br>
 </th:block>
-<div class="form-group pb-2 pt-2">
+<div class="form-group pb-2 pt-2" style="text-align: center;">
     <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
         data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
 </div>
 <table id="genreTable" class="table table-hover table-striped playlist_table sortable-table">
     <colgroup>
-        <col class="contextButton" style="display:none;"/>
+        <col class="contextButton" style="display:none;" />
         <col class="genre-id" />
         <col class="genre-info_button" />
         <col class="genre-band" />
@@ -37,9 +37,11 @@
         <tr th:each="songSubgroup, iter1 : ${songSubgroupList}"
             th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
             <td class="contextButton" style="display:none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor" class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
-                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                  </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor"
+                    class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
+                    <path
+                        d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                </svg>
             </td>
             <td th:text="${iter1.count}"></td>
             <td class="info_button">
@@ -49,12 +51,12 @@
                     data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
             </td>
             <td class="band">
-            <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
-                <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
+                <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList}">
+                    <th:block th:if="${authorSong.role.value!='REMIX'} and ${authorSong.role.value!='FEAT'}">
                         <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                             th:text="${songSubgroup.ingameDisplayBand} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
+                    </th:block>
                 </th:block>
-            </th:block>
             </td>
             <td class="songtitle">
                 <span
@@ -87,6 +89,16 @@
                         data-bs-target="#videoModal"
                         th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                         th:src="@{/images/znakwodny.png}">
+                    <a class="table_link externalYT" target="_blank"
+                        th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-box-arrow-up-right"
+                            viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                            <path fill-rule="evenodd"
+                                d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                        </svg>
+                    </a>
                     <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                     <th:block th:if="${songSubgroup.spotifyId != null}">
                         <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">

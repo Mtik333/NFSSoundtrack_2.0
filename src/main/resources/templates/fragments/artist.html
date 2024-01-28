@@ -88,7 +88,7 @@
 
 <table id="artistStuff" class="table table-hover table-striped playlist_table">
     <colgroup>
-        <col class="contextButton" style="display:none;"/>
+        <col class="contextButton" style="display:none;" />
         <col class="artist-info_button" />
         <col class="artist-subgroup" />
         <col class="artist-group" />
@@ -151,12 +151,14 @@
                         </th:block>
                     </td>
                 </tr>
-                <tr class="all composer" th:each="songSubgroup : ${songToSongSubgroupMap.value}" 
-                th:attr="data-aliasid=${mapEntry.key.id},data-role='composer',data-songSubgroup-id=${songSubgroup.id},data-song_id=${songSubgroup.song.id}">
+                <tr class="all composer" th:each="songSubgroup : ${songToSongSubgroupMap.value}"
+                    th:attr="data-aliasid=${mapEntry.key.id},data-role='composer',data-songSubgroup-id=${songSubgroup.id},data-song_id=${songSubgroup.song.id}">
                     <td class="contextButton" style="display:none;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor" class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
-                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                          </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor"
+                            class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
+                            <path
+                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                        </svg>
                     </td>
                     <td class="info_button">
                         <img class="img-responsive-row-icon add-to-custom-playlist pointable" data-toggle="tooltip"
@@ -190,6 +192,16 @@
                                 data-bs-target="#videoModal"
                                 th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                                 th:src="@{/images/znakwodny.png}">
+                            <a class="table_link externalYT" target="_blank"
+                                th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                    class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                        d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                    <path fill-rule="evenodd"
+                                        d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                                </svg>
+                            </a>
                             <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">
@@ -234,9 +246,11 @@
                 <tr class="all subcomposer" th:each="songSubgroup : ${songToSongSubgroupMap.value}"
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer',data-songSubgroup-id=${songSubgroup.id},data-song_id=${songSubgroup.song.id}">
                     <td class="contextButton" style="display:none;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor" class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
-                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                          </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor"
+                            class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
+                            <path
+                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                        </svg>
                     </td>
                     <td class="info_button">
                         <img class="img-responsive-row-icon add-to-custom-playlist pointable" data-toggle="tooltip"
@@ -270,6 +284,16 @@
                                 data-bs-target="#videoModal"
                                 th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                                 th:src="@{/images/znakwodny.png}">
+                            <a class="table_link externalYT" target="_blank"
+                                th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                    class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                        d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                    <path fill-rule="evenodd"
+                                        d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                                </svg>
+                            </a>
                             <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">
@@ -313,9 +337,11 @@
                 <tr class="all remix" th:each="songSubgroup : ${songToSongSubgroupMap.value}"
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='remix',data-songSubgroup-id=${songSubgroup.id},data-song_id=${songSubgroup.song.id}">
                     <td class="contextButton" style="display:none;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor" class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
-                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                          </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor"
+                            class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
+                            <path
+                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                        </svg>
                     </td>
                     <td class="info_button">
                         <img class="img-responsive-row-icon add-to-custom-playlist pointable" data-toggle="tooltip"
@@ -349,6 +375,16 @@
                                 data-bs-target="#videoModal"
                                 th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                                 th:src="@{/images/znakwodny.png}">
+                            <a class="table_link externalYT" target="_blank"
+                                th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                    class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                        d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                    <path fill-rule="evenodd"
+                                        d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                                </svg>
+                            </a>
                             <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">
@@ -392,9 +428,11 @@
                 <tr class="all feat" th:each="songSubgroup : ${songToSongSubgroupMap.value}"
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='feat',data-songSubgroup-id=${songSubgroup.id},data-song_id=${songSubgroup.song.id}">
                     <td class="contextButton" style="display:none;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor" class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
-                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                          </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor"
+                            class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
+                            <path
+                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                        </svg>
                     </td>
                     <td class="info_button">
                         <img class="img-responsive-row-icon add-to-custom-playlist pointable" data-toggle="tooltip"
@@ -428,6 +466,16 @@
                                 data-bs-target="#videoModal"
                                 th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
                                 th:src="@{/images/znakwodny.png}">
+                            <a class="table_link externalYT" target="_blank"
+                                th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                    class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                        d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                    <path fill-rule="evenodd"
+                                        d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                                </svg>
+                            </a>
                             <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">

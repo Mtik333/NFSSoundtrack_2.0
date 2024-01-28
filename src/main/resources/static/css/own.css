@@ -313,6 +313,12 @@ a.game_class {
   width: 80px;
 }
 
+svg.bi-box-arrow-up-right{
+    width: 0.6vw;
+    height: 0.6vw;
+    vertical-align: top;
+}
+
 @media screen and (max-width: 600px) {
 
   img.img-responsive-website-logo {
@@ -714,6 +720,10 @@ a.game_class {
 
   div.modal-backdrop {
     z-index: 1010;
+  }
+
+  svg.bi-box-arrow-up-right{
+      display: none;
   }
 }
 

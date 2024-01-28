@@ -594,6 +594,7 @@ $(document).ready(function () {
             infoLabel = additionalInfoA.attr("aria-label");
             $("#mobileShowSongInfo").attr("infoLabel", infoLabel);
         }
+        var youtubeElem=$(trElem).find("a.externalYT");
         var spotifyElem=null;
         var deezerElem=null;
         var itunesElem=null;
@@ -606,6 +607,12 @@ $(document).ready(function () {
             } else if (actualAObj.attr("href").indexOf("music.apple.com")>-1){
                 itunesElem=actualAObj;
             }
+        }
+        $("#newDisqusLinkToOpen").css("display", "");
+        if (youtubeElem.length>0){
+            $("#mobileExternalYoutube").attr("href", youtubeElem.attr("href"));
+        } else {
+            $("#mobileExternalYoutube").css("display", "none");
         }
         if (spotifyElem!=null){
             $("#mobileLaunchSpotify").attr("href", spotifyElem.attr("href"));
@@ -627,6 +634,8 @@ $(document).ready(function () {
             $("#mobileLaunchSpotify").css("display", "");
             $("#mobileLaunchItunes").css("display", "");
             $("#mobileLaunchDeezer").css("display", "");
+            $("#mobileExternalYoutube").css("display", "");
+            $("#newDisqusLinkToOpen").css("display", "");
         } else {
             var top = e.originalEvent.touches[0].pageY + (window.innerHeight*0.02);
             var left = e.originalEvent.touches[0].pageX + 15;
@@ -638,6 +647,10 @@ $(document).ready(function () {
             }).addClass("show");
             return false; //blocks default Webbrowser right click menu
         }
+    });
+
+    $(document).on("touchstart", "#newDisqusLinkToOpen", function(e){
+        $("#newDisqusLink").toggle('show');
     });
 
     $(document).on("touchstart", "tr", function(e){
