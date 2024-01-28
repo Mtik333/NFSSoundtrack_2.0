@@ -20,17 +20,13 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(SubgroupController.class);
 
-    @GetMapping(value = "/read/{gameId}")
+    @GetMapping(value = "/read/{subgroupId}")
     public @ResponseBody
-    String subGroupManage(@PathVariable("gameId") int gameId) throws Exception {
+    String subGroupManage(@PathVariable("subgroupId") int subgroupId) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        Game game = gameService.findById(gameId).orElseThrow(() -> new ResourceNotFoundException("no game with id found " + gameId));
-        List<MainGroup> mainGroups = game.getMainGroups();
-        List<Subgroup> subgroups = new ArrayList<>();
-        for (MainGroup mainGroup : mainGroups) {
-            subgroups.addAll(mainGroup.getSubgroups());
-        }
-        return objectMapper.writeValueAsString(subgroups);
+        Subgroup subgroup = subgroupService.findById(subgroupId) .orElseThrow(() ->
+                new ResourceNotFoundException("no subgroup with id found " + subgroupId));
+        return objectMapper.writeValueAsString(subgroup);
     }
 
     @PutMapping(value = "/put/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -97,11 +93,12 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
         Game game = gameService.findById(gameId)
                 .orElseThrow(() -> new ResourceNotFoundException("No game found with id " + gameId));
         List<MainGroup> mainGroups = game.getMainGroups();
-        List<Subgroup> subgroups = new ArrayList<>();
         for (MainGroup mainGroup : mainGroups) {
-            subgroups.addAll(mainGroup.getSubgroups());
+            if (mainGroup.getGroupName().contentEquals("All")){
+                return objectMapper.writeValueAsString(mainGroup.getSubgroups().get(0));
+            }
         }
-        return objectMapper.writeValueAsString(subgroups);
+        throw new Exception("you sudnt come here");
     }
 
 }

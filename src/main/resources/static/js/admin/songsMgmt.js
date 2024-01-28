@@ -1,10 +1,74 @@
 var currentSongSubgroup;
 var currentSubgroup;
+var dropdownDiv;
 var newSong = false;
 $(document).ready(function () {
 
     $(successAlertHtml).hide();
     $(failureAlertHtml).hide();
+
+    function getSingleSubgroupFromGame(subgroupId) {
+        if (subgroupId != 0) {
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/subgroup/read/" + subgroupId,
+                success: function (ooo) {
+                    var allSongsInSubgroup = JSON.parse(ooo);
+                    tableToFill = displayAllSongs(allSongsInSubgroup.songSubgroupList, dropdownDiv);
+                    $('#nfs-content').append(tableToFill);
+                }, error: function (ooo) {
+                    $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                        $(failureAlertHtml).slideUp(500);
+                    });
+                },
+            });
+        } else {
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/maingroup/readForEditGroups/" + gameId,
+                success: function (ooo) {
+                    fullScopeOfEdit = JSON.parse(ooo);
+                    var divToAppend = $('#nfs-content');
+                    divToAppend.empty();
+                    divToAppend.append(successAlertHtml);
+                    divToAppend.append(failureAlertHtml);
+                    var rowDiv = $('<div class="row p-1">');
+                    var leftCellDiv = $('<div class="col">');
+                    var rightCellDiv = $('<div class="col">');
+                    divToAppend.append(rowDiv);
+                    rowDiv.append(leftCellDiv);
+                    rowDiv.append(rightCellDiv);
+                    var newGroupSpan = $('<h2><button data-gameId=' + gameId + ' id="new-song" class="new-group btn btn-success">New song</button></h2>');
+                    dropdownDiv = $('<div id="selectSubgroup" class="dropdown">');
+                    dropdownDiv.append('<button class="btn btn-secondary dropdown-toggle" type="button" id="subgroupsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">All</button>');
+                    leftCellDiv.append(dropdownDiv);
+                    rightCellDiv.append(newGroupSpan);
+                    if (fullScopeOfEdit.length > 0) {
+                        var dropdownMenuDiv = $('<div class="dropdown-menu" style="max-height: 350px; overflow-y: auto;" aria-labelledby="subgroupsDropdown">');
+                        for (let i = 0; i < fullScopeOfEdit.length; i++) {
+                            var group = fullScopeOfEdit[i];
+                            var groupName = fullScopeOfEdit[i].groupName;
+                            for (let j = 0; j < group.subgroups.length; j++) {
+                                var subgroup = group.subgroups[j];
+                                var aSubgroup = $('<a class="dropdown-item songItem" href="#" data-groupId="' + group.id + '" data-subgroupId="' + subgroup.id + '">');
+                                aSubgroup.text('(' + subgroup.subgroupName + ') from group [' + groupName + ']');
+                                dropdownMenuDiv.append(aSubgroup);
+                            }
+                        }
+                        dropdownDiv.append(dropdownMenuDiv);
+                    }
+                },
+                error: function (ooo) {
+                    $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                        $(failureAlertHtml).slideUp(500);
+                    });
+                },
+            });
+        }
+    }
+
     function getSubgroupsFromGame() {
         $.ajax({
             async: false,
@@ -60,6 +124,9 @@ $(document).ready(function () {
     }
 
     function displayAllSongs(songs, dropdownDiv) {
+        if ($("#songs-table").length > 0) {
+            $("#songs-table").remove();
+        }
         var tableToFill = $('<table id="songs-table" class="table table-bordered table-hover table-striped">');
         tableToFill.append("<tbody>");
         for (let i = 0; i < songs.length; i++) {
@@ -89,22 +156,21 @@ $(document).ready(function () {
 
     $("a.manage-songs").click(function (e) {
         gameId = e.target.attributes["data-gameid"].value;
-        getSubgroupsFromGame();
+        getSingleSubgroupFromGame(0);
     });
 
     $(document).on('click', 'button.delete-song', function (e) {
-        var divToAppend = $('#nfs-content');
         var songId = $(this).attr("data-songSubgroupId");
-        divToAppend.empty();
         $.ajax({
             async: false,
             type: "DELETE",
             url: "/songSubgroup/delete/" + Number(songId),
             success: function (ooo) {
-                console.log("e");
-                getSubgroupsFromGame();
+                getSingleSubgroupFromGame(0);
                 $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(successAlertHtml).slideUp(500);
+                    $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                    });
                 });
             }, error: function (ooo) {
                 $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
@@ -292,7 +358,7 @@ $(document).ready(function () {
                     url: "/author/authorName/" + $(mySelect).val(),
                     success: function (ooo) {
                         var result = JSON.parse(ooo);
-                        if (result){
+                        if (result) {
                             response(result);
                         }
                     },
@@ -308,7 +374,7 @@ $(document).ready(function () {
                 $(mySelect).val(ui.item.label);
                 $(mySelect).text(ui.item.label);
                 $(mySelectHidden).val(ui.item.value);
-                if (previousValue!=ui.item.value && !newSong){
+                if (previousValue != ui.item.value && !newSong) {
                     $("#aliasSelect-0").val(ui.item.label);
                     $("#aliasSelect-0").text(ui.item.label);
                     $("#aliasSelectHidden-0").val(ui.item.aliasId);
@@ -334,7 +400,7 @@ $(document).ready(function () {
                     url: "/author/aliasName/" + $(mySelect).val(),
                     success: function (ooo) {
                         var result = JSON.parse(ooo);
-                        if (result){
+                        if (result) {
                             response(result);
                         }
                     },
@@ -364,7 +430,7 @@ $(document).ready(function () {
                     url: "/genre/genreName/" + $(mySelect).val(),
                     success: function (ooo) {
                         var result = JSON.parse(ooo);
-                        if (result){
+                        if (result) {
                             response(result);
                         }
                     },
@@ -394,7 +460,7 @@ $(document).ready(function () {
                     url: "/author/authorAlias/" + valueToSet,
                     success: function (ooo) {
                         var result = JSON.parse(ooo);
-                        if (result){
+                        if (result) {
                             response(result);
                         }
                     },
@@ -419,29 +485,30 @@ $(document).ready(function () {
         $("#subgroupsDropdown").text($(this).text());
         var subgroupId = Number($(this).attr('data-subgroupId'));
         currentSubgroup = Number(subgroupId);
-        var groupId = Number($(this).attr('data-groupId'));
-        var subgroupSongs;
-        for (let i = 0; i < fullScopeOfEdit.length; i++) {
-            if (fullScopeOfEdit[i].id == groupId) {
-                for (let j = 0; j < fullScopeOfEdit[i].subgroups.length; j++) {
-                    if (fullScopeOfEdit[i].subgroups[j].id == subgroupId) {
-                        subgroupSongs = fullScopeOfEdit[i].subgroups[j].songSubgroupList;
-                    }
-                }
-            }
-        }
+        getSingleSubgroupFromGame(currentSubgroup);
         currentSubgroupId = subgroupId;
-        console.log("e");
-        $("#songs-table").find('tr').each(function (e) {
-            $(this).addClass("visually-hidden");
-        });
-        for (let i = 0; i < subgroupSongs.length; i++) {
-            var songId = subgroupSongs[i].song.id;
-            var songToMark = $("#songs-table").find('tr[data-songId="' + songId + '"][data-songsubgroupid="' + subgroupSongs[i].id + '"]').first();
-            songToMark.attr("data-songSubgroupId", subgroupSongs[i].id);
-            songToMark.removeClass("visually-hidden");
-        };
-        console.log("e");
+        // var groupId = Number($(this).attr('data-groupId'));
+        // var subgroupSongs;
+        // for (let i = 0; i < fullScopeOfEdit.length; i++) {
+        //     if (fullScopeOfEdit[i].id == groupId) {
+        //         for (let j = 0; j < fullScopeOfEdit[i].subgroups.length; j++) {
+        //             if (fullScopeOfEdit[i].subgroups[j].id == subgroupId) {
+        //                 subgroupSongs = fullScopeOfEdit[i].subgroups[j].songSubgroupList;
+        //             }
+        //         }
+        //     }
+        // }
+        // currentSubgroupId = subgroupId;
+        // console.log("e");
+        // $("#songs-table").find('tr').each(function (e) {
+        //     $(this).addClass("visually-hidden");
+        // });
+        // for (let i = 0; i < subgroupSongs.length; i++) {
+        //     var songId = subgroupSongs[i].song.id;
+        //     var songToMark = $("#songs-table").find('tr[data-songId="' + songId + '"][data-songsubgroupid="' + subgroupSongs[i].id + '"]').first();
+        //     songToMark.attr("data-songSubgroupId", subgroupSongs[i].id);
+        //     songToMark.removeClass("visually-hidden");
+        // };
     });
 
     function generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv,
@@ -888,11 +955,13 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#cancel-song', function (e) {
-        getSubgroupsFromGame();
+        getSingleSubgroupFromGame(0);
+        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
     });
 
     $(document).on('click', '#cancel-song-globally', function (e) {
-        getSubgroupsFromGame();
+        getSingleSubgroupFromGame(0);
+        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
     });
 
     function generateSpotifyAndLyrics(ingameDisplayDiv, songSubgroup) {
@@ -948,8 +1017,8 @@ $(document).ready(function () {
                 $("#aliasSelect-0").val($(this).val());
                 $("#officialBand").val($(this).val());
             }
-            if ($(this).val()=="Somebody"){
-                let somebodyVar = "Somebodygame_id"+gameId;
+            if ($(this).val() == "Somebody") {
+                let somebodyVar = "Somebodygame_id" + gameId;
                 $(this).val(somebodyVar);
                 $("#aliasSelect-0").val(somebodyVar);
                 $("#officialBand").val(somebodyVar);
@@ -1039,6 +1108,17 @@ $(document).ready(function () {
             if (indexOfTuDotBe > -1) {
                 $(this).val(typedSrcId.substring(indexOfTuDotBe + 4, indexOfTuDotBe + 15));
             }
+        }
+    });
+    //https://open.spotify.com/track/7zI6uJWfq93wgV20V2euv6?si=873a9557277548ac
+    $(document).on('focusout', '#spotifyInput', function (e) {
+        var typedSrcId = $(this).val();
+        var indexOfMark = typedSrcId.indexOf("track/");
+        var indexOfSi = typedSrcId.indexOf("?si");
+        if (indexOfSi > -1) {
+            $(this).val("spotify:track:" + typedSrcId.substring(indexOfSi - 22, indexOfSi));
+        } else {
+            $(this).val("spotify:track:" + typedSrcId.substring(indexOfMark + 6, indexOfTuDotBe + 28));
         }
     });
 
@@ -1136,9 +1216,11 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
-                getSubgroupsFromGame();
+                getSingleSubgroupFromGame(0);
                 $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(successAlertHtml).slideUp(500);
+                    $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                    });
                 });
             },
             error: function (ooo) {
@@ -1185,11 +1267,11 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
-                console.log("eee");
-                getSubgroupsFromGame();
+                getSingleSubgroupFromGame(0);
                 $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(successAlertHtml).slideUp(500);
-                    divToAppend.empty();
+                    $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                    });
                 });
             },
             error: function (ooo) {
@@ -1316,18 +1398,19 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
-                console.log("eee");
+                getSingleSubgroupFromGame(0);
                 $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(successAlertHtml).slideUp(500);
-                    $('#nfs-content').empty();
-                    getSubgroupsFromGame();
+                    $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                    });
                 });
             },
             error: function (ooo) {
+                getSingleSubgroupFromGame(0);
                 $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(failureAlertHtml).slideUp(500);
-                    $('#nfs-content').empty();
-                    getSubgroupsFromGame();
+                    $(failureAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                    });
                 });
             },
         });

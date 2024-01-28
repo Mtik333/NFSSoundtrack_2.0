@@ -11,7 +11,7 @@ $(document).ready(function () {
         $.ajax({
             async: false,
             type: "GET",
-            url: "/maingroup/read/" + gameId,
+            url: "/maingroup/readForEditGroups/" + gameId,
             success: function (ooo) {
                 fullScopeOfEdit = JSON.parse(ooo);
                 var divToAppend = $('#nfs-content');

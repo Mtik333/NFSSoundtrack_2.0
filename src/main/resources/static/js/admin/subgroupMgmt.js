@@ -19,7 +19,7 @@ $(document).ready(function () {
         $.ajax({
             async: false,
             type: "GET",
-            url: "/maingroup/read/" + gameId,
+            url: "/maingroup/readForEditSubgroups/" + gameId,
             success: function (ooo) {
                 fullScopeOfEdit = JSON.parse(ooo);
                 var divToAppend = $('#nfs-content');
@@ -212,7 +212,7 @@ $(document).ready(function () {
                 modifiedSubgroupSongArray.length = 0;
             }, error: function (ooo) {
                 $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(failureAlertHtml).slideUp(500, function (){
+                    $(failureAlertHtml).slideUp(500, function () {
                         getSubgroupsFromGame();
                     });
                 });
@@ -255,7 +255,7 @@ $(document).ready(function () {
                 });
             }, error: function (ooo) {
                 $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(failureAlertHtml).slideUp(500, function (){
+                    $(failureAlertHtml).slideUp(500, function () {
                         getSubgroupsFromGame();
                     });
                 });

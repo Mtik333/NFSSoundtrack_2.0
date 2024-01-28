@@ -5,11 +5,11 @@
         <span th:text="#{otherMusicPlatforms}"></span>
         <br>
         [(${htmlToInject})]
-        <a class="table_link" href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModalHome" id="newDisqusLink"
+        <a class="table_link" href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModal" id="newDisqusLink"
             th:text="#{shareOpinions}"></a> or
-            <a class="table_link" href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModalHome" id="disqusLink"
+        <a class="table_link" href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModal" id="disqusLink"
             th:text="#{oldComments}"></a>
-            <br>
+        <br>
         <br>
         <b>
             <h5 th:text="#{todaySong}"></h5>
@@ -54,8 +54,8 @@
         </th:block>
         </a>
     </div>
-    <div class="modal fade" id="disqusModal" role="dialog" data-bs-keyboard="false" tabindex="-1"
-        aria-hidden="true" th:attr="data-disqusLink='https://nfssoundtrack.com/'">
+    <div class="modal fade" id="disqusModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true"
+        th:attr="data-disqusLink='https://nfssoundtrack.com/'">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">

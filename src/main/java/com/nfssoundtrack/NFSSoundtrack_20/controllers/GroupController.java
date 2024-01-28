@@ -1,14 +1,16 @@
 package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.MainGroup;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
+import com.nfssoundtrack.NFSSoundtrack_20.serializers.ArtistMgmtSerializer;
+import com.nfssoundtrack.NFSSoundtrack_20.serializers.GroupSerializer;
+import com.nfssoundtrack.NFSSoundtrack_20.serializers.GroupWithSubgroupsSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,37 @@ import java.util.Optional;
 public class GroupController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(GroupController.class);
+
+    @Autowired
+    GroupWithSubgroupsSerializer groupWithSubgroupsSerializer;
+
+    @Autowired
+    GroupSerializer groupSerializer;
+
+    @GetMapping(value = "/readForEditSubgroups/{gameId}")
+    public @ResponseBody
+    String gameGroupReadSubgroups(@PathVariable("gameId") int gameId) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Game game = gameService.findById(gameId).orElseThrow(() -> new ResourceNotFoundException("no game found with id " + gameId));
+        List<MainGroup> mainGroups = game.getMainGroups();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(MainGroup.class, groupWithSubgroupsSerializer);
+        objectMapper.registerModule(simpleModule);
+        return objectMapper.writeValueAsString(mainGroups);
+    }
+
+    @GetMapping(value = "/readForEditGroups/{gameId}")
+    public @ResponseBody
+    String gameGroupReadGroups(@PathVariable("gameId") int gameId) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Game game = gameService.findById(gameId).orElseThrow(() -> new ResourceNotFoundException("no game found with id " + gameId));
+        List<MainGroup> mainGroups = game.getMainGroups();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(MainGroup.class, groupSerializer);
+        objectMapper.registerModule(simpleModule);
+        return objectMapper.writeValueAsString(mainGroups);
+    }
+
 
     @GetMapping(value = "/read/{gameId}")
     public @ResponseBody
