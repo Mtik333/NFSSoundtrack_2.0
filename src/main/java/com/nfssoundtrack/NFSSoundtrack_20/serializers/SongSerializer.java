@@ -89,6 +89,18 @@ public class SongSerializer extends JsonSerializer<Song> {
             jsonGenerator.writeString(stringToWrite.toString());
         }
         jsonGenerator.writeEndArray();
+        jsonGenerator.writeFieldName("genres");
+        jsonGenerator.writeStartArray();
+        song.getSongGenreList().forEach(songGenre -> {
+            try {
+                jsonGenerator.writeString(
+                        "<a class='table_link' href='/genre/" + songGenre.getGenre().getId()
+                                + "'>" + songGenre.getGenre().getGenreName() + "</a>");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        jsonGenerator.writeEndArray();
         if (song.getSpotifyId() != null) {
             jsonGenerator.writeStringField("spotify", "<a href='" + song.getSpotifyId() +
                     "'><img class='img-responsive-song-info' src='/images/fullres/spotify_big.png'></a>");

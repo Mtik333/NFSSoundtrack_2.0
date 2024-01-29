@@ -771,6 +771,8 @@ $(document).ready(function () {
             var fileNameInput = $('<input class="form-control" id="fileNameInput"/>');
             if (songSubgroup!=undefined && songSubgroup.filename!=undefined){
                 fileNameInput.val(songSubgroup.filename);
+            } else {
+                fileNameInput.val("");
             }
             filenameColDiv.append('<label for="fileNameInput">Song filename</label>');
             filenameColDiv.append(fileNameInput);

@@ -52,7 +52,7 @@
             <td class="songtitle">
                 <span
                     th:text="${todaysSong.songSubgroup.ingameDisplayTitle!=null} ? ${todaysSong.songSubgroup.ingameDisplayTitle} : ${todaysSong.songSubgroup.song.officialDisplayTitle} "></span>
-                <th:block th:if="${songSubgroup.showFeat}">
+                <th:block th:if="${todaysSong.songSubgroup.showFeat}">
                     <th:block
                         th:each="authorSong,iter : ${todaysSong.songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
                         <span th:text="${iter.first ? '(feat. ' : ''}"></span>

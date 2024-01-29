@@ -542,6 +542,11 @@ $(document).ready(function () {
                         $(songInfo.featArtists[i]).insertAfter($("#featArtists"));
                     }
                 }
+                if (songInfo.genres.length != 0) {
+                    for (let i = 0; i < songInfo.genres.length; i++) {
+                        $(songInfo.genres[i]).insertAfter($("#genres"));
+                    }
+                }
                 if (songInfo.youtube != null) {
                     $(songInfo.youtube).insertAfter("#externalLinks");
                 }
