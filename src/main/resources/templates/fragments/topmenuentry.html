@@ -27,12 +27,14 @@
         -
         <span
             th:text="${todayssong.songSubgroup.ingameDisplayTitle!=null} ? ${todayssong.songSubgroup.ingameDisplayTitle} : ${todayssong.songSubgroup.song.officialDisplayTitle} "></span>
-        <th:block th:each="authorSong,iter : ${todayssong.songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
-            <span th:text="${iter.first ? '(feat. ' : ''}"></span>
-            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
-                th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
-            <th:block th:if="${authorSong.featConcat!=null}">
-                <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
+        <th:block th:if="${todayssong.songSubgroup.showFeat}">
+            <th:block th:each="authorSong,iter : ${todayssong.songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
+                <span th:text="${iter.first ? '(feat. ' : ''}"></span>
+                <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                    th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
+                <th:block th:if="${authorSong.featConcat!=null}">
+                    <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
+                </th:block>
             </th:block>
         </th:block>
         <th:block th:if="${todayssong.songSubgroup.remix.value=='YES'}">
@@ -41,7 +43,7 @@
                     th:href="'/author/'+${authorSong.authorAlias.author.id}"
                     th:text="${authorSong.authorAlias.alias}"></a>
                 <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
-                <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+                <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
             </th:block>
         </th:block>
         <br>

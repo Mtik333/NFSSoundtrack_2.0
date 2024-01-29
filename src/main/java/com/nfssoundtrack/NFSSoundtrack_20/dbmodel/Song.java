@@ -63,6 +63,9 @@ public class Song implements Serializable {
     @JoinColumn(name = "basesong_id")
     private Song baseSong;
 
+    @Column(name="feat_next_to_band", columnDefinition="BIT")
+    private Boolean featNextToBand;
+
     public Long getId() {
         return id;
     }
@@ -173,6 +176,14 @@ public class Song implements Serializable {
 
     public void setBaseSong(Song baseSong) {
         this.baseSong = baseSong;
+    }
+
+    public Boolean getFeatNextToBand() {
+        return featNextToBand;
+    }
+
+    public void setFeatNextToBand(Boolean featNextToBand) {
+        this.featNextToBand = featNextToBand;
     }
 
     public Song() {

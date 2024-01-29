@@ -70,7 +70,7 @@
                     <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
                         th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a>
                     <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
-                    <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+                    <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
                 </th:block>
             </td>
             <td>
@@ -173,7 +173,7 @@
                     <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
                         th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a>
                     <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
-                    <span th:text="${iter.last ? ' Remix)' : ''}"></span>
+                    <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
                 </th:block>
             </td>
             <td>

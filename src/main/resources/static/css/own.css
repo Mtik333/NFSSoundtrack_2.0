@@ -49,6 +49,14 @@ a.a-main-music-link {
   text-decoration: none;
 }
 
+.nav-item{
+    color: #00334e;
+}
+
+.nav-link{
+    color: #00334e;
+}
+
 .nfs-top-item-active {
   background-color: #d1e2ff;
 }
@@ -279,6 +287,41 @@ html[data-bs-theme="dark"] #topNavbar {
   background-color: #262424 !important;
 }
 
+html[data-bs-theme="dark"] a.game_class {
+  display: block;
+  background: #212121;
+  color: #a3cbff;
+}
+
+html[data-bs-theme="dark"] a.game_class:hover {
+  background-color: #3e3e3e;
+}
+
+html[data-bs-theme="dark"] .nav-item {
+  color: #a3cbff;
+}
+html[data-bs-theme="dark"] .nav-link {
+  color: #a3cbff;
+}
+
+#navbarSupportedContent{
+    background-color: lavender;
+}
+
+html[data-bs-theme="dark"] #navbarSupportedContent {
+  background-color: #202166;
+}
+
+.gamegroup-button {
+    color: #00334e;
+    background-color: aliceblue;
+}
+
+html[data-bs-theme="dark"] .gamegroup-button  {
+  color: #a3cbff;
+  background-color: #171e4d;
+}
+
 td.info_button {
   min-width: 6vw;
 }
@@ -306,6 +349,11 @@ img.partners {
 
 a.game_class {
   display: block;
+  color: #00334e;
+}
+
+a.game_class:hover {
+  background-color: #d2dee7;
 }
 
 #listen-music-id {
