@@ -260,7 +260,7 @@ $(document).ready(function () {
                 }
                 if (authorSong.role == "SUBCOMPOSER") {
                     howManySubcomposers++;
-                    generateSubcomposerDiv(subcomposerSelect, subcomposerSelectHidden, subcomposerDiv, subcomposerInputColDiv, subcomposerConcatColDiv, subcomposerButtonColDiv, filenameColDiv, subcomposerRowDiv, howManySubcomposers, i, officialArtistName, authorSong, songSubgroup.filename);
+                    generateSubcomposerDiv(subcomposerSelect, subcomposerSelectHidden, subcomposerDiv, subcomposerInputColDiv, subcomposerConcatColDiv, subcomposerButtonColDiv, filenameColDiv, subcomposerRowDiv, howManySubcomposers, i, officialArtistName, authorSong, songSubgroup);
                 }
                 if (authorSong.role == "FEAT") {
                     howManyFeats++;

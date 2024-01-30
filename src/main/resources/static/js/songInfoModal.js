@@ -20,6 +20,9 @@ $(document).ready(function () {
         $("#subcomposers").parent().find("a").each(function () {
             $(this).remove();
         });
+        $("#filename").parent().find("span").each(function () {
+            $(this).remove();
+        });
         $("#remixers").parent().find("a").each(function () {
             $(this).remove();
         });
