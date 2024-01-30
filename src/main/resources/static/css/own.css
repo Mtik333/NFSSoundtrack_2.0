@@ -247,14 +247,14 @@ html[data-bs-theme="dark"] .preferences {
 }
 
 #lyrics_main {
-  width: 65%;
+  width: 64%;
   float: right;
   overflow: auto;
   height: 20vw;
 }
 
 #ytrow {
-  width: 32vw;
+  width: 32%;
   height: 20vw;
 }
 

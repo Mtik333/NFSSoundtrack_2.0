@@ -15,6 +15,12 @@ var baseVideoSrc;
  */
 var lastActivePlayButton;
 $(document).ready(function () {
+    if (localStorage.getItem("static-leftmenu") == "true") {
+        $("#offcanvas").removeClass("offcanvas");
+        var headerDiv = $("#offcanvas").find(".offcanvas-header")[0];
+        $(headerDiv).css("display", "none");
+        $("#offcanvasSpan").removeAttr("data-bs-toggle");
+    }
     if ('ontouchstart' in window) {
         $("td.info_button").css("display", "none");
         $("th.info_button").css("display", "none");

@@ -26,6 +26,7 @@ public class SongDeserializer extends JsonDeserializer<Song> {
         intoValue.setOfficialDisplayTitle(JustSomeHelper.returnProperValueToDb(node.get("officialTitle").asText()));
         intoValue.setSrcId(JustSomeHelper.returnProperValueToDb(node.get("officialSrcId").asText()));
         intoValue.setLyrics(JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText()));
+        intoValue.setFeatNextToBand(node.get("featNextToComposer").asBoolean());
         if (intoValue.getLyrics() != null) {
             intoValue.setLyrics(intoValue.getLyrics().replaceAll("\n", "<br>"));
         }
@@ -44,10 +45,13 @@ public class SongDeserializer extends JsonDeserializer<Song> {
         String officialTitle = (JustSomeHelper.returnProperValueToDb(node.get("officialTitle").asText()));
         String officialSrcId = (JustSomeHelper.returnProperValueToDb(node.get("officialSrcId").asText()));
         String lyrics = (JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText()));
+        Boolean featNextToBand = node.get("featNextToComposer").asBoolean();
         if (lyrics != null) {
             lyrics = lyrics.replaceAll("\n", "<br>");
         }
-        return new Song(officialBand, officialTitle, officialSrcId, lyrics, spotifyId, deezer, itunes, tidal,
+        Song song = new Song(officialBand, officialTitle, officialSrcId, lyrics, spotifyId, deezer, itunes, tidal,
                 soundcloud);
+        song.setFeatNextToBand(featNextToBand);
+        return song;
     }
 }

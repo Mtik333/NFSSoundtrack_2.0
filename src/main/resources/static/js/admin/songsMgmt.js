@@ -616,10 +616,24 @@ $(document).ready(function () {
         officialTitleDiv.append('<label for="officialTitle">Official title display</label>');
         officialSrcIdDiv.append('<label for="officialSrcId">Official YouTube Src ID</label>');
         existingSongIdDiv.append('<label for="existingSongId">Existing Song ID</label>');
+        var featNextToComposer;
+        if (songSubgroup!=null){
+            featNextToComposer = ('<input type="checkbox" class="form-check-input mt-4" id="featNextToComposer">');
+        } else {
+            if (songSubgroup.song.featNextToBand){
+                featNextToComposer = ('<input type="checkbox" class="form-check-input mt-4" id="featNextToComposer" checked>');
+            } else {
+                featNextToComposer = ('<input type="checkbox" class="form-check-input mt-4" id="featNextToComposer">');
+            }
+        }
+        var featNextToComposerLabel = ('<label class="form-check-label mt-3" for="featNextToComposer">Feat next to composer?</label>');
         officialBandDiv.append(officialBand);
         officialTitleDiv.append(officialTitle);
         officialSrcIdDiv.append(officialSrcId);
         existingSongIdDiv.append(existingSongId);
+        existingSongIdDiv.append('<br>');
+        existingSongIdDiv.append(featNextToComposer);
+        existingSongIdDiv.append(featNextToComposerLabel);
         officialDiv.append(officialBandDiv);
         officialDiv.append(officialTitleDiv);
         officialDiv.append(officialSrcIdDiv);
@@ -804,7 +818,7 @@ $(document).ready(function () {
                     var divNewCol = $('<div class="col"></div>');
                     var subcomposerConcatInput = $('<input type="text" class="form-control" id="subcomposerConcatInput-' + howManySubcomposers + '"/>');
                     subcomposerConcatInput.val(authorSong.subcomposerConcat);
-                    divNewCol.append('<label for="subcomposerConcatInput-' + howManySubcomposers + '">Subcomposer cncat</label>');
+                    divNewCol.append('<label for="subcomposerConcatInput-' + howManySubcomposers + '">Subcomposer concat</label>');
                     divNewCol.append(subcomposerConcatInput);
                     subcomposerRowDivNext.append(divNewCol);
                 }
@@ -812,6 +826,17 @@ $(document).ready(function () {
                 setupAutocompleteAlias(subcomposerSelectNext, subcomposerSelectHiddenNext, "");
             }
             subcomposerRowDivNext.append(subcomposerButtonColDivNext);
+            if (i<=1){
+                var fileNameInput = $('<input class="form-control" id="fileNameInput"/>');
+                if (songSubgroup!=undefined && songSubgroup.filename!=undefined){
+                    fileNameInput.val(songSubgroup.filename);
+                } else {
+                    fileNameInput.val("");
+                }
+                filenameColDiv.append('<label for="fileNameInput">Song filename</label>');
+                filenameColDiv.append(fileNameInput);
+                subcomposerRowDivNext.append(filenameColDiv);
+            }
             subcomposerDiv.append(subcomposerRowDivNext);
         }
     }
@@ -955,7 +980,7 @@ $(document).ready(function () {
         var rowCol = col.parent();
         var divCol = rowCol.parent();
         var thisId = Number($(this).attr("id").replace("add-subcomposer-", "")) + 1;
-        generateSubcomposerDiv(null, null, divCol, null, null, null, null, thisId, thisId, "", null);
+        generateSubcomposerDiv(null, null, divCol, null, null, null, null,null, thisId, thisId, "", null, null);
         var divNewCol = $('<div class="col"></div>');
         var subcomposerConcatInput = $('<input type="text" class="form-control" id="subcomposerConcatInput-' + thisId + '"/>');
         divNewCol.append('<label for="subcomposerConcatInput-' + thisId + '">Subcomposer concat</label>');
@@ -1292,6 +1317,7 @@ $(document).ready(function () {
         songGloballyToSave.deezer = $("#deezerInput").val();
         songGloballyToSave.tidal = $("#tidalInput").val();
         songGloballyToSave.info = $("#ingameInfo").val();
+        songGloballyToSave.featNextToComposer = $("#featNextToComposer").prop("checked");
         var genres = $("#genreDisplay").find("input.genre-select");
         for (let i = 0; i < genres.length; i++) {
             var genreInput = genres[i];
@@ -1365,6 +1391,7 @@ $(document).ready(function () {
         }
         songToSave.info = $("#ingameInfo").val();
         songToSave.subgroup = currentSubgroup;
+        songToSave.featNextToComposer = $("#featNextToComposer").prop("checked");
         if ($("#existingSongId").val() != "") {
             songToSave.existingSongId = $("#existingSongId").val();
             //fix when there is a remix
