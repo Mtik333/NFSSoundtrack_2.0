@@ -20,10 +20,13 @@ $(document).ready(function () {
         $("#subcomposers").parent().find("a").each(function () {
             $(this).remove();
         });
-        $("#filename").parent().find("span").each(function () {
+        $("#filename").find("span").each(function () {
             $(this).remove();
         });
         $("#remixers").parent().find("a").each(function () {
+            $(this).remove();
+        });
+        $("#genres").parent().find("a").each(function () {
             $(this).remove();
         });
         $("#featArtists").parent().find("a").each(function () {

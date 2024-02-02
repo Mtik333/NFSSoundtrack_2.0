@@ -1073,6 +1073,7 @@ $(document).ready(function () {
         socialDiv.append(tidalInputDiv);
         socialDiv.append('<label for="lyrics">Lyrics</label>');
         socialDiv.append(lyricsTextArea);
+        socialDiv.append('<br><br><br><br><br><br>')
         ingameDisplayDiv.append(socialDiv);
     }
 

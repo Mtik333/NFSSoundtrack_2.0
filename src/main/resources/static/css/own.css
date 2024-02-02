@@ -366,6 +366,9 @@ svg.bi-box-arrow-up-right{
     height: 0.6vw;
     vertical-align: top;
 }
+#lyrics{
+    height: 300px;
+}
 
 @media screen and (max-width: 600px) {
 

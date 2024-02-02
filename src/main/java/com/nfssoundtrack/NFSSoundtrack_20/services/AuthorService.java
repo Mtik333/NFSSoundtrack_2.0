@@ -78,8 +78,9 @@ public class AuthorService {
                     if (discoGSObj == null) {
                         discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, "There was some internal error " +
                                 "- you might reach out to admin so he can double check");
+                    } else {
+                        discoGSObjMap.put(author, discoGSObj);
                     }
-                    discoGSObjMap.put(author, discoGSObj);
                 } else {
                     discoGSObj = new DiscoGSObj(true, 0, null,
                             author.getName() + " not found in DiscoGS database");
@@ -91,8 +92,9 @@ public class AuthorService {
                     if (discoGSObj == null) {
                         discoGSObj = new DiscoGSObj(null, "There was some internal error " +
                                 "- you might reach out to admin so he can double check");
+                    } else {
+                        discoGSObjMap.put(author, discoGSObj);
                     }
-                    discoGSObjMap.put(author, discoGSObj);
                 }
             }
         } else {
@@ -159,7 +161,7 @@ public class AuthorService {
             String linkToArtist = String.valueOf(something.get("uri"));
             discoGSObj.setUri(linkToArtist);
             String profile = String.valueOf(something.get("profile"));
-            if (profile.isEmpty()) {
+            if (profile!=null && profile.isEmpty()) {
                 profile = authorName + " has no profile description at DiscoGS";
             }
             discoGSObj.setProfile(profile);

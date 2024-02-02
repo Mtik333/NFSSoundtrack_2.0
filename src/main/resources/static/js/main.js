@@ -35,6 +35,11 @@ $(document).ready(function () {
         $("#offcanvasSpan").text("");
         $("#offcanvasSpan").prev().css("display", "")
         $(document).find("header").addClass("sticky-top");
+    } else {
+        var iconsSize = localStorage.getItem("icons-size");
+        if (iconsSize != undefined) {
+            $(document).find("img.img-responsive-row-icon").css("max-height", iconsSize+"vw");
+        }
     }
     //we make top menu button active
     if (window.location.href.indexOf("/home") > -1) {
@@ -48,6 +53,7 @@ $(document).ready(function () {
         $("#offcanvas").removeClass("w-50");
         $("#offcanvas").addClass("w-" + newWidth);
     }
+
     //pushing content of custom playlist from local storage to related input as it is always rendered by server
     if (localStorage.getItem("custom-playlist") != undefined) {
         var customPlaylistArrayTrigger = JSON.parse(localStorage.getItem("custom-playlist"));
