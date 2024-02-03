@@ -503,7 +503,7 @@ $(document).ready(function () {
             var trElem = $(this).parent().parent();
             $(this).tooltip('dispose');
             var songIdAttr = $(trElem).attr("data-song_id");
-            var additionalInfoA = $(trElem).find("td.infowarn>a");
+            var additionalInfoA = $(trElem).find("td.infowarn>span");
             var filenameInfo = $(trElem).find("td.infowarn>span");
             var infoLabel = null;
             var filenameLabel = null;

@@ -617,7 +617,7 @@ $(document).ready(function () {
         officialSrcIdDiv.append('<label for="officialSrcId">Official YouTube Src ID</label>');
         existingSongIdDiv.append('<label for="existingSongId">Existing Song ID</label>');
         var featNextToComposer;
-        if (songSubgroup!=null){
+        if (songSubgroup==null){
             featNextToComposer = ('<input type="checkbox" class="form-check-input mt-4" id="featNextToComposer">');
         } else {
             if (songSubgroup.song.featNextToBand){

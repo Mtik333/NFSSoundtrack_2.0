@@ -136,6 +136,9 @@ public class AuthorService {
         if (!results.isEmpty()) {
             LinkedHashMap<?, ?> resultsMap = (LinkedHashMap<?, ?>) results.get(0);
             String artistName = String.valueOf(resultsMap.get("title"));
+            if (artistName.contains(")")){
+                artistName = artistName.replaceAll("\\((.+?)\\)", "").trim();
+            }
             if (artistName.contentEquals(authorName)) {
                 return (Integer) resultsMap.get("id");
             }
@@ -161,8 +164,10 @@ public class AuthorService {
             String linkToArtist = String.valueOf(something.get("uri"));
             discoGSObj.setUri(linkToArtist);
             String profile = String.valueOf(something.get("profile"));
-            if (profile!=null && profile.isEmpty()) {
+            if (profile==null || profile.isEmpty()) {
                 profile = authorName + " has no profile description at DiscoGS";
+            } else {
+                profile = profile.replaceAll("\n","<br/>");
             }
             discoGSObj.setProfile(profile);
             List<String> urls = (List<String>) something.get("urls");

@@ -1,12 +1,12 @@
 <h2 th:text="#{infoAbout}+' '+${author?.name}"></h2>
 <hr>
 <div id="briefInfo">
-    <span th:text="${discoGSObj.profile}">
+    <span th:utext="${discoGSObj.profile}"></span>
 </div>
 <div id="socialLinks">
     <th:block th:if="${discoGSObj.uri}">
         <br>
-        <b th:text="#{moreInfo}"></b>
+        <b th:utext="#{moreInfo}"></b>
         <a target="_blank" class="a-external-music-link" th:href="${discoGSObj.uri}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/discogs_big.png}">
         </a>
