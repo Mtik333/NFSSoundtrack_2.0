@@ -1,6 +1,25 @@
 <th:block th:if="${songSubgroups!=null && !songSubgroups.isEmpty()}">
     <h2 style="text-align: center;" th:text="${game.displayTitle}"></h2>
     <hr>
+    <th:block th:if="${game.additionalInfo}">
+        <div class="accordion" id="gameInfoAccordion">
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="gameAdditionalInfo">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#gameInfoDetails" aria-expanded="false" aria-controls="gameInfoDetails">
+                        <span th:text="#{additionalInfo}" class="d-block w-100 text-center"></span>
+                    </button>
+                </h3>
+                <div id="gameInfoDetails" class="accordion-collapse collapse" aria-labelledby="gameAdditionalInfo"
+                    data-bs-parent="#gameInfoAccordion">
+                    <div class="accordion-body" style="text-align: center;">
+                        <span th:text="${game.additionalInfo}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </th:block>
     <div id="playlistsDiv" class="form-group pb-2 pt-2">
         <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
             data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
@@ -144,16 +163,16 @@
                                     <th:block th:if="${songSubgroup.showFeat}">
                                         <th:block th:if="${!#bools.isTrue(songSubgroup.song.featNextToBand)}">
                                             <th:block
-                                            th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
-                                            <span th:text="${iter.first ? '(feat. ' : ''}"></span>
-                                            <a class="table_link"
-                                                th:href="'/author/'+${authorSong.authorAlias.author.id}"
-                                                th:text="${authorSong.authorAlias.alias}"></a><span
-                                                th:text="${iter.last ? ')' : ''}"></span>
-                                            <th:block th:if="${authorSong.featConcat!=null}">
-                                                <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
+                                                th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
+                                                <span th:text="${iter.first ? '(feat. ' : ''}"></span>
+                                                <a class="table_link"
+                                                    th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                                                    th:text="${authorSong.authorAlias.alias}"></a><span
+                                                    th:text="${iter.last ? ')' : ''}"></span>
+                                                <th:block th:if="${authorSong.featConcat!=null}">
+                                                    <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
+                                                </th:block>
                                             </th:block>
-                                        </th:block>
                                         </th:block>
                                     </th:block>
                                     <th:block th:if="${songSubgroup.remix.value=='YES'}">

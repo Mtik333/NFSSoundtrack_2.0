@@ -20,6 +20,11 @@ $(document).ready(function () {
         var headerDiv = $("#offcanvas").find(".offcanvas-header")[0];
         $(headerDiv).css("display", "none");
         $("#offcanvasSpan").removeAttr("data-bs-toggle");
+        $("#unpin-menu").css("display", "");
+        $("#unpin-menu").parent().css("display", "flex");
+    } else {
+        $("#unpin-menu").css("display", "none");
+        $("#unpin-menu").parent().css("display", "");
     }
     if ('ontouchstart' in window) {
         $("td.info_button").css("display", "none");
@@ -32,6 +37,7 @@ $(document).ready(function () {
         $("td.contextButton").css("display", "");
         $("th.contextButton").css("display", "");
         $("col.contextButton").css("display", "");
+        $("#pin-menu").css("display", "none");
         $("#offcanvasSpan").text("");
         $("#offcanvasSpan").prev().css("display", "")
         $(document).find("header").addClass("sticky-top");
@@ -714,5 +720,26 @@ $(document).ready(function () {
         $("#mobileLaunchSpotify").css("display", "");
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
+    });
+
+    $("#pin-menu").on("click", function (e) {
+        $("#closeInHeader").click();
+        $("#offcanvas").removeClass("offcanvas");
+        var headerDiv = $("#offcanvas").find(".offcanvas-header")[0];
+        $(headerDiv).css("display", "none");
+        $("#offcanvasSpan").removeAttr("data-bs-toggle");
+        $("#unpin-menu").css("display", "");
+        $("#unpin-menu").parent().css("display", "flex");
+        localStorage.setItem("static-leftmenu", true);
+    });
+
+    $("#unpin-menu").on("click", function (e) {
+        $("#offcanvas").addClass("offcanvas");
+        var headerDiv = $("#offcanvas").find(".offcanvas-header")[0];
+        $(headerDiv).css("display", "");
+        $("#offcanvasSpan").attr("data-bs-toggle", "offcanvas");
+        $("#unpin-menu").css("display", "none");
+        $("#unpin-menu").parent().css("display", "");
+        localStorage.setItem("static-leftmenu", false);
     });
 });

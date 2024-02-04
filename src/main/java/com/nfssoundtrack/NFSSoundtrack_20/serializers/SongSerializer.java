@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorSong;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Role;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongGenre;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.jackson.JsonComponent;
@@ -91,15 +92,17 @@ public class SongSerializer extends JsonSerializer<Song> {
         jsonGenerator.writeEndArray();
         jsonGenerator.writeFieldName("genres");
         jsonGenerator.writeStartArray();
-        song.getSongGenreList().forEach(songGenre -> {
-            try {
-                jsonGenerator.writeString(
-                        "<a class='table_link' href='/genre/" + songGenre.getGenre().getId()
-                                + "'>" + songGenre.getGenre().getGenreName() + "</a>");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        List<SongGenre> songGenres = song.getSongGenreList();
+        for (int i = 0; i < songGenres.size(); i++) {
+            StringBuilder stringToWrite = new StringBuilder();
+            if (i != feats.size() - 1) {
+                stringToWrite.append("<span>, </span>");
             }
-        });
+            stringToWrite.append("<a class='table_link' href='/genre/").append(
+                    songGenres.get(i).getGenre().getId()).append("'>").append(
+                    songGenres.get(i).getGenre().getGenreName()).append("</a>");
+            jsonGenerator.writeString(stringToWrite.toString());
+        }
         jsonGenerator.writeEndArray();
         if (song.getSpotifyId() != null) {
             jsonGenerator.writeStringField("spotify", "<a href='" + song.getSpotifyId() +

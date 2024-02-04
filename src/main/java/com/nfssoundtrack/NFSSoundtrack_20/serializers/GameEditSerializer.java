@@ -30,6 +30,7 @@ public class GameEditSerializer extends JsonSerializer<Game> {
         jsonGenerator.writeStringField("tidal_id", game.getTidalId());
         jsonGenerator.writeStringField("soundcloud_id", game.getSoundcloudId());
         jsonGenerator.writeStringField("youtube_id", game.getYoutubeId());
+        jsonGenerator.writeStringField("additionalInfo", game.getAdditionalInfo());
         jsonGenerator.writeEndObject();
     }
 }

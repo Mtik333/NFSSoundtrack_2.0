@@ -34,6 +34,7 @@ public class GameDeserializer extends JsonDeserializer<Game> {
         intoValue.setTidalId(JustSomeHelper.returnProperValueToDb(node.get("tidalId").asText()));
         intoValue.setYoutubeId(JustSomeHelper.returnProperValueToDb(node.get("youtubeId").asText()));
         intoValue.setSoundcloudId(JustSomeHelper.returnProperValueToDb(node.get("soundcloudId").asText()));
+        intoValue.setAdditionalInfo(JustSomeHelper.returnProperValueToDb(node.get("additionalInfo").asText()));
         return intoValue;
     }
 
@@ -50,11 +51,12 @@ public class GameDeserializer extends JsonDeserializer<Game> {
         String tidalId = JustSomeHelper.returnProperValueToDb(node.get("tidalId").asText());
         String youtubeId = JustSomeHelper.returnProperValueToDb(node.get("youtubeId").asText());
         String soundcloudId = JustSomeHelper.returnProperValueToDb(node.get("soundcloudId").asText());
+        String additionalInfo = JustSomeHelper.returnProperValueToDb(node.get("additionalInfo").asText());
         int serieId = node.get("serieId").asInt();
         Serie currentSerie = serieService.findById(serieId).orElseThrow(() -> new IOException("No " +
                 "serie with id found " + serieId));
         Game game = new Game(1000L, gameTitle, displayTitle, gameShort, gamePrefix, spotifyId,
-                deezerId, tidalId, youtubeId, soundcloudId, gameStatus);
+                deezerId, tidalId, youtubeId, soundcloudId, gameStatus, additionalInfo);
         game.setSerie(currentSerie);
         return game;
     }

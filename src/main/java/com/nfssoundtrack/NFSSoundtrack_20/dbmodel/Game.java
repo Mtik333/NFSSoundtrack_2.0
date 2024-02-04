@@ -57,6 +57,9 @@ public class Game implements Serializable, Comparable<Game> {
     @Column(name = "disqus_link")
     private String disqusLink;
 
+    @Column(name="additional_info")
+    private String additionalInfo;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     private List<MainGroup> mainGroups = new ArrayList<>();
@@ -184,6 +187,14 @@ public class Game implements Serializable, Comparable<Game> {
         this.disqusLink = disqusLink;
     }
 
+    public String getAdditionalInfo() {
+        return additionalInfo;
+    }
+
+    public void setAdditionalInfo(String additionalInfo) {
+        this.additionalInfo = additionalInfo;
+    }
+
     @Override
     public int compareTo(Game o) {
         int i = getPosition().compareTo(o.getPosition());
@@ -193,7 +204,7 @@ public class Game implements Serializable, Comparable<Game> {
         return i;
     }
 
-    public Game(Long position, String gameTitle, String displayTitle, String gameShort, String prefix, String spotifyId, String deezerId, String tidalId, String youtubeId, String soundcloudId, GameStatus gameStatus) {
+    public Game(Long position, String gameTitle, String displayTitle, String gameShort, String prefix, String spotifyId, String deezerId, String tidalId, String youtubeId, String soundcloudId, GameStatus gameStatus, String additionalInfo) {
         this.position = position;
         this.gameTitle = gameTitle;
         this.displayTitle = displayTitle;
@@ -205,11 +216,12 @@ public class Game implements Serializable, Comparable<Game> {
         this.youtubeId = youtubeId;
         this.soundcloudId = soundcloudId;
         this.gameStatus = gameStatus;
+        this.additionalInfo=additionalInfo;
     }
 
     public Game(Game game) {
         this(game.position, game.gameTitle, game.displayTitle, game.gameShort, game.prefix, game.spotifyId,
                 game.deezerId,
-                game.tidalId, game.youtubeId, game.soundcloudId, GameStatus.RELEASED);
+                game.tidalId, game.youtubeId, game.soundcloudId, GameStatus.RELEASED, game.additionalInfo);
     }
 }

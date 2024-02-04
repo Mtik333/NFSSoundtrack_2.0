@@ -72,6 +72,14 @@ $(document).ready(function () {
                 secondRowDiv.append(youtubeColDiv);
                 secondRowDiv.append(soundcloudColDiv);
                 newGameDiv.append(secondRowDiv);
+                var additionalInfoRowDiv = $('<div class="row">');
+                var additionalInfoColDiv = $('<div class="col">');
+                var additionalInfoInput = $('<textarea class="form-control" id="additionalInfoInput">');
+                additionalInfoColDiv.append('<label for="additionalInfoInput">Additional game info</label>');
+                additionalInfoInput.text(gameToEdit.additionalInfo);
+                additionalInfoColDiv.append(additionalInfoInput);
+                additionalInfoRowDiv.append(additionalInfoColDiv);
+                newGameDiv.append(additionalInfoRowDiv);
                 divToAppend.append('<button id="saveEditGame" type="submit" class="btn btn-primary">Save changes</button>');
                 divToAppend.append(newGameDiv);
 
@@ -92,6 +100,7 @@ $(document).ready(function () {
         formData.tidalId = $("#tidalPlaylistInput").val();
         formData.youtubeId = $("#youtubePlaylistInput").val();
         formData.soundcloudId = $("#soundcloudPlaylistInput").val();
+        formData.additionalInfo = $("#additionalInfoInput").val();
         $.ajax({
             async: false,
             type: "PUT",
