@@ -9,6 +9,7 @@ import com.nfssoundtrack.NFSSoundtrack_20.serializers.GameEditSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,8 @@ public class GameController extends BaseControllerWithErrorHandling {
     @Autowired
     GameEditSerializer gameEditSerializer;
 
+    @Autowired
+    CacheManager cacheManager;
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     String saveNewGame(@RequestBody String formData) throws Exception {
@@ -34,6 +37,7 @@ public class GameController extends BaseControllerWithErrorHandling {
         objectMapper.registerModule(module);
         Game newGame = objectMapper.readValue(formData, Game.class);
         gameService.save(newGame);
+        cacheManager.getCache("series").clear();
         return new ObjectMapper().writeValueAsString("OK");
     }
 

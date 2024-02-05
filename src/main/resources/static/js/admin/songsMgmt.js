@@ -896,7 +896,7 @@ $(document).ready(function () {
                 var remixInput = ('<input type="checkbox" class="form-check-input m-3" id="remixBox" checked></input>');
                 var remixValue = ('<input class="form-control" id="remixText"></input>');
                 if (songSubgroup!=null){
-                    remixValue.val(songSubgroup.remixText);
+                    $(remixValue).val(songSubgroup.remixText);
                 }
                 var remixLabel = ('<label class="form-check-label m-2" for="remixBox">Remix?</label>');
                 remixRowPrevColCheckbox.append(remixLabel);
