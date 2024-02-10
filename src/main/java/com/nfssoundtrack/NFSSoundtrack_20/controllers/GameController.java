@@ -3,6 +3,8 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.MainGroup;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
 import com.nfssoundtrack.NFSSoundtrack_20.deserializers.GameDeserializer;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.GameEditSerializer;
@@ -37,6 +39,15 @@ public class GameController extends BaseControllerWithErrorHandling {
         objectMapper.registerModule(module);
         Game newGame = objectMapper.readValue(formData, Game.class);
         gameService.save(newGame);
+        MainGroup allGroup = new MainGroup();
+        allGroup.setGame(newGame);
+        allGroup.setGroupName("All");
+        mainGroupService.save(allGroup);
+        Subgroup allSubgroup = new Subgroup();
+        allSubgroup.setPosition(1);
+        allSubgroup.setMainGroup(allGroup);
+        allSubgroup.setSubgroupName("All");
+        subgroupService.save(allSubgroup);
         cacheManager.getCache("series").clear();
         return new ObjectMapper().writeValueAsString("OK");
     }

@@ -89,7 +89,7 @@ $(document).ready(function () {
     //triggering all declared tooltips to show up
     $('[data-toggle="tooltip"]').tooltip();
     //if we are in custom playlist mode then we make button active
-    var currentGame = window.location.href.replace(document.location.origin, "");
+    var currentGame = window.location.pathname;
     if (currentGame.indexOf("custom/playlist") > -1) {
         $("#customPlaylistSubmit").parent().parent().addClass("nfs-top-item-active");
     } else {

@@ -95,7 +95,7 @@ public class SongSerializer extends JsonSerializer<Song> {
         List<SongGenre> songGenres = song.getSongGenreList();
         for (int i = 0; i < songGenres.size(); i++) {
             StringBuilder stringToWrite = new StringBuilder();
-            if (i != feats.size() - 1) {
+            if (i > 0 && i != feats.size() - 1) {
                 stringToWrite.append("<span>, </span>");
             }
             stringToWrite.append("<a class='table_link' href='/genre/").append(
