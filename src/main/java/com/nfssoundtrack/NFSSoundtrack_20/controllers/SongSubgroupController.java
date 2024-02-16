@@ -242,6 +242,13 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 }
             }
             songService.save(relatedSong);
+            if (Boolean.parseBoolean(localObjectMapper.get("propagate"))){
+                songSubgroup.setSrcId(relatedSong.getSrcId());
+                songSubgroup.setSpotifyId(relatedSong.getSpotifyId());
+                songSubgroup.setDeezerId(relatedSong.getDeezerId());
+                songSubgroup.setItunesLink(relatedSong.getItunesLink());
+                songSubgroupService.save(songSubgroup);
+            }
             return new ObjectMapper().writeValueAsString("OK");
         } catch (Throwable thr) {
             return new ObjectMapper().writeValueAsString(thr);

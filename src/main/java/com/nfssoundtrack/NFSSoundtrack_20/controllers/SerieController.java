@@ -54,8 +54,7 @@ public class SerieController extends BaseControllerWithErrorHandling {
     }
 
     @PutMapping(value = "/updatePositions", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String putSeriePositions(@RequestBody String formData) throws Exception {
+    public @ResponseBody String putSeriePositions(@RequestBody String formData) throws Exception {
         List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
         for (Object obj : objectMapper) {
             LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;

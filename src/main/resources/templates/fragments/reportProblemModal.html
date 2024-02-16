@@ -1,0 +1,47 @@
+<div class="modal fade" id="reportProblemModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 th:text="#{problem}"></h3>
+                <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="affected-songsubgroup" type="hidden">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="problem-type" th:text="#{problemType}"></label>
+                    </div>
+                    <select class="form-select" id="problem-type" aria-label="Type of problem">
+                        <option selected value="wrong-youtube" th:text="#{wrongYoutube}"></option>
+                        <option value="wrong-musiclink" th:text="#{wrongMusicLink}"></option>
+                        <option value="wrong-flag" th:text="#{wrongFlag}"></option>
+                        <option value="wrong-genre" th:text="#{wrongGenre}"></option>
+                        <option value="wrong-info" th:text="#{wrongInfo}"></option>
+                        <option value="other" th:text="#{wrongOther}"></option>
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="right-value" th:text="#{correctValue}"></label>
+                    </div>
+                    <div class="form-check">
+                        <textarea class="form-control" type="text" id="right-value"></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="discord-id" th:text="#{discordId}"></label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-control" type="text" id="discord-id">
+                    </div>
+                </div>
+                <div class="row p-3">
+                    <button type="button" class="btn btn-success" id="submit-correction" data-bs-dismiss="modal"
+                        aria-label="Submit correction" th:text="#{submitCorrection}"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/reportProblemModal.js}" type="application/javascript"></script>

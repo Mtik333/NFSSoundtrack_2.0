@@ -116,8 +116,13 @@
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup composer"
-                    th:attr="data-aliasid=${mapEntry.key.id},data-role='composer'">
-                    <td colspan="7">
+                    th:attr="data-aliasid=${mapEntry.key.id},data-role='composer',data-song_id=${songToSongSubgroupMap.key.id}">
+                    <td class="info_button">
+                        <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
+                             data-placement="right" th:title="#{showInfo}"
+                             th:src="@{/images/fullres/info_big.png}">
+                    </td>
+                    <td colspan="6">
                         <th:block
                             th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
@@ -230,8 +235,13 @@
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup subcomposer"
-                    th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer'">
-                    <td colspan="7">
+                    th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer',data-song_id=${songToSongSubgroupMap.key.id}">
+                    <td class="info_button">
+                        <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
+                             data-placement="right" th:title="#{showInfo}"
+                             th:src="@{/images/fullres/info_big.png}">
+                    </td>
+                    <td colspan="6">
                         <th:block
                                 th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
@@ -343,8 +353,13 @@
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup remix"
-                    th:attr="data-aliasid=${mapEntry.key.id},data-role='remix'">
-                    <td colspan="7">
+                    th:attr="data-aliasid=${mapEntry.key.id},data-role='remix',data-song_id=${songToSongSubgroupMap.key.id}">
+                    <td class="info_button">
+                        <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
+                             data-placement="right" th:title="#{showInfo}"
+                             th:src="@{/images/fullres/info_big.png}">
+                    </td>
+                    <td colspan="6">
                         <th:block
                                 th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
@@ -456,8 +471,13 @@
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup feat"
-                    th:attr="data-aliasid=${mapEntry.key.id},data-role='feat'">
-                    <td colspan="7">
+                    th:attr="data-aliasid=${mapEntry.key.id},data-role='feat',data-song_id=${songToSongSubgroupMap.key.id}">
+                    <td class="info_button">
+                        <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
+                             data-placement="right" th:title="#{showInfo}"
+                             th:src="@{/images/fullres/info_big.png}">
+                    </td>
+                    <td colspan="6">
                         <th:block
                                 th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"

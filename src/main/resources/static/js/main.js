@@ -528,6 +528,25 @@ $(document).ready(function () {
         }
     });
 
+/**
+     * function to render modal with song information
+     */
+    $(document).on("click", "svg.report-bug", function () {
+        //handling search case
+        var potentialTd = $(this).parent();
+        if (potentialTd.hasClass("info_button")) {
+            var trElem = $(this).parent().parent();
+            var cloneOfTr = trElem.clone();
+            $(this).tooltip('dispose');
+            var songSubgroupIdAttr = $(cloneOfTr).attr("data-songsubgroup-id");
+            $("#affected-songsubgroup").val(songSubgroupIdAttr);
+            cloneOfTr.find(".info_button").remove();
+            $("#affected-songsubgroup").prev().remove();
+            cloneOfTr.insertBefore($("#affected-songsubgroup"));
+            $("#reportProblemModal").modal('show');
+        }
+    });
+
     function fetchInfoSong(songIdAttr, infoLabel, filenameLabel) {
         $("#getAllUsages").attr("href", "/song/" + Number(songIdAttr));
         //we have to call server to provide info about the song

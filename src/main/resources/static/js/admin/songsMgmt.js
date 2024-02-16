@@ -214,7 +214,7 @@ $(document).ready(function () {
             saveCol.append('<button id="save-new-song" type="submit" class="btn btn-success m-2">Save new song </button>');
         }
         saveCol.append('<button id="cancel-song" type="submit" class="btn btn-primary">Cancel</button>');
-        saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate to other subgroups?</label>');
+        saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate links to in-game entry?</label>');
         saveOrCancelDiv.append(saveCol);
         var artistAndAliasDiv = $('<div class="row p-1">');
         var artistDiv = $('<div class="col">');
@@ -329,7 +329,7 @@ $(document).ready(function () {
                 var saveCol = $('<div class="col">');
                 saveCol.append('<button id="save-song-globally" type="submit" class="btn btn-success m-2">Save</button>');
                 saveCol.append('<button id="cancel-song-globally" type="submit" class="btn btn-primary">Cancel</button>');
-                saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate to other subgroups?</label>');
+                saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate links to in-game entry?</label>');
                 globallySaveOrCancelDiv.append(saveCol);
                 var officialDisplayDiv = $('<div class="form-group officialDisplay" id="officialDisplay">');
                 generateOfficialDisplayDiv(officialDisplayDiv, songSubgroup);
@@ -854,11 +854,11 @@ $(document).ready(function () {
             var remixValue;
             var remixInput;
             if (authorSong != undefined) {
-                remixInput = ('<input type="checkbox" class="form-check-input m-3" id="remixBox" checked></input>');
-                remixValue = ('<input class="form-control" id="remixText" value="'+songSubgroup.remixText+'"></input>');
+                remixInput = $('<input type="checkbox" class="form-check-input m-3" id="remixBox" checked></input>');
+                remixValue = $('<input class="form-control" id="remixText" value="'+songSubgroup.remixText+'"></input>');
             } else {
-                remixInput = ('<input type="checkbox" class="form-check-input m-3" id="remixBox"></input>');
-                remixValue = ('<input class="form-control" id="remixText"></input>');
+                remixInput = $('<input type="checkbox" class="form-check-input m-3" id="remixBox"></input>');
+                remixValue = $('<input class="form-control" id="remixText"></input>');
                 $(remixRowDiv).hide();
             }
             var remixLabel = ('<label class="form-check-label m-2" for="remixBox">Remix?</label>');
@@ -893,8 +893,8 @@ $(document).ready(function () {
             remixButtonColDivNext.append('<button id="delete-remix-' + i + '" type="submit" class="btn btn-danger delete-remix">-</button>');
             remixRowDivNext.append(remixInputColDivNext);
             if ($("#remixBox").length<1){
-                var remixInput = ('<input type="checkbox" class="form-check-input m-3" id="remixBox" checked></input>');
-                var remixValue = ('<input class="form-control" id="remixText"></input>');
+                var remixInput = $('<input type="checkbox" class="form-check-input m-3" id="remixBox" checked></input>');
+                var remixValue = $('<input class="form-control" id="remixText"></input>');
                 if (songSubgroup!=null){
                     $(remixValue).val(songSubgroup.remixText);
                 }
@@ -1324,6 +1324,7 @@ $(document).ready(function () {
         songGloballyToSave.tidal = $("#tidalInput").val();
         songGloballyToSave.info = $("#ingameInfo").val();
         songGloballyToSave.featNextToComposer = $("#featNextToComposer").prop("checked");
+        songGloballyToSave.propagate = $("#propagate").prop("checked");
         var genres = $("#genreDisplay").find("input.genre-select");
         for (let i = 0; i < genres.length; i++) {
             var genreInput = genres[i];

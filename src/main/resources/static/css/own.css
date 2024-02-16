@@ -20,6 +20,11 @@ img.img-responsive-row-icon {
   margin: 0.05vw;
 }
 
+svg.img-responsive-row-icon {
+  max-height: 2vw;
+  margin: 0.05vw;
+}
+
 img.img-main-icon {
   max-height: 6vw;
   margin: 0.35vw;
@@ -209,6 +214,10 @@ div.info-container {
 }
 
 img.pointable {
+  cursor: pointer;
+}
+
+svg.pointable {
   cursor: pointer;
 }
 

@@ -9,14 +9,19 @@ import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.others.JustSomeHelper;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.SongSerializer;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.LoginException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -35,6 +40,11 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     @Value("${spring.application.name}")
     String appName;
 
+    @Value("${bot.token}")
+    private String botSecret;
+
+    @Value("${textchannel.id}")
+    private String channelId;
     /**
      * @return the main 'endpoint' of the website
      */
@@ -262,5 +272,31 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("appName", appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         return "index";
+    }
+
+    @PostMapping(value = "/correction", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String submitCorrection(@RequestBody String formData) throws JsonProcessingException {
+        Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
+        int songSubgroupId = (int) objectMapper.get("affectedSongsubgroup");
+        String problemType = (String) objectMapper.get("problemType");
+        String correctValue = (String) objectMapper.get("rightValue");
+        String discordId = (String) objectMapper.get("discordId");
+        try {
+            JDA jda = JDABuilder.createDefault(botSecret).build();
+            jda.awaitReady();
+            TextChannel textChannel = jda.getTextChannelById(channelId);
+            if (textChannel.canTalk()){
+                textChannel.sendMessage("Correction: " + songSubgroupId + ", " + problemType + ", " + correctValue
+                    + ", " + discordId).queue();
+            }
+            if (discordId!=null && !discordId.isEmpty()){
+                jda.openPrivateChannelById(discordId).queue(privateChannel -> privateChannel
+                        .sendMessage("Correction: " + songSubgroupId + ", " + problemType + ", " + correctValue).queue());
+            }
+
+        } catch (LoginException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return new ObjectMapper().writeValueAsString("OK");
     }
 }
