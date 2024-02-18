@@ -74,6 +74,7 @@
                 <div th:if="${songUsages}" th:insert="~{fragments/song.html}"></div>
                 <div th:if="${todays30Songs}" th:insert="~{fragments/todayssong.html}"></div>
             </div>
+            <th:block th:insert="~{fragments/changeLanguageModal.html}"></th:block>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

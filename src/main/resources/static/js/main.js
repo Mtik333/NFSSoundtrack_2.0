@@ -44,7 +44,21 @@ $(document).ready(function () {
     } else {
         var iconsSize = localStorage.getItem("icons-size");
         if (iconsSize != undefined) {
-            $(document).find("img.img-responsive-row-icon").css("max-height", iconsSize+"vw");
+            $(document).find("img.img-responsive-row-icon").css("max-height", iconsSize + "vw");
+        }
+    }
+    var langDisplayed = localStorage.getItem("suggest-lang");
+    if (langDisplayed == undefined) {
+        var userLang = navigator.language || navigator.userLanguage;
+        const langs = ["ar", "es", "jp", "ru", "pl"];
+        for (let i = 0; i < langs.length; i++) {
+            var thisLang = langs[i];
+            if (userLang.indexOf(thisLang) > -1) {
+                $("#appendLang").append(userLang);
+                $("#langToChange").val(userLang);
+                $("#switchLangModal").modal('show');
+                localStorage.setItem("suggest-lang", true);
+            }
         }
     }
     //we make top menu button active
@@ -528,9 +542,9 @@ $(document).ready(function () {
         }
     });
 
-/**
-     * function to render modal with song information
-     */
+    /**
+         * function to render modal with song information
+         */
     $(document).on("click", "svg.report-bug", function () {
         //handling search case
         var potentialTd = $(this).parent();
@@ -686,10 +700,10 @@ $(document).ready(function () {
             $("#mobileLaunchItunes").css("display", "");
             $("#mobileLaunchDeezer").css("display", "");
             $("#mobileExternalYoutube").css("display", "");
-            if (window.location.href.indexOf("/game/") > -1){
+            if (window.location.href.indexOf("/game/") > -1) {
                 $("#newDisqusLinkToOpen").css("display", "");
-                $("#newDisqusLinkToOpen").attr("data-bs-toggle","modal");
-                $("#newDisqusLinkToOpen").attr("data-bs-target","#disqusModal");
+                $("#newDisqusLinkToOpen").attr("data-bs-toggle", "modal");
+                $("#newDisqusLinkToOpen").attr("data-bs-target", "#disqusModal");
             }
         } else {
             var top = e.originalEvent.touches[0].pageY + (window.innerHeight * 0.02);

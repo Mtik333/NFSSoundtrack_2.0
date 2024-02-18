@@ -1,0 +1,28 @@
+<div class="modal fade" id="switchLangModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 th:text="#{selectLang}"></h3>
+                <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="langToChange" hidden>
+                <div class="row">
+                        <span id="appendLang" th:text="#{detectedLang}+': '"></span><span th:text="#{switchLang}"></span>
+                </div>
+                <br>
+                <div class="row" style="text-align: center;">
+                    <div class="col">
+                        <button type="button" class="btn btn-success" id="change-lang-yes" data-bs-dismiss="modal"
+                        aria-label="Yes" th:text="#{yes}"></button>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-danger" id="change-lang-no" data-bs-dismiss="modal"
+                        aria-label="No" th:text="#{no}"></button>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/changeLanguageModal.js}" type="application/javascript"></script>
