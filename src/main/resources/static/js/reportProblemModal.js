@@ -5,7 +5,8 @@ $(document).ready(function () {
         correction.affectedSongsubgroup = Number($("#affected-songsubgroup").val());
         correction.problemType = $("#problem-type").val();
         correction.rightValue = $("#right-value").val();
-        correction.discordId = $("#discord-id").val();
+        correction.sourceUrl = $("#source-url").val();
+        correction.discordUsername = $("#discord-username").val();
         $.ajax({
             async: false,
             type: "POST",
@@ -14,12 +15,21 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {
-                alert("success");
                 console.log("argh");
+                $("#discord-username").val("");
+                $("#right-value").val("");
+                $("#success-alert").fadeTo(500, 500).slideUp(1000, function () {
+                    $("#success-alert").slideUp(1000, function (){
+                        $("#reportProblemModal").modal('hide');
+                    });
+                });
             },
             error: function (ooo) {
-                alert("fail");
-                console.log("eehehehe");
+                $("#failure-alert").fadeTo(500, 500).slideUp(1000, function () {
+                    $("#failure-alert").slideUp(1000, function (){
+                        $("#reportProblemModal").modal('hide');
+                    });
+                });
             },
         });
     });

@@ -49,8 +49,8 @@
                 </form>
             </li>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
-                <a class="nav-link d-inline p-1" href="#" th:text="#{problem}" data-toggle="tooltip"
-                    data-placement="top" title="Work in progress"></a>
+                <a class="nav-link d-inline p-1" id="reportGeneralProblem"
+                   th:text="#{problem}"></a>
             </li>
             <li class="btn d-inline-block p-1">
                 <form id="topsearch" th:action="@{/search/basic}" method="get" class="d-inline p-1">
@@ -61,7 +61,7 @@
                 </form>
             </li>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
-                <a class="nav-link d-inline p-1" id="nfs-top-donate" href="https://racingsoundtracks.com:445/"
+                <a class="nav-link d-inline p-1" href="https://racingsoundtracks.com:445/"
                     th:text="#{oldWebsite}"></a>
             </li>
         </ul>
@@ -90,6 +90,7 @@
                             <option value="ar" th:text="#{arabic}"></option>
                             <option value="es" th:text="#{spanish}"></option>
                             <option value="ru" th:text="#{russian}"></option>
+                            <option value="pl" th:text="#{polish}"></option>
                         </select>
                     </div>
                 </div>

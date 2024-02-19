@@ -59,6 +59,8 @@ public class BaseControllerWithErrorHandling implements ErrorController {
     @Autowired
     TodaysSongService todaysSongService;
 
+    @Autowired
+    CorrectionService correctionService;
     /**
      *
      * @param otherval invalid input endpoint

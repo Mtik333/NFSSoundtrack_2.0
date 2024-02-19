@@ -554,6 +554,7 @@ $(document).ready(function () {
             $(this).tooltip('dispose');
             var songSubgroupIdAttr = $(cloneOfTr).attr("data-songsubgroup-id");
             $("#affected-songsubgroup").val(songSubgroupIdAttr);
+            $("#source-url").val(window.location.href);
             cloneOfTr.find(".info_button").remove();
             $("#affected-songsubgroup").prev().remove();
             cloneOfTr.insertBefore($("#affected-songsubgroup"));
@@ -561,6 +562,16 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on("click", "#reportGeneralProblem", function () {
+            $("#affected-songsubgroup").val(-1);
+            $("#source-url").val(window.location.href);
+            $("#reportProblemModal").modal('show');
+            $("#problem-type").val("OTHER-PROBLEM").change();
+    });
+
+    /**
+         * function to render modal with song information
+         */
     function fetchInfoSong(songIdAttr, infoLabel, filenameLabel) {
         $("#getAllUsages").attr("href", "/song/" + Number(songIdAttr));
         //we have to call server to provide info about the song

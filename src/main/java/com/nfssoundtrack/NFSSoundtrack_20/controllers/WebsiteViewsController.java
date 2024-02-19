@@ -4,16 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorAlias;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.AuthorSong;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Genre;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Role;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongGenre;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.TodaysSong;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.others.JustSomeHelper;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
@@ -21,6 +12,8 @@ import com.nfssoundtrack.NFSSoundtrack_20.serializers.SongSerializer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,21 +22,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import javax.security.auth.login.LoginException;
 import java.awt.*;
-import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class WebsiteViewsController extends BaseControllerWithErrorHandling {
@@ -304,39 +289,62 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 			throws JsonProcessingException {
 		Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
 		int songSubgroupId = (int) objectMapper.get("affectedSongsubgroup");
+		String pageUrl = (String) objectMapper.get("sourceUrl");
 		String problemType = (String) objectMapper.get("problemType");
 		String correctValue = (String) objectMapper.get("rightValue");
-		String discordId = (String) objectMapper.get("discordId");
+		String discordUserName = (String) objectMapper.get("discordUsername");
 		try {
+			Optional<SongSubgroup> songSubgroup;
+			Correction correction;
+			if (songSubgroupId!=-1){
+				songSubgroup = songSubgroupService.findById(songSubgroupId);
+				correction = new Correction(songSubgroup.get(), pageUrl, ProblemType.valueOf(problemType), correctValue, discordUserName);
+			} else {
+				songSubgroup = Optional.empty();
+				correction = new Correction(null, pageUrl, ProblemType.valueOf(problemType), correctValue, discordUserName);
+			}
+			correction.setCorrectionStatus(CorrectionStatus.PENDING);
+			correction = correctionService.save(correction);
 			JDA jda = JDABuilder.createDefault(botSecret).build();
 			jda.awaitReady();
+			List<Member> foundUsers;
+			if (!discordUserName.isEmpty()){
+				foundUsers = jda.getGuilds().get(0).retrieveMembersByPrefix(discordUserName, 1).get();
+			} else {
+				foundUsers = new ArrayList<>();
+			}
 			TextChannel textChannel = jda.getTextChannelById(channelId);
+			EmbedBuilder eb = new EmbedBuilder();
+			eb.setTitle("Correction", pageUrl);
+			eb.setThumbnail("https://racingsoundtracks.com/images/racingsoundtracks.png");
+			eb.setColor(Color.red);
+			if (songSubgroup.isPresent()){
+				eb.setDescription("Submitted correction for:\n" + songSubgroup.get().toCorrectionString());
+			} else {
+				eb.setDescription("Submitted general correction on:\n" + pageUrl);
+			}
+			eb.addField("Problem Type", problemType, false);
+			eb.addField("Correct Value", correctValue, false);
+			if (!foundUsers.isEmpty()){
+				eb.addField("Reported by", foundUsers.get(0).getEffectiveName(), false);
+			}
+			eb.setFooter("Correction ID: " + correction.getId());
+			MessageEmbed embed = eb.build();
 			if (textChannel!=null && textChannel.canTalk()) {
-				textChannel.sendMessage("Correction: " + songSubgroupId + ", " + problemType + ", " + correctValue
-						+ ", " + discordId).queue();
+				textChannel.sendMessageEmbeds(embed).queue();
 			}
-			if (discordId != null && !discordId.isEmpty()) {
-				EmbedBuilder eb = new EmbedBuilder();
-				eb.setTitle("Correction", "https://racingsoundtracks.com/content/home");
-				eb.setColor(Color.red);
-				eb.setDescription("Submitted correction for: " + songSubgroupId);
-				eb.addField("Problem type", problemType, false);
-				eb.addBlankField(false);
-				eb.addField("Correct value", correctValue, false);
-				eb.addBlankField(false);
-				eb.setAuthor("name", null,
-						"https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
-				eb.setFooter("Text",
-						"https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
-				eb.setImage("https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/logo%20-%20title.png");
-				eb.setThumbnail("https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/logo%20-%20title.png");
-				jda.openPrivateChannelById(discordId).queue(privateChannel -> privateChannel
-						.sendMessageEmbeds(eb.build()).queue());
+			if (!foundUsers.isEmpty()) {
+				foundUsers.get(0).getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+						.sendMessage("Thanks for submitting correction to RacingSoundtracks.com\nI will try to handle this fast\nHere are the details of your correction").queue());
+				foundUsers.get(0).getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+						.sendMessageEmbeds(embed).queue());
+//				jda.openPrivateChannelById(discordUserName).queue(privateChannel -> privateChannel
+//						.sendMessageEmbeds(eb.build()).queue());
 			}
-
-		} catch (LoginException | InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-		return new ObjectMapper().writeValueAsString("OK");
+		} catch (Exception e) {
+			e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return new ObjectMapper().writeValueAsString("OK");
 	}
 }

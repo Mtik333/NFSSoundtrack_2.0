@@ -252,4 +252,9 @@ public class SongSubgroup implements Serializable {
                 songSubgroup.lyrics, songSubgroup.info);
     }
 
+    public String toCorrectionString(){
+        return this.getSong().getOfficialDisplayBand() + " - " + this.getSong().getOfficialDisplayTitle()
+                + " from " + this.getSubgroup().getMainGroup().getGame().getDisplayTitle() + "\nSubgroup: "
+                + this.getSubgroup().getSubgroupName() + " -- Group: " + this.getSubgroup().getMainGroup().getGroupName();
+    }
 }
