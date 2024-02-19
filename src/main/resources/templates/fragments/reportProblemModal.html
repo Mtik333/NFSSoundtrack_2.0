@@ -11,6 +11,8 @@
                     <div class="col-md-6">
                         <label for="problem-type" th:text="#{problemType}"></label>
                     </div>
+                </div>
+                <div class="row">
                     <select class="form-select" id="problem-type" aria-label="Type of problem">
                         <option selected value="wrong-youtube" th:text="#{wrongYoutube}"></option>
                         <option value="wrong-musiclink" th:text="#{wrongMusicLink}"></option>
@@ -24,17 +26,17 @@
                     <div class="col-md-6">
                         <label for="right-value" th:text="#{correctValue}"></label>
                     </div>
-                    <div class="form-check">
-                        <textarea class="form-control" type="text" id="right-value"></textarea>
-                    </div>
+                </div>
+                <div class="row">
+                    <textarea class="form-control" type="text" id="right-value"></textarea>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <label for="discord-id" th:text="#{discordId}"></label>
                     </div>
-                    <div class="form-check">
-                        <input class="form-control" type="text" id="discord-id">
-                    </div>
+                </div>
+                <div class="row">
+                    <input class="form-control" type="text" id="discord-id">
                 </div>
                 <div class="row p-3">
                     <button type="button" class="btn btn-success" id="submit-correction" data-bs-dismiss="modal"

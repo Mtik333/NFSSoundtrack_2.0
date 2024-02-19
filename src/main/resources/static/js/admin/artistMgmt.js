@@ -200,7 +200,7 @@ $(document).on('click', '#save-artist', function (e) {
 function generateCountryDiv(i, country, countriesDiv) {
     var countriesRowDiv = $('<div id="countriesRow-' + i + '" class="row p-1">');
     var inputDiv = $('<div class="col">');
-    var buttonsDiv = $('<div class="col">');
+    var buttonsDiv = $('<div class="col mt-auto">');
     inputDiv.append('<label for="countryInfo-' + i + '">Country</label>');
     var countrySelect = $('<input class="form-control countryInfo" id="countryInfo-' + i + '">');
     if (country != undefined) {
@@ -225,7 +225,7 @@ function generateCountryDiv(i, country, countriesDiv) {
 function generateAliasDiv(i, alias, aliasesDiv) {
     var aliasesRowDiv = $('<div id="aliasesRow-' + i + '" class="row p-1">');
     var inputDiv = $('<div class="col">');
-    var buttonsDiv = $('<div class="col">');
+    var buttonsDiv = $('<div class="col mt-auto">');
     inputDiv.append('<label for="aliasInfo-' + i + '">Alias</label>');
     var aliasSelect = $('<input class="form-control aliasInfo" id="aliasInfo-' + i + '">');
     if (alias != undefined) {

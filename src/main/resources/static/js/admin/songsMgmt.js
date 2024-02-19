@@ -227,17 +227,18 @@ $(document).ready(function () {
         var featDiv = $('<div class="form-group featDiv" id="featDiv">');
         var featRowDiv = $('<div class="row p-1">');
         var featInputColDiv = $('<div class="col">');
-        var featButtonColDiv = $('<div class="col">');
+        var featButtonColDiv = $('<div class="col mt-auto">');
         var remixDiv = $('<div class="form-group remixer" id="remixer">');
         var remixRowDiv = $('<div class="row p-1">');
         var remixInputColDiv = $('<div class="col">');
-        var remixButtonColDiv = $('<div class="col">');
+        var remixButtonColDiv = $('<div class="col mt-auto">');
         var remixValueDiv = $('<div class="col">');
+        var remixOfDiv = $('<div class="col">');
         var subcomposerDiv = $('<div class="form-group subcomposerDiv" id="subcomposerDiv">');
         var subcomposerRowDiv = $('<div class="row p-1">');
         var subcomposerInputColDiv = $('<div class="col">');
         var subcomposerConcatColDiv = $('<div class="col">');
-        var subcomposerButtonColDiv = $('<div class="col">');
+        var subcomposerButtonColDiv = $('<div class="col mt-auto">');
         var filenameColDiv = $('<div class="col">');
         var featSelect = $('<input class="form-control feat-select" id="featSelect-1"/>');
         var featSelectHidden = $('<input type="hidden" id="featSelectHidden-1"/>');
@@ -270,7 +271,7 @@ $(document).ready(function () {
                 if (authorSong.role == "REMIX") {
                     howManyRemixes++;
                     console.log(authorSong);
-                    generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixValueDiv, remixRowDiv, howManyRemixes, officialArtistName, i, authorSong);
+                    generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixValueDiv, remixOfDiv, remixRowDiv, howManyRemixes, officialArtistName, i, authorSong);
                 }
             }
         } else {
@@ -288,7 +289,7 @@ $(document).ready(function () {
         }
         if (howManyRemixes == 0) {
             // howManyRemixes++;
-            generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixValueDiv, remixRowDiv, howManyRemixes, officialArtistName, howManyFeats, undefined);
+            generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixValueDiv, remixOfDiv, remixRowDiv, howManyRemixes, officialArtistName, howManyFeats, undefined);
         }
         divToAppend.append(saveOrCancelDiv);
         divToAppend.append(mainComposerDiv);
@@ -841,7 +842,7 @@ $(document).ready(function () {
         }
     }
 
-    function generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixValueDiv, remixRowDiv, howManyRemixes, officialArtistName, i, authorSong) {
+    function generateRemixDiv(remixSelect, remixSelectHidden, remixDiv, songSubgroup, remixInputColDiv, remixButtonColDiv, remixValueDiv, remixOfDiv, remixRowDiv, howManyRemixes, officialArtistName, i, authorSong) {
         if (howManyRemixes == 0) {
             if (authorSong != undefined) {
                 setupAutocompleteAlias(remixSelect, remixSelectHidden, authorSong.authorAlias.id);
@@ -853,12 +854,19 @@ $(document).ready(function () {
             remixDiv.append('<h4>Remix</h4>');
             var remixValue;
             var remixInput;
+            var remixOf;
             if (authorSong != undefined) {
                 remixInput = $('<input type="checkbox" class="form-check-input m-3" id="remixBox" checked></input>');
                 remixValue = $('<input class="form-control" id="remixText" value="'+songSubgroup.remixText+'"></input>');
+                if (songSubgroup.song.baseSong!=null){
+                    remixOf = $('<input class="form-control" id="remixOf" value="'+songSubgroup.song.baseSong.id+'"></input>');
+                } else {
+                    remixOf = $('<input class="form-control" id="remixOf"></input>');
+                }
             } else {
                 remixInput = $('<input type="checkbox" class="form-check-input m-3" id="remixBox"></input>');
                 remixValue = $('<input class="form-control" id="remixText"></input>');
+                remixOf = $('<input class="form-control" id="remixOf"></input>');
                 $(remixRowDiv).hide();
             }
             var remixLabel = ('<label class="form-check-label m-2" for="remixBox">Remix?</label>');
@@ -873,17 +881,21 @@ $(document).ready(function () {
             remixButtonColDiv.append(deleteRemixButton);
             remixValueDiv.append('<label for="remixText">Remix value</label>');
             remixValueDiv.append(remixValue);
+            remixOfDiv.append('<label for="remixText">Remix of (Song ID)</label>');
+            remixOfDiv.append(remixOf);
             remixRowDiv.append(remixInputColDiv);
             remixRowDiv.append(remixButtonColDiv);
             remixRowDiv.append(remixValueDiv);
+            remixRowDiv.append(remixOfDiv);
             remixDiv.append(remixRowDiv);
         } else {
             var remixRowPrev = $('<div class="row p-1">');
             var remixRowDivNext = $('<div class="row p-1">');
             var remixRowPrevColCheckbox = $('<div class="col">');
             var remixRowPrevColValue = $('<div class="col">');
+            var remixRowPrevColOf = $('<div class="col">');
             var remixInputColDivNext = $('<div class="col">');
-            var remixButtonColDivNext = $('<div class="col">');
+            var remixButtonColDivNext = $('<div class="col mt-auto">');
             var remixSelectNext = $('<input class="form-control remix-select" id="remixSelect-' + i + '" value="' + officialArtistName + '"/>');
             var remixSelectHiddenNext = $('<input type="hidden" id="remixSelectHidden-' + i + '" value="' + officialArtistName + '"/>');
             remixInputColDivNext.append('<label for="remixSelect-' + i + '">Remix</label>');
@@ -895,14 +907,20 @@ $(document).ready(function () {
             if ($("#remixBox").length<1){
                 var remixInput = $('<input type="checkbox" class="form-check-input m-3" id="remixBox" checked></input>');
                 var remixValue = $('<input class="form-control" id="remixText"></input>');
+                var remixOf = $('<input class="form-control" id="remixOf"></input>');
                 if (songSubgroup!=null){
                     $(remixValue).val(songSubgroup.remixText);
+                    if (songSubgroup.song.baseSong!=null){
+                        $(remixOf).val(songSubgroup.song.baseSong.id);
+                    }
                 }
                 var remixLabel = ('<label class="form-check-label m-2" for="remixBox">Remix?</label>');
                 remixRowPrevColCheckbox.append(remixLabel);
                 remixRowPrevColCheckbox.append(remixInput);
                 remixRowPrevColValue.append('<label for="remixText">Remix value</label>');
                 remixRowPrevColValue.append(remixValue);
+                remixRowPrevColOf.append('<label for="remixOf">Remix of (Song ID)</label>');
+                remixRowPrevColOf.append(remixOf);
             }
             if (authorSong != undefined) {
                 setupAutocompleteAlias(remixSelectNext, remixSelectHiddenNext, authorSong.authorAlias.id);
@@ -922,6 +940,7 @@ $(document).ready(function () {
             remixRowDivNext.append(remixButtonColDivNext);
             remixRowPrev.append(remixRowPrevColCheckbox);
             remixRowPrev.append(remixRowPrevColValue);
+            remixRowPrev.append(remixRowPrevColOf);
             remixDiv.append(remixRowPrev);
             remixDiv.append(remixRowDivNext);
         }
@@ -1258,6 +1277,7 @@ $(document).ready(function () {
             }
         }
         songToSave.remixValue=$("#remixText").val();
+        songToSave.remixOf=$("#remixOf").val();
         var subcomposers = $("#subcomposerDiv").find("input.subcomposer-select");
         songToSave.subcomposer = false;
         for (let i = 0; i < subcomposers.length; i++) {
@@ -1368,6 +1388,9 @@ $(document).ready(function () {
         divToAppend.empty();
         newSong = true;
         renderEditCreateSong(divToAppend, null);
+        if ($("#existingSongId").length==1){
+            $("#remixOf").parent().remove();
+        }
     });
 
     $(document).on('click', '#save-new-song', function (e) {

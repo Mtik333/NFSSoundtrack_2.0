@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/songSubgroup")
@@ -68,6 +69,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             boolean feat = Boolean.parseBoolean(localObjectMapper.get("feat"));
             boolean subcomposer = Boolean.parseBoolean(localObjectMapper.get("subcomposer"));
             boolean remix = Boolean.parseBoolean(localObjectMapper.get("remix"));
+            String remixOf = localObjectMapper.get("remixOf");
             String mainAliasId = localObjectMapper.get("aliasId");
             String authorId = localObjectMapper.get("authorId");
             Song relatedSong = songSubgroup.getSong();
@@ -123,6 +125,18 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             if (remix) {
                 songSubgroupService.updateFeat(localObjectMapper, "remixSelect",
                         "remixConcatInput", songSubgroup, Role.REMIX, relatedSong);
+            }
+            if (!remixOf.isEmpty()){
+                Integer existingSongId = Integer.parseInt(remixOf);
+                Optional<Song> existingSong = songService.findById(existingSongId);
+                if (existingSong.isPresent()) {
+                    songSubgroup.setSong(existingSong.get());
+                    if (existingSong.get().getBaseSong() != null) {
+                        songSubgroup.setRemix(Remix.YES);
+                    } else {
+                        songSubgroup.setRemix(Remix.NO);
+                    }
+                }
             }
             songSubgroupService.save(songSubgroup);
             return new ObjectMapper().writeValueAsString("OK");
