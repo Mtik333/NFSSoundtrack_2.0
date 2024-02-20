@@ -171,6 +171,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         Author author = authorService.findById(Integer.parseInt(authorId)).orElseThrow(()
                 -> new ResourceNotFoundException("No author with id found " + authorId));
         author.setName(authorName);
+        author = authorService.save(author);
         AuthorAlias rootAlias = authorAliasService.findByAuthor(author).get(0);
         List<AuthorCountry> existingCountries = author.getAuthorCountries();
         List<String> countryInfos = mergeInfo.keySet().stream().filter(
@@ -236,7 +237,6 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 authorAliasService.save(authorAlias);
             }
         }
-        authorService.save(author);
         return new ObjectMapper().writeValueAsString("OK");
     }
 }

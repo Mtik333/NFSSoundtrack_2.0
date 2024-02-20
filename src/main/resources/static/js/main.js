@@ -54,10 +54,18 @@ $(document).ready(function () {
         for (let i = 0; i < langs.length; i++) {
             var thisLang = langs[i];
             if (userLang.indexOf(thisLang) > -1) {
-                $("#appendLang").append(userLang);
-                $("#langToChange").val(userLang);
-                $("#switchLangModal").modal('show');
-                localStorage.setItem("suggest-lang", true);
+                $.ajax({
+                    async: false,
+                    type: "GET",
+                    url: "/langdisplay/" + userLang,
+                    success: function (ooo) {
+                        var langDisplay = ooo;
+                        $("#appendLang").append(userLang + " (" + langDisplay + ")");
+                        $("#langToChange").val(userLang);
+                        $("#switchLangModal").modal('show');
+                        localStorage.setItem("suggest-lang", true);
+                    },
+                });
             }
         }
     }
@@ -562,11 +570,24 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on("click", "#reportProblemMobile", function () {
+        //handling search case
+        var songSubgroupIdAttr = $(this).attr("data-songsubgroup-id");
+        var relatedTr = $("tbody").find("tr[data-songSubgroup-id='" + songSubgroupIdAttr + "']");
+        var cloneOfTr = relatedTr.clone();
+        $("#affected-songsubgroup").val(songSubgroupIdAttr);
+        $("#source-url").val(window.location.href);
+        $("#affected-songsubgroup").prev().remove();
+        cloneOfTr.insertBefore($("#affected-songsubgroup"));
+        $("#mobile_context").removeClass("show").hide();
+        $("#reportProblemModal").modal('show');
+    });
+
     $(document).on("click", "#reportGeneralProblem", function () {
-            $("#affected-songsubgroup").val(-1);
-            $("#source-url").val(window.location.href);
-            $("#reportProblemModal").modal('show');
-            $("#problem-type").val("OTHER-PROBLEM").change();
+        $("#affected-songsubgroup").val(-1);
+        $("#source-url").val(window.location.href);
+        $("#reportProblemModal").modal('show');
+        $("#problem-type").val("OTHER-PROBLEM").change();
     });
 
     /**
@@ -663,6 +684,7 @@ $(document).ready(function () {
         var songSubgroupIdAttr = $(trElem).attr("data-songsubgroup-id");
         var externalLinks = $(trElem).find("a.a-external-music-link");
         $("#mobileAddToPlaylist").attr("data-songsubgroup-id", songSubgroupIdAttr);
+        $("#reportProblemMobile").attr("data-songsubgroup-id", songSubgroupIdAttr);
         $("#mobileRemoveFromPlaylist").attr("data-songsubgroup-id", songSubgroupIdAttr);
         $("#mobileShowSongInfo").attr("data-song_id", songIdAttr);
         var additionalInfoA = $(trElem).find("td.infowarn>a");

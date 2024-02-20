@@ -16,6 +16,7 @@ $(document).ready(function () {
             window.location = window.location + "?lang=" + $("#lang-select").val();
         }
     });
+
     /**
      * function to switch night mode (when you click outside checkbox) and save it in local storage
      */

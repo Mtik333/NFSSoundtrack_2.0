@@ -97,6 +97,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         WebMvcConfigurer.super.addResourceHandlers(registry);
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/")
-                .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS));
+                .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS));
     }
 }

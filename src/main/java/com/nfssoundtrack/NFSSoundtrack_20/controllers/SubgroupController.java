@@ -24,7 +24,7 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
     public @ResponseBody
     String subGroupManage(@PathVariable("subgroupId") int subgroupId) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        Subgroup subgroup = subgroupService.findById(subgroupId) .orElseThrow(() ->
+        Subgroup subgroup = subgroupService.findById(subgroupId).orElseThrow(() ->
                 new ResourceNotFoundException("no subgroup with id found " + subgroupId));
         return objectMapper.writeValueAsString(subgroup);
     }
@@ -55,7 +55,15 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
                     songSubgroup -> String.valueOf(songSubgroup.getSong().getId()).equals(song)).findFirst();
             if (subgroupOptional.isPresent()) {
                 Song mySong = subgroupOptional.get().getSong();
-                songSubgroupService.delete(subgroupOptional.get());
+                SongSubgroup songSubgroup = subgroupOptional.get();
+                List<Correction> relatedCorrections = correctionService.findBySongSubgroup(songSubgroup);
+                for (Correction correction : relatedCorrections) {
+                    correction.setSongSubgroup(null);
+                    correction.setCorrectValue(correction.getCorrectValue()
+                            + "; deleted song-subgroup: " + songSubgroup.getId());
+                    correctionService.save(correction);
+                }
+                songSubgroupService.delete(songSubgroup);
                 //delete orphaned stuff
                 List<SongSubgroup> orphanedSong = songSubgroupService.findBySong(mySong);
                 if (orphanedSong.isEmpty()) {
@@ -94,7 +102,7 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
                 .orElseThrow(() -> new ResourceNotFoundException("No game found with id " + gameId));
         List<MainGroup> mainGroups = game.getMainGroups();
         for (MainGroup mainGroup : mainGroups) {
-            if (mainGroup.getGroupName().contentEquals("All")){
+            if (mainGroup.getGroupName().contentEquals("All")) {
                 return objectMapper.writeValueAsString(mainGroup.getSubgroups().get(0));
             }
         }

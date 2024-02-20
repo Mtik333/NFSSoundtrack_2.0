@@ -15,11 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/songSubgroup")
@@ -75,7 +71,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             Song relatedSong = songSubgroup.getSong();
             Author mainComposer;
             AuthorAlias composerAlias;
-            if (authorId!=null && authorId.startsWith("NEW")) {
+            if (authorId != null && authorId.startsWith("NEW")) {
                 String newAuthor = authorId.replace("NEW-", "");
                 mainComposer = new Author();
                 mainComposer.setName(newAuthor);
@@ -126,7 +122,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 songSubgroupService.updateFeat(localObjectMapper, "remixSelect",
                         "remixConcatInput", songSubgroup, Role.REMIX, relatedSong);
             }
-            if (!remixOf.isEmpty()){
+            if (!remixOf.isEmpty()) {
                 Integer existingSongId = Integer.parseInt(remixOf);
                 Optional<Song> existingSong = songService.findById(existingSongId);
                 if (existingSong.isPresent()) {
@@ -206,6 +202,13 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 songSubgroupService.delete(songSubgroup);
                 songService.delete(song);
             } else {
+                List<Correction> relatedCorrections = correctionService.findBySongSubgroup(songSubgroup);
+                for (Correction correction : relatedCorrections) {
+                    correction.setSongSubgroup(null);
+                    correction.setCorrectValue(correction.getCorrectValue()
+                            + "; deleted song-subgroup: " + songSubgroup.getId());
+                    correctionService.save(correction);
+                }
                 songSubgroupService.delete(songSubgroup);
             }
             return new ObjectMapper().writeValueAsString("OK");
@@ -256,7 +259,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 }
             }
             songService.save(relatedSong);
-            if (Boolean.parseBoolean(localObjectMapper.get("propagate"))){
+            if (Boolean.parseBoolean(localObjectMapper.get("propagate"))) {
                 songSubgroup.setSrcId(relatedSong.getSrcId());
                 songSubgroup.setSpotifyId(relatedSong.getSpotifyId());
                 songSubgroup.setDeezerId(relatedSong.getDeezerId());
