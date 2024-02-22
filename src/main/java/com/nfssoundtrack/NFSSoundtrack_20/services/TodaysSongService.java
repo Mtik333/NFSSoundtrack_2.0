@@ -81,6 +81,9 @@ public class TodaysSongService {
                 }
                 correction.setCorrectionStatus(CorrectionStatus.NOTIFIED);
                 correctionService.save(correction);
+            } else {
+                correction.setCorrectionStatus(CorrectionStatus.NOTIFIED);
+                correctionService.save(correction);
             }
         }
     }

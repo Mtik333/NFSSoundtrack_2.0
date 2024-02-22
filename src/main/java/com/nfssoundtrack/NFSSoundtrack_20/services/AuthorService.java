@@ -2,9 +2,11 @@ package com.nfssoundtrack.NFSSoundtrack_20.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nfssoundtrack.NFSSoundtrack_20.controllers.WebsiteViewsController;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
 import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.AuthorRepository;
+import net.dv8tion.jda.api.JDABuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.security.auth.login.LoginException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -38,6 +41,9 @@ public class AuthorService {
 
     @Autowired
     Map<Author, DiscoGSObj> discoGSObjMap;
+
+    @Value("${bot.token}")
+    private String botSecret;
 
     public Optional<Author> findById(int authorId) {
         return authorRepository.findById(authorId);
@@ -65,7 +71,7 @@ public class AuthorService {
 
 
     @CachePut(value = "discoGSMap")
-    public DiscoGSObj fetchInfoFromMap(Author author) throws JsonProcessingException {
+    public DiscoGSObj fetchInfoFromMap(Author author) throws JsonProcessingException, LoginException, InterruptedException {
         Optional<Author> authorAlreadyThere =
                 discoGSObjMap.keySet().stream().filter(author::equals).findFirst();
         DiscoGSObj discoGSObj;
@@ -148,7 +154,7 @@ public class AuthorService {
         return null;
     }
 
-    private DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws JsonProcessingException {
+    private DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws JsonProcessingException, InterruptedException, LoginException {
         try {
             RestTemplate restTemplate = new RestTemplate();
             String uri2 = "https://api.discogs.com/artists/" + id;
@@ -191,7 +197,12 @@ public class AuthorService {
             return discoGSObj;
         } catch (Exception exp) {
             logger.error("what exception? " + exp.getMessage());
-            exp.printStackTrace();
+            if (WebsiteViewsController.JDA == null) {
+                WebsiteViewsController.JDA = JDABuilder.createDefault(botSecret).build();
+                WebsiteViewsController.JDA.awaitReady();
+                WebsiteViewsController.JDA.getUserById("356215521420771329").openPrivateChannel().queue(privateChannel -> privateChannel
+                        .sendMessage(Arrays.toString(exp.getStackTrace())).queue());
+            }
             return null;
         }
     }

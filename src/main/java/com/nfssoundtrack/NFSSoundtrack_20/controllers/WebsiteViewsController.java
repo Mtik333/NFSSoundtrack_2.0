@@ -195,7 +195,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @GetMapping(value = "/author/{authorId}")
     public String readAuthor(Model model, @PathVariable("authorId") int authorId)
-            throws ResourceNotFoundException, JsonProcessingException {
+            throws ResourceNotFoundException, JsonProcessingException, LoginException, InterruptedException {
         Author author =
                 authorService.findById(authorId).orElseThrow(
                         () -> new ResourceNotFoundException("No author found with id " + authorId));

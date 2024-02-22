@@ -50,7 +50,7 @@ $(document).ready(function () {
     var langDisplayed = localStorage.getItem("suggest-lang");
     if (langDisplayed == undefined) {
         var userLang = navigator.language || navigator.userLanguage;
-        const langs = ["ar", "es", "jp", "ru", "pl"];
+        const langs = ["ar", "de", "el", "es", "fr", "hi", "hu", "id", "it", "jp", "pl", "pt", "ru", "tr", "uk", "zh"];
         for (let i = 0; i < langs.length; i++) {
             var thisLang = langs[i];
             if (userLang.indexOf(thisLang) > -1) {
