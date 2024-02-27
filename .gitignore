@@ -35,7 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
-/src/main/resources/application.properties
 /settings.gradle
 /gradle/wrapper/gradle-wrapper.jar
 /gradle/wrapper/gradle-wrapper.properties

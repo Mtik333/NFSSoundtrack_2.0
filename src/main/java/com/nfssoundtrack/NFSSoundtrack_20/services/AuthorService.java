@@ -200,9 +200,9 @@ public class AuthorService {
             if (WebsiteViewsController.JDA == null) {
                 WebsiteViewsController.JDA = JDABuilder.createDefault(botSecret).build();
                 WebsiteViewsController.JDA.awaitReady();
-                WebsiteViewsController.JDA.getUserById("356215521420771329").openPrivateChannel().queue(privateChannel -> privateChannel
-                        .sendMessage(Arrays.toString(exp.getStackTrace())).queue());
             }
+            WebsiteViewsController.JDA.getUserById("356215521420771329").openPrivateChannel().queue(privateChannel -> privateChannel
+                    .sendMessage(Arrays.toString(exp.getStackTrace())).queue());
             return null;
         }
     }
