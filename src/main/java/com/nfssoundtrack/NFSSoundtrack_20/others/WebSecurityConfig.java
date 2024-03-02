@@ -22,7 +22,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -37,6 +36,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private DatabaseUserDetailsService databaseUserDetailsService;
     @Autowired
     private Environment environment;
+
     @Bean
     public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -98,10 +98,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         WebMvcConfigurer.super.addResourceHandlers(registry);
-        if (!"docker".contains(environment.getActiveProfiles()[0])) {
-            registry.addResourceHandler("/**")
-                    .addResourceLocations("classpath:/static/")
-                    .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS));
+        if (environment.getActiveProfiles().length > 0) {
+            if (!"docker".contains(environment.getActiveProfiles()[0])) {
+                registry.addResourceHandler("/**")
+                        .addResourceLocations("classpath:/static/")
+                        .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS));
+            }
         }
     }
 }

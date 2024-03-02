@@ -16,7 +16,7 @@ services:
   app:
     depends_on:
       mysqldb:
-        condition: service_started
+        condition: service_completed_successfully
     build: .
     restart: on-failure
     env_file: ./.env
