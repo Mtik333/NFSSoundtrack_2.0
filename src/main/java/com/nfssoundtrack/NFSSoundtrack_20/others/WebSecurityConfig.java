@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.CacheControl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -33,7 +35,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
     @Autowired
     private DatabaseUserDetailsService databaseUserDetailsService;
-
+    @Autowired
+    private Environment environment;
     @Bean
     public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -95,8 +98,10 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         WebMvcConfigurer.super.addResourceHandlers(registry);
-        registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/")
-                .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS));
+        if (!"docker".contains(environment.getActiveProfiles()[0])) {
+            registry.addResourceHandler("/**")
+                    .addResourceLocations("classpath:/static/")
+                    .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS));
+        }
     }
 }

@@ -115,7 +115,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
             if (author.isEmpty()) {
                 return objectMapper.writeValueAsString(null);
             }
-            return objectMapper.writeValueAsString(Collections.singleton(author));
+            return objectMapper.writeValueAsString(Collections.singleton(author.get()));
         } else {
             List<Author> authorList = authorService.findByNameContains(input);
             if (authorList == null) {
