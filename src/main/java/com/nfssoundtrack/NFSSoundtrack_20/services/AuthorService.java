@@ -208,6 +208,9 @@ public class AuthorService {
                 WebsiteViewsController.JDA.awaitReady();
             }
             WebsiteViewsController.JDA.getUserById(adminId).openPrivateChannel().queue(privateChannel -> privateChannel
+                    .sendMessage("Error trying to obtainArtistLinkAndProfile on " +
+                            "authorName " + authorName + " id + " + id + " WHY??? " + exp.getMessage()).queue());
+            WebsiteViewsController.JDA.getUserById(adminId).openPrivateChannel().queue(privateChannel -> privateChannel
                     .sendMessage(Arrays.toString(exp.getStackTrace()).substring(0,1800)).queue());
             return null;
         }
