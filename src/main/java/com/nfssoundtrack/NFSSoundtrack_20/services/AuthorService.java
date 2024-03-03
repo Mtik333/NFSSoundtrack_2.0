@@ -7,6 +7,8 @@ import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
 import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.AuthorRepository;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -207,11 +209,14 @@ public class AuthorService {
                 WebsiteViewsController.JDA = JDABuilder.createDefault(botSecret).build();
                 WebsiteViewsController.JDA.awaitReady();
             }
-            WebsiteViewsController.JDA.getUserById(adminId).openPrivateChannel().queue(privateChannel -> privateChannel
-                    .sendMessage("Error trying to obtainArtistLinkAndProfile on " +
-                            "authorName " + authorName + " id + " + id + " WHY??? " + exp.getMessage()).queue());
-            WebsiteViewsController.JDA.getUserById(adminId).openPrivateChannel().queue(privateChannel -> privateChannel
-                    .sendMessage(Arrays.toString(exp.getStackTrace()).substring(0,1800)).queue());
+            RestAction<Member> memberRestAction = WebsiteViewsController.JDA.getGuilds().get(0).retrieveMemberById(adminId);
+            memberRestAction.queue(member -> {
+                member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                        .sendMessage("Error trying to obtainArtistLinkAndProfile on " +
+                                "authorName " + authorName + " id + " + id + " WHY??? " + exp.getMessage()).queue());
+                member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                        .sendMessage(Arrays.toString(exp.getStackTrace()).substring(0,1800)).queue());
+            });
             return null;
         }
     }
