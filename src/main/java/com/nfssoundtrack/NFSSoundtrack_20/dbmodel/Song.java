@@ -58,8 +58,8 @@ public class Song implements Serializable {
     @OneToMany(mappedBy = "song")
     private List<SongGenre> songGenreList = new ArrayList<>();
 
-    @JsonBackReference
-    @OneToOne(fetch = FetchType.LAZY)
+    //@JsonBackReference
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "basesong_id")
     private Song baseSong;
 

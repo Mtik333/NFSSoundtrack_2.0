@@ -26,12 +26,14 @@
                 $(document).find("#topNavbar").addClass("bg-dark");
                 $(document).find("#topNavbar").removeClass("navbar-light");
                 $(document).find("#topNavbar").removeClass("bg-light");
+                $(document).find("#sunlight").css("display", "none");
             } else {
                 $(document).find("html").attr("data-bs-theme", "light");
                 $(document).find("#topNavbar").addClass("navbar-light");
                 $(document).find("#topNavbar").addClass("bg-light");
                 $(document).find("#topNavbar").removeClass("navbar-dark");
                 $(document).find("#topNavbar").removeClass("bg-dark");
+                $(document).find("#moonlight").css("display", "none");
             }
         }
     </script>

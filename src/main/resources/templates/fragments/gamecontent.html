@@ -20,31 +20,43 @@
         </div>
         <hr>
     </th:block>
-    <div id="playlistsDiv" class="form-group pb-2 pt-2">
+    <div id="playlistsDiv" class="form-group pb-2 pt-2" style="display: flex; align-items: center; justify-content: center">
         <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
             data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
-        <th:block th:if="${game.spotifyId!=null && game.spotifyId!=''}">
-            <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal"
-                data-bs-target="#spotifyModal" id="spotifyLink" th:attr="data-tagVideo=${game.spotifyId}"
-                th:text="#{launchSpotify}"></span>
-        </th:block>
-        <th:block th:if="${game.tidalId!=null && game.tidalId!=''}">
-            <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal" data-bs-target="#tidalModal"
-                id="tidalLink" th:attr="data-tagVideo=${game.tidalId}" th:text="#{launchTidal}"></span>
-        </th:block>
-        <th:block th:if="${game.deezerId!=null && game.deezerId!=''}">
-            <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal" data-bs-target="#deezerModal"
-                id="deezerLink" th:attr="data-tagVideo=${game.deezerId}" th:text="#{launchDeezer}"></span>
-        </th:block>
-        <th:block th:if="${game.soundcloudId!=null && game.soundcloudId!=''}">
-            <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal"
-                data-bs-target="#soundcloudModal" id="soundcloudLink" th:attr="data-tagVideo=${game.soundcloudId}"
-                th:text="#{launchSoundcloud}"></span>
-        </th:block>
-        <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal" data-bs-target="#disqusModal"
-            id="disqusLink" th:text="#{showDisqus}"></span>
-        <span class="p-2 nfs-top-item d-inline-block pointable" data-bs-toggle="modal" data-bs-target="#disqusModal"
-            id="newDisqusLink" th:text="#{showNewDisqus}"></span>
+        <div style="display: flex; align-items: center">
+            <th:block th:if="${game.spotifyId!=null && game.spotifyId!=''}">
+                <div class="pointable" data-bs-target="#spotifyModal" data-bs-toggle="modal" id="spotifyLink" th:attr="data-tagVideo=${game.spotifyId}">
+                    <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top" th:title="#{launchSpotify}"
+                         th:src="@{/images/fullres/spotify_big.png}">
+                </div>
+            </th:block>
+            <th:block th:if="${game.tidalId!=null && game.tidalId!=''}">
+                <div class="pointable" data-bs-target="#tidalModal" data-bs-toggle="modal" id="tidalLink" th:attr="data-tagVideo=${game.tidalId}">
+                    <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top" th:title="#{launchTidal}"
+                         th:src="@{/images/fullres/tidal_big.png}">
+                </div>
+            </th:block>
+            <th:block th:if="${game.deezerId!=null && game.deezerId!=''}">
+                <div class="pointable" data-bs-target="#deezerModal" data-bs-toggle="modal" id="deezerLink" th:attr="data-tagVideo=${game.deezerId}">
+                    <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top" th:title="#{launchDeezer}"
+                         th:src="@{/images/fullres/deezer_big.png}">
+                </div>
+            </th:block>
+            <th:block th:if="${game.soundcloudId!=null && game.soundcloudId!=''}">
+                <div class="pointable" data-bs-target="#soundcloudModal" data-bs-toggle="modal" id="soundcloudLink" th:attr="data-tagVideo=${game.soundcloudId}">
+                    <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top" th:title="#{launchSoundcloud}"
+                         th:src="@{/images/fullres/soundcloud_big.png}">
+                </div>
+            </th:block>
+        </div>
+        <div class="pointable" data-bs-target="#disqusModal" data-bs-toggle="modal" id="newDisqusLink">
+            <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top" th:title="#{showNewDisqus}"
+                 th:src="@{/images/fullres/disqus_big.png}">
+        </div>
+        <div class="pointable" data-bs-target="#disqusModal" data-bs-toggle="modal" id="disqusLink">
+            <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top" th:title="#{showDisqus}"
+                 th:src="@{/images/fullres/disqus_archive_big.png}">
+        </div>
     </div>
     <div class="form-group">
         <span>

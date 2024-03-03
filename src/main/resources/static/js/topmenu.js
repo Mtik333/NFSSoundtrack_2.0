@@ -25,6 +25,28 @@ $(document).ready(function () {
         localStorage.setItem("dark-mode", !$(this).prev().prop("checked"));
         $(this).prev().click();
     });
+
+    $("#sunlight").click(function (e) {
+        e.preventDefault();
+        localStorage.setItem("dark-mode", true);
+        $("#moonlight").css("display", "");
+        $("#sunlight").css("display", "none");
+        changeStuffForDarkMode();
+        if (typeof DISQUS != "undefined") {
+            DISQUS.reset({ reload: true });
+        }
+    });
+
+    $("#moonlight").click(function (e) {
+        e.preventDefault();
+        localStorage.setItem("dark-mode", false);
+        $("#moonlight").css("display", "none");
+        $("#sunlight").css("display", "");
+        changeStuffForDarkMode();
+        if (typeof DISQUS != "undefined") {
+            DISQUS.reset({ reload: true });
+        }
+    });
     /**
      * function to switch night mode (when you click inside checkbox) and reload disqus due to that
      */

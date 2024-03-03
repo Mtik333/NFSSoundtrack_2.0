@@ -30,6 +30,7 @@
                 $(document).find("#topNavbar").removeClass("bg-light");
                 $(document).find("#logoDiv").addClass("bg-dark");
                 $(document).find("#logoDiv").removeClass("bg-light");
+                $(document).find("#sunlight").css("display", "none");
             } else {
                 $(document).find("html").attr("data-bs-theme", "light");
                 $(document).find("#topNavbar").addClass("navbar-light");
@@ -38,6 +39,7 @@
                 $(document).find("#topNavbar").removeClass("bg-dark");
                 $(document).find("#logoDiv").removeClass("bg-dark");
                 $(document).find("#logoDiv").addClass("bg-light");
+                $(document).find("#moonlight").css("display", "none");
             }
         }
     </script>

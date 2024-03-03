@@ -126,12 +126,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 Integer existingSongId = Integer.parseInt(remixOf);
                 Optional<Song> existingSong = songService.findById(existingSongId);
                 if (existingSong.isPresent()) {
-                    songSubgroup.setSong(existingSong.get());
-                    if (existingSong.get().getBaseSong() != null) {
-                        songSubgroup.setRemix(Remix.YES);
-                    } else {
-                        songSubgroup.setRemix(Remix.NO);
-                    }
+                    songSubgroup.getSong().setBaseSong(existingSong.get());
+                    songSubgroup.setRemix(Remix.YES);
                 }
             }
             songSubgroupService.save(songSubgroup);

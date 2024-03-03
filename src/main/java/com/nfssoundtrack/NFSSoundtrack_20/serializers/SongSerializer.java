@@ -120,6 +120,9 @@ public class SongSerializer extends JsonSerializer<Song> {
             jsonGenerator.writeStringField("youtube", "<a href='https://www.youtube.com/watch?v=" + song.getSrcId() +
                     "' target='_blank'><img class='img-responsive-song-info' src='/images/fullres/youtube_big.png'></a>");
         }
+        if (song.getBaseSong() != null) {
+            jsonGenerator.writeStringField("remixOf", String.valueOf(song.getBaseSong().getId()));
+        }
         jsonGenerator.writeEndObject();
     }
 }

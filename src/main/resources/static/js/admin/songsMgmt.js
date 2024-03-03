@@ -478,7 +478,7 @@ $(document).ready(function () {
                 event.preventDefault();
                 $(mySelect).val(ui.item.label);
                 $(mySelect).text(ui.item.label);
-                $(mySelectHidden).val(ui.item.value);
+                $(mySelectHidden).val(ui.item.aliasId);
             },
             minLength: 1
         });
@@ -881,7 +881,7 @@ $(document).ready(function () {
             remixButtonColDiv.append(deleteRemixButton);
             remixValueDiv.append('<label for="remixText">Remix value</label>');
             remixValueDiv.append(remixValue);
-            remixOfDiv.append('<label for="remixText">Remix of (Song ID)</label>');
+            remixOfDiv.append('<label for="remixOf">Remix of (Song ID)</label>');
             remixOfDiv.append(remixOf);
             remixRowDiv.append(remixInputColDiv);
             remixRowDiv.append(remixButtonColDiv);

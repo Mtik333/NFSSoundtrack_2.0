@@ -42,6 +42,11 @@ img.img-responsive-author-info {
   margin: 0.05vw;
 }
 
+img.playlist-icon {
+    max-height: 3.5vw;
+    margin: 0.15vw;
+}
+
 img.img-country {
   max-height: 3vw;
 }
@@ -375,8 +380,21 @@ svg.bi-box-arrow-up-right{
     height: 0.6vw;
     vertical-align: top;
 }
+
 #lyrics{
     height: 300px;
+}
+div.no-padding{
+   padding-top: 0;
+   padding-bottom: 0;
+}
+svg.bi-moon{
+    width: 2vw;
+    height: 2vw;
+}
+svg.bi-sun{
+    width: 2vw;
+    height: 2vw;
 }
 
 @media screen and (max-width: 600px) {
@@ -784,6 +802,21 @@ svg.bi-box-arrow-up-right{
 
   svg.bi-box-arrow-up-right{
       display: none;
+  }
+
+  img.playlist-icon {
+      max-height: 10vw;
+      margin: 0.3vw;
+  }
+
+  svg.bi-moon{
+      width: 5vw;
+      height: 5vw;
+  }
+
+  svg.bi-sun{
+      width: 5vw;
+      height: 5vw;
   }
 }
 
