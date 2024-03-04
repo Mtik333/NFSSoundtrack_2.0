@@ -113,4 +113,20 @@ public class DiscoGSObj {
     public void setArtistId(Integer artistId) {
         this.artistId = artistId;
     }
+
+    @Override
+    public String toString() {
+        return "DiscoGSObj{" +
+                "notInDiscogs=" + notInDiscogs +
+                ", artistId=" + artistId +
+                ", uri='" + uri + '\'' +
+                ", profile='" + profile + '\'' +
+                ", twitter='" + twitter + '\'' +
+                ", facebook='" + facebook + '\'' +
+                ", instagram='" + instagram + '\'' +
+                ", soundcloud='" + soundcloud + '\'' +
+                ", myspace='" + myspace + '\'' +
+                ", wikipedia='" + wikipedia + '\'' +
+                '}';
+    }
 }

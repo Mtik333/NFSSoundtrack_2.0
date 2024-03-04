@@ -98,12 +98,22 @@ public class AuthorService {
                 }
             } else {
                 if (!discoGSObj.isNotInDiscogs()) {
-                    discoGSObj = obtainArtistLinkAndProfile(author.getName(), discoGSObj.getArtistId());
-                    if (discoGSObj == null) {
-                        discoGSObj = new DiscoGSObj(null, "There was some internal error " +
-                                "- you might reach out to admin so he can double check");
+                    if (discoGSObj.getArtistId()==null){
+                        RestAction<Member> memberRestAction = WebsiteViewsController.JDA.getGuilds().get(0).retrieveMemberById(adminId);
+                        DiscoGSObj finalDiscoGSObj = discoGSObj;
+                        memberRestAction.queue(member -> {
+                            member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                                    .sendMessage("discoGSObj " + finalDiscoGSObj).queue());
+                        });
+                        discoGSObjMap.remove(author);
                     } else {
-                        discoGSObjMap.put(author, discoGSObj);
+                        discoGSObj = obtainArtistLinkAndProfile(author.getName(), discoGSObj.getArtistId());
+                        if (discoGSObj == null) {
+                            discoGSObj = new DiscoGSObj(null, "There was some internal error " +
+                                    "- you might reach out to admin so he can double check");
+                        } else {
+                            discoGSObjMap.put(author, discoGSObj);
+                        }
                     }
                 }
             }
