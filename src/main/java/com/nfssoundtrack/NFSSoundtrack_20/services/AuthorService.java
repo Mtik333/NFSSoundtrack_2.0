@@ -187,6 +187,7 @@ public class AuthorService {
             DiscoGSObj discoGSObj = new DiscoGSObj();
             String linkToArtist = String.valueOf(something.get("uri"));
             discoGSObj.setUri(linkToArtist);
+            discoGSObj.setArtistId(id);
             String profile = String.valueOf(something.get("profile"));
             if (profile==null || profile.isEmpty()) {
                 profile = authorName + " has no profile description at DiscoGS";
