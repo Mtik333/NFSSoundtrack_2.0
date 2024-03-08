@@ -147,9 +147,9 @@
                                     <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
                                 </th:block>
                             </th:block>
+                        /
+                        <span th:text="'Associated genres: '"></span>
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
-                            /
-                            <span th:text="'Associated genres: '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
                                 th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
@@ -192,7 +192,7 @@
                     </td>
                     <td th:text="${songSubgroup.instrumental}"></td>
                     <td>
-                        <div class="play_icondiv">
+                        <div class="play_icondiv" style="display: flex;">
                             <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
                                 data-bs-target="#videoModal"
                                 th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"

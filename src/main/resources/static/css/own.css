@@ -396,6 +396,12 @@ svg.bi-sun{
     width: 2vw;
     height: 2vw;
 }
+#warnUser{
+    font-size: 1vw;
+    color: red;
+    margin-bottom: 0px;
+    text-align: center;
+}
 
 @media screen and (max-width: 600px) {
 
@@ -817,6 +823,10 @@ svg.bi-sun{
   svg.bi-sun{
       width: 5vw;
       height: 5vw;
+  }
+
+  #warnUser{
+      font-size: 2.8vw;
   }
 }
 

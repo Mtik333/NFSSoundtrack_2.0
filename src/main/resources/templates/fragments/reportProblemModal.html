@@ -39,15 +39,15 @@
                     <textarea class="form-control" type="text" id="right-value"></textarea>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-9">
                         <label for="discord-username" th:text="#{discordId}"></label>
                     </div>
                 </div>
                 <div class="col">
-                    <input class="form-control" type="text" id="discord-username">
+                    <input class="form-control w-50" type="text" id="discord-username">
                 </div>
                 <div class="col" style="text-align: center;">
-                    <button type="button" class="btn btn-success" id="submit-correction"
+                    <button type="button" class="btn btn-success m-2" id="submit-correction"
                         aria-label="Submit correction" th:text="#{submitCorrection}"></button>
                 </div>
                 <div class="alert alert-success" id="success-alert" style="display: none;"><strong th:text="#{success}"></strong></div>

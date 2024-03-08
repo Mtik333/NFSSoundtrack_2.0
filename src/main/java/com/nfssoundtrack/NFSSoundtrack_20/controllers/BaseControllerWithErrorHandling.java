@@ -5,10 +5,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.FileNotFoundException;
+import java.util.Locale;
 
 public class BaseControllerWithErrorHandling implements ErrorController {
 
@@ -61,6 +64,9 @@ public class BaseControllerWithErrorHandling implements ErrorController {
 
     @Autowired
     CorrectionService correctionService;
+
+    @Autowired
+    private MessageSource messageSource;
     /**
      *
      * @param otherval invalid input endpoint
@@ -73,4 +79,8 @@ public class BaseControllerWithErrorHandling implements ErrorController {
         throw new FileNotFoundException("Tried to access non-existing page: " + otherval);
     }
 
+    String getLocalizedMessage(String translationKey) {
+        Locale locale = LocaleContextHolder.getLocale();
+        return messageSource.getMessage(translationKey, null, locale);
+    }
 }

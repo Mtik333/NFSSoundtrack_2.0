@@ -2,9 +2,7 @@ package com.nfssoundtrack.NFSSoundtrack_20.others;
 
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JustSomeHelper {
 
@@ -20,7 +18,7 @@ public class JustSomeHelper {
                                                List<SongSubgroup> songSubgroupList) {
         if (role.equals(authorSong.getRole())) {
             if (songsAsComposer.get(authorAlias) == null) {
-                Map<Song, List<SongSubgroup>> songsPerSubgroup = new HashMap<>();
+                Map<Song, List<SongSubgroup>> songsPerSubgroup = new TreeMap<>(Comparator.comparing(Song::getOfficialDisplayTitle));
                 songsPerSubgroup.put(authorSong.getSong(), songSubgroupList);
                 songsAsComposer.put(authorAlias, songsPerSubgroup);
             } else {

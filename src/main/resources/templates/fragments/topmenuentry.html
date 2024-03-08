@@ -49,6 +49,9 @@
                 <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
             </th:block>
         </th:block>
+        from
+        <a class="table_link" th:href="'/game/'+${todayssong.songSubgroup.subgroup.mainGroup.game.gameShort}"
+           th:text="${todayssong.songSubgroup.subgroup.mainGroup.game.displayTitle}"></a>
         <br>
         <iframe class="home_frame"
             th:src="'https://www.youtube.com/embed/'+${todayssong.songSubgroup.srcId}+'?modestbranding=1&amp;showinfo=0'"

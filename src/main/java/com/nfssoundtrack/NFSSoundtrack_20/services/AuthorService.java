@@ -25,6 +25,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.security.auth.login.LoginException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -48,6 +50,8 @@ public class AuthorService {
 
     @Value("${bot.token}")
     private String botSecret;
+
+    private static Instant LAST_ERROR;
 
     public Optional<Author> findById(int authorId) {
         return authorRepository.findById(authorId);
@@ -82,12 +86,18 @@ public class AuthorService {
         if (authorAlreadyThere.isPresent()) {
             discoGSObj = discoGSObjMap.get(authorAlreadyThere.get());
             if (discoGSObj == null) {
+                if (!checkIfCanQueryDiscoGS()) {
+                    discoGSObj = new DiscoGSObj(false, 0, null, "Seems there were too many " +
+                            "requests to DiscoGS. Please retry in 2 minutes");
+                    return discoGSObj;
+                }
                 Integer artistDiscogsId = retrieveArtistId(author.getName());
                 if (artistDiscogsId != null) {
                     discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
                     if (discoGSObj == null) {
-                        discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, "There was some internal error " +
-                                "- you might reach out to admin so he can double check");
+                        discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, "Seems there were too many " +
+                                "requests to DiscoGS. Please retry in 2 minutes");
+                        LAST_ERROR=Instant.now();
                     } else {
                         discoGSObjMap.put(author, discoGSObj);
                     }
@@ -107,10 +117,16 @@ public class AuthorService {
                         });
                         discoGSObjMap.remove(author);
                     } else {
+                        if (!checkIfCanQueryDiscoGS()) {
+                            discoGSObj = new DiscoGSObj(false, 0, null, "Seems there were too many " +
+                                    "requests to DiscoGS. Please retry in 2 minutes");
+                            return discoGSObj;
+                        }
                         discoGSObj = obtainArtistLinkAndProfile(author.getName(), discoGSObj.getArtistId());
                         if (discoGSObj == null) {
                             discoGSObj = new DiscoGSObj(null, "There was some internal error " +
                                     "- you might reach out to admin so he can double check");
+                            LAST_ERROR=Instant.now();
                         } else {
                             discoGSObjMap.put(author, discoGSObj);
                         }
@@ -118,12 +134,18 @@ public class AuthorService {
                 }
             }
         } else {
+            if (!checkIfCanQueryDiscoGS()) {
+                discoGSObj = new DiscoGSObj(false, 0, null, "Seems there were too many " +
+                        "requests to DiscoGS. Please retry in 2 minutes");
+                return discoGSObj;
+            }
             Integer artistDiscogsId = retrieveArtistId(author.getName());
             if (artistDiscogsId != null) {
                 discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
                 if (discoGSObj == null) {
                     discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, "There was some internal error " +
                             "- you might reach out to admin so he can double check");
+                    LAST_ERROR=Instant.now();
                 }
                 discoGSObjMap.put(author, discoGSObj);
             } else {
@@ -133,6 +155,20 @@ public class AuthorService {
             }
         }
         return discoGSObj;
+    }
+
+    private boolean checkIfCanQueryDiscoGS(){
+        if (LAST_ERROR!=null){
+            Instant currentInstant = Instant.now();
+            Duration timeElapsed = Duration.between(LAST_ERROR,currentInstant);
+            if (timeElapsed.toMinutes()>1){
+                LAST_ERROR=null;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Integer retrieveArtistId(String authorName) throws JsonProcessingException {
