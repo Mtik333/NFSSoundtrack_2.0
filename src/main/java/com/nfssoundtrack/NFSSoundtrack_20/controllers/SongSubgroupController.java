@@ -65,6 +65,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             boolean feat = Boolean.parseBoolean(localObjectMapper.get("feat"));
             boolean subcomposer = Boolean.parseBoolean(localObjectMapper.get("subcomposer"));
             boolean remix = Boolean.parseBoolean(localObjectMapper.get("remix"));
+            boolean propagate = Boolean.parseBoolean(localObjectMapper.get("propagate"));
             String remixOf = localObjectMapper.get("remixOf");
             String mainAliasId = localObjectMapper.get("aliasId");
             String authorId = localObjectMapper.get("authorId");
@@ -112,15 +113,15 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             }
             if (subcomposer) {
                 songSubgroupService.updateFeat(localObjectMapper, "subcomposerSelect",
-                        "subcomposerConcatInput", songSubgroup, Role.SUBCOMPOSER, relatedSong);
+                        "subcomposerConcatInput", songSubgroup, Role.SUBCOMPOSER, relatedSong, propagate);
             }
             if (feat) {
                 songSubgroupService.updateFeat(localObjectMapper, "featSelect",
-                        "featConcatInput", songSubgroup, Role.FEAT, relatedSong);
+                        "featConcatInput", songSubgroup, Role.FEAT, relatedSong, propagate);
             }
             if (remix) {
                 songSubgroupService.updateFeat(localObjectMapper, "remixSelect",
-                        "remixConcatInput", songSubgroup, Role.REMIX, relatedSong);
+                        "remixConcatInput", songSubgroup, Role.REMIX, relatedSong, propagate);
             }
             if (!remixOf.isEmpty()) {
                 Integer existingSongId = Integer.parseInt(remixOf);
@@ -321,15 +322,15 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             boolean remix = Boolean.parseBoolean(objectMapper.get("remix"));
             if (subcomposer) {
                 songSubgroupService.updateFeat(objectMapper, "subcomposerSelect", "subcomposerConcatInput",
-                        songSubgroup, Role.SUBCOMPOSER, song);
+                        songSubgroup, Role.SUBCOMPOSER, song, false);
             }
             if (feat) {
                 songSubgroupService.updateFeat(objectMapper, "featSelect", "featConcatInput",
-                        songSubgroup, Role.FEAT, song);
+                        songSubgroup, Role.FEAT, song, false);
             }
             if (remix) {
                 songSubgroupService.updateFeat(objectMapper, "remixSelect", "remixConcatInput",
-                        songSubgroup, Role.REMIX, song);
+                        songSubgroup, Role.REMIX, song, false);
             }
             List<String> comingGenres = objectMapper.keySet().stream().filter(
                     o -> o.contains("genreSelect")).toList();

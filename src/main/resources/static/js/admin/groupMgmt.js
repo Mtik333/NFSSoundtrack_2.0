@@ -2,6 +2,12 @@ var gameId;
 var fullScopeOfEdit;
 var successAlertHtml = $('<div class="alert alert-success" id="success-alert" style="display: none;"><strong>Success!</strong></div>');
 var failureAlertHtml = $('<div class="alert alert-danger" id="failure-alert" style="display: none;"><strong>Failure! Check the logs</strong></div>');
+
+function ModifiedGroupPositionDef(groupId, position) {
+    this.groupId = groupId;
+    this.position = position;
+}
+
 $(document).ready(function () {
     $("body").append(successAlertHtml);
     $("body").append(failureAlertHtml);
@@ -20,13 +26,17 @@ $(document).ready(function () {
                 divToAppend.append(failureAlertHtml);
                 var newGroupSpan = $('<h2><button data-gameId=' + gameId + ' id="new-group-' + gameId + '" class="new-group btn btn-success">New group</button></h2>');
                 if (fullScopeOfEdit.length > 0) {
-                    var tableApp = $('<table class="table-bordered">');
+                    var tableApp = $('<table id="groupsTable" class="table-bordered">');
+                    tableApp.append("<tbody>");
                     divToAppend.append(newGroupSpan);
+                    divToAppend.append('<button id="recounterGroupPositions" type="submit" class="btn btn-primary">Recounter positions</button>');
+                    divToAppend.append('<button id="updateGroupPositionsInDb" type="submit" class="btn btn-primary">Update positions in DB</button>');
                     divToAppend.append(tableApp);
                     for (let i = 0; i < fullScopeOfEdit.length; i++) {
                         var groupName = fullScopeOfEdit[i].groupName;
-                        var trElem = $('<tr>');
+                        var trElem = $('<tr data-groupId="' + fullScopeOfEdit[i].id + '">');
                         trElem.append('<td class="w-75"><h4><span>' + groupName + '</span></h4></td>');
+                        trElem.append('<td class="col-md-1"><input class="form-control groupPosition" type="text" value="' + fullScopeOfEdit[i].position + '"></td>');
                         trElem.append('<td class="text-right"><button type="button" id="edit-group" data-groupId="' + fullScopeOfEdit[i].id + '" class="btn btn-warning">Edit</button></td>');
                         trElem.append('<td class="text-right"><button type="button" id="delete-group" data-groupId="' + fullScopeOfEdit[i].id + '" class="btn btn-danger">Delete</button></td>');
                         tableApp.append(trElem);
@@ -217,6 +227,61 @@ $(document).ready(function () {
             error: function (ooo) {
                 $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(failureAlertHtml).slideUp(500);
+                });
+            },
+        });
+    });
+
+        $(document).on('click', '#recounterGroupPositions', function (e) {
+            $("#groupsTable").find("tr").each(function (index) {
+                $($(this).find("input")).val((index + 1) * 10);
+            });
+            sortTable();
+        });
+
+$(document).on('focusout', '.groupPosition', sortTable);
+
+function sortTable() {
+        var $tbody = $('#groupsTable tbody');
+        $("#groupsTable").find('tr').sort(function (a, b) {
+            var tda = Number($($(a).find("input")).val()); // target order attribute
+            var tdb = Number($($(b).find("input")).val()); // target order attribute
+            // if a < b return 1
+            return tda > tdb ? 1
+                // else if a > b return -1
+                : tda < tdb ? -1
+                    // else they are equal - return 0
+                    : 0;
+        }).appendTo($tbody);
+    }
+
+    $(document).on('click', '#updateGroupPositionsInDb', function (e) {
+        var arrayOfSeries = [];
+        $("#groupsTable").find("tr").each(function (index) {
+            var rowPositionValue = $($(this).find("input")[0]).val();
+            var serieId = $(this).attr("data-groupId");
+            var myPositionChange = new ModifiedGroupPositionDef(serieId, rowPositionValue);
+            arrayOfSeries.push(myPositionChange);
+        });
+        $.ajax({
+            async: false,
+            type: "PUT",
+            data: JSON.stringify(arrayOfSeries),
+            contentType: 'application/json; charset=utf-8',
+            url: "/maingroup/updatePositions",
+            success: function (ooo) {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
+                        var divToAppend = $('#nfs-content');
+                        divToAppend.empty();
+                    });
+                });
+            }, error: function (ooo) {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500, function () {
+                        var divToAppend = $('#nfs-content');
+                        divToAppend.empty();
+                    });
                 });
             },
         });

@@ -32,6 +32,10 @@ public class AuthorSongService {
         return authorSongRepository.findByAuthorAliasAndSong(authorAlias, song);
     }
 
+    public List<AuthorSong> findMultipleByAuthorAliasAndSong(AuthorAlias authorAlias, Song song) {
+        return authorSongRepository.findMultipleByAuthorAliasAndSong(authorAlias, song);
+    }
+
     public AuthorSong save(AuthorSong authorSong) {
         return authorSongRepository.save(authorSong);
     }

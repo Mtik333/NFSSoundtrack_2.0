@@ -25,6 +25,9 @@ public class MainGroup implements Serializable {
     @JoinColumn(name = "game_id")
     private Game game;
 
+    @Column(name = "position")
+    private Integer position;
+
     @JsonManagedReference
     @OrderBy("position ASC")
     @OneToMany(mappedBy = "mainGroup", fetch = FetchType.LAZY)
@@ -54,6 +57,14 @@ public class MainGroup implements Serializable {
         this.game = game;
     }
 
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
+
     public List<Subgroup> getSubgroups() {
         return subgroups;
     }
@@ -69,6 +80,7 @@ public class MainGroup implements Serializable {
     public MainGroup(String groupName, Game game) {
         this.groupName = groupName;
         this.game = game;
+        this.position=1;
     }
 
     public MainGroup(MainGroup mainGroup) {

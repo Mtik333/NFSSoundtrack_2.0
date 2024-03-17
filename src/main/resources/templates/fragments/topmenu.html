@@ -3,30 +3,37 @@
         <ul class="navbar-nav mr-auto d-inline ml-2 w-100">
             <button class="btn nfs-top-item d-inline p-1" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"
                 role="button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="7vw" height="7vw" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16" style="display: none;">
-                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
-                  </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="7vw" height="7vw" fill="currentColor" class="bi bi-list"
+                    viewBox="0 0 16 16" style="display: none;">
+                    <path fill-rule="evenodd"
+                        d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
+                </svg>
                 <span id="offcanvasSpan" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" th:text="#{menu}">
                 </span>
             </button>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
                 <a class="nav-link d-inline p-1" id="nfs-top-home" th:href="@{/content/home}" th:text="#{home}"></a>
             </li>
-            <svg id="sunlight" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-sun pointable" viewBox="0 0 16 16" data-toggle="tooltip" th:title="#{night}">
-                <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+            <svg id="sunlight" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-sun pointable"
+                viewBox="0 0 16 16" data-toggle="tooltip" th:title="#{night}">
+                <path
+                    d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708" />
             </svg>
-            <svg id="moonlight" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-moon pointable" viewBox="0 0 16 16" data-toggle="tooltip" th:title="#{night}">
-                <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286"/>
+            <svg id="moonlight" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-moon pointable"
+                viewBox="0 0 16 16" data-toggle="tooltip" th:title="#{night}">
+                <path
+                    d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286" />
             </svg>
-<!--            <li class="btn nav-item d-inline-block p-1">-->
-<!--                <div class="pl-2 pt-2 d-inline">-->
-<!--                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">-->
-<!--                    <a class="nav-link d-inline p-1" id="nightModeSwitch" href="#" th:text="#{night}"></a>-->
-<!--                </div>-->
-<!--            </li>-->
+            <!--            <li class="btn nav-item d-inline-block p-1">-->
+            <!--                <div class="pl-2 pt-2 d-inline">-->
+            <!--                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">-->
+            <!--                    <a class="nav-link d-inline p-1" id="nightModeSwitch" href="#" th:text="#{night}"></a>-->
+            <!--                </div>-->
+            <!--            </li>-->
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
                 <a id="openPreferences" class="nav-link d-inline p-1 preferences" href="#" data-bs-toggle="modal"
-                    data-bs-target="#preferencesModal" data-toggle="tooltip" data-placement="top" th:title="#{preferencesTooltip}" th:text="#{preferences}"></a>
+                    data-bs-target="#preferencesModal" data-toggle="tooltip" data-placement="top"
+                    th:title="#{preferencesTooltip}" th:text="#{preferences}"></a>
             </li>
             <th:block sec:authorize="isAuthenticated()">
                 <li class="btn nav-item nfs-top-item d-inline-block p-1">
@@ -44,8 +51,7 @@
                 </form>
             </li>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
-                <a class="nav-link d-inline p-1" id="reportGeneralProblem"
-                   th:text="#{problem}"></a>
+                <a class="nav-link d-inline p-1" id="reportGeneralProblem" th:text="#{problem}"></a>
             </li>
             <li class="btn d-inline-block p-1">
                 <form id="topsearch" th:action="@{/search/basic}" method="get" class="d-inline p-1">
@@ -56,11 +62,11 @@
                 </form>
             </li>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
-                <a class="nav-link d-inline p-1" href="https://racingsoundtracks.com:445/"
-                   th:text="#{oldWebsite}"></a>
+                <a class="nav-link d-inline p-1" href="https://racingsoundtracks.com:445/" th:text="#{oldWebsite}"></a>
             </li>
             <li class="btn nav-item nfs-top-item d-inline-block p-1 dropdown">
-                <a class="nav-link d-inline p-1 dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="#{more}">
+                <a class="nav-link d-inline p-1 dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="#{more}">
                 </a>
                 <div class="dropdown-menu no-padding" aria-labelledby="dropdownMenuButton">
                     <ul style="padding: 0.5vw">
@@ -70,7 +76,8 @@
                         <a class="nav-link nfs-top-item d-inline p-1" id="nfs-top-donate" th:href="@{/content/donate}"
                             th:text="#{donate}"></a>
                         <div class="dropdown-divider"></div>
-                        <a class="nav-link nfs-top-item d-inline p-1" th:href="@{/content/cookies}" th:text="#{privacy}"></a>
+                        <a class="nav-link nfs-top-item d-inline p-1" th:href="@{/content/cookies}"
+                            th:text="#{privacy}"></a>
                     </ul>
                 </div>
             </li>
@@ -86,7 +93,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 th:text="#{preferences}"></h3>
-                <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -97,21 +105,21 @@
                         <select class="form-select" id="lang-select" aria-label="Set language">
                             <option selected value="en" th:text="#{english}"></option>
                             <option value="ar" th:text="#{arabic}"></option>
-                            <option value="pl" th:text="#{german}"></option>
-                            <option value="pl" th:text="#{greek}"></option>
+                            <option value="de" th:text="#{german}"></option>
+                            <option value="el" th:text="#{greek}"></option>
                             <option value="es" th:text="#{spanish}"></option>
-                            <option value="pl" th:text="#{french}"></option>
-                            <option value="pl" th:text="#{hindi}"></option>
-                            <option value="pl" th:text="#{hungarian}"></option>
-                            <option value="pl" th:text="#{indonesian}"></option>
-                            <option value="pl" th:text="#{italian}"></option>
+                            <option value="fr" th:text="#{french}"></option>
+                            <option value="hi" th:text="#{hindi}"></option>
+                            <option value="hu" th:text="#{hungarian}"></option>
+                            <option value="id" th:text="#{indonesian}"></option>
+                            <option value="it" th:text="#{italian}"></option>
                             <option value="jp" th:text="#{japanese}"></option>
                             <option value="pl" th:text="#{polish}"></option>
-                            <option value="pl" th:text="#{portuguese}"></option>
+                            <option value="pt" th:text="#{portuguese}"></option>
                             <option value="ru" th:text="#{russian}"></option>
-                            <option value="pl" th:text="#{turkish}"></option>
-                            <option value="pl" th:text="#{ukrainian}"></option>
-                            <option value="pl" th:text="#{chinese}"></option>
+                            <option value="tr" th:text="#{turkish}"></option>
+                            <option value="uk" th:text="#{ukrainian}"></option>
+                            <option value="zh" th:text="#{chinese}"></option>
                         </select>
                     </div>
                 </div>

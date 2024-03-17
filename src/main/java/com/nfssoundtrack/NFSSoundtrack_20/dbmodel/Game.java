@@ -62,6 +62,7 @@ public class Game implements Serializable, Comparable<Game> {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
+    @OrderBy("position ASC")
     private List<MainGroup> mainGroups = new ArrayList<>();
 
     public Game() {

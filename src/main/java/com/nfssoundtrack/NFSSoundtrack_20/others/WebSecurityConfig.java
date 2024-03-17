@@ -1,14 +1,14 @@
 package com.nfssoundtrack.NFSSoundtrack_20.others;
 
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Author;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.nfssoundtrack.NFSSoundtrack_20.deserializers.AuthorToDiscoGSDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.CacheControl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,6 +24,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -93,8 +95,31 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     @Cacheable("discoGSMap")
-    public Map<Author, DiscoGSObj> discoGSObjMap() {
-        return new HashMap<>();
+    public Map<Long, DiscoGSObj> discoGSObjMap() {
+        File discoGsFile = new File("discogs.json");
+        if (!discoGsFile.exists()){
+            try {
+                boolean created = discoGsFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return new HashMap<>();
+        } else {
+            ObjectMapper mapper = new ObjectMapper();
+            SimpleModule simpleModule = new SimpleModule();
+            simpleModule.addDeserializer(AuthorToDiscoGSObj.class, new AuthorToDiscoGSDeserializer());
+            mapper.registerModule(simpleModule);
+            Map<Long,DiscoGSObj> discogsMap = new HashMap<>();
+            try {
+                AuthorToDiscoGSObj[] objs = mapper.readValue(discoGsFile,AuthorToDiscoGSObj[].class);
+                for (AuthorToDiscoGSObj authorToDiscoGSObj : objs){
+                    discogsMap.put(authorToDiscoGSObj.getArtistId(), authorToDiscoGSObj.getDiscoGSObj());
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return discogsMap;
+        }
     }
 
     @Override

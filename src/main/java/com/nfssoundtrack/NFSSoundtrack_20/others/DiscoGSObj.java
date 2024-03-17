@@ -4,7 +4,7 @@ public class DiscoGSObj {
 
     private boolean notInDiscogs;
 
-    private Integer artistId;
+    private Integer discogsId;
     private String uri;
     private String profile;
 
@@ -29,7 +29,7 @@ public class DiscoGSObj {
 
     public DiscoGSObj(boolean notInDiscogs, Integer artistId, String uri, String profile) {
         this.notInDiscogs = notInDiscogs;
-        this.artistId = artistId;
+        this.discogsId = artistId;
         this.uri = uri;
         this.profile = profile;
     }
@@ -106,19 +106,19 @@ public class DiscoGSObj {
         this.notInDiscogs = notInDiscogs;
     }
 
-    public Integer getArtistId() {
-        return artistId;
+    public Integer getDiscogsId() {
+        return discogsId;
     }
 
-    public void setArtistId(Integer artistId) {
-        this.artistId = artistId;
+    public void setDiscogsId(Integer artistId) {
+        this.discogsId = artistId;
     }
 
     @Override
     public String toString() {
         return "DiscoGSObj{" +
                 "notInDiscogs=" + notInDiscogs +
-                ", artistId=" + artistId +
+                ", discogsId=" + discogsId +
                 ", uri='" + uri + '\'' +
                 ", profile='" + profile + '\'' +
                 ", twitter='" + twitter + '\'' +

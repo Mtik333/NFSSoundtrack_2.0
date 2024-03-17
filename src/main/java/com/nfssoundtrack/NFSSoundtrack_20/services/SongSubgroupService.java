@@ -4,6 +4,7 @@ import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.SongSubgroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +65,7 @@ public class SongSubgroupService {
     }
 
     public void updateFeat(Map<String, String> objectMapper, String comingInput, String comingConcatInput,
-                           SongSubgroup songSubgroup, Role role, Song relatedSong) throws Exception {
+                           SongSubgroup songSubgroup, Role role, Song relatedSong, Boolean propagate) throws Exception {
         List<String> comingFeats = objectMapper.keySet().stream().filter(
                 o -> o.contains(comingInput)).toList();
         Iterator<String> comingConcats = objectMapper.keySet().stream().filter(
@@ -77,7 +78,7 @@ public class SongSubgroupService {
             String featValue = objectMapper.get(comingFeat);
             if (featValue.startsWith("NEW")) {
                 String actualFeatValue = featValue.replace("NEW-", "");
-                saveNewFeatOrRemixer(actualFeatValue, songSubgroup, role, concatVal);
+                saveNewFeatOrRemixer(actualFeatValue, songSubgroup, role, concatVal, propagate);
             } else if (featValue.startsWith("DELETE")) {
                 String deleteFeatId = featValue.replace("DELETE-", "");
                 AuthorAlias authorAlias = authorAliasService.findById(Integer.parseInt(deleteFeatId))
@@ -85,13 +86,17 @@ public class SongSubgroupService {
                 AuthorSong authorSong = authorSongService.findByAuthorAliasAndSong(authorAlias, relatedSong)
                         .orElseThrow(() -> new ResourceNotFoundException("No authorsong found"));
                 authorSongService.delete(authorSong);
+                if (Role.REMIX.equals(role)){
+                    songSubgroup.setRemix(Remix.NO);
+                }
             } else {
-                saveNewAssignmentOfExistingFeatRemixer(featValue, songSubgroup, role, concatVal);
+                saveNewAssignmentOfExistingFeatRemixer(featValue, songSubgroup, role, concatVal, propagate);
             }
         }
     }
 
-    private void saveNewFeatOrRemixer(String actualRemixValue, SongSubgroup songSubgroup, Role role, String concatValue) {
+    private void saveNewFeatOrRemixer(String actualRemixValue, SongSubgroup songSubgroup, Role role,
+                                      String concatValue, Boolean propagate) {
         Author author = new Author();
         author.setName(actualRemixValue);
         author = authorService.save(author);
@@ -100,6 +105,15 @@ public class SongSubgroupService {
         AuthorSong authorSong = new AuthorSong(authorAlias, songSubgroup.getSong(), role);
         if (role.equals(Role.REMIX)) {
             authorSong.setRemixConcat(concatValue);
+            if (propagate){
+                List<SongSubgroup> entriesToUpdateConcat = songSubgroupRepository.findBySong(songSubgroup.getSong());
+                entriesToUpdateConcat.remove(songSubgroup);
+                for (SongSubgroup localSubgroup : entriesToUpdateConcat){
+                    localSubgroup.setRemix(Remix.YES);
+                    localSubgroup.setRemixText(songSubgroup.getRemixText());
+                    songSubgroupRepository.save(localSubgroup);
+                }
+            }
         }
         if (role.equals(Role.FEAT)) {
             authorSong.setFeatConcat(concatValue);
@@ -111,7 +125,8 @@ public class SongSubgroupService {
     }
 
 
-    private void saveNewAssignmentOfExistingFeatRemixer(String remixValue, SongSubgroup songSubgroup, Role role, String concatValue) throws ResourceNotFoundException {
+    private void saveNewAssignmentOfExistingFeatRemixer(String remixValue, SongSubgroup songSubgroup, Role role,
+                                                        String concatValue, Boolean propagate) throws ResourceNotFoundException {
         AuthorAlias authorAlias = authorAliasService.findById(Integer.parseInt(remixValue))
                 .orElseThrow(() -> new ResourceNotFoundException("No authoralias with id found " + remixValue));
         boolean alreadyAssigned = false;
@@ -132,6 +147,15 @@ public class SongSubgroupService {
             AuthorSong authorSong = new AuthorSong(authorAlias, songSubgroup.getSong(), role);
             if (role.equals(Role.REMIX)) {
                 authorSong.setRemixConcat(concatValue);
+                if (propagate){
+                    List<SongSubgroup> entriesToUpdateConcat = songSubgroupRepository.findBySong(songSubgroup.getSong());
+                    entriesToUpdateConcat.remove(songSubgroup);
+                    for (SongSubgroup localSubgroup : entriesToUpdateConcat){
+                        localSubgroup.setRemix(Remix.YES);
+                        localSubgroup.setRemixText(songSubgroup.getRemixText());
+                        songSubgroupRepository.save(localSubgroup);
+                    }
+                }
             }
             if (role.equals(Role.FEAT)) {
                 authorSong.setFeatConcat(concatValue);

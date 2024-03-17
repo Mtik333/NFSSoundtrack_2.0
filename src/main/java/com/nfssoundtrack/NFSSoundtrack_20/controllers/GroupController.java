@@ -15,10 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/maingroup")
@@ -150,5 +147,20 @@ public class GroupController extends BaseControllerWithErrorHandling {
         ObjectMapper objectMapper2 = new ObjectMapper();
         mainGroup = mainGroupService.save(mainGroup);
         return objectMapper2.writeValueAsString(mainGroup);
+    }
+
+    @PutMapping(value = "/updatePositions", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String putGroupPositions(@RequestBody String formData) throws Exception {
+        List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
+        for (Object obj : objectMapper) {
+            LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
+            long groupId = Long.parseLong(String.valueOf(linkedHashMap.get("groupId")));
+            Integer position = Integer.parseInt(String.valueOf(linkedHashMap.get("position")));
+            MainGroup mainGroup = mainGroupService.findById(Math.toIntExact(groupId)).orElseThrow(
+                    () -> new ResourceNotFoundException("no serie with id found " + groupId));
+            mainGroup.setPosition(position);
+            mainGroupService.save(mainGroup);
+        }
+        return new ObjectMapper().writeValueAsString("OK");
     }
 }

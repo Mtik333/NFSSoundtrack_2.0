@@ -41,6 +41,7 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
         intoValue.setRemixText(JustSomeHelper.returnProperValueToDb(node.get("remixValue").asText()));
         intoValue.setLyrics(JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText()));
         intoValue.setShowFeat(node.get("showFeat").asBoolean());
+        intoValue.setShowSubcomposer(node.get("showSubcomposer").asBoolean());
         if (intoValue.getLyrics() != null) {
             intoValue.setLyrics(intoValue.getLyrics().replaceAll("\n", "<br>"));
         }
@@ -76,6 +77,7 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
         String filename = JustSomeHelper.returnProperValueToDb(node.get("filename").asText());
         String remixText = JustSomeHelper.returnProperValueToDb(node.get("remixValue").asText());
         Boolean showFeat = node.get("showFeat").asBoolean();
+        Boolean showSubcomposer = node.get("showSubcomposer").asBoolean();
         Instrumental instrumental = Instrumental.fromBoolean(node.get("instrumental").asBoolean());
         Remix remix = Remix.NO;
         if (node.get("remix")!=null){
@@ -86,6 +88,7 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
         songSubgroup.setFilename(filename);
         songSubgroup.setRemixText(remixText);
         songSubgroup.setShowFeat(showFeat);
+        songSubgroup.setShowSubcomposer(showSubcomposer);
         JsonNode existingSongNode = node.get("existingSongId");
         if (existingSongNode!=null && existingSongNode.isInt()) {
             Integer existingSongId = existingSongNode.asInt();

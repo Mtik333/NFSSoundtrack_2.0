@@ -74,6 +74,9 @@ public class SongSubgroup implements Serializable {
     @Column(name = "remix_text")
     private String remixText;
 
+    @Column(name = "show_subcomposer", columnDefinition="BIT")
+    private Boolean showSubcomposer;
+
     public Long getId() {
         return id;
     }
@@ -224,6 +227,14 @@ public class SongSubgroup implements Serializable {
 
     public void setShowFeat(Boolean showFeat) {
         this.showFeat = showFeat;
+    }
+
+    public Boolean getShowSubcomposer() {
+        return showSubcomposer;
+    }
+
+    public void setShowSubcomposer(Boolean showSubcomposer) {
+        this.showSubcomposer = showSubcomposer;
     }
 
     public SongSubgroup(Instrumental instrumental, Remix remix, String srcId, String spotifyId, String deezerId, String itunesLink, String tidalLink, String soundcloudLink, String ingameDisplayBand, String ingameDisplayTitle, Long position, String lyrics, String info) {

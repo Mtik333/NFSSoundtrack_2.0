@@ -11,7 +11,8 @@
             th:text="#{oldComments}"></a>
         <br>
         <br>
-        <span th:text="#{sourceCode}+' '"></span><a class="table_link" href="https://github.com/Mtik333/NFSSoundtrack_2.0" th:text="#{here}"></a>
+        <span th:text="#{sourceCode}+' '"></span><a class="table_link"
+            href="https://github.com/Mtik333/NFSSoundtrack_2.0" th:text="#{here}"></a>
         <br>
         <br>
         <b>
@@ -21,11 +22,13 @@
             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
                 th:text="${todayssong.songSubgroup.ingameDisplayBand!=null} ? ${todayssong.songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
         </th:block>
-        <th:block
-            th:each="authorSong,iter : ${todayssong.songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
-            <span th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
-            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
-                th:text="${authorSong.authorAlias.alias}"></a>
+        <th:block th:if="${todayssong.songSubgroup.showSubcomposer}">
+            <th:block
+                th:each="authorSong,iter : ${todayssong.songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
+                <span th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                    th:text="${authorSong.authorAlias.alias}"></a>
+            </th:block>
         </th:block>
         -
         <span
@@ -51,7 +54,7 @@
         </th:block>
         from
         <a class="table_link" th:href="'/game/'+${todayssong.songSubgroup.subgroup.mainGroup.game.gameShort}"
-           th:text="${todayssong.songSubgroup.subgroup.mainGroup.game.displayTitle}"></a>
+            th:text="${todayssong.songSubgroup.subgroup.mainGroup.game.displayTitle}"></a>
         <br>
         <iframe class="home_frame"
             th:src="'https://www.youtube.com/embed/'+${todayssong.songSubgroup.srcId}+'?modestbranding=1&amp;showinfo=0'"

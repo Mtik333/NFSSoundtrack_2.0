@@ -257,7 +257,7 @@ $(document).ready(function () {
                 var aliasSelect = $('<input class="form-control w-100" id="aliasSelect-' + i + '" value="' + officialArtistName + '"/>');
                 var aliasSelectHidden = $('<input type="hidden" id="aliasSelectHidden-' + i + '" value="' + authorSong.authorAlias.id + '"/>');
                 if (authorSong.role == "COMPOSER") {
-                    generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv, artistAndAliasDiv, aliasSelect, aliasSelectHidden, i, authorSong, instrumentalDiv, officialTitleDiv, songSubgroup.instrumental, officialTitle, songSubgroup.showFeat);
+                    generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv, artistAndAliasDiv, aliasSelect, aliasSelectHidden, i, authorSong, instrumentalDiv, officialTitleDiv, songSubgroup.instrumental, officialTitle, songSubgroup.showFeat, songSubgroup.showSubcomposer);
                 }
                 if (authorSong.role == "SUBCOMPOSER") {
                     howManySubcomposers++;
@@ -515,7 +515,7 @@ $(document).ready(function () {
     });
 
     function generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv,
-        artistAndAliasDiv, aliasSelect, aliasSelectHidden, i, authorSong, instrumentalDiv,officialTitleDiv, instrumentalValue, officialTitle, showFeat) {
+        artistAndAliasDiv, aliasSelect, aliasSelectHidden, i, authorSong, instrumentalDiv,officialTitleDiv, instrumentalValue, officialTitle, showFeat, showSubcomposer) {
         mainComposerDiv.append("<h4>Author / Alias info</h4>");
         var authorSelect = $('<input class="form-control authorSelect" id="authorSelect-' + i + '" value="' + officialArtistName + '"/>');
         var authorSelectHidden = $('<input type="hidden" id="authorSelectHidden-' + i + '"/>');
@@ -552,9 +552,19 @@ $(document).ready(function () {
             showFeatInput = ('<input type="checkbox" class="form-check-input mt-4" id="showFeatBox">');
         }
         var showFeatLabel = ('<label class="form-check-label mt-3" for="showFeatBox">Show feat?</label>');
+        var showSubcomposerInput;
+        if (showSubcomposer) {
+            showSubcomposerInput = ('<input type="checkbox" class="form-check-input mt-4" id="showSubcomposerBox" checked>');
+        } else {
+            showSubcomposerInput = ('<input type="checkbox" class="form-check-input mt-4" id="showSubcomposerBox">');
+        }
+        var showSubcomposerLabel = ('<label class="form-check-label mt-3" for="showSubcomposerBox">Show subcomposer?</label>');
         instrumentalDiv.append('<br>');
         instrumentalDiv.append(showFeatInput);
         instrumentalDiv.append(showFeatLabel);
+        instrumentalDiv.append('<br>');
+        instrumentalDiv.append(showSubcomposerInput);
+        instrumentalDiv.append(showSubcomposerLabel);
         if (officialTitle != undefined){
             var officialTitleInput = $('<input class="form-control" id="officialSongTitle" value="' + officialTitle + '" disabled/>');
             officialTitleDiv.append('<label class="form-check-label mt-3" for="officialSongTitle">Official title</label>');
@@ -1231,9 +1241,11 @@ $(document).ready(function () {
         }
         songToSave.instrumental = $("#instrumentalBox").prop("checked");
         songToSave.showFeat = $("#showFeatBox").prop("checked");
+        songToSave.showSubcomposer = $("#showSubcomposerBox").prop("checked");
         songToSave.ingameBand = $("#ingameBand").val();
         songToSave.ingameTitle = $("#ingameTitle").val();
         songToSave.ingameSrcId = $("#ingameSrcId").val();
+        songToSave.propagate = $("#propagate").prop("checked");
         var feats = $("#featDiv").find("input.feat-select");
         songToSave.feat = false;
         for (let i = 0; i < feats.length; i++) {
