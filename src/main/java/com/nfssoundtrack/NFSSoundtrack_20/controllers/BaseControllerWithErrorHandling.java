@@ -66,6 +66,9 @@ public class BaseControllerWithErrorHandling implements ErrorController {
     CorrectionService correctionService;
 
     @Autowired
+    CustomThemeService customThemeService;
+
+    @Autowired
     private MessageSource messageSource;
     /**
      *

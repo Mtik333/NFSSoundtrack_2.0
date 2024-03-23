@@ -42,7 +42,7 @@ img.img-responsive-author-info {
   margin: 0.05vw;
 }
 
-img.playlist-icon {
+.playlist-icon {
     max-height: 3.5vw;
     margin: 0.15vw;
 }
@@ -298,7 +298,7 @@ footer div {
 }
 
 html[data-bs-theme="dark"] #topNavbar {
-  background-color: #262424 !important;
+  background-color: #262424;
 }
 
 html[data-bs-theme="dark"] a.game_class {
@@ -810,7 +810,7 @@ svg.bi-sun{
       display: none;
   }
 
-  img.playlist-icon {
+  .playlist-icon {
       max-height: 10vw;
       margin: 0.3vw;
   }

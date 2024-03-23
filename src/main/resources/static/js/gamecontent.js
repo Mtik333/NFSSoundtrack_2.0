@@ -187,4 +187,58 @@ $(document).ready(function () {
         $(firstGameGroup).first().click();
         //we have to hit first subgroup in main group to have stuff displayed
     }
+
+    $(document).on('click', '#dynamicBackground', function (e) {
+        var gameId = Number($("#playlistsDiv").attr("data-el_id"));
+        if ($("body").css("background-image").indexOf("url")==0){
+            changeStuffForDarkMode();
+            $("body").css("background","");
+            $("body").css("background-size","");
+            $("body").css("background-attachment","");
+            $("#filter_songs").css("background", "");
+            $(".table").css("--bs-table-bg","var(--bs-body-bg)");
+            $(".table-primary").css("--bs-table-bg","");
+            $(".table-primary").css("--bs-table-striped-bg","");
+            $(".table a").css("color","");
+            $("th").css("color","");
+            $("h2").css("color","");
+            $("#logoDiv").css("background", "");
+            $("#topNavbar").css("background", "");
+            $("#navbarSupportedContent").css("background", "");
+            $(".nav-link").css("color","");
+        } else {
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/customtheme/" + gameId,
+                success: function (ooo) {
+                    var theme = JSON.parse(ooo);
+                    if ('ontouchstart' in window){
+                        $("body").css("background", theme.mobileTheme);
+                    } else {
+                        $("body").css("background", theme.pcTheme);
+                    }
+                    changeStuffForDarkMode(theme.nightMode);
+                    $("body").css("background-size", "cover");
+                    $("body").css("background-attachment", "fixed");
+                    $("#filter_songs").css("background", "transparent");
+                    $(".table").css("--bs-table-bg","transparent");
+                    $(".table-primary").css("--bs-table-bg","transparent");
+                    $(".table-primary").css("--bs-table-striped-bg","transparent");
+                    $(".table a").css("color",theme.hyperlinkColor);
+                    $("th").css("color",theme.hyperlinkColor);
+                    $("h2").css("color",theme.hyperlinkColor);
+                    $(".nav-link").css("color",theme.hyperlinkColor);
+                    if (!('ontouchstart' in window)){
+                        $("#logoDiv").removeClass("bg-dark");
+                        $("#logoDiv").css("background-color", "transparent");
+                        $("#topNavbar").removeClass("bg-dark");
+                        $("#topNavbar").removeClass("navbar-dark");
+                        $("#topNavbar").css("background-color","transparent");
+                        $("#navbarSupportedContent").css("background-color", "transparent");
+                    }
+                },
+            });
+        }
+    });
 });

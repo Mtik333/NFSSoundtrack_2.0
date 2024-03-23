@@ -88,20 +88,22 @@
                     th:href="'/game/'+${songSubgroup.subgroup.mainGroup.game.gameShort}"></a></td>
             <td>
                 <div class="play_icondiv">
-                    <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
-                        data-bs-target="#videoModal"
-                        th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
-                        th:src="@{/images/znakwodny.png}">
-                    <a class="table_link externalYT" target="_blank"
-                        th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-box-arrow-up-right"
-                            viewBox="0 0 16 16">
-                            <path fill-rule="evenodd"
-                                d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
-                            <path fill-rule="evenodd"
-                                d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
-                        </svg>
-                    </a>
+                    <th:block th:if="${songSubgroup.srcId != null}">
+                        <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
+                            data-bs-target="#videoModal"
+                            th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
+                            th:src="@{/images/znakwodny.png}">
+                        <a class="table_link externalYT" target="_blank"
+                            th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-box-arrow-up-right"
+                                viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                <path fill-rule="evenodd"
+                                    d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                            </svg>
+                        </a>
+                    </th:block>
                     <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                     <th:block th:if="${songSubgroup.spotifyId != null}">
                         <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">

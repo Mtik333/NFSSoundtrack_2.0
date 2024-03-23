@@ -1491,6 +1491,11 @@ $(document).ready(function () {
                     }
                 }
             }
+            if (!songToSave.subcomposer){
+                songToSave.showSubcomposer=false;
+            } else {
+                songToSave.showSubcomposer=true;
+            }
             var genres = $("#genreDisplay").find("input.genre-select");
             for (let i = 0; i < genres.length; i++) {
                 var genreInput = genres[i];

@@ -111,6 +111,8 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("appName", game.getDisplayTitle() +
                 " " + getLocalizedMessage("soundtrackAt") + " " + appName);
         model.addAttribute("gamegroups", game.getMainGroups());
+        Optional<CustomTheme> customTheme = customThemeService.findByGame(game);
+        customTheme.ifPresent(theme -> model.addAttribute("customTheme", theme));
         model.addAttribute("songSubgroups", songSubgroupService.fetchFromGame(game));
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         return "index";
@@ -315,6 +317,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             }
             List<Member> foundUsers;
             if (!discordUserName.isEmpty()) {
+                discordUserName = discordUserName.replace("@","");
                 foundUsers = JDA.getGuilds().get(0).retrieveMembersByPrefix(discordUserName, 1).get();
             } else {
                 foundUsers = new ArrayList<>();
@@ -363,4 +366,16 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return displayLoc;
     }
 
+    @GetMapping(value = "/customtheme/{game_id}")
+    public @ResponseBody String getCustomTheme(@PathVariable("game_id") Integer game_id) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Optional<Game> game = gameService.findById(game_id);
+        if (game.isPresent()){
+            Optional<CustomTheme> customTheme = customThemeService.findByGame(game.get());
+            if (customTheme.isPresent()){
+                return objectMapper.writeValueAsString(customTheme.get());
+            }
+        }
+        return objectMapper.writeValueAsString(null);
+    }
 }
