@@ -1436,6 +1436,7 @@ $(document).ready(function () {
         songToSave.subgroup = currentSubgroup;
         songToSave.remix = $("#remixBox").prop("checked");
         songToSave.featNextToComposer = $("#featNextToComposer").prop("checked");
+        songToSave.showSubcomposer = $("#showSubcomposerBox").prop("checked");
         if ($("#existingSongId").val() != "") {
             songToSave.existingSongId = $("#existingSongId").val();
             //fix when there is a remix
