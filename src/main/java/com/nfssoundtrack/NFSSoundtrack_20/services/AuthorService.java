@@ -106,13 +106,13 @@ public class AuthorService {
                         LAST_ERROR = Instant.now();
                     } else {
                         discoGSObjMap.put(author.getId(), discoGSObj);
-                        pushArtistToJson(author.getId(), discoGSObj);
+                        createArtistJson(author.getId(), discoGSObj);
                     }
                 } else {
                     discoGSObj = new DiscoGSObj(true, 0, null,
                             author.getName() + " not found in DiscoGS database");
                     discoGSObjMap.put(author.getId(), discoGSObj);
-                    pushArtistToJson(author.getId(), discoGSObj);
+                    createArtistJson(author.getId(), discoGSObj);
                 }
             } else {
                 if (!discoGSObj.isNotInDiscogs()) {
@@ -140,7 +140,7 @@ public class AuthorService {
                             LAST_ERROR = Instant.now();
                         } else {
                             discoGSObjMap.put(author.getId(), discoGSObj);
-                            pushArtistToJson(author.getId(), discoGSObj);
+                            createArtistJson(author.getId(), discoGSObj);
                         }
                     }
                 }
@@ -160,14 +160,19 @@ public class AuthorService {
                     LAST_ERROR = Instant.now();
                 }
                 discoGSObjMap.put(author.getId(), discoGSObj);
-                pushArtistToJson(author.getId(), discoGSObj);
+                createArtistJson(author.getId(), discoGSObj);
             } else {
                 discoGSObj = new DiscoGSObj(true, 0, null,
                         author.getName() + " not found in DiscoGS database");
                 discoGSObjMap.put(author.getId(), discoGSObj);
-                pushArtistToJson(author.getId(), discoGSObj);
+                createArtistJson(author.getId(), discoGSObj);
             }
         }
+        return discoGSObj;
+    }
+
+    public DiscoGSObj manuallyFetchDiscogsInfo(Integer artistDiscogsId) throws JsonProcessingException, LoginException, InterruptedException {
+        DiscoGSObj discoGSObj = obtainArtistLinkAndProfile("adminmode", artistDiscogsId);
         return discoGSObj;
     }
 
@@ -290,10 +295,16 @@ public class AuthorService {
         return new HttpEntity<>("parameters", headers);
     }
 
-    private void pushArtistToJson(Long artistId, DiscoGSObj discoGSObj) throws InterruptedException, LoginException {
+    private void createArtistJson(Long artistId, DiscoGSObj discoGSObj) throws InterruptedException, LoginException {
         try {
-            RandomAccessFile randomDiscoGsFile = new RandomAccessFile("discogs.json", "rw");
-            File discoGsFile = new File("discogs.json");
+            File folderFile = new File("discogs"+File.separator+artistId+"");
+            if (!folderFile.exists()){
+                logger.debug("creating folder "+folderFile.mkdir());
+            }
+            RandomAccessFile randomDiscoGsFile = new RandomAccessFile( folderFile.getPath()
+                    +File.separator+"discogs.json", "rw");
+            File discoGsFile = new File(folderFile.getPath()
+                    +File.separator+"discogs.json");
             if (discoGsFile.canWrite()) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 SimpleModule simpleModule = new SimpleModule();
@@ -301,16 +312,8 @@ public class AuthorService {
                 objectMapper.registerModule(simpleModule);
                 AuthorToDiscoGSObj authorToDiscoGSObj = new AuthorToDiscoGSObj(artistId, discoGSObj);
                 String valueAsString = objectMapper.writeValueAsString(authorToDiscoGSObj);
-                if (discoGsFile.length() == 0) {
-                    randomDiscoGsFile.write("[".getBytes(StandardCharsets.UTF_8));
-                    randomDiscoGsFile.write(valueAsString.getBytes(StandardCharsets.UTF_8));
-                    randomDiscoGsFile.write("]".getBytes(StandardCharsets.UTF_8));
-                } else {
-                    randomDiscoGsFile.seek(randomDiscoGsFile.length() - 1);
-                    randomDiscoGsFile.write(",".getBytes(StandardCharsets.UTF_8));
-                    randomDiscoGsFile.write(valueAsString.getBytes(StandardCharsets.UTF_8));
-                    randomDiscoGsFile.write("]".getBytes(StandardCharsets.UTF_8));
-                }
+                randomDiscoGsFile.write(valueAsString.getBytes(StandardCharsets.UTF_8));
+                randomDiscoGsFile.close();
             }
         } catch (IOException exp) {
             logger.error("what exception? " + exp.getMessage());
@@ -327,4 +330,10 @@ public class AuthorService {
             });
         }
     }
+
+    public void updateDiscoGSObj(Integer artistId, DiscoGSObj updatedDiscoGSObj) throws LoginException, InterruptedException {
+        discoGSObjMap.put((long)artistId,updatedDiscoGSObj);
+        createArtistJson((long)artistId, updatedDiscoGSObj);
+    }
+
 }

@@ -1,3 +1,11 @@
+<div class="row">
+    <div class="input-group">
+        <h2 class="me-2 d-flex" th:text="#{infoAbout}+' '+${author?.name}"></h2>
+        <div class="input-group-append">
+            <button id="report-artist-bug" type="submit" class="btn btn-warning" data-toggle="tooltip" th:text="#{reportWrongArtistInfo}"></button>
+        </div>
+    </div>
+</div>
 <h2 th:text="#{infoAbout}+' '+${author?.name}"></h2>
 <hr>
 <div id="briefInfo">
@@ -119,8 +127,7 @@
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='composer',data-song_id=${songToSongSubgroupMap.key.id}">
                     <td class="info_button">
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
-                             data-placement="right" th:title="#{showInfo}"
-                             th:src="@{/images/fullres/info_big.png}">
+                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
                     </td>
                     <td colspan="6">
                         <th:block
@@ -137,16 +144,16 @@
                         </th:block>
                         -
                         <span th:text="${songToSongSubgroupMap.key.officialDisplayTitle} "></span>
-                            <th:block
-                                th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
-                                <span th:text="${iter.first ? '(feat. ' : ''}"></span>
-                                <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                                    th:text="${authorSong.authorAlias.alias}"></a><span
-                                    th:text="${iter.last ? ')' : ''}"></span>
-                                <th:block th:if="${authorSong.featConcat!=null}">
-                                    <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
-                                </th:block>
+                        <th:block
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
+                            <span th:text="${iter.first ? '(feat. ' : ''}"></span>
+                            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
+                                th:text="${authorSong.authorAlias.alias}"></a><span
+                                th:text="${iter.last ? ')' : ''}"></span>
+                            <th:block th:if="${authorSong.featConcat!=null}">
+                                <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
                             </th:block>
+                        </th:block>
                         /
                         <span th:text="'Associated genres: '"></span>
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
@@ -240,29 +247,28 @@
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer',data-song_id=${songToSongSubgroupMap.key.id}">
                     <td class="info_button">
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
-                             data-placement="right" th:title="#{showInfo}"
-                             th:src="@{/images/fullres/info_big.png}">
+                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
                     </td>
                     <td colspan="6">
                         <th:block
-                                th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
-                               th:text="${authorSong.authorAlias.alias} "></a>
+                                th:text="${authorSong.authorAlias.alias} "></a>
                         </th:block>
                         <th:block
-                                th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
                             <span
-                                    th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                                th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                               th:text="${authorSong.authorAlias.alias}"></a>
+                                th:text="${authorSong.authorAlias.alias}"></a>
                         </th:block>
                         -
                         <span th:text="${songToSongSubgroupMap.key.officialDisplayTitle} "></span>
                         <th:block
-                                th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
                             <span th:text="${iter.first ? '(feat. ' : ''}"></span>
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                               th:text="${authorSong.authorAlias.alias}"></a><span
+                                th:text="${authorSong.authorAlias.alias}"></a><span
                                 th:text="${iter.last ? ')' : ''}"></span>
                             <th:block th:if="${authorSong.featConcat!=null}">
                                 <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
@@ -272,8 +278,8 @@
                             /
                             <span th:text="'Associated genres: '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
-                               th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
-                                                                                   th:text="${!iter.last ? ', ' : ''}"></span>
+                                th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
                     </td>
                 </tr>
@@ -360,29 +366,28 @@
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='remix',data-song_id=${songToSongSubgroupMap.key.id}">
                     <td class="info_button">
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
-                             data-placement="right" th:title="#{showInfo}"
-                             th:src="@{/images/fullres/info_big.png}">
+                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
                     </td>
                     <td colspan="6">
                         <th:block
-                                th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
-                               th:text="${authorSong.authorAlias.alias} "></a>
+                                th:text="${authorSong.authorAlias.alias} "></a>
                         </th:block>
                         <th:block
-                                th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
                             <span
-                                    th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                                th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                               th:text="${authorSong.authorAlias.alias}"></a>
+                                th:text="${authorSong.authorAlias.alias}"></a>
                         </th:block>
                         -
                         <span th:text="${songToSongSubgroupMap.key.officialDisplayTitle} "></span>
                         <th:block
-                                th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
                             <span th:text="${iter.first ? '(feat. ' : ''}"></span>
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                               th:text="${authorSong.authorAlias.alias}"></a><span
+                                th:text="${authorSong.authorAlias.alias}"></a><span
                                 th:text="${iter.last ? ')' : ''}"></span>
                             <th:block th:if="${authorSong.featConcat!=null}">
                                 <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
@@ -392,8 +397,8 @@
                             /
                             <span th:text="'Associated genres: '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
-                               th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
-                                                                                   th:text="${!iter.last ? ', ' : ''}"></span>
+                                th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
                     </td>
                 </tr>
@@ -480,29 +485,28 @@
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='feat',data-song_id=${songToSongSubgroupMap.key.id}">
                     <td class="info_button">
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
-                             data-placement="right" th:title="#{showInfo}"
-                             th:src="@{/images/fullres/info_big.png}">
+                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
                     </td>
                     <td colspan="6">
                         <th:block
-                                th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
-                               th:text="${authorSong.authorAlias.alias} "></a>
+                                th:text="${authorSong.authorAlias.alias} "></a>
                         </th:block>
                         <th:block
-                                th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
                             <span
-                                    th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                                th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                               th:text="${authorSong.authorAlias.alias}"></a>
+                                th:text="${authorSong.authorAlias.alias}"></a>
                         </th:block>
                         -
                         <span th:text="${songToSongSubgroupMap.key.officialDisplayTitle} "></span>
                         <th:block
-                                th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
+                            th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
                             <span th:text="${iter.first ? '(feat. ' : ''}"></span>
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
-                               th:text="${authorSong.authorAlias.alias}"></a><span
+                                th:text="${authorSong.authorAlias.alias}"></a><span
                                 th:text="${iter.last ? ')' : ''}"></span>
                             <th:block th:if="${authorSong.featConcat!=null}">
                                 <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
@@ -512,8 +516,8 @@
                             /
                             <span th:text="'Associated genres: '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
-                               th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
-                                                                                   th:text="${!iter.last ? ', ' : ''}"></span>
+                                th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
+                                th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
                     </td>
                 </tr>

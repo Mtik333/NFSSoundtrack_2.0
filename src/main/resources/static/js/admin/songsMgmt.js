@@ -961,7 +961,7 @@ $(document).ready(function () {
         var rowCol = col.parent();
         var divCol = rowCol.parent();
         var thisId = Number($(this).attr("id").replace("add-remix-", ""));
-        generateRemixDiv(null, null, divCol, null, null, null, null, null, (thisId + 1), "", (thisId + 1), undefined);
+        generateRemixDiv(null, null, divCol, null, null, null, null, null, null, (thisId + 1), "", (thisId + 1), undefined);
         var divNewCol = $('<div class="col"></div>');
         var remixConcatInput = $('<input type="text" class="form-control" id="remixConcatInput-' + thisId + '"/>');
         divNewCol.append('<label for="remixConcatInput-' + thisId + '">Remix concat string</label>');
@@ -1434,6 +1434,7 @@ $(document).ready(function () {
         }
         songToSave.info = $("#ingameInfo").val();
         songToSave.subgroup = currentSubgroup;
+        songToSave.remix = $("#remixBox").prop("checked");
         songToSave.featNextToComposer = $("#featNextToComposer").prop("checked");
         if ($("#existingSongId").val() != "") {
             songToSave.existingSongId = $("#existingSongId").val();

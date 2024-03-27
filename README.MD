@@ -1,4 +1,4 @@
-I just want to rewrite NFSSoundtrack.com to handle some stuff better than 11 years ago.
+I just want to rewrite NFSSoundtrack.com to handle some stuff better than in 2012.
 
 # How to deploy locally
 
@@ -175,3 +175,21 @@ I just want to rewrite NFSSoundtrack.com to handle some stuff better than 11 yea
 6. Finish the import and try to access localhost again
 
 ![](./src/main/resources/readme/56.PNG)
+
+# Generating user password
+
+If you need to have admin user, then I assume you already had to configure IDE to work with this code.
+Therefore, recommended is to setup following startup configuration
+![](./src/main/resources/readme/password/pass1.PNG)
+
+First argument simply indicates that we want to create new user. Second parameter is user login, third is user password and final parameter is to run it on "dev" default.properties, probably based on local database. You can switch to "prod" or "docker".
+
+Then once you run the project, this code should get triggered in Application.java
+![](./src/main/resources/readme/password/pass2.PNG)
+After the program starts and you see "successful?" message in the log. Double check then if user is then visible in "user" table.
+![](./src/main/resources/readme/password/pass3.PNG)
+Then you should be able to go to "admin login" page - https://localhost:8082/login - enter your credentials and be able to work on things as admin.
+![](./src/main/resources/readme/password/pass4.PNG)
+![](./src/main/resources/readme/password/pass5.PNG)
+Then you can go to "Manage" and be able to edit various things in database
+![](./src/main/resources/readme/password/pass6.PNG)

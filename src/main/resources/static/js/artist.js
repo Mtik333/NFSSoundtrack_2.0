@@ -228,4 +228,13 @@ $(document).ready(function () {
             }
         }
     });
+
+        $(document).on("click", "#report-artist-bug", function () {
+            //handling search case
+                $(this).tooltip('dispose');
+                $("#source-url").val(window.location.href);
+                $("#reportProblemModal").modal('show');
+                $("#problem-type").val("WRONG_ARTIST_INFO");
+                $("#affected-songsubgroup").val(-1);
+        });
 });

@@ -627,7 +627,10 @@ $(document).ready(function () {
                     }
                 }
                 if (songInfo.genres.length != 0) {
-                    for (let i = 0; i < songInfo.genres.length; i++) {
+                    $("#genres").parent().find(">:not(#genres)").each(function () {
+                        $(this).remove();
+                    });
+                    for (let i = songInfo.genres.length-1; i >= 0; i--) {
                         $(songInfo.genres[i]).insertAfter($("#genres"));
                     }
                 }

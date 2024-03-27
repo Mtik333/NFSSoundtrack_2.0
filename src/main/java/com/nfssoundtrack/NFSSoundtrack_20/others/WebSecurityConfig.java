@@ -96,30 +96,32 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Bean
     @Cacheable("discoGSMap")
     public Map<Long, DiscoGSObj> discoGSObjMap() {
-        File discoGsFile = new File("discogs.json");
-        if (!discoGsFile.exists()){
-            try {
-                boolean created = discoGsFile.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return new HashMap<>();
-        } else {
-            ObjectMapper mapper = new ObjectMapper();
-            SimpleModule simpleModule = new SimpleModule();
-            simpleModule.addDeserializer(AuthorToDiscoGSObj.class, new AuthorToDiscoGSDeserializer());
-            mapper.registerModule(simpleModule);
-            Map<Long,DiscoGSObj> discogsMap = new HashMap<>();
-            try {
-                AuthorToDiscoGSObj[] objs = mapper.readValue(discoGsFile,AuthorToDiscoGSObj[].class);
-                for (AuthorToDiscoGSObj authorToDiscoGSObj : objs){
-                    discogsMap.put(authorToDiscoGSObj.getArtistId(), authorToDiscoGSObj.getDiscoGSObj());
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return discogsMap;
+        ObjectMapper mapper = new ObjectMapper();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addDeserializer(AuthorToDiscoGSObj.class, new AuthorToDiscoGSDeserializer());
+        mapper.registerModule(simpleModule);
+        Map<Long, DiscoGSObj> discogsMap = new HashMap<>();
+        File currentDir = new File("discogs");
+        if (!currentDir.exists()) {
+            currentDir.mkdir();
         }
+        File[] allDirs = currentDir.listFiles();
+        if (allDirs != null) {
+            for (File artistDir : allDirs) {
+                if (artistDir.isDirectory()) {
+                    try {
+                        File discoGsFile = new File(artistDir.getPath() + File.separator + "discogs.json");
+                        AuthorToDiscoGSObj obj = mapper.readValue(discoGsFile, AuthorToDiscoGSObj.class);
+                        discogsMap.put(obj.getArtistId(), obj.getDiscoGSObj());
+                    } catch (NumberFormatException e1) {
+                        logger.debug("that's fine");
+                    } catch (IOException e) {
+                        logger.error("unexpected error " + e.getMessage());
+                    }
+                }
+            }
+        }
+        return discogsMap;
     }
 
     @Override

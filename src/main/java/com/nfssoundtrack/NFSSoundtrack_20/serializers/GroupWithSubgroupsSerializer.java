@@ -3,7 +3,9 @@ package com.nfssoundtrack.NFSSoundtrack_20.serializers;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.MainGroup;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
 import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;

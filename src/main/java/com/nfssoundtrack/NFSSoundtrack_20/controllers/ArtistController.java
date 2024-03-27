@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
+import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
+import com.nfssoundtrack.NFSSoundtrack_20.others.JustSomeHelper;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.ArtistMgmtSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.ArtistSerializer;
@@ -16,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.LoginException;
 import java.util.*;
 
 
@@ -33,6 +36,9 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 
     @Autowired
     ArtistSerializer artistSerializer;
+
+    @Autowired
+    Map<Long, DiscoGSObj> discoGSObjMap;
 
     @GetMapping(value = "/authorAlias/{input}")
     public @ResponseBody String readAliasesFromArtist(@PathVariable("input") int input)
@@ -237,6 +243,45 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 authorAliasService.save(authorAlias);
             }
         }
+        Boolean updateDiscogs = (Boolean) mergeInfo.get("discogsToUpdate");
+        if (updateDiscogs){
+            String uri = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("uri"));
+            String twitter = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("twitter"));
+            String facebook = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("facebook"));
+            String instagram = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("instagram"));
+            String soundcloud = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("soundcloud"));
+            String wikipedia = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("wikipedia"));
+            String myspace = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("myspace"));
+            String profile = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("profile"));
+            String id = (String) mergeInfo.get("id");
+            DiscoGSObj discoGSObj = new DiscoGSObj(false, Integer.parseInt(id),uri, profile,
+                    twitter,facebook,instagram,soundcloud,myspace,wikipedia);
+            authorService.updateDiscoGSObj(Integer.valueOf(authorId),discoGSObj);
+        }
         return new ObjectMapper().writeValueAsString("OK");
+    }
+
+    @GetMapping(value = "/discogsInfo/{input}")
+    public @ResponseBody
+    String getDiscogsInfo(@PathVariable("input") int input)
+            throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Optional<Long> authorIdAlreadyThere = discoGSObjMap.keySet().stream().filter(aLong ->
+                aLong.equals(Long.valueOf(input))).findFirst();
+        if (authorIdAlreadyThere.isPresent()) {
+            DiscoGSObj discoGSObj = discoGSObjMap.get(authorIdAlreadyThere.get());
+            return objectMapper.writeValueAsString(discoGSObj);
+        } else {
+            return objectMapper.writeValueAsString("null");
+        }
+    }
+
+    @GetMapping(value = "/discogsEntry/{input}")
+    public @ResponseBody
+    String findDiscogsInfoViaId(@PathVariable("input") int input)
+            throws JsonProcessingException, LoginException, InterruptedException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        DiscoGSObj discoGSObj = authorService.manuallyFetchDiscogsInfo(input);
+        return objectMapper.writeValueAsString(discoGSObj);
     }
 }

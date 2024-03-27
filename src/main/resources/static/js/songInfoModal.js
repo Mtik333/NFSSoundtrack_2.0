@@ -26,7 +26,7 @@ $(document).ready(function () {
         $("#remixers").parent().find("a").each(function () {
             $(this).remove();
         });
-        $("#genres").find("a").each(function () {
+        $("#genres").parent().find("a").each(function () {
             $(this).remove();
         });
         $("#featArtists").parent().find("a").each(function () {

@@ -1,6 +1,5 @@
 package com.nfssoundtrack.NFSSoundtrack_20.dbmodel;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 

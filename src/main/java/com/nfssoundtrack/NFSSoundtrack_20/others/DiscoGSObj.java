@@ -34,6 +34,19 @@ public class DiscoGSObj {
         this.profile = profile;
     }
 
+    public DiscoGSObj(boolean notInDiscogs, Integer discogsId, String uri, String profile, String twitter, String facebook, String instagram, String soundcloud, String myspace, String wikipedia) {
+        this.notInDiscogs = notInDiscogs;
+        this.discogsId = discogsId;
+        this.uri = uri;
+        this.profile = profile;
+        this.twitter = twitter;
+        this.facebook = facebook;
+        this.instagram = instagram;
+        this.soundcloud = soundcloud;
+        this.myspace = myspace;
+        this.wikipedia = wikipedia;
+    }
+
     public String getUri() {
         return uri;
     }

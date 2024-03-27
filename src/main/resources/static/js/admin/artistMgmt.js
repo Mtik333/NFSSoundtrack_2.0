@@ -1,4 +1,5 @@
 var foundArtist;
+var discogsToUpdate=false;
 
 $(document).ready(function () {
     $("#manage-artists").click(function (e) {
@@ -92,6 +93,10 @@ function setupCountryAndAliasFields(foundArtist) {
         generateAliasDiv(i, allAliases[i], aliasesDiv);
     }
     divToAppend.append(aliasesDiv);
+    $("#discogs-info").remove();
+    var discoGsDiv = $('<div id="discogs-info">');
+    generateDiscogsInfoDiv(foundArtist.value, discoGsDiv);
+    divToAppend.append(discoGsDiv);
 }
 
 $(document).on('click', 'button.delete-alias', function (e) {
@@ -171,6 +176,18 @@ $(document).on('click', '#save-artist', function (e) {
                 artistToSave[aliasInput.id] = "NEW-" + $(aliasInput).val();
             }
         }
+    }
+    artistToSave.discogsToUpdate=discogsToUpdate;
+    if (discogsToUpdate){
+        artistToSave.uri=$("#discogsUriInput").val()
+        artistToSave.twitter=$("#discogsTwitterInput").val();
+        artistToSave.facebook=$("#discogsFacebookInput").val();
+        artistToSave.instagram=$("#discogsInstagramInput").val();
+        artistToSave.soundcloud=$("#discogsSoundcloudInput").val();
+        artistToSave.wikipedia=$("#discogsWikipediaInput").val();
+        artistToSave.myspace=$("#discogsMyspaceInput").val();
+        artistToSave.profile=$("#discogsProfile").text();
+        artistToSave.id=$("#discogsIdInput").val();
     }
     $.ajax({
         async: false,
@@ -309,3 +326,96 @@ function setupAutocompleteAliasArtistMgmt(mySelect, mySelectHidden, valueToSet) 
         minLength: 1
     });
 }
+
+function generateDiscogsInfoDiv(foundArtist, discoGsDiv) {
+    $.ajax({
+        async: false,
+        type: "GET",
+        url: "/author/discogsInfo/" + foundArtist,
+        success: function (ooo) {
+            var songInfo = JSON.parse(ooo);
+            var zeroRowDiv = $('<div class="row p-1">');
+            var divHeader = $('<h2>DiscoGS info</h2>');
+            var fetchUsingDiscogsId = $('<button id="fetch-from-discogs" type="submit" class="btn btn-primary">Fetch from DiscoGS via ID</button>');
+            var firstRowDiv = $('<div class="row p-1">');
+            var firstRowColDiv1 = $('<div class="col">');
+            var firstRowColDiv2 = $('<div class="col">');
+            var firstRowColDiv3 = $('<div class="col">');
+            var firstRowColDiv4 = $('<div class="col">');
+            zeroRowDiv.append(divHeader);
+            zeroRowDiv.append(fetchUsingDiscogsId);
+            discoGsDiv.append(zeroRowDiv);
+            var discogsIdInput = $('<input class="form-control" type="text" id="discogsIdInput" value="' + songInfo.discogsId + '">');
+            var discogsUriInput = $('<input class="form-control" type="text" id="discogsUriInput" value="' + songInfo.uri + '">');
+            var discogsTwitterInput = $('<input class="form-control" type="text" id="discogsTwitterInput" value="' + songInfo.twitter + '">');
+            var discogsFacebookInput = $('<input class="form-control" type="text" id="discogsFacebookInput" value="' + songInfo.facebook + '">');
+            firstRowColDiv1.append(discogsIdInput);
+            firstRowColDiv1.append('<label for="discogsIdInput">DiscoGS ID</label>');
+            firstRowColDiv2.append(discogsUriInput);
+            firstRowColDiv2.append('<label for="discogsUriInput">DiscoGS link</label>');
+            firstRowColDiv3.append(discogsTwitterInput);
+            firstRowColDiv3.append('<label for="discogsTwitterInput">Twitter link</label>');
+            firstRowColDiv4.append(discogsFacebookInput);
+            firstRowColDiv4.append('<label for="discogsFacebookInput">Facebook link</label>');
+            firstRowDiv.append(firstRowColDiv1);
+            firstRowDiv.append(firstRowColDiv2);
+            firstRowDiv.append(firstRowColDiv3);
+            firstRowDiv.append(firstRowColDiv4);
+            discoGsDiv.append(firstRowDiv);
+            var secondRowDiv = $('<div class="row p-1">');
+            var secondRowColDiv1 = $('<div class="col">');
+            var secondRowColDiv2 = $('<div class="col">');
+            var secondRowColDiv3 = $('<div class="col">');
+            var secondRowColDiv4 = $('<div class="col">');
+            var discogsInstagramInput = $('<input class="form-control" type="text" id="discogsInstagramInput" value="' + songInfo.instagram + '">');
+            var discogsSoundcloudInput = $('<input class="form-control" type="text" id="discogsSoundcloudInput" value="' + songInfo.soundcloud + '">');
+            var discogsWikipediaInput = $('<input class="form-control" type="text" id="discogsWikipediaInput" value="' + songInfo.wikipedia + '">');
+            var discogsMyspaceInput = $('<input class="form-control" type="text" id="discogsMyspaceInput" value="' + songInfo.myspace + '">');
+            secondRowColDiv1.append(discogsInstagramInput);
+            secondRowColDiv1.append('<label for="discogsInstagramInput">Instagram link</label>');
+            secondRowColDiv2.append(discogsSoundcloudInput);
+            secondRowColDiv2.append('<label for="discogsSoundcloudInput">SoundCloud link</label>');
+            secondRowColDiv3.append(discogsWikipediaInput);
+            secondRowColDiv3.append('<label for="discogsWikipediaInput">Wikipedia link</label>');
+            secondRowColDiv4.append(discogsMyspaceInput);
+            secondRowColDiv4.append('<label for="discogsMyspaceInput">Myspace link</label>');
+            secondRowDiv.append(secondRowColDiv1);
+            secondRowDiv.append(secondRowColDiv2);
+            secondRowDiv.append(secondRowColDiv3);
+            secondRowDiv.append(secondRowColDiv4);
+            discoGsDiv.append(secondRowDiv);
+            var thirdRowDiv = $('<div class="row p-1">');
+            var discogsProfile = $('<textarea class="form-control" id="discogsProfile"></textarea/>');
+            discogsProfile.text(songInfo.profile);
+            thirdRowDiv.append(discogsProfile);
+            thirdRowDiv.append('<label for="discogsProfile">DiscoGS profile</label>');
+            discoGsDiv.append(thirdRowDiv);
+        },
+        error: function (ooo) {
+            console.log("e2");
+            console.log(ooo);
+        },
+    });
+}
+
+$(document).on('click', '#fetch-from-discogs', function (e) {
+    var idToCheck = Number($("#discogsIdInput").val());
+    discogsToUpdate = true;
+    $.ajax({
+        async: false,
+        type: "GET",
+        url: "/author/discogsEntry/" + idToCheck,
+        success: function (ooo) {
+            var songInfo = JSON.parse(ooo);
+            $("#discogsUriInput").val(songInfo.uri);
+            $("#discogsTwitterInput").val(songInfo.twitter);
+            $("#discogsFacebookInput").val(songInfo.facebook);
+            $("#discogsInstagramInput").val(songInfo.instagram);
+            $("#discogsSoundcloudInput").val(songInfo.soundcloud);
+            $("#discogsWikipediaInput").val(songInfo.wikipedia);
+            $("#discogsMyspaceInput").val(songInfo.myspace);
+            $("#discogsProfile").text(songInfo.profile);
+        }
+    });
+
+});

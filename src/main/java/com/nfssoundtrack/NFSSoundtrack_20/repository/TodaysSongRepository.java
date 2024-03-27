@@ -1,8 +1,6 @@
 package com.nfssoundtrack.NFSSoundtrack_20.repository;
 
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.TodaysSong;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.User;
-import org.apache.poi.ss.formula.functions.Today;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
