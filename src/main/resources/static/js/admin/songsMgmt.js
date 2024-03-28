@@ -1438,7 +1438,7 @@ $(document).ready(function () {
         songToSave.featNextToComposer = $("#featNextToComposer").prop("checked");
         songToSave.showSubcomposer = $("#showSubcomposerBox").prop("checked");
         if ($("#existingSongId").val() != "") {
-            songToSave.existingSongId = $("#existingSongId").val();
+            songToSave.existingSongId = Number($("#existingSongId").val());
             //fix when there is a remix
         } else {
             var feats = $("#featDiv").find("input.feat-select");

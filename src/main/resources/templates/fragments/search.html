@@ -27,9 +27,9 @@
         <tr>
             <th class="game_content_th no-sort contextButton" scope="col" style="display:none;"></th>
             <th class="game_content_th info_button no-sort"></th>
-            <th class="game_content_th" scope="col" th:text="#{band}"></th>
-            <th class="game_content_th" scope="col" th:text="#{song}"></th>
-            <th class="game_content_th" scope="col" th:text="#{game}"></th>
+            <th class="game_content_th band" scope="col" th:text="#{band}"></th>
+            <th class="game_content_th song" scope="col" th:text="#{song}"></th>
+            <th class="game_content_th game" scope="col" th:text="#{game}"></th>
             <th class="game_content_th no-sort"></th>
         </tr>
     </thead>
@@ -130,9 +130,9 @@
         <tr>
             <th class="game_content_th no-sort contextButton" scope="col" style="display:none;"></th>
             <th class="game_content_th info_button no-sort"></th>
-            <th class="game_content_th" scope="col" th:text="#{band}"></th>
-            <th class="game_content_th" scope="col" th:text="#{song}"></th>
-            <th class="game_content_th" scope="col" th:text="#{game}"></th>
+            <th class="game_content_th band" scope="col" th:text="#{band}"></th>
+            <th class="game_content_th song" scope="col" th:text="#{song}"></th>
+            <th class="game_content_th game" scope="col" th:text="#{game}"></th>
             <th class="game_content_th no-sort"></th>
         </tr>
     </thead>
@@ -219,3 +219,4 @@
     </tbody>
 </table>
 <th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
+<script th:src="@{/js/search.js}" type="application/javascript"></script>
