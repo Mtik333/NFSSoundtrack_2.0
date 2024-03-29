@@ -84,7 +84,8 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
             remix = Remix.fromBoolean(node.get("remix").asBoolean());
         }
         SongSubgroup songSubgroup = new SongSubgroup(instrumental, remix, ingameSrcId, spotifyLink, deezerLink,
-                itunesLink, tidalink, soundcloudLink, ingameBand, ingameTitle, 10000L, lyrics, info);
+                itunesLink, tidalink, soundcloudLink, ingameBand, ingameTitle, 10000L, lyrics, info, remixText,
+                showFeat, showSubcomposer);
         songSubgroup.setFilename(filename);
         songSubgroup.setRemixText(remixText);
         songSubgroup.setShowFeat(showFeat);

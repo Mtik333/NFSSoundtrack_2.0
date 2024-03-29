@@ -2,6 +2,7 @@ var currentSongSubgroup;
 var currentSubgroup;
 var dropdownDiv;
 var newSong = false;
+var firstClickToAutoFetch = true;
 $(document).ready(function () {
 
     $(successAlertHtml).hide();
@@ -1061,6 +1062,8 @@ $(document).ready(function () {
     $(document).on('click', '#cancel-song', function (e) {
         getSingleSubgroupFromGame(0);
         $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+        newSong = false;
+        firstClickToAutoFetch = true;
     });
 
     $(document).on('click', '#cancel-song-globally', function (e) {
@@ -1132,7 +1135,8 @@ $(document).ready(function () {
     });
 
     $(document).on('focusout', '#officialTitle', function (e) {
-        if (newSong) {
+        if (newSong && firstClickToAutoFetch) {
+            firstClickToAutoFetch = false;
             var songToFind = new Object();
             songToFind.band = $("#officialBand").val();
             songToFind.title = $(this).val();

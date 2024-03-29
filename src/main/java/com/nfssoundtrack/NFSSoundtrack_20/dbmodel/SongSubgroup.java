@@ -237,7 +237,7 @@ public class SongSubgroup implements Serializable {
         this.showSubcomposer = showSubcomposer;
     }
 
-    public SongSubgroup(Instrumental instrumental, Remix remix, String srcId, String spotifyId, String deezerId, String itunesLink, String tidalLink, String soundcloudLink, String ingameDisplayBand, String ingameDisplayTitle, Long position, String lyrics, String info) {
+    public SongSubgroup(Instrumental instrumental, Remix remix, String srcId, String spotifyId, String deezerId, String itunesLink, String tidalLink, String soundcloudLink, String ingameDisplayBand, String ingameDisplayTitle, Long position, String lyrics, String info, String remixText, Boolean showFeat, Boolean showSubcomposer) {
         this.instrumental = instrumental;
         this.remix = remix;
         this.srcId = srcId;
@@ -251,6 +251,9 @@ public class SongSubgroup implements Serializable {
         this.position = position;
         this.lyrics = lyrics;
         this.info = info;
+        this.remixText = remixText;
+        this.showFeat = showFeat;
+        this.showSubcomposer = showSubcomposer;
     }
 
     public SongSubgroup() {
@@ -260,7 +263,8 @@ public class SongSubgroup implements Serializable {
         this(songSubgroup.instrumental, songSubgroup.remix, songSubgroup.srcId, songSubgroup.spotifyId,
                 songSubgroup.deezerId, songSubgroup.itunesLink, songSubgroup.tidalLink, songSubgroup.soundcloudLink,
                 songSubgroup.ingameDisplayBand, songSubgroup.ingameDisplayTitle, songSubgroup.position,
-                songSubgroup.lyrics, songSubgroup.info);
+                songSubgroup.lyrics, songSubgroup.info, songSubgroup.remixText, songSubgroup.showFeat,
+                songSubgroup.showSubcomposer);
     }
 
     public String toCorrectionString(){
