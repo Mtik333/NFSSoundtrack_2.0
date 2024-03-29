@@ -14,6 +14,10 @@ public class CustomThemeService {
     @Autowired
     CustomThemeRepository customThemeRepository;
 
+    public Optional<CustomTheme> findById(Integer id){
+        return customThemeRepository.findById(id);
+    }
+
     public Optional<CustomTheme> findByGame(Game game) {
         return customThemeRepository.findByGame(game);
     }

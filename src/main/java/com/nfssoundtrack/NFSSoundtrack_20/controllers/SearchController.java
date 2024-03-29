@@ -104,7 +104,7 @@ public class SearchController extends BaseControllerWithErrorHandling {
                 genreList = genreService.findByGenreNameContains(query);
             }
         }
-        model.addAttribute("appName", appName);
+        model.addAttribute("appName", "Search results at " + appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         model.addAttribute("authorAliases", authorAliases);
         model.addAttribute("songTitleList", songTitleList);

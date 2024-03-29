@@ -5,12 +5,12 @@ $(document).ready(function () {
 	 * @returns result of filtering
 	 */
 
-	if ('ontouchstart' in window){
-        $("td.song-instrumental").css("display","none");
-        $("th.song-instrumental").css("display","none");
-        $("col.song-instrumental").css("display","none");
-		$("#mobileShowSongInfo").css("display","none");
-    }
+	if ('ontouchstart' in window) {
+		$("td.song-instrumental").css("display", "none");
+		$("th.song-instrumental").css("display", "none");
+		$("col.song-instrumental").css("display", "none");
+		$("#mobileShowSongInfo").css("display", "none");
+	}
 
 	function TableComparer(index) {
 		return function (a, b) {

@@ -19,14 +19,14 @@ $(document).ready(function () {
                 $("#discord-username").val("");
                 $("#right-value").val("");
                 $("#success-alert").fadeTo(500, 500).slideUp(1000, function () {
-                    $("#success-alert").slideUp(1000, function (){
+                    $("#success-alert").slideUp(1000, function () {
                         $("#reportProblemModal").modal('hide');
                     });
                 });
             },
             error: function (ooo) {
                 $("#failure-alert").fadeTo(500, 500).slideUp(1000, function () {
-                    $("#failure-alert").slideUp(1000, function (){
+                    $("#failure-alert").slideUp(1000, function () {
                         $("#reportProblemModal").modal('hide');
                     });
                 });

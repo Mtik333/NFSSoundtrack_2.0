@@ -1,9 +1,9 @@
 $(document).ready(function () {
-		/**
-	 * i got this function from somwhere, it's about sorting table by specific column
-	 * @param {*} index
-	 * @returns result of filtering
-	 */
+	/**
+ * i got this function from somwhere, it's about sorting table by specific column
+ * @param {*} index
+ * @returns result of filtering
+ */
 
 	function TableComparer(index) {
 		return function (a, b) {
@@ -36,18 +36,18 @@ $(document).ready(function () {
 	});
 
 	$(document).on("click", "#searchSongLyricsTable thead tr th:not(.no-sort)", function () {
-    		var table = $(this).parents("#searchSongLyricsTable");
-    		var rows = $(this).parents("#searchSongLyricsTable").find("tbody tr").toArray().sort(TableComparer($(this).index()));
-    		var dir = ($(this).hasClass("sort-asc")) ? "desc" : "asc";
-    		if (dir == "desc") {
-    			rows = rows.reverse();
-    		}
-    		for (var i = 0; i < rows.length; i++) {
-    			table.append(rows[i]);
-    		}
-    		table.find("thead tr th").removeClass("sort-asc").removeClass("sort-desc");
-    		$(this).removeClass("sort-asc").removeClass("sort-desc").addClass("sort-" + dir);
-    	});
+		var table = $(this).parents("#searchSongLyricsTable");
+		var rows = $(this).parents("#searchSongLyricsTable").find("tbody tr").toArray().sort(TableComparer($(this).index()));
+		var dir = ($(this).hasClass("sort-asc")) ? "desc" : "asc";
+		if (dir == "desc") {
+			rows = rows.reverse();
+		}
+		for (var i = 0; i < rows.length; i++) {
+			table.append(rows[i]);
+		}
+		table.find("thead tr th").removeClass("sort-asc").removeClass("sort-desc");
+		$(this).removeClass("sort-asc").removeClass("sort-desc").addClass("sort-" + dir);
+	});
 
 	$(document).find("th.band").click();
 });

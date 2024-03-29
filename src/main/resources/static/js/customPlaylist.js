@@ -5,13 +5,13 @@ $(document).ready(function () {
 	 * @returns result of filtering
 	 */
 
-	if ('ontouchstart' in window){
-        $("td.song-instrumental").css("display","none");
-        $("th.song-instrumental").css("display","none");
-        $("col.song-instrumental").css("display","none");
-		$("#mobileAddToPlaylist").css("display","none");
-		$("#mobileRemoveFromPlaylist").css("display","");
-    }
+	if ('ontouchstart' in window) {
+		$("td.song-instrumental").css("display", "none");
+		$("th.song-instrumental").css("display", "none");
+		$("col.song-instrumental").css("display", "none");
+		$("#mobileAddToPlaylist").css("display", "none");
+		$("#mobileRemoveFromPlaylist").css("display", "");
+	}
 
 	function TableComparer(index) {
 		return function (a, b) {
@@ -56,10 +56,10 @@ $(document).ready(function () {
 		//we have to check local storage to see what's there now
 		var relatedTr = $(this).parent().parent();
 		var songSubgroupId = $(relatedTr).attr("data-songsubgroup-id");
-		removeSongFromPlaylist(relatedTr,songSubgroupId);
+		removeSongFromPlaylist(relatedTr, songSubgroupId);
 	});
 
-	function removeSongFromPlaylist(relatedTr, songSubgroupId){
+	function removeSongFromPlaylist(relatedTr, songSubgroupId) {
 		var tbody = relatedTr.parent();
 		var customPlaylistArray = JSON.parse(localStorage.getItem("custom-playlist"));
 		var songToRemoveIndex = customPlaylistArray.indexOf(songSubgroupId);
@@ -108,15 +108,15 @@ $(document).ready(function () {
 		$("#spotifyVideo").attr('src', '');
 	});
 
-	$("#mobileRemoveFromPlaylist").on("click", function(e){
-        var songSubgroupId = $(this).attr("data-songSubgroup-id");
-		var relatedTr = $("tbody").find("tr[data-songSubgroup-id='"+songSubgroupId+"']");
-		removeSongFromPlaylist(relatedTr,songSubgroupId);
-        $("#mobile_context").removeClass("show").hide();
-        $("#mobileLaunchSpotify").css("display", "");
-        $("#mobileLaunchItunes").css("display", "");
-        $("#mobileLaunchDeezer").css("display", "");
-    });
+	$("#mobileRemoveFromPlaylist").on("click", function (e) {
+		var songSubgroupId = $(this).attr("data-songSubgroup-id");
+		var relatedTr = $("tbody").find("tr[data-songSubgroup-id='" + songSubgroupId + "']");
+		removeSongFromPlaylist(relatedTr, songSubgroupId);
+		$("#mobile_context").removeClass("show").hide();
+		$("#mobileLaunchSpotify").css("display", "");
+		$("#mobileLaunchItunes").css("display", "");
+		$("#mobileLaunchDeezer").css("display", "");
+	});
 
 	$(document).find("th.id").click();
 });

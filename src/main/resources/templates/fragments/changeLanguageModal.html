@@ -3,22 +3,23 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 th:text="#{selectLang}"></h3>
-                <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <input id="langToChange" hidden>
                 <div class="row">
-                        <span id="appendLang" th:text="#{detectedLang}+': '"></span><span th:text="#{switchLang}"></span>
+                    <span id="appendLang" th:text="#{detectedLang}+': '"></span><span th:text="#{switchLang}"></span>
                 </div>
                 <br>
                 <div class="row" style="text-align: center;">
                     <div class="col">
                         <button type="button" class="btn btn-success" id="change-lang-yes" data-bs-dismiss="modal"
-                        aria-label="Yes" th:text="#{yes}"></button>
+                            aria-label="Yes" th:text="#{yes}"></button>
                     </div>
                     <div class="col">
                         <button type="button" class="btn btn-danger" id="change-lang-no" data-bs-dismiss="modal"
-                        aria-label="No" th:text="#{no}"></button>                        
+                            aria-label="No" th:text="#{no}"></button>
                     </div>
                 </div>
             </div>

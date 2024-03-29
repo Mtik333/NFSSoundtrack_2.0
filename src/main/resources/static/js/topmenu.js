@@ -1,4 +1,6 @@
+var currentBg = 0;
 $(document).ready(function () {
+    changeStuffForDynamicTheme();
     /**
      * method to save preferences
      */
@@ -29,9 +31,11 @@ $(document).ready(function () {
     $("#sunlight").click(function (e) {
         e.preventDefault();
         localStorage.setItem("dark-mode", true);
+        localStorage.removeItem("dynamic-bg");
         $("#moonlight").css("display", "");
         $("#sunlight").css("display", "none");
         changeStuffForDarkMode();
+        changeStuffForDynamicTheme();
         if (typeof DISQUS != "undefined") {
             DISQUS.reset({ reload: true });
         }
@@ -40,9 +44,11 @@ $(document).ready(function () {
     $("#moonlight").click(function (e) {
         e.preventDefault();
         localStorage.setItem("dark-mode", false);
+        localStorage.removeItem("dynamic-bg");
         $("#moonlight").css("display", "none");
         $("#sunlight").css("display", "");
         changeStuffForDarkMode();
+        changeStuffForDynamicTheme();
         if (typeof DISQUS != "undefined") {
             DISQUS.reset({ reload: true });
         }
@@ -55,6 +61,34 @@ $(document).ready(function () {
         changeStuffForDarkMode();
         if (typeof DISQUS != "undefined") {
             DISQUS.reset({ reload: true });
+        }
+    });
+
+    $(document).on('click', '#dynamic_bg', function (e) {
+        e.preventDefault();
+        if (localStorage.hasOwnProperty("dynamic-bg")) {
+            currentBg = (Number(localStorage.getItem("dynamic-bg-index")) + 1) % 5;
+        } else {
+            currentBg = (currentBg + 1) % 5
+        }
+        if (currentBg == 0) {
+            localStorage.removeItem("dynamic-bg");
+            localStorage.setItem("dynamic-bg-index", 0);
+            changeStuffForDarkMode();
+            changeStuffForDynamicTheme();
+        } else {
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: "/dynamictheme/" + currentBg,
+                success: function (ooo) {
+                    localStorage.setItem("dynamic-bg", ooo);
+                    localStorage.setItem("dynamic-bg-index", currentBg);
+                    var theme = JSON.parse(ooo);
+                    changeStuffForDarkMode(theme.nightMode);
+                    changeStuffForDynamicTheme();
+                },
+            });
         }
     });
 });

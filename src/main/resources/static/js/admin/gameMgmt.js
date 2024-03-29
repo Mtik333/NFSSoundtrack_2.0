@@ -22,10 +22,10 @@ $(document).ready(function () {
                 var gameShortColDiv = $('<div class="col">');
                 var prefixColDiv = $('<div class="col">');
                 var gameStatusColDiv = $('<div class="col">');
-                var gameTitleInput = $('<input class="form-control" id="gameTitle" type="text" value="'+gameToEdit.gametitle+'">');
-                var gameDisplayInput = $('<input class="form-control" id="gameDisplay" type="text" value="'+gameToEdit.displayTitle+'">');
-                var gameShortInput = $('<input class="form-control" id="gameShort" type="text" value="'+gameToEdit.gameshort+'">');
-                var gamePrefixInput = $('<input class="form-control" id="gamePrefix" type="text" value="'+gameToEdit.prefix+'">');
+                var gameTitleInput = $('<input class="form-control" id="gameTitle" type="text" value="' + gameToEdit.gametitle + '">');
+                var gameDisplayInput = $('<input class="form-control" id="gameDisplay" type="text" value="' + gameToEdit.displayTitle + '">');
+                var gameShortInput = $('<input class="form-control" id="gameShort" type="text" value="' + gameToEdit.gameshort + '">');
+                var gamePrefixInput = $('<input class="form-control" id="gamePrefix" type="text" value="' + gameToEdit.prefix + '">');
                 var gameStatusInput = $('<select class="form-select" id="gameStatus"><option value="RELEASED" selected>Released</option><option value="UNRELEASED">Unreleased</option><option value="UNPLAYABLE">Unplayable</option><option value="CANCELED">Canceled</option>');
                 gameStatusInput.val(gameToEdit.status);
                 gameTitleColDiv.append('<label for="gameTitle">Game title</label>');
@@ -51,11 +51,11 @@ $(document).ready(function () {
                 var tidalColDiv = $('<div class="col">');
                 var youtubeColDiv = $('<div class="col">');
                 var soundcloudColDiv = $('<div class="col">');
-                var spotifyInput = $('<input class="form-control" id="spotifyPlaylistInput" type="text" value="'+gameToEdit.spotify_id+'">');
-                var deezerInput = $('<input class="form-control" id="deezerPlaylistInput" type="text" value="'+gameToEdit.deezer_id+'">');
-                var tidalInput = $('<input class="form-control" id="tidalPlaylistInput" type="text" value="'+gameToEdit.tidal_id+'">');
-                var youtubeInput = $('<input class="form-control" id="youtubePlaylistInput" type="text" value="'+gameToEdit.youtube_id+'">');
-                var soundcloudInput = $('<input class="form-control" id="soundcloudPlaylistInput" type="text" value="'+gameToEdit.soundcloud_id+'">');
+                var spotifyInput = $('<input class="form-control" id="spotifyPlaylistInput" type="text" value="' + gameToEdit.spotify_id + '">');
+                var deezerInput = $('<input class="form-control" id="deezerPlaylistInput" type="text" value="' + gameToEdit.deezer_id + '">');
+                var tidalInput = $('<input class="form-control" id="tidalPlaylistInput" type="text" value="' + gameToEdit.tidal_id + '">');
+                var youtubeInput = $('<input class="form-control" id="youtubePlaylistInput" type="text" value="' + gameToEdit.youtube_id + '">');
+                var soundcloudInput = $('<input class="form-control" id="soundcloudPlaylistInput" type="text" value="' + gameToEdit.soundcloud_id + '">');
                 spotifyColDiv.append('<label for="spotifyPlaylistInput">Spotify playlist ID</label>');
                 spotifyColDiv.append(spotifyInput);
                 deezerColDiv.append('<label for="deezerPlaylistInput">Deezer playlist ID</label>');
@@ -105,7 +105,7 @@ $(document).ready(function () {
             async: false,
             type: "PUT",
             data: JSON.stringify(formData),
-            url: "/gamedb/put/"+Number(gameToEdit.id),
+            url: "/gamedb/put/" + Number(gameToEdit.id),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (ooo) {

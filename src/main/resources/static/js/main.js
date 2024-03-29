@@ -630,7 +630,7 @@ $(document).ready(function () {
                     $("#genres").parent().find(">:not(#genres)").each(function () {
                         $(this).remove();
                     });
-                    for (let i = songInfo.genres.length-1; i >= 0; i--) {
+                    for (let i = songInfo.genres.length - 1; i >= 0; i--) {
                         $(songInfo.genres[i]).insertAfter($("#genres"));
                     }
                 }
@@ -671,6 +671,12 @@ $(document).ready(function () {
     }
 
     $(document).on("touchstart", "td:not(.infowarn)", function (e) {
+        if ('ontouchstart' in window) {
+            $(document).find("div.tooltip").hide();
+        }
+    });
+
+    $(document).on("touchstart", "#dynamic_bg", function (e) {
         if ('ontouchstart' in window) {
             $(document).find("div.tooltip").hide();
         }

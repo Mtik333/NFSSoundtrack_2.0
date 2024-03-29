@@ -1,9 +1,9 @@
 $(document).ready(function () {
-		/**
-	 * i got this function from somwhere, it's about sorting table by specific column
-	 * @param {*} index 
-	 * @returns result of filtering
-	 */
+	/**
+ * i got this function from somwhere, it's about sorting table by specific column
+ * @param {*} index 
+ * @returns result of filtering
+ */
 
 	function TableComparer(index) {
 		return function (a, b) {

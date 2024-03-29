@@ -317,7 +317,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             }
             List<Member> foundUsers;
             if (!discordUserName.isEmpty()) {
-                discordUserName = discordUserName.replace("@","");
+                discordUserName = discordUserName.replace("@", "");
                 foundUsers = JDA.getGuilds().get(0).retrieveMembersByPrefix(discordUserName, 1).get();
             } else {
                 foundUsers = new ArrayList<>();
@@ -370,11 +370,21 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public @ResponseBody String getCustomTheme(@PathVariable("game_id") Integer game_id) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         Optional<Game> game = gameService.findById(game_id);
-        if (game.isPresent()){
+        if (game.isPresent()) {
             Optional<CustomTheme> customTheme = customThemeService.findByGame(game.get());
-            if (customTheme.isPresent()){
+            if (customTheme.isPresent()) {
                 return objectMapper.writeValueAsString(customTheme.get());
             }
+        }
+        return objectMapper.writeValueAsString(null);
+    }
+
+    @GetMapping(value = "/dynamictheme/{bg_id}")
+    public @ResponseBody String getDynamicTheme(@PathVariable("bg_id") Integer bg_id) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Optional<CustomTheme> customTheme = customThemeService.findById(bg_id);
+        if (customTheme.isPresent()) {
+            return objectMapper.writeValueAsString(customTheme.get());
         }
         return objectMapper.writeValueAsString(null);
     }

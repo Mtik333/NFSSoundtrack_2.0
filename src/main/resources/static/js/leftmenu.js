@@ -53,7 +53,7 @@ $(document).ready(function () {
         $(this).on('shown.bs.collapse', function () {
             //if user disabled scrolling menu on click then we ignore this stuff
             var unscrollableMenu = localStorage.getItem("scrolling-stuff");
-            if (unscrollableMenu==="false" || unscrollableMenu===null) {
+            if (unscrollableMenu === "false" || unscrollableMenu === null) {
                 //if filtering by game name is not active or shorter than 3
                 if ($("#filter_games_menu").val() == "" || $("#filter_games_menu").val().length < 3) {
                     //we simply check how far we are from top and scroll menu so that it is "on" top of the series menu

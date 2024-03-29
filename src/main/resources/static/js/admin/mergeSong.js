@@ -26,8 +26,8 @@ $(document).ready(function () {
         var songToMerge = $("#songMergeInput").val();
         var targetSong = $("#targetSongInput").val();
         var objToSubmit = {};
-        objToSubmit.songToMergeId=songToMerge;
-        objToSubmit.targetSongId=targetSong;
+        objToSubmit.songToMergeId = songToMerge;
+        objToSubmit.targetSongId = targetSong;
         $(successAlertHtml).hide();
         $(failureAlertHtml).hide();
         $.ajax({

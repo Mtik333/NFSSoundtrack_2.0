@@ -43,8 +43,8 @@ img.img-responsive-author-info {
 }
 
 .playlist-icon {
-    max-height: 3.5vw;
-    margin: 0.15vw;
+  max-height: 3.5vw;
+  margin: 0.15vw;
 }
 
 img.img-country {
@@ -59,12 +59,12 @@ a.a-main-music-link {
   text-decoration: none;
 }
 
-.nav-item{
-    color: #00334e;
+.nav-item {
+  color: #00334e;
 }
 
-.nav-link{
-    color: #00334e;
+.nav-link {
+  color: #00334e;
 }
 
 .nfs-top-item-active {
@@ -314,12 +314,13 @@ html[data-bs-theme="dark"] a.game_class:hover {
 html[data-bs-theme="dark"] .nav-item {
   color: #a3cbff;
 }
+
 html[data-bs-theme="dark"] .nav-link {
   color: #a3cbff;
 }
 
-#navbarSupportedContent{
-    background-color: lavender;
+#navbarSupportedContent {
+  background-color: lavender;
 }
 
 html[data-bs-theme="dark"] #navbarSupportedContent {
@@ -327,11 +328,11 @@ html[data-bs-theme="dark"] #navbarSupportedContent {
 }
 
 .gamegroup-button {
-    color: #00334e;
-    background-color: aliceblue;
+  color: #00334e;
+  background-color: aliceblue;
 }
 
-html[data-bs-theme="dark"] .gamegroup-button  {
+html[data-bs-theme="dark"] .gamegroup-button {
   color: #a3cbff;
   background-color: #171e4d;
 }
@@ -375,32 +376,41 @@ a.game_class:hover {
   width: 80px;
 }
 
-svg.bi-box-arrow-up-right{
-    width: 0.6vw;
-    height: 0.6vw;
-    vertical-align: top;
+svg.bi-box-arrow-up-right {
+  width: 0.6vw;
+  height: 0.6vw;
+  vertical-align: top;
 }
 
-#lyrics{
-    height: 300px;
+#lyrics {
+  height: 300px;
 }
-div.no-padding{
-   padding-top: 0;
-   padding-bottom: 0;
+
+div.no-padding {
+  padding-top: 0;
+  padding-bottom: 0;
 }
-svg.bi-moon{
-    width: 2vw;
-    height: 2vw;
+
+svg.bi-moon {
+  width: 2vw;
+  height: 2vw;
 }
-svg.bi-sun{
-    width: 2vw;
-    height: 2vw;
+
+svg.bi-sun {
+  width: 2vw;
+  height: 2vw;
 }
-#warnUser{
-    font-size: 1vw;
-    color: red;
-    margin-bottom: 0px;
-    text-align: center;
+
+svg.bi-palette {
+  width: 2vw;
+  height: 2vw;
+}
+
+#warnUser {
+  font-size: 1vw;
+  color: red;
+  margin-bottom: 0px;
+  text-align: center;
 }
 
 @media screen and (max-width: 600px) {
@@ -806,27 +816,32 @@ svg.bi-sun{
     z-index: 1010;
   }
 
-  svg.bi-box-arrow-up-right{
-      display: none;
+  svg.bi-box-arrow-up-right {
+    display: none;
   }
 
   .playlist-icon {
-      max-height: 10vw;
-      margin: 0.3vw;
+    max-height: 10vw;
+    margin: 0.3vw;
   }
 
-  svg.bi-moon{
-      width: 5vw;
-      height: 5vw;
+  svg.bi-moon {
+    width: 5vw;
+    height: 5vw;
   }
 
-  svg.bi-sun{
-      width: 5vw;
-      height: 5vw;
+  svg.bi-sun {
+    width: 5vw;
+    height: 5vw;
   }
 
-  #warnUser{
-      font-size: 2.8vw;
+  svg.bi-palette {
+    width: 5vw;
+    height: 5vw;
+  }
+
+  #warnUser {
+    font-size: 2.8vw;
   }
 }
 

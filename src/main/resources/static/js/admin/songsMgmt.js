@@ -516,7 +516,7 @@ $(document).ready(function () {
     });
 
     function generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv,
-        artistAndAliasDiv, aliasSelect, aliasSelectHidden, i, authorSong, instrumentalDiv,officialTitleDiv, instrumentalValue, officialTitle, showFeat, showSubcomposer) {
+        artistAndAliasDiv, aliasSelect, aliasSelectHidden, i, authorSong, instrumentalDiv, officialTitleDiv, instrumentalValue, officialTitle, showFeat, showSubcomposer) {
         mainComposerDiv.append("<h4>Author / Alias info</h4>");
         var authorSelect = $('<input class="form-control authorSelect" id="authorSelect-' + i + '" value="' + officialArtistName + '"/>');
         var authorSelectHidden = $('<input type="hidden" id="authorSelectHidden-' + i + '"/>');
@@ -566,7 +566,7 @@ $(document).ready(function () {
         instrumentalDiv.append('<br>');
         instrumentalDiv.append(showSubcomposerInput);
         instrumentalDiv.append(showSubcomposerLabel);
-        if (officialTitle != undefined){
+        if (officialTitle != undefined) {
             var officialTitleInput = $('<input class="form-control" id="officialSongTitle" value="' + officialTitle + '" disabled/>');
             officialTitleDiv.append('<label class="form-check-label mt-3" for="officialSongTitle">Official title</label>');
             officialTitleDiv.append(officialTitleInput);
@@ -629,10 +629,10 @@ $(document).ready(function () {
         officialSrcIdDiv.append('<label for="officialSrcId">Official YouTube Src ID</label>');
         existingSongIdDiv.append('<label for="existingSongId">Existing Song ID</label>');
         var featNextToComposer;
-        if (songSubgroup==null){
+        if (songSubgroup == null) {
             featNextToComposer = ('<input type="checkbox" class="form-check-input mt-4" id="featNextToComposer">');
         } else {
-            if (songSubgroup.song.featNextToBand){
+            if (songSubgroup.song.featNextToBand) {
                 featNextToComposer = ('<input type="checkbox" class="form-check-input mt-4" id="featNextToComposer" checked>');
             } else {
                 featNextToComposer = ('<input type="checkbox" class="form-check-input mt-4" id="featNextToComposer">');
@@ -795,7 +795,7 @@ $(document).ready(function () {
             subcomposerButtonColDiv.append(addSubcomposerButton);
             subcomposerButtonColDiv.append(deleteSubcomposerButton);
             var fileNameInput = $('<input class="form-control" id="fileNameInput"/>');
-            if (songSubgroup!=undefined && songSubgroup.filename!=undefined){
+            if (songSubgroup != undefined && songSubgroup.filename != undefined) {
                 fileNameInput.val(songSubgroup.filename);
             } else {
                 fileNameInput.val("");
@@ -838,9 +838,9 @@ $(document).ready(function () {
                 setupAutocompleteAlias(subcomposerSelectNext, subcomposerSelectHiddenNext, "");
             }
             subcomposerRowDivNext.append(subcomposerButtonColDivNext);
-            if (i<=1){
+            if (i <= 1) {
                 var fileNameInput = $('<input class="form-control" id="fileNameInput"/>');
-                if (songSubgroup!=undefined && songSubgroup.filename!=undefined){
+                if (songSubgroup != undefined && songSubgroup.filename != undefined) {
                     fileNameInput.val(songSubgroup.filename);
                 } else {
                     fileNameInput.val("");
@@ -868,9 +868,9 @@ $(document).ready(function () {
             var remixOf;
             if (authorSong != undefined) {
                 remixInput = $('<input type="checkbox" class="form-check-input m-3" id="remixBox" checked></input>');
-                remixValue = $('<input class="form-control" id="remixText" value="'+songSubgroup.remixText+'"></input>');
-                if (songSubgroup.song.baseSong!=null){
-                    remixOf = $('<input class="form-control" id="remixOf" value="'+songSubgroup.song.baseSong.id+'"></input>');
+                remixValue = $('<input class="form-control" id="remixText" value="' + songSubgroup.remixText + '"></input>');
+                if (songSubgroup.song.baseSong != null) {
+                    remixOf = $('<input class="form-control" id="remixOf" value="' + songSubgroup.song.baseSong.id + '"></input>');
                 } else {
                     remixOf = $('<input class="form-control" id="remixOf"></input>');
                 }
@@ -915,13 +915,13 @@ $(document).ready(function () {
             remixButtonColDivNext.append('<button id="add-remix-' + i + '" type="submit" class="btn btn-primary add-remix">+</button>');
             remixButtonColDivNext.append('<button id="delete-remix-' + i + '" type="submit" class="btn btn-danger delete-remix">-</button>');
             remixRowDivNext.append(remixInputColDivNext);
-            if ($("#remixBox").length<1){
+            if ($("#remixBox").length < 1) {
                 var remixInput = $('<input type="checkbox" class="form-check-input m-3" id="remixBox" checked></input>');
                 var remixValue = $('<input class="form-control" id="remixText"></input>');
                 var remixOf = $('<input class="form-control" id="remixOf"></input>');
-                if (songSubgroup!=null){
+                if (songSubgroup != null) {
                     $(remixValue).val(songSubgroup.remixText);
-                    if (songSubgroup.song.baseSong!=null){
+                    if (songSubgroup.song.baseSong != null) {
                         $(remixOf).val(songSubgroup.song.baseSong.id);
                     }
                 }
@@ -1015,7 +1015,7 @@ $(document).ready(function () {
         var rowCol = col.parent();
         var divCol = rowCol.parent();
         var thisId = Number($(this).attr("id").replace("add-subcomposer-", "")) + 1;
-        generateSubcomposerDiv(null, null, divCol, null, null, null, null,null, thisId, thisId, "", null, null);
+        generateSubcomposerDiv(null, null, divCol, null, null, null, null, null, thisId, thisId, "", null, null);
         var divNewCol = $('<div class="col"></div>');
         var subcomposerConcatInput = $('<input type="text" class="form-control" id="subcomposerConcatInput-' + thisId + '"/>');
         divNewCol.append('<label for="subcomposerConcatInput-' + thisId + '">Subcomposer concat</label>');
@@ -1292,8 +1292,8 @@ $(document).ready(function () {
                 }
             }
         }
-        songToSave.remixValue=$("#remixText").val();
-        songToSave.remixOf=$("#remixOf").val();
+        songToSave.remixValue = $("#remixText").val();
+        songToSave.remixOf = $("#remixOf").val();
         var subcomposers = $("#subcomposerDiv").find("input.subcomposer-select");
         songToSave.subcomposer = false;
         for (let i = 0; i < subcomposers.length; i++) {
@@ -1322,7 +1322,7 @@ $(document).ready(function () {
         songToSave.deezer = $("#deezerInput").val();
         songToSave.tidal = $("#tidalInput").val();
         songToSave.info = $("#ingameInfo").val();
-        songToSave.filename=$("#fileNameInput").val();
+        songToSave.filename = $("#fileNameInput").val();
         $.ajax({
             async: false,
             type: "PUT",
@@ -1404,7 +1404,7 @@ $(document).ready(function () {
         divToAppend.empty();
         newSong = true;
         renderEditCreateSong(divToAppend, null);
-        if ($("#existingSongId").length==1){
+        if ($("#existingSongId").length == 1) {
             $("#remixOf").parent().remove();
         }
     });
@@ -1426,7 +1426,7 @@ $(document).ready(function () {
         songToSave.officialSrcId = $("#officialSrcId").val();
         songToSave.instrumental = $("#instrumentalBox").prop("checked");
         songToSave.showFeat = $("#showFeatBox").prop("checked");
-        songToSave.remixValue=$("#remixText").val();
+        songToSave.remixValue = $("#remixText").val();
         if ($("#ingameBand").val() != "") {
             songToSave.ingameBand = $("#ingameBand").val();
         }
@@ -1497,10 +1497,10 @@ $(document).ready(function () {
                     }
                 }
             }
-            if (!songToSave.subcomposer){
-                songToSave.showSubcomposer=false;
+            if (!songToSave.subcomposer) {
+                songToSave.showSubcomposer = false;
             } else {
-                songToSave.showSubcomposer=true;
+                songToSave.showSubcomposer = true;
             }
             var genres = $("#genreDisplay").find("input.genre-select");
             for (let i = 0; i < genres.length; i++) {

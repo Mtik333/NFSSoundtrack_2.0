@@ -33,6 +33,12 @@ public class CustomTheme implements Serializable {
     @Column(name="night_mode", columnDefinition="BIT")
     private Boolean nightMode;
 
+    @Column(name = "gamegroup_bg_color")
+    private String gameGroupBackgroundColor;
+
+    @Column(name = "gamegroup_text_color")
+    private String gameGroupTextColor;
+
     public Long getId() {
         return id;
     }
@@ -87,6 +93,22 @@ public class CustomTheme implements Serializable {
 
     public void setNightMode(Boolean nightMode) {
         this.nightMode = nightMode;
+    }
+
+    public String getGameGroupBackgroundColor() {
+        return gameGroupBackgroundColor;
+    }
+
+    public void setGameGroupBackgroundColor(String gameGroupBackgroundColor) {
+        this.gameGroupBackgroundColor = gameGroupBackgroundColor;
+    }
+
+    public String getGameGroupTextColor() {
+        return gameGroupTextColor;
+    }
+
+    public void setGameGroupTextColor(String gameGroupTextColor) {
+        this.gameGroupTextColor = gameGroupTextColor;
     }
 
     public CustomTheme() {

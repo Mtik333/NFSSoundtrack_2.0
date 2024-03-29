@@ -1,5 +1,5 @@
 var foundArtist;
-var discogsToUpdate=false;
+var discogsToUpdate = false;
 
 $(document).ready(function () {
     $("#manage-artists").click(function (e) {
@@ -177,17 +177,17 @@ $(document).on('click', '#save-artist', function (e) {
             }
         }
     }
-    artistToSave.discogsToUpdate=discogsToUpdate;
-    if (discogsToUpdate){
-        artistToSave.uri=$("#discogsUriInput").val()
-        artistToSave.twitter=$("#discogsTwitterInput").val();
-        artistToSave.facebook=$("#discogsFacebookInput").val();
-        artistToSave.instagram=$("#discogsInstagramInput").val();
-        artistToSave.soundcloud=$("#discogsSoundcloudInput").val();
-        artistToSave.wikipedia=$("#discogsWikipediaInput").val();
-        artistToSave.myspace=$("#discogsMyspaceInput").val();
-        artistToSave.profile=$("#discogsProfile").text();
-        artistToSave.id=$("#discogsIdInput").val();
+    artistToSave.discogsToUpdate = discogsToUpdate;
+    if (discogsToUpdate) {
+        artistToSave.uri = $("#discogsUriInput").val()
+        artistToSave.twitter = $("#discogsTwitterInput").val();
+        artistToSave.facebook = $("#discogsFacebookInput").val();
+        artistToSave.instagram = $("#discogsInstagramInput").val();
+        artistToSave.soundcloud = $("#discogsSoundcloudInput").val();
+        artistToSave.wikipedia = $("#discogsWikipediaInput").val();
+        artistToSave.myspace = $("#discogsMyspaceInput").val();
+        artistToSave.profile = $("#discogsProfile").text();
+        artistToSave.id = $("#discogsIdInput").val();
     }
     $.ajax({
         async: false,

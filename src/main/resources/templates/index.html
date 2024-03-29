@@ -22,6 +22,7 @@
     <script>
         //to make night mode run flawlessly it must be first in the body
         function changeStuffForDarkMode(darkMode) {
+
             if (localStorage.getItem("dark-mode") == "true" || darkMode) {
                 $(document).find("html").attr("data-bs-theme", "dark");
                 $(document).find("#topNavbar").addClass("navbar-dark");
@@ -30,7 +31,9 @@
                 $(document).find("#topNavbar").removeClass("bg-light");
                 $(document).find("#logoDiv").addClass("bg-dark");
                 $(document).find("#logoDiv").removeClass("bg-light");
-                $(document).find("#sunlight").css("display", "none");
+                if (!darkMode) {
+                    $(document).find("#sunlight").css("display", "none");
+                }
             } else {
                 $(document).find("html").attr("data-bs-theme", "light");
                 $(document).find("#topNavbar").addClass("navbar-light");
@@ -40,6 +43,85 @@
                 $(document).find("#logoDiv").removeClass("bg-dark");
                 $(document).find("#logoDiv").addClass("bg-light");
                 $(document).find("#moonlight").css("display", "none");
+            }
+        }
+
+        function changeStuffForDynamicTheme(json) {
+            if (localStorage.hasOwnProperty("dynamic-bg") || json) {
+                var theme;
+                if (json) {
+                    theme = json;
+                } else {
+                    var ooo = localStorage.getItem("dynamic-bg");
+                    theme = JSON.parse(ooo);
+                }
+                changeStuffForDarkMode(theme.nightMode);
+                if ('ontouchstart' in window) {
+                    $("body").css("background", theme.mobileTheme);
+                } else {
+                    $("body").css("background", theme.pcTheme);
+                }
+                $("body").css("background-size", "cover");
+                $("body").css("background-attachment", "fixed");
+                $("#filter_songs").css("background", "transparent");
+                $(".table").css("--bs-table-bg", "transparent");
+                $(".table-primary").css("--bs-table-bg", "transparent");
+                $(".table-primary").css("--bs-table-striped-bg", "transparent");
+                $(".table a").css("color", theme.hyperlinkColor);
+                $("#centerKeeper a").css("color", theme.hyperlinkColor);
+                $("th").css("color", theme.textColor);
+                $("h2").css("color", theme.textColor);
+                $("span").css("color", theme.textColor);
+                $(".nav-link").css("color", theme.hyperlinkColor);
+                $("#navbarSupportedContent").css("background-color", "transparent");
+                if ('ontouchstart' in window) {
+                    $("header").removeClass("sticky-top");
+                }
+                $("#logoDiv").removeClass("bg-dark");
+                $("#logoDiv").css("background-color", "transparent");
+                $("#topNavbar").removeClass("bg-dark");
+                $("#topNavbar").removeClass("navbar-dark");
+                $("#topNavbar").css("background-color", "transparent");
+                $(".gamegroup-button").css("background-color", theme.gameGroupBackgroundColor);
+                $(".gamegroup-button").css("color", theme.gameGroupTextColor);
+                $("a>span").css("color", theme.hyperlinkColor);
+                $("#offcanvas").css("opacity", "95%");
+                $(".offcanvas-header").css("opacity", "85%");
+                $(".offcanvas-body").css("opacity", "70%");
+                $("svg.top-svg").css("fill", theme.hyperlinkColor);
+                $("#searchStuff").css("background-color", theme.hyperlinkColor + "40");
+                $(".nav-link.active").css("background-color", theme.gameGroupBackgroundColor + "40");
+                $("tr.subgroup-separator").css("--bs-table-hover-bg", theme.gameGroupBackgroundColor + "40");
+            } else {
+                $("body").css("background", "");
+                $("body").css("background-size", "");
+                $("body").css("background-attachment", "");
+                $("#filter_songs").css("background", "");
+                $(".table").css("--bs-table-bg", "var(--bs-body-bg)");
+                $(".table-primary").css("--bs-table-bg", "");
+                $(".table-primary").css("--bs-table-striped-bg", "");
+                $(".table a").css("color", "");
+                $("#centerKeeper a").css("color", "");
+                $("th").css("color", "");
+                $("h2").css("color", "");
+                $("span").css("color", "");
+                $("#logoDiv").css("background", "");
+                $("#topNavbar").css("background", "");
+                $("#navbarSupportedContent").css("background", "");
+                if ('ontouchstart' in window) {
+                    $("header").addClass("sticky-top");
+                }
+                $(".nav-link").css("color", "");
+                $(".gamegroup-button").css("background-color", "");
+                $(".gamegroup-button").css("color", "");
+                $("a>span").css("color", "");
+                $("#offcanvas").css("opacity", "");
+                $(".offcanvas-header").css("opacity", "");
+                $(".offcanvas-body").css("opacity", "");
+                $("svg.top-svg").css("fill", "");
+                $("#searchStuff").css("background-color", "");
+                $(".nav-link.active").css("background-color", "var(--bs-nav-tabs-link-active-bg)");
+                $("tr.subgroup-separator").css("--bs-table-hover-bg", "");
             }
         }
     </script>
@@ -61,7 +143,7 @@
                     <img class="img-responsive-global-logo float-end" th:src="@{/images/fullres/twitter_big.png}">
                 </a>
             </div>
-<!--            <p id="warnUser" th:utext="#{warnUser}"></p>-->
+                        <p id="warnUser" th:utext="#{warnUser}"></p>
         </div>
         <th:block th:insert="~{fragments/topmenu.html}"></th:block>
     </header>
@@ -90,22 +172,23 @@
 </body>
 <footer>
     <div class="centerKeeper">
-    <br>
-    <b>
-        <h5 th:text="#{ourPartners}"></h5>
-    </b>
-    <a class="table_link" href="https://nightriderz.world/" target="_blank">
-        <img class="partners" th:src="@{/images/NFSSTBanner.png}" alt="NIGHTRIDERZ NFS World Server">
-    </a>
-    <br><br>
-    <a class="table_link" href="https://www.youtube.com/channel/UCSars_35pUP8YxpOYt7Q_gw" target="_blank">
-        <img class="partners" th:src="@{/images/loud_yt.png}" alt="LOUD YouTube Channel">
-    </a>
+        <br>
+        <b>
+            <h5 th:text="#{ourPartners}"></h5>
+        </b>
+        <a class="table_link" href="https://nightriderz.world/" target="_blank">
+            <img class="partners" th:src="@{/images/NFSSTBanner.png}" alt="NIGHTRIDERZ NFS World Server">
+        </a>
+        <br><br>
+        <a class="table_link" href="https://www.youtube.com/channel/UCSars_35pUP8YxpOYt7Q_gw" target="_blank">
+            <img class="partners" th:src="@{/images/loud_yt.png}" alt="LOUD YouTube Channel">
+        </a>
     </div>
     <div class="centerKeeper">
-    2012-2024
-    <br>
-    All trademarks, registered trademarks, product names, company names are the property of their respective owners.
+        2012-2024
+        <br>
+        All trademarks, registered trademarks, product names, company names are the property of their respective owners.
     </div>
 </footer>
+
 </html>

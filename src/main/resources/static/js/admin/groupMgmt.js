@@ -232,16 +232,16 @@ $(document).ready(function () {
         });
     });
 
-        $(document).on('click', '#recounterGroupPositions', function (e) {
-            $("#groupsTable").find("tr").each(function (index) {
-                $($(this).find("input")).val((index + 1) * 10);
-            });
-            sortTable();
+    $(document).on('click', '#recounterGroupPositions', function (e) {
+        $("#groupsTable").find("tr").each(function (index) {
+            $($(this).find("input")).val((index + 1) * 10);
         });
+        sortTable();
+    });
 
-$(document).on('focusout', '.groupPosition', sortTable);
+    $(document).on('focusout', '.groupPosition', sortTable);
 
-function sortTable() {
+    function sortTable() {
         var $tbody = $('#groupsTable tbody');
         $("#groupsTable").find('tr').sort(function (a, b) {
             var tda = Number($($(a).find("input")).val()); // target order attribute
