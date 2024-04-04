@@ -278,7 +278,7 @@ $(document).ready(function () {
         } else {
             var aliasSelect = $('<input class="form-control w-100" id="aliasSelect-0"/>');
             var aliasSelectHidden = $('<input type="hidden" id="aliasSelectHidden-0"/>');
-            generateAuthorDiv(mainComposerDiv, "", artistDiv, aliasDiv, artistAndAliasDiv, aliasSelect, aliasSelectHidden, 0, null, instrumentalDiv, officialTitleDiv, false, "", true);
+            generateAuthorDiv(mainComposerDiv, "", artistDiv, aliasDiv, artistAndAliasDiv, aliasSelect, aliasSelectHidden, 0, null, instrumentalDiv, officialTitleDiv, false, "", false, false);
         }
         if (howManySubcomposers == 0) {
             // howManySubcomposers++;

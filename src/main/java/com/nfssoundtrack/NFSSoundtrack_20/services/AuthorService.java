@@ -67,6 +67,10 @@ public class AuthorService {
         return authorRepository.findByName(name);
     }
 
+    public List<Author> findAllByName(String name){
+        return authorRepository.findAllByName(name);
+    }
+
     public List<Author> findByNameContains(String name) {
         return authorRepository.findByNameContains(name);
     }

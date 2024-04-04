@@ -131,6 +131,9 @@ public class SongSubgroupService {
         boolean alreadyAssigned = false;
         for (AuthorSong authorSong : songSubgroup.getSong().getAuthorSongList()) {
             if (authorSong.getAuthorAlias().equals(authorAlias)) {
+                if (!role.equals(authorSong.getRole())){
+                    continue;
+                }
                 alreadyAssigned = true;
                 if (Role.SUBCOMPOSER.equals(role)){
                     authorSong.setSubcomposerConcat(concatValue);

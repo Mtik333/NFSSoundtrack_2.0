@@ -81,6 +81,7 @@
             </td>
             <td>
                 <div class="play_icondiv">
+                    <th:block th:if="${song.key.srcId != null}">
                     <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
                         data-bs-target="#videoModal"
                         th:attr="data-tagVideo='https://www.youtube.com/embed/'+${song.key.srcId}"
@@ -95,6 +96,7 @@
                                 d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
                         </svg>
                     </a>
+                    </th:block>
                     <textarea th:utext="${song.key.lyrics}" th:attr="data-noLyrics=#{noLyrics}" hidden></textarea>
                     <th:block th:if="${song.key.spotifyId != null}">
                         <a class="a-external-music-link" th:href="${song.key.spotifyId}">
@@ -184,6 +186,7 @@
             </td>
             <td>
                 <div class="play_icondiv">
+                    <th:block th:if="${song.key.srcId != null}">
                     <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
                         data-bs-target="#videoModal"
                         th:attr="data-tagVideo='https://www.youtube.com/embed/'+${song.key.srcId}"
@@ -198,6 +201,7 @@
                                 d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
                         </svg>
                     </a>
+                    </th:block>
                     <textarea th:utext="${song.key.lyrics}" th:attr="data-noLyrics=#{noLyrics}" hidden></textarea>
                     <th:block th:if="${song.key.spotifyId != null}">
                         <a class="a-external-music-link" th:href="${song.key.spotifyId}">

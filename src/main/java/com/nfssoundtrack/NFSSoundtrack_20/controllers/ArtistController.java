@@ -167,6 +167,33 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         return new ObjectMapper().writeValueAsString("OK");
     }
 
+    @PutMapping(value = "/fixDuplicate", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String fixDuplicate(@RequestBody String formData)
+            throws Exception {
+        Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
+        String artistName = (String) mergeInfo.get("artistName");
+        List<Author> authorList = authorService.findAllByName(artistName);
+        authorList.sort(Comparator.comparing(Author::getId));
+        Author targetAuthor = authorList.get(0);
+        authorList.remove(targetAuthor);
+        AuthorAlias defaultAlias = authorAliasService.findByAuthor(targetAuthor).get(0);
+        for (Author author : authorList){
+            authorCountryService.deleteAll(author.getAuthorCountries());
+            List<AuthorAlias> aliases = authorAliasService.findByAuthor(author);
+            for (AuthorAlias authorAlias : aliases){
+                List<AuthorSong> authorSongs = authorSongService.findByAuthorAlias(authorAlias);
+                for (AuthorSong authorSong : authorSongs){
+                    authorSong.setAuthorAlias(defaultAlias);
+                    authorSongService.save(authorSong);
+                }
+                authorAliasService.delete(authorAlias);
+            }
+            authorService.delete(author);
+        }
+
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
     @PutMapping(value = "/put", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String updateArtist(@RequestBody String formData)
             throws Exception {
