@@ -114,6 +114,7 @@ $(document).ready(function () {
 		removeSongFromPlaylist(relatedTr, songSubgroupId);
 		$("#mobile_context").removeClass("show").hide();
 		$("#mobileLaunchSpotify").css("display", "");
+		$("#playSpotifySample").css("display", "");
 		$("#mobileLaunchItunes").css("display", "");
 		$("#mobileLaunchDeezer").css("display", "");
 	});

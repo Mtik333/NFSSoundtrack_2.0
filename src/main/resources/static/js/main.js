@@ -14,6 +14,9 @@ var baseVideoSrc;
  * for mobile trying to remember last clicked play button to de-activate it again
  */
 var lastActivePlayButton;
+var spotifyApi;
+var spotifyController;
+var currentlyPlayedSpotify;
 $(document).ready(function () {
     if (localStorage.getItem("static-leftmenu") == "true") {
         $("#offcanvas").removeClass("offcanvas");
@@ -31,7 +34,7 @@ $(document).ready(function () {
         $("td.info_button").css("display", "none");
         $("th.info_button").css("display", "none");
         $("col.info_button").css("display", "none");
-        $("a.a-external-music-link").css("display", "none");
+        $(".a-external-music-link").css("display", "none");
         var currentColspan = $("td.subgroup-separator-td").attr("colspan");
         $("td.subgroup-separator-td").attr("colspan", currentColspan - 1);
         $("td.info_button").css("display", "none");
@@ -697,6 +700,7 @@ $(document).ready(function () {
         $("#reportProblemMobile").attr("data-songsubgroup-id", songSubgroupIdAttr);
         $("#mobileRemoveFromPlaylist").attr("data-songsubgroup-id", songSubgroupIdAttr);
         $("#mobileShowSongInfo").attr("data-song_id", songIdAttr);
+        $("#playSpotifySample").attr("data-songsubgroup-id", songSubgroupIdAttr);
         var additionalInfoA = $(trElem).find("td.infowarn>a");
         var infoLabel = null;
         if (additionalInfoA.length > 0) {
@@ -724,8 +728,10 @@ $(document).ready(function () {
         }
         if (spotifyElem != null) {
             $("#mobileLaunchSpotify").attr("href", spotifyElem.attr("href"));
+            $("#playSpotifySample").css("display", "");
         } else {
             $("#mobileLaunchSpotify").css("display", "none");
+            $("#playSpotifySample").css("display", "none");
         }
         if (deezerElem != null) {
             $("#mobileLaunchDeezer").attr("href", deezerElem.attr("href"));
@@ -740,6 +746,7 @@ $(document).ready(function () {
         if ($("#mobile_context").hasClass("show")) {
             $("#mobile_context").removeClass("show").hide();
             $("#mobileLaunchSpotify").css("display", "");
+            $("#playSpotifySample").css("display", "");
             $("#mobileLaunchItunes").css("display", "");
             $("#mobileLaunchDeezer").css("display", "");
             $("#mobileExternalYoutube").css("display", "");
@@ -768,6 +775,7 @@ $(document).ready(function () {
     $(document).on("touchstart", "tr", function (e) {
         $("#mobile_context").removeClass("show").hide();
         $("#mobileLaunchSpotify").css("display", "");
+        $("#playSpotifySample").css("display", "");
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
     });
@@ -777,6 +785,7 @@ $(document).ready(function () {
         addToCustomPlaylist(songSubgroupId);
         $("#mobile_context").removeClass("show").hide();
         $("#mobileLaunchSpotify").css("display", "");
+        $("#playSpotifySample").css("display", "");
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
     });
@@ -787,6 +796,28 @@ $(document).ready(function () {
         fetchInfoSong(songIdAttr, infoLabel);
         $("#mobile_context").removeClass("show").hide();
         $("#mobileLaunchSpotify").css("display", "");
+        $("#playSpotifySample").css("display", "");
+        $("#mobileLaunchItunes").css("display", "");
+        $("#mobileLaunchDeezer").css("display", "");
+    });
+
+    $("#playSpotifySample").on("click", function (e) {
+        var linkToUse = $("#mobileLaunchSpotify")[0].href;
+        var songSubgroupId = Number($(e.target).attr("data-songsubgroup-id"));
+        if ($("#spotify-iframeapi-script").length > 0) {
+            playSpotifySampleMobile(linkToUse, songSubgroupId);
+        }
+        else {
+            var script = document.createElement('script');
+            script.src = "https://open.spotify.com/embed/iframe-api/v1";
+            document.head.appendChild(script);
+            setTimeout(function() {
+                playSpotifySampleMobile(linkToUse, songSubgroupId);
+                }, 1000);
+        }
+        $("#mobile_context").removeClass("show").hide();
+        $("#mobileLaunchSpotify").css("display", "");
+        $("#playSpotifySample").css("display", "");
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
     });
@@ -794,6 +825,7 @@ $(document).ready(function () {
     $("a.single_action").on("click", function (e) {
         $("#mobile_context").removeClass("show").hide();
         $("#mobileLaunchSpotify").css("display", "");
+        $("#playSpotifySample").css("display", "");
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
     });
@@ -820,4 +852,126 @@ $(document).ready(function () {
         $("#unpin-menu").parent().css("display", "");
         localStorage.setItem("static-leftmenu", false);
     });
+
+    $(document).on("click", "img.30-player", function (elem) {
+        //        var spotifyIframe = $('<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/6p7CD2XsLUVI88aB6rCaXr?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>');
+        if ($("#spotify-iframeapi-script").length > 0) {
+            playSpotifySample(elem, false);
+        }
+        else {
+            var script = document.createElement('script');
+            script.src = "https://open.spotify.com/embed/iframe-api/v1";
+            document.head.appendChild(script);
+            setTimeout(function() {
+                playSpotifySample(elem, false);
+                }, 1000);
+        }
+    });
+
+    function playSpotifySample(elem) {
+        var spotifyToPlay = elem.target.previousElementSibling.href;
+        if (currentlyPlayedSpotify != null) {
+            $(currentlyPlayedSpotify.nextElementSibling).css("display", "none");
+            $(currentlyPlayedSpotify).css("display", "");
+            spotifyController.togglePlay();
+        }
+        if (elem.target.src.indexOf("play") > -1) {
+            //gonna play the song
+            $(elem.target.nextElementSibling).css("display", "");
+            $(elem.target).css("display", "none");
+        } else {
+            $(elem.target.previousElementSibling).css("display", "");
+            $(elem.target).css("display", "none");
+            spotifyController.togglePlay();
+            currentlyPlayedSpotify = null;
+            return;
+        }
+        currentlyPlayedSpotify = elem.target;
+        if (spotifyController != undefined) {
+            spotifyController.loadUri(spotifyToPlay);
+            spotifyController.play();
+        } else {
+            var divForSpotify = $("#embed-iframe");
+            if ($("#embed-iframe").length == 0) {
+                divForSpotify = $('<div id="embed-iframe"></div>');
+            }
+            $(elem.target.parentElement).append(divForSpotify);
+            const element = divForSpotify[0];
+            const options = {
+                width: '0%',
+                height: '0',
+                uri: spotifyToPlay
+            };
+            const callback = (EmbedController) => {
+                spotifyController = EmbedController;
+                EmbedController.addListener('ready', () => {
+                    console.log('The Embed has initialized ' + new Date().toString());
+                });
+                EmbedController.addListener('playback_update', e => {
+                    if (e.data.duration != 0) {
+                        if (e.data.duration == e.data.position) {
+                            if (currentlyPlayedSpotify) {
+                                    $(currentlyPlayedSpotify.nextElementSibling).css("display", "none");
+                                    $(currentlyPlayedSpotify).css("display", "");
+                                currentlyPlayedSpotify = null;
+                            }
+                        }
+                    }
+                });
+            };
+//            console.log("before creating controller " + console.log(new Date().toString()));
+            spotifyApi.createController(element, options, callback);
+//            console.log("after creating controller " + console.log(new Date().toString()));
+            spotifyController.play();
+//            console.log("after play trigger " + console.log(new Date().toString()));
+        }
+    }
+
+    function playSpotifySampleMobile(spotifyToPlay, snogSubgroupId) {
+        if (currentlyPlayedSpotify != null) {
+            spotifyController.togglePlay();
+        }
+        currentlyPlayedSpotify = spotifyToPlay;
+        if (spotifyController != undefined) {
+            spotifyController.loadUri(spotifyToPlay);
+            spotifyController.play();
+        } else {
+            var divForSpotify = $("#embed-iframe");
+            if ($("#embed-iframe").length == 0) {
+                divForSpotify = $('<div id="embed-iframe"></div>');
+            }
+            $("tr[data-songsubgroup-id="+snogSubgroupId+"]").append(divForSpotify);
+//            $("#mobile_context").append(divForSpotify);
+            const element = divForSpotify[0];
+            const options = {
+                width: '0%',
+                height: '0',
+                uri: spotifyToPlay
+            };
+            const callback = (EmbedController) => {
+                spotifyController = EmbedController;
+                EmbedController.addListener('ready', () => {
+                    console.log('The Embed has initialized ' + new Date().toString());
+                });
+                EmbedController.addListener('playback_update', e => {
+                    if (e.data.duration != 0) {
+                        if (e.data.duration == e.data.position) {
+                            if (currentlyPlayedSpotify) {
+                                currentlyPlayedSpotify = null;
+                            }
+                        }
+                    }
+                });
+            };
+//            console.log("before creating controller " + console.log(new Date().toString()));
+            spotifyApi.createController(element, options, callback);
+//            console.log("after creating controller " + console.log(new Date().toString()));
+            spotifyController.play();
+//            console.log("after play trigger " + console.log(new Date().toString()));
+        }
+    }
+    window.onSpotifyIframeApiReady = (IFrameAPI) => {
+        console.log("loaded");
+        spotifyApi = IFrameAPI;
+    };
 });

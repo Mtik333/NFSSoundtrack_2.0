@@ -41,6 +41,7 @@ public class GameController extends BaseControllerWithErrorHandling {
         gameService.save(newGame);
         MainGroup allGroup = new MainGroup();
         allGroup.setGame(newGame);
+        allGroup.setPosition(1);
         allGroup.setGroupName("All");
         mainGroupService.save(allGroup);
         Subgroup allSubgroup = new Subgroup();

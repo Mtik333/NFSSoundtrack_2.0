@@ -275,7 +275,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         List<SongSubgroup> songSubgroupList = songSubgroupService.findBySongInSortedByIdAsc(songs);
         model.addAttribute("songSubgroupList", songSubgroupList);
         model.addAttribute("genre", genre);
-        model.addAttribute("appName", appName);
+        model.addAttribute("appName", "Full list of genre " + genre.getGenreName() + " - " + appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         return "index";
     }
@@ -284,7 +284,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public String getTodaysSongHistory(Model model) {
         List<TodaysSong> todays30Songs = todaysSongService.findAllFromLast30Days();
         model.addAttribute("todays30Songs", todays30Songs);
-        model.addAttribute("appName", appName);
+        model.addAttribute("appName", "Archive of today's songs - " + appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         return "index";
     }
