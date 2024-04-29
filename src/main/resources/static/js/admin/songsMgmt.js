@@ -35,6 +35,8 @@ $(document).ready(function () {
                     divToAppend.empty();
                     divToAppend.append(successAlertHtml);
                     divToAppend.append(failureAlertHtml);
+                    divToAppend.addClass("vh-100");
+                    divToAppend.addClass("overflow-auto");
                     var rowDiv = $('<div class="row p-1">');
                     var leftCellDiv = $('<div class="col">');
                     var rightCellDiv = $('<div class="col">');
@@ -81,6 +83,8 @@ $(document).ready(function () {
                 divToAppend.empty();
                 divToAppend.append(successAlertHtml);
                 divToAppend.append(failureAlertHtml);
+                divToAppend.addClass("vh-100");
+                divToAppend.addClass("overflow-auto");
                 var rowDiv = $('<div class="row p-1">');
                 var leftCellDiv = $('<div class="col">');
                 var rightCellDiv = $('<div class="col">');
@@ -161,24 +165,27 @@ $(document).ready(function () {
     });
 
     $(document).on('click', 'button.delete-song', function (e) {
-        var songId = $(this).attr("data-songSubgroupId");
-        $.ajax({
-            async: false,
-            type: "DELETE",
-            url: "/songSubgroup/delete/" + Number(songId),
-            success: function (ooo) {
-                getSingleSubgroupFromGame(0);
-                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(successAlertHtml).slideUp(500, function () {
-                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+        var confirmDel = confirm("Are you sure?");
+        if (confirmDel) {
+            var songId = $(this).attr("data-songSubgroupId");
+            $.ajax({
+                async: false,
+                type: "DELETE",
+                url: "/songSubgroup/delete/" + Number(songId),
+                success: function (ooo) {
+                    getSingleSubgroupFromGame(0);
+                    $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                        $(successAlertHtml).slideUp(500, function () {
+                            $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                        });
                     });
-                });
-            }, error: function (ooo) {
-                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(failureAlertHtml).slideUp(500);
-                });
-            },
-        });
+                }, error: function (ooo) {
+                    $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                        $(failureAlertHtml).slideUp(500);
+                    });
+                },
+            });
+        }
     });
 
     $(document).on('click', 'button.edit-song', function (e) {

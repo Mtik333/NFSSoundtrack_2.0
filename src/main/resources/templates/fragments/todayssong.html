@@ -96,20 +96,32 @@
                     <textarea th:utext="${todaysSong.songSubgroup.lyrics}" hidden></textarea>
                     <th:block th:if="${todaysSong.songSubgroup.spotifyId != null}">
                         <a class="a-external-music-link" th:href="${todaysSong.songSubgroup.spotifyId}">
-                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}" data-toggle="tooltip"
-                                 data-placement="top" th:title="#{openInSpotify}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                         </a>
                     </th:block>
                     <th:block th:if="${todaysSong.songSubgroup.deezerId != null}">
                         <a class="a-external-music-link" th:href="${todaysSong.songSubgroup.deezerId}">
-                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}" data-toggle="tooltip"
-                                 data-placement="top" th:title="#{openInDeezer}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
                         </a>
                     </th:block>
                     <th:block th:if="${todaysSong.songSubgroup.itunesLink != null}">
                         <a class="a-external-music-link" th:href="${todaysSong.songSubgroup.itunesLink}">
-                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}" data-toggle="tooltip"
-                                 data-placement="top" th:title="#{openInAppleMusic}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
+                        </a>
+                    </th:block>
+                    <th:block th:if="${songSubgroup.tidalLink != null}">
+                        <a class="a-external-music-link" th:href="${songSubgroup.tidalLink}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
+                        </a>
+                    </th:block>
+                    <th:block th:if="${songSubgroup.soundcloudLink != null}">
+                        <a class="a-external-music-link" th:href="${songSubgroup.soundcloudLink}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
                         </a>
                     </th:block>
                 </div>

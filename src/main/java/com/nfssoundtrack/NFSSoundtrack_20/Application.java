@@ -1,9 +1,17 @@
 package com.nfssoundtrack.NFSSoundtrack_20;
 
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Song;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.User;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +22,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
 
 @EnableCaching
 @SpringBootApplication
@@ -27,6 +46,8 @@ public class Application implements CommandLineRunner {
         SpringApplication.run(Application.class, args);
     }
 
+    @PersistenceContext
+    private EntityManager entityManager;
     @Autowired
     private AuthorRepository authorRepository;
 
@@ -70,7 +91,7 @@ public class Application implements CommandLineRunner {
     public void run(String... args) {
         if (args.length > 0) {
 //            Row currentRow = null;
-            if (args[0].equals("NewUser")){
+            if (args[0].equals("NewUser")) {
                 String username = args[1];
                 String password = args[2];
                 PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
@@ -80,6 +101,131 @@ public class Application implements CommandLineRunner {
                 user.setLogin(username);
                 userRepository.save(user);
                 System.out.println("successful?");
+            }
+            if (args[0].equals("FixStreamingLinks")) {
+                CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+                CriteriaQuery<Song> cq = criteriaBuilder.createQuery(Song.class);
+                Root<Song> songRoot = cq.from(Song.class);
+                Predicate spotifyIdPredicate = criteriaBuilder.like(songRoot.get("spotifyId"), "spotify:track%");
+                Predicate tidalPredicate = criteriaBuilder.isNull(songRoot.get("tidalLink"));
+                cq.where(spotifyIdPredicate,tidalPredicate);
+                TypedQuery<Song> query = entityManager.createQuery(cq);
+                List<Song> songs = query.getResultList();
+                List<String> iTunesSqlStatements = new ArrayList<>();
+                List<String> tidalSqlStatements = new ArrayList<>();
+                List<String> soundcloudSqlStatements = new ArrayList<>();
+                List<String> deezerSqlStatements = new ArrayList<>();
+                Song song=null;
+                for (int i=0; i<1000; i++) {
+//                for (Song song : songs) {
+                    System.out.println("index " + i);
+                    try {
+                        StringBuilder content = new StringBuilder();
+                        song = songs.get(i);
+                        URL url = new URL("https://odesli.co/embed?url="+song.getSpotifyId());
+                        URLConnection urlConnection = url.openConnection();
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                        String line;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            content.append(line).append("\n");
+                        }
+                        bufferedReader.close();
+                        String valueToCheck = content.toString();
+                        int beginPositionITunes = valueToCheck.indexOf("https://geo.music.apple.com");
+                        if (beginPositionITunes>-1){
+                            int endPosition = valueToCheck.indexOf("0026mt=1");
+                            String iTunesLink = valueToCheck.substring(beginPositionITunes,endPosition-2);
+                            String fixItunesSql = "update nfs.song set itunes_link='"+iTunesLink+"' where id='"+song.getId()+"' and spotify_id='"+song.getSpotifyId()+"';";
+                            iTunesSqlStatements.add(fixItunesSql);
+                            String fixItunesSql2 = "update nfs.song_subgroup set itunes_link='"+iTunesLink+"' where  spotify_id='"+song.getSpotifyId()+"';";
+                            iTunesSqlStatements.add(fixItunesSql2);
+//                            System.out.println("???");
+                        }
+                        int beginPositionTidal = valueToCheck.indexOf("https://listen.tidal.com");
+                        if (beginPositionTidal>-1){
+                            int endPosition = beginPositionTidal+40;
+                            String tidalLink = valueToCheck.substring(beginPositionTidal,endPosition);
+                            String fixTidalLink = "update nfs.song set tidal_link='"+tidalLink+"' where id='"+song.getId()+"' and spotify_id='"+song.getSpotifyId()+"';";
+                            fixTidalLink = fixTidalLink.replace("\"","").replace("}","").replace(",","");
+                            tidalSqlStatements.add(fixTidalLink);
+                            String fixTidalLink2 = "update nfs.song_subgroup set tidal_link='"+tidalLink+"' where spotify_id='"+song.getSpotifyId()+"';";
+                            fixTidalLink2 = fixTidalLink2.replace("\"","").replace("}","").replace(",","");
+                            tidalSqlStatements.add(fixTidalLink2);
+//                            System.out.println("???");
+                        }
+                        int beginPositionDeezer = valueToCheck.indexOf("www.deezer.com");
+                        if (beginPositionDeezer>-1){
+                            int endPosition = beginPositionDeezer+30;
+                            String deezerId = "deezer://"+valueToCheck.substring(beginPositionDeezer,endPosition);
+                            String fixDeezerId = "update nfs.song set deezer_id='"+deezerId+"' where id='"+song.getId()+"' and spotify_id='"+song.getSpotifyId()+"';";
+                            fixDeezerId = fixDeezerId.replace("\"","").replace("}","").replace(",","");
+                            deezerSqlStatements.add(fixDeezerId);
+                            String fixDeezerId2 = "update nfs.song_subgroup set deezer_id='"+deezerId+"' where spotify_id='"+song.getSpotifyId()+"';";
+                            fixDeezerId2 = fixDeezerId2.replace("\"","").replace("}","").replace(",","");
+                            deezerSqlStatements.add(fixDeezerId2);
+//                            System.out.println("???");
+                        }
+                        int beginPositionSoundcloud = valueToCheck.indexOf("https://soundcloud.com");
+                        if (beginPositionSoundcloud>-1){
+                            int endPosition = valueToCheck.indexOf("\"",beginPositionSoundcloud);
+                            String soundcloudLink = valueToCheck.substring(beginPositionSoundcloud,endPosition);
+                            String fixSoundcloudLink = "update nfs.song set soundcloud_link='"+soundcloudLink+"' where id='"+song.getId()+"' and spotify_id='"+song.getSpotifyId()+"';";
+                            soundcloudSqlStatements.add(fixSoundcloudLink);
+                            String fixSoundcloudLink2 = "update nfs.song_subgroup set soundcloud_link='"+soundcloudLink+"' where spotify_id='"+song.getSpotifyId()+"';";
+                            soundcloudSqlStatements.add(fixSoundcloudLink2);
+//                            System.out.println("???");
+                        }
+                        Thread.sleep(500);
+                    } catch (Throwable thr) {
+                        System.out.println("couldn't process response for song " + song);
+                        System.out.println(thr.getMessage());
+                        thr.printStackTrace();
+                    }
+                }
+                try {
+                    Path iTunesFilePath = Paths.get("iTunesFilePath.sql");
+                    Path tidalFilePath = Paths.get("tidalFilePath.sql");
+                    Path deezerFilePath = Paths.get("deezerFilePath.sql");
+                    Path soundcloudFilePath = Paths.get("soundcloudFilePath.sql");
+                    Path fullFixPath = Paths.get("fullFix.sql");
+                    Files.deleteIfExists(iTunesFilePath);
+                    Files.deleteIfExists(tidalFilePath);
+                    Files.deleteIfExists(deezerFilePath);
+                    Files.deleteIfExists(soundcloudFilePath);
+                    Files.createFile(iTunesFilePath);
+                    Files.createFile(tidalFilePath);
+                    Files.createFile(deezerFilePath);
+                    Files.createFile(soundcloudFilePath);
+                    for (String str : iTunesSqlStatements) {
+                        Files.writeString(iTunesFilePath, str + System.lineSeparator(),
+                                StandardOpenOption.APPEND);
+                        Files.writeString(fullFixPath, str + System.lineSeparator(),
+                                StandardOpenOption.APPEND);
+                    }
+                    for (String str : tidalSqlStatements) {
+                        Files.writeString(tidalFilePath, str + System.lineSeparator(),
+                                StandardOpenOption.APPEND);
+                        Files.writeString(fullFixPath, str + System.lineSeparator(),
+                                StandardOpenOption.APPEND);
+                    }
+                    for (String str : deezerSqlStatements) {
+                        Files.writeString(deezerFilePath, str + System.lineSeparator(),
+                                StandardOpenOption.APPEND);
+                        Files.writeString(fullFixPath, str + System.lineSeparator(),
+                                StandardOpenOption.APPEND);
+                    }
+                    for (String str : soundcloudSqlStatements) {
+                        Files.writeString(soundcloudFilePath, str + System.lineSeparator(),
+                                StandardOpenOption.APPEND);
+                        Files.writeString(fullFixPath, str + System.lineSeparator(),
+                                StandardOpenOption.APPEND);
+                    }
+                } catch (Throwable ttt){
+                    System.out.println("couldn't creating files");
+                    System.out.println(ttt.getMessage());
+                    ttt.printStackTrace();
+                }
+                System.out.println("???");
             }
 //            if (args[0].equals("SingleGame")) {
 //                try {

@@ -116,6 +116,14 @@ public class SongSerializer extends JsonSerializer<Song> {
             jsonGenerator.writeStringField("itunes", "<a href='" + song.getItunesLink() +
                     "' target='_blank'><img class='img-responsive-song-info' src='/images/fullres/itunes_big.png'></a>");
         }
+        if (song.getTidalLink() != null) {
+            jsonGenerator.writeStringField("tidal", "<a href='" + song.getTidalLink() +
+                    "' target='_blank'><img class='img-responsive-song-info' src='/images/fullres/tidal_big.png'></a>");
+        }
+        if (song.getSoundcloudLink() != null) {
+            jsonGenerator.writeStringField("soundcloud", "<a href='" + song.getSoundcloudLink() +
+                    "' target='_blank'><img class='img-responsive-song-info' src='/images/fullres/soundcloud_big.png'></a>");
+        }
         if (song.getSrcId() != null) {
             jsonGenerator.writeStringField("youtube", "<a href='https://www.youtube.com/watch?v=" + song.getSrcId() +
                     "' target='_blank'><img class='img-responsive-song-info' src='/images/fullres/youtube_big.png'></a>");

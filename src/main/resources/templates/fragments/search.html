@@ -82,44 +82,56 @@
             <td>
                 <div class="play_icondiv">
                     <th:block th:if="${song.key.srcId != null}">
-                    <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
-                        data-bs-target="#videoModal"
-                        th:attr="data-tagVideo='https://www.youtube.com/embed/'+${song.key.srcId}"
-                        th:src="@{/images/znakwodny.png}">
-                    <a class="table_link" target="_blank"
-                        th:href="'https://www.youtube.com/watch?v='+${song.key.srcId}">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-box-arrow-up-right"
-                            viewBox="0 0 16 16">
-                            <path fill-rule="evenodd"
-                                d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
-                            <path fill-rule="evenodd"
-                                d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
-                        </svg>
-                    </a>
+                        <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
+                            data-bs-target="#videoModal"
+                            th:attr="data-tagVideo='https://www.youtube.com/embed/'+${song.key.srcId}"
+                            th:src="@{/images/znakwodny.png}">
+                        <a class="table_link" target="_blank"
+                            th:href="'https://www.youtube.com/watch?v='+${song.key.srcId}">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-box-arrow-up-right"
+                                viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                <path fill-rule="evenodd"
+                                    d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                            </svg>
+                        </a>
                     </th:block>
                     <textarea th:utext="${song.key.lyrics}" th:attr="data-noLyrics=#{noLyrics}" hidden></textarea>
                     <th:block th:if="${song.key.spotifyId != null}">
                         <a class="a-external-music-link" th:href="${song.key.spotifyId}">
-                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}" data-toggle="tooltip"
-                                 data-placement="top" th:title="#{openInSpotify}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                         </a>
                         <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                             th:src="@{/images/fullres/play_with30.png}" data-toggle="tooltip"
-                             data-placement="top" th:title="#{playSample}">
+                            th:src="@{/images/fullres/play_with30.png}" data-toggle="tooltip" data-placement="top"
+                            th:title="#{playSample}">
                         <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                             th:src="@{/images/fullres/pause_with30.png}" data-toggle="tooltip"
-                             data-placement="top" th:title="#{pauseSample}" style="display: none;">
+                            th:src="@{/images/fullres/pause_with30.png}" data-toggle="tooltip" data-placement="top"
+                            th:title="#{pauseSample}" style="display: none;">
                     </th:block>
                     <th:block th:if="${song.key.deezerId != null}">
                         <a class="a-external-music-link" th:href="${song.key.deezerId}">
-                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}" data-toggle="tooltip"
-                                 data-placement="top" th:title="#{openInDeezer}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
                         </a>
                     </th:block>
                     <th:block th:if="${song.key.itunesLink != null}">
                         <a class="a-external-music-link" th:href="${song.key.itunesLink}">
-                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}" data-toggle="tooltip"
-                                 data-placement="top" th:title="#{openInAppleMusic}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
+                        </a>
+                    </th:block>
+                    <th:block th:if="${song.key.tidalLink != null}">
+                        <a class="a-external-music-link" th:href="${song.key.tidalLink}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
+                        </a>
+                    </th:block>
+                    <th:block th:if="${song.key.soundcloudLink != null}">
+                        <a class="a-external-music-link" th:href="${song.key.soundcloudLink}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
                         </a>
                     </th:block>
                 </div>
@@ -196,44 +208,56 @@
             <td>
                 <div class="play_icondiv">
                     <th:block th:if="${song.key.srcId != null}">
-                    <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
-                        data-bs-target="#videoModal"
-                        th:attr="data-tagVideo='https://www.youtube.com/embed/'+${song.key.srcId}"
-                        th:src="@{/images/znakwodny.png}">
-                    <a class="table_link externalYT" target="_blank"
-                        th:href="'https://www.youtube.com/watch?v='+${song.key.srcId}">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-box-arrow-up-right"
-                            viewBox="0 0 16 16">
-                            <path fill-rule="evenodd"
-                                d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
-                            <path fill-rule="evenodd"
-                                d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
-                        </svg>
-                    </a>
+                        <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
+                            data-bs-target="#videoModal"
+                            th:attr="data-tagVideo='https://www.youtube.com/embed/'+${song.key.srcId}"
+                            th:src="@{/images/znakwodny.png}">
+                        <a class="table_link externalYT" target="_blank"
+                            th:href="'https://www.youtube.com/watch?v='+${song.key.srcId}">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-box-arrow-up-right"
+                                viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                <path fill-rule="evenodd"
+                                    d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                            </svg>
+                        </a>
                     </th:block>
                     <textarea th:utext="${song.key.lyrics}" th:attr="data-noLyrics=#{noLyrics}" hidden></textarea>
                     <th:block th:if="${song.key.spotifyId != null}">
                         <a class="a-external-music-link" th:href="${song.key.spotifyId}">
-                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}" data-toggle="tooltip"
-                                 data-placement="top" th:title="#{openInSpotify}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                         </a>
                         <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                             th:src="@{/images/fullres/play_with30.png}" data-toggle="tooltip"
-                             data-placement="top" th:title="#{playSample}">
+                            th:src="@{/images/fullres/play_with30.png}" data-toggle="tooltip" data-placement="top"
+                            th:title="#{playSample}">
                         <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                             th:src="@{/images/fullres/pause_with30.png}" data-toggle="tooltip"
-                             data-placement="top" th:title="#{pauseSample}" style="display: none;">
+                            th:src="@{/images/fullres/pause_with30.png}" data-toggle="tooltip" data-placement="top"
+                            th:title="#{pauseSample}" style="display: none;">
                     </th:block>
                     <th:block th:if="${song.key.deezerId != null}">
                         <a class="a-external-music-link" th:href="${song.key.deezerId}">
-                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}" data-toggle="tooltip"
-                                 data-placement="top" th:title="#{openInDeezer}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
                         </a>
                     </th:block>
                     <th:block th:if="${song.key.itunesLink != null}">
                         <a class="a-external-music-link" th:href="${song.key.itunesLink}">
-                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}" data-toggle="tooltip"
-                                 data-placement="top" th:title="#{openInAppleMusic}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
+                        </a>
+                    </th:block>
+                    <th:block th:if="${song.key.tidalLink != null}">
+                        <a class="a-external-music-link" th:href="${song.key.tidalLink}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
+                        </a>
+                    </th:block>
+                    <th:block th:if="${song.key.soundcloudLink != null}">
+                        <a class="a-external-music-link" th:href="${song.key.soundcloudLink}">
+                            <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.png}"
+                                data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
                         </a>
                     </th:block>
                 </div>

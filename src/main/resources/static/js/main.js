@@ -97,7 +97,7 @@ $(document).ready(function () {
         $("#customPlaylistSubmit").prop("disabled", true);
         $("#customPlaylistSubmit").parent().parent().attr("data-toggle", "tooltip");
         $("#customPlaylistSubmit").parent().parent().attr("data-placement", "top");
-        $("#customPlaylistSubmit").parent().parent().attr("data-bs-original-title", "Custom playlist is empty");
+        $("#customPlaylistSubmit").parent().parent().attr("data-bs-original-title", $("#customPlaylistSubmit").attr("data-tooltip"));
         $("#customPlaylistSubmit").parent().parent().tooltip();
     }
     //if user does not want 'modal' render then we disable this modal
@@ -204,6 +204,7 @@ $(document).ready(function () {
                     iframeToPut.width("76%");
                 }
                 iframeToPut.attr("src", videoToUse + "?autoplay=1&amp;autohide=0&amp;theme=light&amp;wmode=transparent");
+                iframeToPut.attr("allow", "autoplay");
                 pElem.append(lyricsText);
                 lyricsDiv.append(pElem);
                 newTd.append(iframeToPut);
@@ -442,7 +443,7 @@ $(document).ready(function () {
         if ($('#playlist_progress tr:nth-child(' + (current_id + 1) + ')').hasClass("disabled")) {
             initPlayer(current_id + 1);
         } else {
-            $('#playlistModePlayer').html('<iframe id="player" type="text/html" src="https://www.youtube.com/embed/' + data_song[current_id] + '?enablejsapi=1&autoplay=1&autohide=0&theme=light&wmode=transparent" frameborder="0"></iframe>');
+            $('#playlistModePlayer').html('<iframe id="player" allow="autoplay" type="text/html" src="https://www.youtube.com/embed/' + data_song[current_id] + '?enablejsapi=1&autoplay=1&autohide=0&theme=light&wmode=transparent" frameborder="0"></iframe>');
 
             var player = new YT.Player('player', {
                 events: {
@@ -654,6 +655,12 @@ $(document).ready(function () {
                 if (songInfo.itunes != null) {
                     $(songInfo.itunes).insertAfter("#externalLinks");
                 }
+                if (songInfo.tidal != null) {
+                    $(songInfo.tidal).insertAfter("#externalLinks");
+                }
+                if (songInfo.soundcloud != null) {
+                    $(songInfo.soundcloud).insertAfter("#externalLinks");
+                }
                 if (filenameLabel != null) {
                     var infoSpan = $("<span>");
                     infoSpan.append(filenameLabel);
@@ -711,6 +718,8 @@ $(document).ready(function () {
         var spotifyElem = null;
         var deezerElem = null;
         var itunesElem = null;
+        var tidalElem = null;
+        var soundCloudElem = null;
         for (let i = 0; i < externalLinks.length; i++) {
             var actualAObj = $(externalLinks[i]);
             if (actualAObj.attr("href").indexOf("spotify:") > -1) {
@@ -719,6 +728,10 @@ $(document).ready(function () {
                 deezerElem = actualAObj;
             } else if (actualAObj.attr("href").indexOf("music.apple.com") > -1) {
                 itunesElem = actualAObj;
+            } else if (actualAObj.attr("href").indexOf("tidal.com") > -1) {
+                tidalElem = actualAObj;
+            } else if (actualAObj.attr("href").indexOf("soundcloud.com") > -1) {
+                soundCloudElem = actualAObj;
             }
         }
         if (youtubeElem.length > 0) {
@@ -743,12 +756,24 @@ $(document).ready(function () {
         } else {
             $("#mobileLaunchItunes").css("display", "none");
         }
+        if (tidalElem != null) {
+            $("#mobileLaunchTidal").attr("href", tidalElem.attr("href"));
+        } else {
+            $("#mobileLaunchTidal").css("display", "none");
+        }
+        if (soundCloudElem != null) {
+            $("#mobileLaunchSoundCloud").attr("href", soundCloudElem.attr("href"));
+        } else {
+            $("#mobileLaunchSoundCloud").css("display", "none");
+        }
         if ($("#mobile_context").hasClass("show")) {
             $("#mobile_context").removeClass("show").hide();
             $("#mobileLaunchSpotify").css("display", "");
             $("#playSpotifySample").css("display", "");
             $("#mobileLaunchItunes").css("display", "");
             $("#mobileLaunchDeezer").css("display", "");
+            $("#mobileLaunchTidal").css("display", "");
+            $("#mobileLaunchSoundCloud").css("display", "");
             $("#mobileExternalYoutube").css("display", "");
             if (window.location.href.indexOf("/game/") > -1) {
                 $("#newDisqusLinkToOpen").css("display", "");
@@ -778,6 +803,8 @@ $(document).ready(function () {
         $("#playSpotifySample").css("display", "");
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
+        $("#mobileLaunchTidal").css("display", "");
+        $("#mobileLaunchSoundCloud").css("display", "");
     });
 
     $("#mobileAddToPlaylist").on("click", function (e) {
@@ -788,6 +815,8 @@ $(document).ready(function () {
         $("#playSpotifySample").css("display", "");
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
+        $("#mobileLaunchTidal").css("display", "");
+        $("#mobileLaunchSoundCloud").css("display", "");
     });
 
     $("#mobileShowSongInfo").on("click", function (e) {
@@ -799,6 +828,8 @@ $(document).ready(function () {
         $("#playSpotifySample").css("display", "");
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
+        $("#mobileLaunchTidal").css("display", "");
+        $("#mobileLaunchSoundCloud").css("display", "");
     });
 
     $("#playSpotifySample").on("click", function (e) {
@@ -811,15 +842,17 @@ $(document).ready(function () {
             var script = document.createElement('script');
             script.src = "https://open.spotify.com/embed/iframe-api/v1";
             document.head.appendChild(script);
-            setTimeout(function() {
+            setTimeout(function () {
                 playSpotifySampleMobile(linkToUse, songSubgroupId);
-                }, 1000);
+            }, 1000);
         }
         $("#mobile_context").removeClass("show").hide();
         $("#mobileLaunchSpotify").css("display", "");
         $("#playSpotifySample").css("display", "");
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
+        $("#mobileLaunchTidal").css("display", "");
+        $("#mobileLaunchSoundCloud").css("display", "");
     });
 
     $("a.single_action").on("click", function (e) {
@@ -828,6 +861,8 @@ $(document).ready(function () {
         $("#playSpotifySample").css("display", "");
         $("#mobileLaunchItunes").css("display", "");
         $("#mobileLaunchDeezer").css("display", "");
+        $("#mobileLaunchTidal").css("display", "");
+        $("#mobileLaunchSoundCloud").css("display", "");
     });
 
     $("#pin-menu").on("click", function (e) {
@@ -862,9 +897,9 @@ $(document).ready(function () {
             var script = document.createElement('script');
             script.src = "https://open.spotify.com/embed/iframe-api/v1";
             document.head.appendChild(script);
-            setTimeout(function() {
+            setTimeout(function () {
                 playSpotifySample(elem, false);
-                }, 1000);
+            }, 1000);
         }
     });
 
@@ -911,19 +946,19 @@ $(document).ready(function () {
                     if (e.data.duration != 0) {
                         if (e.data.duration == e.data.position) {
                             if (currentlyPlayedSpotify) {
-                                    $(currentlyPlayedSpotify.nextElementSibling).css("display", "none");
-                                    $(currentlyPlayedSpotify).css("display", "");
+                                $(currentlyPlayedSpotify.nextElementSibling).css("display", "none");
+                                $(currentlyPlayedSpotify).css("display", "");
                                 currentlyPlayedSpotify = null;
                             }
                         }
                     }
                 });
             };
-//            console.log("before creating controller " + console.log(new Date().toString()));
+            //            console.log("before creating controller " + console.log(new Date().toString()));
             spotifyApi.createController(element, options, callback);
-//            console.log("after creating controller " + console.log(new Date().toString()));
+            //            console.log("after creating controller " + console.log(new Date().toString()));
             spotifyController.play();
-//            console.log("after play trigger " + console.log(new Date().toString()));
+            //            console.log("after play trigger " + console.log(new Date().toString()));
         }
     }
 
@@ -940,8 +975,8 @@ $(document).ready(function () {
             if ($("#embed-iframe").length == 0) {
                 divForSpotify = $('<div id="embed-iframe"></div>');
             }
-            $("tr[data-songsubgroup-id="+snogSubgroupId+"]").append(divForSpotify);
-//            $("#mobile_context").append(divForSpotify);
+            $("tr[data-songsubgroup-id=" + snogSubgroupId + "]").append(divForSpotify);
+            //            $("#mobile_context").append(divForSpotify);
             const element = divForSpotify[0];
             const options = {
                 width: '0%',
@@ -963,11 +998,11 @@ $(document).ready(function () {
                     }
                 });
             };
-//            console.log("before creating controller " + console.log(new Date().toString()));
+            //            console.log("before creating controller " + console.log(new Date().toString()));
             spotifyApi.createController(element, options, callback);
-//            console.log("after creating controller " + console.log(new Date().toString()));
+            //            console.log("after creating controller " + console.log(new Date().toString()));
             spotifyController.play();
-//            console.log("after play trigger " + console.log(new Date().toString()));
+            //            console.log("after play trigger " + console.log(new Date().toString()));
         }
     }
     window.onSpotifyIframeApiReady = (IFrameAPI) => {

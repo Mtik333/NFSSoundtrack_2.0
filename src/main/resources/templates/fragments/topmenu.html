@@ -47,7 +47,7 @@
                 <form th:action="@{/custom/playlist}" method="post" class="d-inline p-1">
                     <input class="form-control" id="playlistContent" type="hidden" name="customPlaylist">
                     <button id="customPlaylistSubmit" type="submit" class="nav-link d-inline-block p-1"
-                        th:text="#{customPlaylist}"></button>
+                    th:attr="data-tooltip=#{customPlaylistTooltip}" th:text="#{customPlaylist}"></button>
                 </form>
             </li>
             <svg id="dynamic_bg" xmlns="http://www.w3.org/2000/svg" height="7vw" fill="currentColor"

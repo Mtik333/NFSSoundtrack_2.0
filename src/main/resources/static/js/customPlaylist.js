@@ -117,6 +117,8 @@ $(document).ready(function () {
 		$("#playSpotifySample").css("display", "");
 		$("#mobileLaunchItunes").css("display", "");
 		$("#mobileLaunchDeezer").css("display", "");
+		$("#mobileLaunchTidal").css("display", "");
+		$("#mobileLaunchSoundCloud").css("display", "");
 	});
 
 	$(document).find("th.id").click();

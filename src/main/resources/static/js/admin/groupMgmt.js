@@ -135,13 +135,16 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#delete-subgroup', function (e) {
-        var subgroupInput = $($(this).parent().parent()).find('input')[0];
-        if ($(subgroupInput).attr('data-subgroupId') != undefined) {
-            if (subgroupInput.value != "All") {
-                $(subgroupInput).addClass('text-decoration-line-through');
+        var confirmDel = confirm("Are you sure?");
+        if (confirmDel) {
+            var subgroupInput = $($(this).parent().parent()).find('input')[0];
+            if ($(subgroupInput).attr('data-subgroupId') != undefined) {
+                if (subgroupInput.value != "All") {
+                    $(subgroupInput).addClass('text-decoration-line-through');
+                }
+            } else {
+                subgroupInput.parentElement.parentElement.remove();
             }
-        } else {
-            subgroupInput.parentElement.parentElement.remove();
         }
     });
 
@@ -213,23 +216,26 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#delete-group', function (e) {
-        var groupId = $(this).attr('data-groupId');
-        $.ajax({
-            async: false,
-            type: "DELETE",
-            url: "/maingroup/delete/" + Number(groupId),
-            success: function (ooo) {
-                getGroupsFromGame();
-                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(successAlertHtml).slideUp(500);
-                });
-            },
-            error: function (ooo) {
-                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(failureAlertHtml).slideUp(500);
-                });
-            },
-        });
+        var confirmDel = confirm("Are you sure?");
+        if (confirmDel) {
+            var groupId = $(this).attr('data-groupId');
+            $.ajax({
+                async: false,
+                type: "DELETE",
+                url: "/maingroup/delete/" + Number(groupId),
+                success: function (ooo) {
+                    getGroupsFromGame();
+                    $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                        $(successAlertHtml).slideUp(500);
+                    });
+                },
+                error: function (ooo) {
+                    $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                        $(failureAlertHtml).slideUp(500);
+                    });
+                },
+            });
+        }
     });
 
     $(document).on('click', '#recounterGroupPositions', function (e) {
