@@ -68,7 +68,7 @@ I just want to rewrite NFSSoundtrack.com to handle some stuff better than in 201
 
 ![](./src/main/resources/readme/docker/15.PNG)
 
-16. When ready, then click on "Start" button for the second entry in the view (the one that is 'created')
+16. Then the second container should in few seconds start (the one that was 'created' during database import)
 
 ![](./src/main/resources/readme/docker/16.PNG)
 

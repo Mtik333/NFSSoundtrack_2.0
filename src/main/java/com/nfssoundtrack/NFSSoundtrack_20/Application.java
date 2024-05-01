@@ -108,7 +108,10 @@ public class Application implements CommandLineRunner {
                 Root<Song> songRoot = cq.from(Song.class);
                 Predicate spotifyIdPredicate = criteriaBuilder.like(songRoot.get("spotifyId"), "spotify:track%");
                 Predicate tidalPredicate = criteriaBuilder.isNull(songRoot.get("tidalLink"));
-                cq.where(spotifyIdPredicate,tidalPredicate);
+//                Predicate idBigger = criteriaBuilder.greaterThan(songRoot.get("id"),1);
+//                cq.where(spotifyIdPredicate,tidalPredicate);
+//                cq.where(spotifyIdPredicate,tidalPredicate,idBigger);
+//                cq.orderBy(criteriaBuilder.asc(songRoot.get("id")));
                 TypedQuery<Song> query = entityManager.createQuery(cq);
                 List<Song> songs = query.getResultList();
                 List<String> iTunesSqlStatements = new ArrayList<>();

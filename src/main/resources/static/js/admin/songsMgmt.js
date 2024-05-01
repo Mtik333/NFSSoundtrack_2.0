@@ -1076,6 +1076,7 @@ $(document).ready(function () {
     $(document).on('click', '#cancel-song-globally', function (e) {
         getSingleSubgroupFromGame(0);
         $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+        firstClickToAutoFetch=true;
     });
 
     function generateSpotifyAndLyrics(ingameDisplayDiv, songSubgroup) {
