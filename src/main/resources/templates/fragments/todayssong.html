@@ -112,14 +112,14 @@
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
                         </a>
                     </th:block>
-                    <th:block th:if="${songSubgroup.tidalLink != null}">
-                        <a class="a-external-music-link" th:href="${songSubgroup.tidalLink}">
+                    <th:block th:if="${todaysSong.songSubgroup.tidalLink != null}">
+                        <a class="a-external-music-link" th:href="${todaysSong.songSubgroup.tidalLink}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
                         </a>
                     </th:block>
-                    <th:block th:if="${songSubgroup.soundcloudLink != null}">
-                        <a class="a-external-music-link" th:href="${songSubgroup.soundcloudLink}">
+                    <th:block th:if="${todaysSong.songSubgroup.soundcloudLink != null}">
+                        <a class="a-external-music-link" th:href="${todaysSong.songSubgroup.soundcloudLink}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
                         </a>
