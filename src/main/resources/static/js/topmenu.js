@@ -10,6 +10,7 @@ $(document).ready(function () {
         localStorage.setItem("scrolling-stuff", $("#scrolling-stuff").prop("checked"));
         localStorage.setItem("static-leftmenu", $("#static-leftmenu").prop("checked"));
         localStorage.setItem("icons-size", $("#icons-size").val());
+        localStorage.setItem("content-width", $("#content-width").val());
         localStorage.setItem("video-rendering-stuff", $("#video-rendering-stuff").prop("checked"));
         var langAlreadyThere = window.location.toString().indexOf("?lang") > -1;
         if (langAlreadyThere) {

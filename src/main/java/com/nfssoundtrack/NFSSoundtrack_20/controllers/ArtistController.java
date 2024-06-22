@@ -285,6 +285,15 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                     twitter,facebook,instagram,soundcloud,myspace,wikipedia);
             authorService.updateDiscoGSObj(Integer.valueOf(authorId),discoGSObj);
         }
+        Boolean updateOfficialArtist = (Boolean) mergeInfo.get("changeOfficialArtist");
+        if (updateOfficialArtist){
+            List<AuthorSong> authorSongs = authorSongService.findByAuthorAlias(rootAlias);
+            for (AuthorSong authorSong : authorSongs){
+                Song song = authorSong.getSong();
+                song.setOfficialDisplayBand(authorName);
+                songService.save(song);
+            }
+        }
         return new ObjectMapper().writeValueAsString("OK");
     }
 

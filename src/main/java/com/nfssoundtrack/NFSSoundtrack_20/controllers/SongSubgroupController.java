@@ -15,6 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 @Controller
@@ -351,5 +355,56 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         }
         return new ObjectMapper().writeValueAsString("OK");
 
+    }
+
+    @GetMapping(value = "/links/{songSubgroup}")
+    public @ResponseBody
+    String getLinksFromYoutubeId(@PathVariable("songSubgroup") String youtubeId)
+            throws Exception {
+        StringBuilder content = new StringBuilder();
+        URL url = new URL("https://odesli.co/embed?url="+"https://www.youtube.com/watch?v="+youtubeId);
+        URLConnection urlConnection = url.openConnection();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            content.append(line).append("\n");
+        }
+        bufferedReader.close();
+        String valueToCheck = content.toString();
+        SongSubgroup songSubgroup = new SongSubgroup();
+        int beginPositionITunes = valueToCheck.indexOf("https://geo.music.apple.com");
+        if (beginPositionITunes>-1) {
+            int endPosition = valueToCheck.indexOf("0026mt=1");
+            String iTunesLink = valueToCheck.substring(beginPositionITunes, endPosition - 2);
+            songSubgroup.setItunesLink(iTunesLink);
+        }
+        int beginPositionTidal = valueToCheck.indexOf("https://listen.tidal.com");
+        if (beginPositionTidal>-1) {
+            int endPosition = beginPositionTidal + 40;
+            String tidalLink = valueToCheck.substring(beginPositionTidal, endPosition);
+            tidalLink = tidalLink.replace("\"","").replace("}","").replace(",","");
+            songSubgroup.setTidalLink(tidalLink);
+        }
+        int beginPositionDeezer = valueToCheck.indexOf("www.deezer.com");
+        if (beginPositionDeezer>-1) {
+            int endPosition = beginPositionDeezer + 30;
+            String deezerId = "deezer://" + valueToCheck.substring(beginPositionDeezer, endPosition);
+            deezerId = deezerId.replace("\"","").replace("}","").replace(",","");
+            songSubgroup.setDeezerId(deezerId);
+        }
+        int beginPositionSoundcloud = valueToCheck.indexOf("\"https://soundcloud.com");
+        if (beginPositionSoundcloud>-1) {
+            int endPosition = valueToCheck.indexOf("\"", beginPositionSoundcloud+1);
+            String soundcloudLink = valueToCheck.substring(beginPositionSoundcloud+1, endPosition);
+            songSubgroup.setSoundcloudLink(soundcloudLink);
+        }
+        int beginPositionSpotify = valueToCheck.indexOf("https://open.spotify.com/track/");
+        if (beginPositionSpotify>-1) {
+            int endPosition = beginPositionSpotify + 46;
+            String spotifyLink = "spotify:track:"+valueToCheck.substring(beginPositionSpotify+31, endPosition);
+            songSubgroup.setSpotifyId(spotifyLink);
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(songSubgroup);
     }
 }

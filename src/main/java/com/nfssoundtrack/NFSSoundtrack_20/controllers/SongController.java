@@ -33,6 +33,7 @@ public class SongController extends BaseControllerWithErrorHandling {
         Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
         String idToMerge = (String) mergeInfo.get("songToMergeId");
         String targetId = (String) mergeInfo.get("targetSongId");
+        Boolean addInGameTitle = (Boolean) mergeInfo.get("pushIngameTitle");
         Song songToMerge =
                 songService.findById(Integer.valueOf(idToMerge)).orElseThrow(() -> new ResourceNotFoundException("No song with id " +
                         "found " + idToMerge));
@@ -56,6 +57,9 @@ public class SongController extends BaseControllerWithErrorHandling {
         List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(songToMerge);
         for (SongSubgroup songSubgroup : songSubgroupList) {
             songSubgroup.setSong(targetSong);
+            if (addInGameTitle){
+                songSubgroup.setIngameDisplayTitle(songToMerge.getOfficialDisplayTitle());
+            }
         }
         songSubgroupService.saveAll(songSubgroupList);
         List<AuthorSong> authorSongs = authorSongService.findBySong(songToMerge);

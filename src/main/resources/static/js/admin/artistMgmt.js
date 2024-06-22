@@ -7,6 +7,12 @@ $(document).ready(function () {
         divToAppend.empty();
         divToAppend.append(successAlertHtml);
         divToAppend.append(failureAlertHtml);
+        var rowToChangeOfficialArtist = $('<div class="row p-1">');
+        var colToChangeOfficialArtist = $('<div class="col">');
+        divToAppend.append(rowToChangeOfficialArtist);
+        rowToChangeOfficialArtist.append(colToChangeOfficialArtist);
+        colToChangeOfficialArtist.append('<input type="checkbox" class="form-check-input m-3" id="changeOfficialArtist"><label class="form-check-label pl-2 pt-2" for="changeOfficialArtist">Modify official artist of songs?</label>');
+        divToAppend.append(rowDiv);
         var rowDiv = $('<div class="row p-1">');
         var leftCellDiv = $('<div class="col">');
         var rightCellDiv = $('<div class="col">');
@@ -189,6 +195,7 @@ $(document).on('click', '#save-artist', function (e) {
         artistToSave.profile = $("#discogsProfile").text();
         artistToSave.id = $("#discogsIdInput").val();
     }
+    artistToSave.changeOfficialArtist = $("#changeOfficialArtist").prop("checked");
     $.ajax({
         async: false,
         type: "PUT",

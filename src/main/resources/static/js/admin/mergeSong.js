@@ -4,6 +4,12 @@ $(document).ready(function () {
         divToAppend.empty();
         divToAppend.append(successAlertHtml);
         divToAppend.append(failureAlertHtml);
+        var rowToPushIngameTitle = $('<div class="row p-1">');
+        var colToPushIngameTitle = $('<div class="col">');
+        divToAppend.append(rowToPushIngameTitle);
+        rowToPushIngameTitle.append(colToPushIngameTitle);
+        colToPushIngameTitle.append('<button id="merge-song" type="submit" class="btn btn-primary">Save</button>');
+        colToPushIngameTitle.append('<input type="checkbox" class="form-check-input m-3" id="pushIngameTitle"><label class="form-check-label pl-2 pt-2" for="pushIngameTitle">Add in-game title for merged song?</label>');
         var rowDiv = $('<div class="row p-1">');
         var leftCellDiv = $('<div class="col">');
         var rightCellDiv = $('<div class="col">');
@@ -16,7 +22,6 @@ $(document).ready(function () {
         var targetSongInput = $('<input class="form-control" type="text" id="targetSongInput"/>');
         rightCellDiv.append('<label for="targetAuthorInput">Target song ID</label>');
         rightCellDiv.append(targetSongInput);
-        rowDiv.append('<button id="merge-song" type="submit" class="btn btn-primary">Save</button>');
         rowDiv.append(leftCellDiv);
         rowDiv.append(rightCellDiv);
         divToAppend.append(rowDiv);
@@ -28,6 +33,7 @@ $(document).ready(function () {
         var objToSubmit = {};
         objToSubmit.songToMergeId = songToMerge;
         objToSubmit.targetSongId = targetSong;
+        objToSubmit.pushIngameTitle = $("#pushIngameTitle").prop('checked');
         $(successAlertHtml).hide();
         $(failureAlertHtml).hide();
         $.ajax({

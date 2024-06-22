@@ -125,4 +125,16 @@ $(document).ready(function () {
             },
         });
     });
+
+    //https://open.spotify.com/playlist/2LgPnp08dukdw6qll3IuEq?si=9f51ef5185e747ce
+    $(document).on('focusout', '#spotifyPlaylistInput', function (e) {
+        var typedSrcId = $(this).val();
+        var indexOfMark = typedSrcId.indexOf("playlist/");
+        var indexOfSi = typedSrcId.indexOf("?si");
+        if (indexOfSi > -1) {
+            $(this).val(typedSrcId.substring(indexOfSi - 22, indexOfSi));
+        } else {
+            $(this).val(typedSrcId.substring(indexOfMark + 6, indexOfTuDotBe + 28));
+        }
+    });
 });

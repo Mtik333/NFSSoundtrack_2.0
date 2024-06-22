@@ -1081,6 +1081,7 @@ $(document).ready(function () {
 
     function generateSpotifyAndLyrics(ingameDisplayDiv, songSubgroup) {
         ingameDisplayDiv.append("<h4>Spotify and others / lyrics</h4>");
+        ingameDisplayDiv.append('<button id="fetch-spotify-links" class="btn btn-info">Fetch all possible links</button>');
         var itunesInput = $('<input type="text" class="form-control" id="itunesInput"/>');
         var spotifyInput = $('<input type="text" class="form-control" id="spotifyInput"/>');
         var soundcloudInput = $('<input type="text" class="form-control" id="soundcloudInput"/>');
@@ -1213,6 +1214,7 @@ $(document).ready(function () {
                 $(this).val(typedSrcId.substring(indexOfTuDotBe + 4, indexOfTuDotBe + 15));
             }
         }
+        fetchMusicLinks();
     });
 
     $(document).on('focusout', '#officialSrcId', function (e) {
@@ -1226,6 +1228,7 @@ $(document).ready(function () {
                 $(this).val(typedSrcId.substring(indexOfTuDotBe + 4, indexOfTuDotBe + 15));
             }
         }
+        fetchMusicLinks();
     });
     //https://open.spotify.com/track/7zI6uJWfq93wgV20V2euv6?si=873a9557277548ac
     $(document).on('focusout', '#spotifyInput', function (e) {
@@ -1235,7 +1238,7 @@ $(document).ready(function () {
         if (indexOfSi > -1) {
             $(this).val("spotify:track:" + typedSrcId.substring(indexOfSi - 22, indexOfSi));
         } else {
-            $(this).val("spotify:track:" + typedSrcId.substring(indexOfMark + 6, indexOfTuDotBe + 28));
+            $(this).val("spotify:track:" + typedSrcId.substring(indexOfMark + 6, indexOfMark + 28));
         }
     });
 
@@ -1554,4 +1557,47 @@ $(document).ready(function () {
             },
         });
     });
+
+
+    $(document).on('click', '#fetch-spotify-links', function (e) {
+        fetchMusicLinks();
+    });
+
+    function fetchMusicLinks() {
+        var srcId;
+        if ($("#officialSrcId").length>0){
+            srcId = $("#officialSrcId").val();
+        } else {
+            srcId = $("#ingameSrcId").val();
+        }
+        $("#fetch-spotify-links").after("<span id='request-status'>Fetching...</span>")
+        $.ajax({
+            async: true,
+            type: "GET",
+            url: "/songSubgroup/links/" + srcId,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (links) {
+                if (links.spotifyId!=null){
+                    $("#spotifyInput").val(links.spotifyId);
+                }
+                if (links.deezerId!=null){
+                    $("#deezerInput").val(links.deezerId);
+                }
+                if (links.itunesLink!=null){
+                    $("#itunesInput").val(links.itunesLink);
+                }
+                if (links.tidalLink!=null){
+                    $("#tidalInput").val(links.tidalLink);
+                }
+                if (links.soundcloudLink!=null){
+                    $("#soundcloudInput").val(links.soundcloudLink);
+                }
+                $("#request-status").text("OK");
+            },
+            error: function (ooo) {
+                alert("error fetching music links, check the logs");
+            },
+        });
+    }
 });

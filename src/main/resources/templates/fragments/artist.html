@@ -49,7 +49,7 @@
 </th:block>
 <h5 th:text="#{associatedCountries}"></h5>
 <th:block th:each="authorCountry : ${author?.authorCountries}">
-    <img class="img-country" th:src="${authorCountry.country.countryLink}">
+    <img class="img-country img-responsive-row-icon" th:src="${authorCountry.country.countryLink}">
 </th:block>
 <h4 th:text="'Songs associated with '+ ${author?.name}"></h4>
 <div class="form-group pb-2 pt-2">

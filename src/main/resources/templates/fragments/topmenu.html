@@ -186,6 +186,19 @@
                         </select>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="content-width" th:text="#{pageContentWidth}"></label>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" id="content-width">
+                            <option selected value="12">100%</option>
+                            <option value="11">92%</option>
+                            <option value="10">85%</option>
+                            <option value="8">70%</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="row p-3">
                     <button type="button" class="btn btn-success" id="save-preferences" data-bs-dismiss="modal"
                         aria-label="Save preferences" th:text="#{savePreferences}"></button>

@@ -56,7 +56,7 @@
                     <td class="playlist-countries countries">
                         <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
                             <th:block th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
-                                <img class="img-country" th:src="${authorCountry.country.countryLink}">
+                                <img class="img-country img-responsive-row-icon" th:src="${authorCountry.country.countryLink}">
                             </th:block>
                         </th:block>
                     </td>

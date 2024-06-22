@@ -1,6 +1,5 @@
 package com.nfssoundtrack.NFSSoundtrack_20;
 
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.MainGroup;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Serie;
 import com.nfssoundtrack.NFSSoundtrack_20.repository.GameRepository;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -47,7 +45,7 @@ public class LazyDataTest {
 //        assert !Hibernate.isInitialized(gameList.get(0).getMainGroups());
 //    }
 
-//    @Test
+    //    @Test
 //    public void get_games_with_groups() {
 //        List<Game> gameList = gameRepository.findByIdNotNull();
 //        assert Hibernate.isInitialized(gameList.get(0).getMainGroups());

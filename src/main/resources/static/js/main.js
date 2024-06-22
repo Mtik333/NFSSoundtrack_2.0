@@ -18,6 +18,7 @@ var spotifyApi;
 var spotifyController;
 var currentlyPlayedSpotify;
 $(document).ready(function () {
+    var contentWidth = localStorage.getItem("content-width");
     if (localStorage.getItem("static-leftmenu") == "true") {
         $("#offcanvas").removeClass("offcanvas");
         var headerDiv = $("#offcanvas").find(".offcanvas-header")[0];
@@ -26,9 +27,19 @@ $(document).ready(function () {
         $("#offcanvasSpan").css("display", "none");
         $("#unpin-menu").css("display", "");
         $("#unpin-menu").parent().css("display", "flex");
+        var contentDiv = $("#offcanvas").next().next();
+        if (contentWidth != null){
+            contentDiv.addClass("col");
+            contentDiv.removeClass("col-sm-"+contentWidth);
+        }
     } else {
         $("#unpin-menu").css("display", "none");
         $("#unpin-menu").parent().css("display", "");
+        var contentDiv = $("#offcanvas").next().next();
+        if (contentWidth != null){
+            contentDiv.addClass("col-sm-"+contentWidth);
+            contentDiv.removeClass("col");
+        }
     }
     if ('ontouchstart' in window) {
         $("td.info_button").css("display", "none");
@@ -49,6 +60,7 @@ $(document).ready(function () {
         var iconsSize = localStorage.getItem("icons-size");
         if (iconsSize != undefined) {
             $(document).find("img.img-responsive-row-icon").css("max-height", iconsSize + "vw");
+            $(document).find("svg.img-responsive-row-icon").css("max-height", iconsSize + "vw");
         }
     }
     var langDisplayed = localStorage.getItem("suggest-lang");
@@ -875,6 +887,12 @@ $(document).ready(function () {
         $("#unpin-menu").css("display", "");
         $("#unpin-menu").parent().css("display", "flex");
         localStorage.setItem("static-leftmenu", true);
+        var contentDiv = $("#offcanvas").next().next();
+        var contentWidth = localStorage.getItem("content-width");
+        if (contentWidth != null){
+            contentDiv.addClass("col");
+            contentDiv.removeClass("col-sm-"+contentWidth);
+        }
     });
 
     $("#unpin-menu").on("click", function (e) {
@@ -886,6 +904,11 @@ $(document).ready(function () {
         $("#unpin-menu").css("display", "none");
         $("#unpin-menu").parent().css("display", "");
         localStorage.setItem("static-leftmenu", false);
+        var contentDiv = $("#offcanvas").next().next();
+        if (contentWidth != null){
+            contentDiv.addClass("col-sm-"+contentWidth);
+            contentDiv.removeClass("col");
+        }
     });
 
     $(document).on("click", "img.30-player", function (elem) {
