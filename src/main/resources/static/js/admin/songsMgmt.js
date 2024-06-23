@@ -1076,7 +1076,7 @@ $(document).ready(function () {
     $(document).on('click', '#cancel-song-globally', function (e) {
         getSingleSubgroupFromGame(0);
         $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
-        firstClickToAutoFetch=true;
+        firstClickToAutoFetch = true;
     });
 
     function generateSpotifyAndLyrics(ingameDisplayDiv, songSubgroup) {
@@ -1565,7 +1565,7 @@ $(document).ready(function () {
 
     function fetchMusicLinks() {
         var srcId;
-        if ($("#officialSrcId").length>0){
+        if ($("#officialSrcId").length > 0) {
             srcId = $("#officialSrcId").val();
         } else {
             srcId = $("#ingameSrcId").val();
@@ -1578,19 +1578,19 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (links) {
-                if (links.spotifyId!=null){
+                if (links.spotifyId != null) {
                     $("#spotifyInput").val(links.spotifyId);
                 }
-                if (links.deezerId!=null){
+                if (links.deezerId != null) {
                     $("#deezerInput").val(links.deezerId);
                 }
-                if (links.itunesLink!=null){
+                if (links.itunesLink != null) {
                     $("#itunesInput").val(links.itunesLink);
                 }
-                if (links.tidalLink!=null){
+                if (links.tidalLink != null) {
                     $("#tidalInput").val(links.tidalLink);
                 }
-                if (links.soundcloudLink!=null){
+                if (links.soundcloudLink != null) {
                     $("#soundcloudInput").val(links.soundcloudLink);
                 }
                 $("#request-status").text("OK");

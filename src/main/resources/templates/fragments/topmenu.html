@@ -47,7 +47,7 @@
                 <form th:action="@{/custom/playlist}" method="post" class="d-inline p-1">
                     <input class="form-control" id="playlistContent" type="hidden" name="customPlaylist">
                     <button id="customPlaylistSubmit" type="submit" class="nav-link d-inline-block p-1"
-                    th:attr="data-tooltip=#{customPlaylistTooltip}" th:text="#{customPlaylist}"></button>
+                        th:attr="data-tooltip=#{customPlaylistTooltip}" th:text="#{customPlaylist}"></button>
                 </form>
             </li>
             <svg id="dynamic_bg" xmlns="http://www.w3.org/2000/svg" height="7vw" fill="currentColor"
@@ -197,6 +197,33 @@
                             <option value="10">85%</option>
                             <option value="8">70%</option>
                         </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="hide-icons" th:text="#{hideIcons}"></label>
+                    </div>
+                    <div class="col-md-6">
+                            <select id="hide-icons" multiple="multiple">
+                                <option id="plusIcon" value="add-to-custom-playlist" th:text="#{plusIcon}"></option>
+                                <option id="infoIcon" value="info-about-song" th:text="#{infoIcon}"></option>
+                                <option id="bugIcon" value="report-bug" th:text="#{bugIcon}"></option>
+                                <option id="deezerIcon" value="deezer-link" th:text="#{deezerIcon}"></option>
+                                <option id="soundcloudIcon" value="soundcloud-link" th:text="#{soundcloudIcon}"></option>
+                                <option id="appleMusicIcon" value="itunes-link" th:text="#{appleMusicIcon}"></option>
+                                <option id="tidalIcon" value="tidal-link" th:text="#{tidalIcon}"></option>
+                                <option id="spotifyIcon" value="spotify-link" th:text="#{spotifyIcon}"></option>
+                            </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="hide-flags" th:text="#{hideFlags}"></label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="hide-flags">
+                        </div>
                     </div>
                 </div>
                 <div class="row p-3">

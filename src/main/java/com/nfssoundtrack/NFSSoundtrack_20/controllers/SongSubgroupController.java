@@ -11,6 +11,8 @@ import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -33,12 +35,16 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
     @Autowired
     SongDeserializer songDeserializer;
 
+    @Autowired
+    CacheManager cacheManager;
+
     @PutMapping(value = "/positions/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     String putSubgroupPositions(@PathVariable("subgroupId") int subgroupId,
                                 @RequestBody String formData) throws Exception {
         System.out.println("???");
         List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
+        SongSubgroup firstSongSubgroup=null;
         for (Object obj : objectMapper) {
             LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
             long songSubgroupId = Long.parseLong(String.valueOf(linkedHashMap.get("songSubgroupId")));
@@ -48,6 +54,11 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                             " songsubgroup found with id " + subgroupId));
             songSubgroup.setPosition(position);
             songSubgroupService.save(songSubgroup);
+            firstSongSubgroup = songSubgroup;
+        }
+        if (!objectMapper.isEmpty()){
+            String gameShort = firstSongSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
+            removeCacheEntry(gameShort);
         }
         return new ObjectMapper().writeValueAsString("OK");
     }
@@ -135,6 +146,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                     songSubgroup.setRemix(Remix.YES);
                 }
             }
+            String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
+            removeCacheEntry(gameShort);
             songSubgroupService.save(songSubgroup);
             return new ObjectMapper().writeValueAsString("OK");
         } catch (Throwable thr) {
@@ -160,6 +173,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             SongSubgroup songSubgroup =
                     songSubgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No subgroup found " +
                             "with id " + subgroupId));
+            String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
+            removeCacheEntry(gameShort);
             Song song = songSubgroup.getSong();
             List<SongSubgroup> allSongSubgroupEntries = songSubgroupService.findBySong(song);
             if (allSongSubgroupEntries.size() == 1) {
@@ -267,6 +282,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 songSubgroup.setItunesLink(relatedSong.getItunesLink());
                 songSubgroupService.save(songSubgroup);
             }
+            String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
+            removeCacheEntry(gameShort);
             return new ObjectMapper().writeValueAsString("OK");
         } catch (Throwable thr) {
             return new ObjectMapper().writeValueAsString(thr);
@@ -353,6 +370,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             }
             songSubgroupService.save(songSubgroup);
         }
+        String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
+        removeCacheEntry(gameShort);
         return new ObjectMapper().writeValueAsString("OK");
 
     }
@@ -406,5 +425,12 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         }
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(songSubgroup);
+    }
+
+    private void removeCacheEntry(String gameShort){
+        Cache cache = cacheManager.getCache("findByGameShort");
+        if (cache!=null){
+            cache.evict(gameShort);
+        }
     }
 }

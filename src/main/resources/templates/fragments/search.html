@@ -99,7 +99,7 @@
                     </th:block>
                     <textarea th:utext="${song.key.lyrics}" th:attr="data-noLyrics=#{noLyrics}" hidden></textarea>
                     <th:block th:if="${song.key.spotifyId != null}">
-                        <a class="a-external-music-link" th:href="${song.key.spotifyId}">
+                        <a class="a-external-music-link spotify-link" th:href="${song.key.spotifyId}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                         </a>
@@ -111,25 +111,25 @@
                             th:title="#{pauseSample}" style="display: none;">
                     </th:block>
                     <th:block th:if="${song.key.deezerId != null}">
-                        <a class="a-external-music-link" th:href="${song.key.deezerId}">
+                        <a class="a-external-music-link deezer-link" th:href="${song.key.deezerId}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
                         </a>
                     </th:block>
                     <th:block th:if="${song.key.itunesLink != null}">
-                        <a class="a-external-music-link" th:href="${song.key.itunesLink}">
+                        <a class="a-external-music-link itunes-link" th:href="${song.key.itunesLink}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
                         </a>
                     </th:block>
                     <th:block th:if="${song.key.tidalLink != null}">
-                        <a class="a-external-music-link" th:href="${song.key.tidalLink}">
+                        <a class="a-external-music-link tidal-link" th:href="${song.key.tidalLink}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
                         </a>
                     </th:block>
                     <th:block th:if="${song.key.soundcloudLink != null}">
-                        <a class="a-external-music-link" th:href="${song.key.soundcloudLink}">
+                        <a class="a-external-music-link soundcloud-link" th:href="${song.key.soundcloudLink}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
                         </a>
@@ -225,7 +225,7 @@
                     </th:block>
                     <textarea th:utext="${song.key.lyrics}" th:attr="data-noLyrics=#{noLyrics}" hidden></textarea>
                     <th:block th:if="${song.key.spotifyId != null}">
-                        <a class="a-external-music-link" th:href="${song.key.spotifyId}">
+                        <a class="a-external-music-link spotify-link" th:href="${song.key.spotifyId}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                         </a>
@@ -237,25 +237,25 @@
                             th:title="#{pauseSample}" style="display: none;">
                     </th:block>
                     <th:block th:if="${song.key.deezerId != null}">
-                        <a class="a-external-music-link" th:href="${song.key.deezerId}">
+                        <a class="a-external-music-link deezer-link" th:href="${song.key.deezerId}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
                         </a>
                     </th:block>
                     <th:block th:if="${song.key.itunesLink != null}">
-                        <a class="a-external-music-link" th:href="${song.key.itunesLink}">
+                        <a class="a-external-music-link itunes-link" th:href="${song.key.itunesLink}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
                         </a>
                     </th:block>
                     <th:block th:if="${song.key.tidalLink != null}">
-                        <a class="a-external-music-link" th:href="${song.key.tidalLink}">
+                        <a class="a-external-music-link tidal-link" th:href="${song.key.tidalLink}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
                         </a>
                     </th:block>
                     <th:block th:if="${song.key.soundcloudLink != null}">
-                        <a class="a-external-music-link" th:href="${song.key.soundcloudLink}">
+                        <a class="a-external-music-link soundcloud-link" th:href="${song.key.soundcloudLink}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.png}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
                         </a>

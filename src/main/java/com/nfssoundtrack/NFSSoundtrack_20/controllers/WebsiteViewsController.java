@@ -9,6 +9,7 @@ import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.others.JustSomeHelper;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.SongSerializer;
+import jakarta.servlet.http.HttpSession;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -17,8 +18,10 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,8 +39,14 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(WebsiteViewsController.class);
 
+//    @Autowired
+//    ObjectFactory<HttpSession> httpSessionFactory;
+
     @Autowired
     SongSerializer songSerializer;
+
+    @Autowired
+    CacheManager cacheManager;
 
     @Value("${spring.application.name}")
     String appName;
@@ -104,7 +113,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @return whole display of game's soundtrack
      */
     @GetMapping(value = "/game/{gameshort}")
-    public String game(Model model, @PathVariable("gameshort") String gameshort) {
+    public String game(Model model, @PathVariable("gameshort") String gameshort/*, HttpSession httpSession*/) {
         Game game = gameService.findByGameShort(gameshort);
         model.addAttribute("endpoint", "/game/" + gameshort);
         model.addAttribute("game", game);

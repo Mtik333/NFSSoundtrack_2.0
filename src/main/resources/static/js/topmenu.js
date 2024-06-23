@@ -1,9 +1,16 @@
 var currentBg = 0;
 $(document).ready(function () {
     changeStuffForDynamicTheme();
+    $('#hide-icons').multiselect({
+        includeSelectAllOption: true,
+        templates: {
+            button: '<button type="button" class="form-select multiselect dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
+        },
+    });
     /**
      * method to save preferences
      */
+
     $(document).on("click", "#save-preferences", function () {
         //putting all stuff to the localstorage and reloading page as someone might have decided to change language
         localStorage.setItem("expandable-width", $("#expandable-width").val());
@@ -12,6 +19,8 @@ $(document).ready(function () {
         localStorage.setItem("icons-size", $("#icons-size").val());
         localStorage.setItem("content-width", $("#content-width").val());
         localStorage.setItem("video-rendering-stuff", $("#video-rendering-stuff").prop("checked"));
+        localStorage.setItem("hide-icons", JSON.stringify($("#hide-icons").val()));
+        localStorage.setItem("hide-flags", $("#hide-flags").prop("checked"));
         var langAlreadyThere = window.location.toString().indexOf("?lang") > -1;
         if (langAlreadyThere) {
             window.location.search = "?lang=" + $("#lang-select").val();

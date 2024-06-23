@@ -17,7 +17,8 @@ var lastActivePlayButton;
 var spotifyApi;
 var spotifyController;
 var currentlyPlayedSpotify;
-$(document).ready(function () {
+
+async function doLoadingCrap(){
     var contentWidth = localStorage.getItem("content-width");
     if (localStorage.getItem("static-leftmenu") == "true") {
         $("#offcanvas").removeClass("offcanvas");
@@ -28,16 +29,16 @@ $(document).ready(function () {
         $("#unpin-menu").css("display", "");
         $("#unpin-menu").parent().css("display", "flex");
         var contentDiv = $("#offcanvas").next().next();
-        if (contentWidth != null){
+        if (contentWidth != null) {
             contentDiv.addClass("col");
-            contentDiv.removeClass("col-sm-"+contentWidth);
+            contentDiv.removeClass("col-sm-" + contentWidth);
         }
     } else {
         $("#unpin-menu").css("display", "none");
         $("#unpin-menu").parent().css("display", "");
         var contentDiv = $("#offcanvas").next().next();
-        if (contentWidth != null){
-            contentDiv.addClass("col-sm-"+contentWidth);
+        if (contentWidth != null) {
+            contentDiv.addClass("col-sm-" + contentWidth);
             contentDiv.removeClass("col");
         }
     }
@@ -61,6 +62,28 @@ $(document).ready(function () {
         if (iconsSize != undefined) {
             $(document).find("img.img-responsive-row-icon").css("max-height", iconsSize + "vw");
             $(document).find("svg.img-responsive-row-icon").css("max-height", iconsSize + "vw");
+        }
+        var iconsToHide = localStorage.getItem("hide-icons");
+        if (iconsToHide != undefined && iconsToHide.length>0) {
+            iconsToHide = JSON.parse(iconsToHide);
+            for (let i = 0; i < iconsToHide.length; i++) {
+                var iconToHide = iconsToHide[i];
+                $("a."+iconToHide).hide();
+                $("a."+iconToHide).css("display","none");
+                $("img."+iconToHide).hide();
+                $("img."+iconToHide).css("display","none");
+                $("svg."+iconToHide).hide();
+                $("svg."+iconToHide).css("display","none");
+            }
+            if ($($("td.info_button")[0]).children(":visible").length==0){
+                $("td.info_button").hide();
+                $("th.info_button").hide();
+            }
+        }
+        var flagsToHide = localStorage.getItem("hide-flags");
+        if (flagsToHide == "true") {
+                $("td.countries").hide();
+                $("th.countries").hide();
         }
     }
     var langDisplayed = localStorage.getItem("suggest-lang");
@@ -144,6 +167,10 @@ $(document).ready(function () {
             }
         });
     }
+}
+
+$(document).ready(function () {
+    doLoadingCrap();
 
     /**
      * method to remove duplicate countries from column because i couldn't develop it on backend in a way to return only distinct countries
@@ -889,9 +916,9 @@ $(document).ready(function () {
         localStorage.setItem("static-leftmenu", true);
         var contentDiv = $("#offcanvas").next().next();
         var contentWidth = localStorage.getItem("content-width");
-        if (contentWidth != null){
+        if (contentWidth != null) {
             contentDiv.addClass("col");
-            contentDiv.removeClass("col-sm-"+contentWidth);
+            contentDiv.removeClass("col-sm-" + contentWidth);
         }
     });
 
@@ -905,8 +932,8 @@ $(document).ready(function () {
         $("#unpin-menu").parent().css("display", "");
         localStorage.setItem("static-leftmenu", false);
         var contentDiv = $("#offcanvas").next().next();
-        if (contentWidth != null){
-            contentDiv.addClass("col-sm-"+contentWidth);
+        if (contentWidth != null) {
+            contentDiv.addClass("col-sm-" + contentWidth);
             contentDiv.removeClass("col");
         }
     });
@@ -954,11 +981,12 @@ $(document).ready(function () {
                 divForSpotify = $('<div id="embed-iframe"></div>');
             }
             $(elem.target.parentElement).append(divForSpotify);
+            $(divForSpotify).css("display","none");
             const element = divForSpotify[0];
             const options = {
-                width: '0%',
+                width: '0',
                 height: '0',
-                uri: spotifyToPlay
+                uri: spotifyToPlay,
             };
             const callback = (EmbedController) => {
                 spotifyController = EmbedController;

@@ -56,7 +56,8 @@
                     <td class="playlist-countries countries">
                         <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
                             <th:block th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
-                                <img class="img-country img-responsive-row-icon" th:src="${authorCountry.country.countryLink}">
+                                <img class="img-country img-responsive-row-icon"
+                                    th:src="${authorCountry.country.countryLink}">
                             </th:block>
                         </th:block>
                     </td>
@@ -127,31 +128,37 @@
                             </a>
                             <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
-                                <a class="a-external-music-link" th:href="${songSubgroup.spotifyId}">
+                                <a class="a-external-music-link spotify-link" th:href="${songSubgroup.spotifyId}">
                                     <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                                 </a>
+                                <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
+                                     th:src="@{/images/fullres/play_with30.png}" data-toggle="tooltip"
+                                     data-placement="top" th:title="#{playSample}">
+                                <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
+                                     th:src="@{/images/fullres/pause_with30.png}" data-toggle="tooltip"
+                                     data-placement="top" th:title="#{pauseSample}" style="display: none;">
                             </th:block>
                             <th:block th:if="${songSubgroup.deezerId != null}">
-                                <a class="a-external-music-link" th:href="${songSubgroup.deezerId}">
+                                <a class="a-external-music-link deezer-link" th:href="${songSubgroup.deezerId}">
                                     <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
                                 </a>
                             </th:block>
                             <th:block th:if="${songSubgroup.itunesLink != null}">
-                                <a class="a-external-music-link" th:href="${songSubgroup.itunesLink}">
+                                <a class="a-external-music-link itunes-link" th:href="${songSubgroup.itunesLink}">
                                     <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
                                 </a>
                             </th:block>
                             <th:block th:if="${songSubgroup.tidalLink != null}">
-                                <a class="a-external-music-link" th:href="${songSubgroup.tidalLink}">
+                                <a class="a-external-music-link tidal-link" th:href="${songSubgroup.tidalLink}">
                                     <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.png}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
                                 </a>
                             </th:block>
                             <th:block th:if="${songSubgroup.soundcloudLink != null}">
-                                <a class="a-external-music-link" th:href="${songSubgroup.soundcloudLink}">
+                                <a class="a-external-music-link soundcloud-link" th:href="${songSubgroup.soundcloudLink}">
                                     <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.png}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
                                 </a>
