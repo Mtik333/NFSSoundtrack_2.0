@@ -112,6 +112,6 @@ public class SearchController extends BaseControllerWithErrorHandling {
         model.addAttribute("genreList", genreList);
         model.addAttribute("search", true);
         model.addAttribute("searchPhrase", searchData);
-        return "index";
+        return "min/index";
     }
 }

@@ -104,7 +104,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("home", isHome);
         model.addAttribute("todayssong", todaysSongService.getTodaysSong());
         model.addAttribute("appName", value + " - " + appName);
-        return "index";
+        return "min/index";
     }
 
     /**
@@ -119,12 +119,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("game", game);
         model.addAttribute("appName", game.getDisplayTitle() +
                 " " + getLocalizedMessage("soundtrackAt") + " " + appName);
-        model.addAttribute("gamegroups", game.getMainGroups());
+//        model.addAttribute("gamegroups", game.getMainGroups());
         Optional<CustomTheme> customTheme = customThemeService.findByGame(game);
         customTheme.ifPresent(theme -> model.addAttribute("customTheme", theme));
-        model.addAttribute("songSubgroups", songSubgroupService.fetchFromGame(game));
+        model.addAttribute("songSubgroups", songSubgroupService.hasGameAnySongs(game));
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
-        return "index";
+        return "min/index";
     }
 
     /**
@@ -154,7 +154,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("appName", "Custom playlist - " + appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         model.addAttribute("customPlaylist", songSubgroupList);
-        return "index";
+        return "min/index";
     }
 
     /**
@@ -195,7 +195,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
         model.addAttribute("songToCheck", song);
         model.addAttribute("songUsages", songSubgroupService.findBySong(song));
-        return "index";
+        return "min/index";
     }
 
     /**
@@ -242,7 +242,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("allAliases", allAliases);
         model.addAttribute("appName", author.getName() + " - " + appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
-        return "index";
+        return "min/index";
     }
 
     /**
@@ -264,7 +264,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("readFull", true);
         model.addAttribute("appName", genre.getGenreName() + " - " + appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
-        return "index";
+        return "min/index";
     }
 
     /**
@@ -286,7 +286,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("genre", genre);
         model.addAttribute("appName", "Full list of genre " + genre.getGenreName() + " - " + appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
-        return "index";
+        return "min/index";
     }
 
     @GetMapping(value = "/songhistory")
@@ -295,7 +295,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("todays30Songs", todays30Songs);
         model.addAttribute("appName", "Archive of today's songs - " + appName);
         model.addAttribute("series", serieService.findAllSortedByPositionAsc());
-        return "index";
+        return "min/index";
     }
 
     @PostMapping(value = "/correction", consumes = MediaType.APPLICATION_JSON_VALUE)

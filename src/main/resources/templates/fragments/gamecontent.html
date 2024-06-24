@@ -1,11 +1,4 @@
-<!--<style th:inline="text">-->
-<!--    body{-->
-<!--        background: url([[@{/images/test2.gif}]]) no-repeat center;-->
-<!--        background-size: cover;-->
-<!--        background-attachment: fixed;-->
-<!--    }-->
-<!--</style>-->
-<th:block th:if="${songSubgroups!=null && !songSubgroups.isEmpty()}">
+<th:block th:if="${songSubgroups!=null && #bools.isTrue(songSubgroups)}">
     <h2 style="text-align: center;" th:text="${game.displayTitle}"></h2>
     <hr>
     <th:block th:if="${game.additionalInfo}">
@@ -88,13 +81,13 @@
     </div>
     <div class="tabbable boxed parentTabs">
         <ul class="nav nav-tabs gamegroup">
-            <li class="nav-item" th:each="gamegroup: ${gamegroups}">
+            <li class="nav-item" th:each="gamegroup: ${game.mainGroups}">
                 <a class="nav-link gamegroup" th:href="@{'#gamegroupid'+${gamegroup.id}}"
                     th:attr="data-el_id='gamegroupid'+${gamegroup.id}" data-toggle="tab"
                     th:text="${gamegroup.groupName}"></a>
             </li>
         </ul>
-        <th:block th:each="gamegroup: ${gamegroups}">
+        <th:block th:each="gamegroup: ${game.mainGroups}">
             <ul class="nav nav-tabs subgroup visually-hidden"
                 th:attr="id='gamegroupid'+${gamegroup.id}, data-el_id='gamegroupid'+${gamegroup.id}">
                 <li class="nav-item" th:each="subgroup: ${gamegroup.subgroups}">
@@ -128,7 +121,7 @@
                 </tr>
             </thead>
             <tbody>
-                <th:block th:each="gamegroup: ${gamegroups}">
+                <th:block th:each="gamegroup: ${game.mainGroups}">
                     <th:block th:each="subgroup: ${gamegroup.subgroups}">
                         <th:block th:if="${gamegroup.groupName != 'All'}">
                             <tr class="subgroup-separator table-primary"
@@ -435,7 +428,7 @@
     </div>
     <th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
 </th:block>
-<th:block th:if="${songSubgroups!=null && songSubgroups.isEmpty()}">
+<th:block th:if="${songSubgroups!=null && !#bools.isTrue(songSubgroups)}">
     <h2 th:text="#{gameNoSongs}"></h2>
 </th:block>
 <div class="success-container info-container" aria-hidden="true">

@@ -63,6 +63,18 @@ public class SongSubgroupService {
         return allSongs;
     }
 
+    public boolean hasGameAnySongs(Game game) {
+        List<SongSubgroup> allSongs = new ArrayList<>();
+        for (MainGroup mainGroup : game.getMainGroups()) {
+            for (Subgroup subgroup : mainGroup.getSubgroups()) {
+                if (!subgroup.getSongSubgroupList().isEmpty()){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void updateFeat(Map<String, String> objectMapper, String comingInput, String comingConcatInput,
                            SongSubgroup songSubgroup, Role role, Song relatedSong, Boolean propagate) throws Exception {
         List<String> comingFeats = objectMapper.keySet().stream().filter(

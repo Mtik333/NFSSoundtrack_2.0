@@ -155,7 +155,7 @@
             <th:block th:insert="~{fragments/leftmenu.html}"></th:block>
             <div class="col">
                 <div th:replace="~{fragments/topmenuentry.html}"></div>
-                <div th:if="${gamegroups}" th:replace="~{fragments/gamecontent.html}"></div>
+                <div th:if="${game}" th:replace="~{fragments/gamecontent.html}"></div>
                 <div th:if="${author}" th:insert="~{fragments/artist.html}"></div>
                 <div th:if="${genre}" th:insert="~{fragments/genre.html}"></div>
                 <div th:if="${search}" th:insert="~{fragments/search.html}"></div>
