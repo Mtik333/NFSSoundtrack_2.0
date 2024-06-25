@@ -16,29 +16,29 @@
         <br>
         <b th:utext="#{moreInfo}"></b>
         <a target="_blank" class="a-external-music-link" th:href="${discoGSObj.uri}">
-            <img class="img-responsive-author-info" th:src="@{/images/fullres/discogs_big.png}">
+            <img class="img-responsive-author-info" th:src="@{/images/fullres/discogs_big.webp}">
         </a>
         <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.wikipedia}"
             th:href="${discoGSObj.wikipedia}">
-            <img class="img-responsive-author-info" th:src="@{/images/fullres/wikipedia_big.png}">
+            <img class="img-responsive-author-info" th:src="@{/images/fullres/wikipedia_big.webp}">
         </a>
         <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.facebook}"
             th:href="${discoGSObj.facebook}">
-            <img class="img-responsive-author-info" th:src="@{/images/fullres/facebook_big.png}">
+            <img class="img-responsive-author-info" th:src="@{/images/fullres/facebook_big.webp}">
         </a>
         <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.twitter}" th:href="${discoGSObj.twitter}">
-            <img class="img-responsive-author-info" th:src="@{/images/fullres/twitter_big.png}">
+            <img class="img-responsive-author-info" th:src="@{/images/fullres/twitter_big.webp}">
         </a>
         <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.instagram}"
             th:href="${discoGSObj.instagram}">
-            <img class="img-responsive-author-info" th:src="@{/images/fullres/instagram_big.png}">
+            <img class="img-responsive-author-info" th:src="@{/images/fullres/instagram_big.webp}">
         </a>
         <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.soundcloud}"
             th:href="${discoGSObj.soundcloud}">
-            <img class="img-responsive-author-info" th:src="@{/images/fullres/soundcloud_big.png}">
+            <img class="img-responsive-author-info" th:src="@{/images/fullres/soundcloud_big.webp}">
         </a>
         <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.myspace}" th:href="${discoGSObj.myspace}">
-            <img class="img-responsive-author-info" th:src="@{/images/fullres/myspace_big.png}">
+            <img class="img-responsive-author-info" th:src="@{/images/fullres/myspace_big.webp}">
         </a>
     </th:block>
 </div>
@@ -127,7 +127,7 @@
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='composer',data-song_id=${songToSongSubgroupMap.key.id}">
                     <td class="info_button">
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
-                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
+                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.webp}">
                     </td>
                     <td colspan="6">
                         <th:block
@@ -174,7 +174,7 @@
                     </td>
                     <td class="info_button">
                         <img class="img-responsive-row-icon add-to-custom-playlist pointable" data-toggle="tooltip"
-                            data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/fullres/plus_big.png}">
+                            data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/fullres/plus_big.webp}">
                     </td>
                     <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
                     </td>
@@ -204,7 +204,7 @@
                                 <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
                                     data-bs-target="#videoModal"
                                     th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
-                                    th:src="@{/images/znakwodny.png}">
+                                    th:src="@{/images/znakwodny.webp}">
                                 <a class="table_link externalYT" target="_blank"
                                     th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -219,37 +219,37 @@
                             <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a class="a-external-music-link spotify-link" th:href="${songSubgroup.spotifyId}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                                 </a>
                                 <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                                     th:src="@{/images/fullres/play_with30.png}" data-toggle="tooltip"
+                                     th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip"
                                      data-placement="top" th:title="#{playSample}">
                                 <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                                     th:src="@{/images/fullres/pause_with30.png}" data-toggle="tooltip"
+                                     th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip"
                                      data-placement="top" th:title="#{pauseSample}" style="display: none;">
                             </th:block>
                             <th:block th:if="${songSubgroup.deezerId != null}">
                                 <a class="a-external-music-link deezer-link" th:href="${songSubgroup.deezerId}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
                                 </a>
                             </th:block>
                             <th:block th:if="${songSubgroup.itunesLink != null}">
                                 <a class="a-external-music-link itunes-link" th:href="${songSubgroup.itunesLink}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
                                 </a>
                             </th:block>
                             <th:block th:if="${songSubgroup.tidalLink != null}">
                                 <a class="a-external-music-link tidal-link" th:href="${songSubgroup.tidalLink}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
                                 </a>
                             </th:block>
                             <th:block th:if="${songSubgroup.soundcloudLink != null}">
                                 <a class="a-external-music-link soundcloud-link" th:href="${songSubgroup.soundcloudLink}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
                                 </a>
                             </th:block>
@@ -268,7 +268,7 @@
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer',data-song_id=${songToSongSubgroupMap.key.id}">
                     <td class="info_button">
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
-                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
+                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.webp}">
                     </td>
                     <td colspan="6">
                         <th:block
@@ -315,7 +315,7 @@
                     </td>
                     <td class="info_button">
                         <img class="img-responsive-row-icon add-to-custom-playlist pointable" data-toggle="tooltip"
-                            data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/fullres/plus_big.png}">
+                            data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/fullres/plus_big.webp}">
                     </td>
                     <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
                     </td>
@@ -345,7 +345,7 @@
                                 <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
                                     data-bs-target="#videoModal"
                                     th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
-                                    th:src="@{/images/znakwodny.png}">
+                                    th:src="@{/images/znakwodny.webp}">
                                 <a class="table_link externalYT" target="_blank"
                                     th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -360,25 +360,25 @@
                             <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a class="a-external-music-link spotify-link" th:href="${songSubgroup.spotifyId}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                                 </a>
                                 <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                                     th:src="@{/images/fullres/play_with30.png}" data-toggle="tooltip"
+                                     th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip"
                                      data-placement="top" th:title="#{playSample}">
                                 <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                                     th:src="@{/images/fullres/pause_with30.png}" data-toggle="tooltip"
+                                     th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip"
                                      data-placement="top" th:title="#{pauseSample}" style="display: none;">
                             </th:block>
                             <th:block th:if="${songSubgroup.deezerId != null}">
                                 <a class="a-external-music-link deezer-link" th:href="${songSubgroup.deezerId}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
                                 </a>
                             </th:block>
                             <th:block th:if="${songSubgroup.itunesLink != null}">
                                 <a class="a-external-music-link itunes-link" th:href="${songSubgroup.itunesLink}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
                                 </a>
                             </th:block>
@@ -396,7 +396,7 @@
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='remix',data-song_id=${songToSongSubgroupMap.key.id}">
                     <td class="info_button">
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
-                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
+                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.webp}">
                     </td>
                     <td colspan="6">
                         <th:block
@@ -443,7 +443,7 @@
                     </td>
                     <td class="info_button">
                         <img class="img-responsive-row-icon add-to-custom-playlist pointable" data-toggle="tooltip"
-                            data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/fullres/plus_big.png}">
+                            data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/fullres/plus_big.webp}">
                     </td>
                     <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
                     </td>
@@ -473,7 +473,7 @@
                                 <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
                                     data-bs-target="#videoModal"
                                     th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
-                                    th:src="@{/images/znakwodny.png}">
+                                    th:src="@{/images/znakwodny.webp}">
                                 <a class="table_link externalYT" target="_blank"
                                     th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -488,25 +488,25 @@
                             <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a class="a-external-music-link spotify-link" th:href="${songSubgroup.spotifyId}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                                 </a>
                                 <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                                     th:src="@{/images/fullres/play_with30.png}" data-toggle="tooltip"
+                                     th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip"
                                      data-placement="top" th:title="#{playSample}">
                                 <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                                     th:src="@{/images/fullres/pause_with30.png}" data-toggle="tooltip"
+                                     th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip"
                                      data-placement="top" th:title="#{pauseSample}" style="display: none;">
                             </th:block>
                             <th:block th:if="${songSubgroup.deezerId != null}">
                                 <a class="a-external-music-link deezer-link" th:href="${songSubgroup.deezerId}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
                                 </a>
                             </th:block>
                             <th:block th:if="${songSubgroup.itunesLink != null}">
                                 <a class="a-external-music-link itunes-link" th:href="${songSubgroup.itunesLink}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
                                 </a>
                             </th:block>
@@ -524,7 +524,7 @@
                     th:attr="data-aliasid=${mapEntry.key.id},data-role='feat',data-song_id=${songToSongSubgroupMap.key.id}">
                     <td class="info_button">
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
-                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.png}">
+                            data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.webp}">
                     </td>
                     <td colspan="6">
                         <th:block
@@ -571,7 +571,7 @@
                     </td>
                     <td class="info_button">
                         <img class="img-responsive-row-icon add-to-custom-playlist pointable" data-toggle="tooltip"
-                            data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/fullres/plus_big.png}">
+                            data-placement="right" th:title="#{addToPlaylist}" th:src="@{/images/fullres/plus_big.webp}">
                     </td>
                     <td class="band" style="display: none" th:text="${songToSongSubgroupMap.key.officialDisplayBand}">
                     </td>
@@ -601,7 +601,7 @@
                                 <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
                                     data-bs-target="#videoModal"
                                     th:attr="data-tagVideo=${songSubgroup.srcId} ? 'https://www.youtube.com/embed/'+${songSubgroup.srcId} : 'https://www.youtube.com/embed/'+${songSubgroup.song.srcId}"
-                                    th:src="@{/images/znakwodny.png}">
+                                    th:src="@{/images/znakwodny.webp}">
                                 <a class="table_link externalYT" target="_blank"
                                     th:href="'https://www.youtube.com/watch?v='+${songSubgroup.srcId}">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -616,25 +616,25 @@
                             <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">
                                 <a class="a-external-music-link spotify-link" th:href="${songSubgroup.spotifyId}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                                 </a>
                                 <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                                     th:src="@{/images/fullres/play_with30.png}" data-toggle="tooltip"
+                                     th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip"
                                      data-placement="top" th:title="#{playSample}">
                                 <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                                     th:src="@{/images/fullres/pause_with30.png}" data-toggle="tooltip"
+                                     th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip"
                                      data-placement="top" th:title="#{pauseSample}" style="display: none;">
                             </th:block>
                             <th:block th:if="${songSubgroup.deezerId != null}">
                                 <a class="a-external-music-link deezer-link" th:href="${songSubgroup.deezerId}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
                                 </a>
                             </th:block>
                             <th:block th:if="${songSubgroup.itunesLink != null}">
                                 <a class="a-external-music-link itunes-link" th:href="${songSubgroup.itunesLink}">
-                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.png}"
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.webp}"
                                         data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
                                 </a>
                             </th:block>

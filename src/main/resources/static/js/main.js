@@ -454,9 +454,9 @@ $(document).ready(function () {
                     var youtubeLink = youtubePlayIcon.attr("data-tagvideo")
                         .replace("https://www.youtube.com/embed/", "");
                     var trElem = $('<tr id="' + localI + '" rel="' + youtubeLink + '"></tr>');
-                    trElem.append('<td class="playlist_play_it"><img class="img-responsive-playlist-modal-icon pointable" src="/images/znakwodny.png"></td>');
+                    trElem.append('<td class="playlist_play_it"><img class="img-responsive-playlist-modal-icon pointable" src="/images/znakwodny.webp"></td>');
                     trElem.append('<td class="playlist_row">' + bandText + ' - ' + titleText + '</td>');
-                    trElem.append('<td class="playlist_disable_song"><img class="img-responsive-playlist-modal-icon pointable" src="/images/fullres/trashcan_big.png"></td>');
+                    trElem.append('<td class="playlist_disable_song"><img class="img-responsive-playlist-modal-icon pointable" src="/images/fullres/trashcan_big.webp"></td>');
                     $("#playlist_progress").append(trElem);
                     localI++;
                 }

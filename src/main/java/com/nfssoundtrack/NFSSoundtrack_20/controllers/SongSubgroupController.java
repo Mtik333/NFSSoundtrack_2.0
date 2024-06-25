@@ -280,6 +280,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 songSubgroup.setSpotifyId(relatedSong.getSpotifyId());
                 songSubgroup.setDeezerId(relatedSong.getDeezerId());
                 songSubgroup.setItunesLink(relatedSong.getItunesLink());
+				songSubgroup.setSoundcloudLink(relatedSong.getSoundcloudLink());
+				songSubgroup.setTidalLink(relatedSong.getTidalLink());
                 songSubgroupService.save(songSubgroup);
             }
             String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
