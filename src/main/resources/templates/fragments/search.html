@@ -62,12 +62,12 @@
             <td class="songtitle">
                 <span th:text="${song.key.officialDisplayTitle} "></span>
                 <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='FEAT']}">
-                    <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
+                    <span th:text="${iter.first ? ' (feat. ' : ''}"></span><a class="table_link"
                         th:href="'/author/'+${authorSong.authorAlias.id}"
                         th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
                 </th:block>
                 <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='REMIX']}">
-                    <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+                    <span th:text="${iter.first ? ' (' : ''}"></span><a class="table_link"
                         th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a>
                     <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
                     <span th:text="${iter.last ? 'Remix)' : ''}"></span>
@@ -188,12 +188,12 @@
             <td class="songtitle">
                 <span th:text="${song.key.officialDisplayTitle}"></span>
                 <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='FEAT']}">
-                    <span th:text="${iter.first ? '(feat. ' : ''}"></span><a class="table_link"
+                    <span th:text="${iter.first ? ' (feat. ' : ''}"></span><a class="table_link"
                         th:href="'/author/'+${authorSong.authorAlias.id}"
                         th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
                 </th:block>
                 <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='REMIX']}">
-                    <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+                    <span th:text="${iter.first ? ' (' : ''}"></span><a class="table_link"
                         th:href="'/author/'+${authorSong.authorAlias.id}" th:text="${authorSong.authorAlias.alias}"></a>
                     <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
                     <span th:text="${iter.last ? 'Remix)' : ''}"></span>

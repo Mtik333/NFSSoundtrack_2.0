@@ -185,7 +185,7 @@
                                         <th:block th:if="${songSubgroup.song.featNextToBand}">
                                             <th:block
                                                 th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
-                                                <span th:text="${iter.first ? 'feat. ' : ''}"></span>
+                                                <span th:text="${iter.first ? ' feat. ' : ''}"></span>
                                                 <a class="table_link"
                                                     th:href="'/author/'+${authorSong.authorAlias.author.id}"
                                                     th:text="${authorSong.authorAlias.alias}"></a>
@@ -203,7 +203,7 @@
                                         <th:block th:if="${!#bools.isTrue(songSubgroup.song.featNextToBand)}">
                                             <th:block
                                                 th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
-                                                <span th:text="${iter.first ? '(feat. ' : ''}"></span>
+                                                <span th:text="${iter.first ? ' (feat. ' : ''}"></span>
                                                 <a class="table_link"
                                                     th:href="'/author/'+${authorSong.authorAlias.author.id}"
                                                     th:text="${authorSong.authorAlias.alias}"></a><span
@@ -217,7 +217,7 @@
                                     <th:block th:if="${songSubgroup.remix.value=='YES'}">
                                         <th:block
                                             th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
-                                            <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+                                            <span th:text="${iter.first ? ' (' : ''}"></span><a class="table_link"
                                                 th:href="'/author/'+${authorSong.authorAlias.author.id}"
                                                 th:text="${authorSong.authorAlias.alias}"></a>
                                             <span

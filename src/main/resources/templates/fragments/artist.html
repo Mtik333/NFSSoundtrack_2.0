@@ -142,7 +142,7 @@
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                                 th:text="${authorSong.authorAlias.alias}"></a>
                         </th:block>
-                        -
+                        <span>&nbsp;-</span>
                         <span th:text="${songToSongSubgroupMap.key.officialDisplayTitle} "></span>
                         <th:block
                             th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
@@ -154,7 +154,7 @@
                                 <span th:text="${!iter.last ? authorSong.featConcat : ''}"></span>
                             </th:block>
                         </th:block>
-                        /
+                        <span>&nbsp;/</span>
                         <span th:text="'Associated genres: '"></span>
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
@@ -283,7 +283,7 @@
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                                 th:text="${authorSong.authorAlias.alias}"></a>
                         </th:block>
-                        -
+                        <span>&nbsp;-</span>
                         <span th:text="${songToSongSubgroupMap.key.officialDisplayTitle} "></span>
                         <th:block
                             th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
@@ -411,7 +411,7 @@
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                                 th:text="${authorSong.authorAlias.alias}"></a>
                         </th:block>
-                        -
+                        <span>&nbsp;-</span>
                         <span th:text="${songToSongSubgroupMap.key.officialDisplayTitle} "></span>
                         <th:block
                             th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">
@@ -539,7 +539,7 @@
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                                 th:text="${authorSong.authorAlias.alias}"></a>
                         </th:block>
-                        -
+                        <span>&nbsp;-</span>
                         <span th:text="${songToSongSubgroupMap.key.officialDisplayTitle} "></span>
                         <th:block
                             th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='FEAT']}">

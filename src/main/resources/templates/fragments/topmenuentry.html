@@ -30,7 +30,7 @@
                     th:text="${authorSong.authorAlias.alias}"></a>
             </th:block>
         </th:block>
-        -
+        <span>&nbsp;-</span>
         <span
             th:text="${todayssong.songSubgroup.ingameDisplayTitle!=null} ? ${todayssong.songSubgroup.ingameDisplayTitle} : ${todayssong.songSubgroup.song.officialDisplayTitle} "></span>
         <th:block th:if="${todayssong.songSubgroup.showFeat}">
@@ -52,7 +52,7 @@
                 <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
             </th:block>
         </th:block>
-        from
+        <span>&nbsp;from</span>
         <a class="table_link" th:href="'/game/'+${todayssong.songSubgroup.subgroup.mainGroup.game.gameShort}"
             th:text="${todayssong.songSubgroup.subgroup.mainGroup.game.displayTitle}"></a>
         <br>
