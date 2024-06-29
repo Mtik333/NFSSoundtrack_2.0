@@ -92,6 +92,11 @@ public class AuthorService {
     public DiscoGSObj fetchInfoFromMap(Author author) throws JsonProcessingException, LoginException, InterruptedException {
         Optional<Long> authorIdAlreadyThere = discoGSObjMap.keySet().stream().filter(aLong ->
                 aLong.equals(author.getId())).findFirst();
+        if (Boolean.TRUE.equals(author.getSkipDiscogs())){
+            discoGSObjMap.remove(author.getId());
+            return new DiscoGSObj(true, 0, null,
+                    author.getName() + " not found in DiscoGS database");
+        }
         DiscoGSObj discoGSObj;
         if (authorIdAlreadyThere.isPresent()) {
             discoGSObj = discoGSObjMap.get(authorIdAlreadyThere.get());
@@ -175,8 +180,8 @@ public class AuthorService {
         return discoGSObj;
     }
 
-    public DiscoGSObj manuallyFetchDiscogsInfo(Integer artistDiscogsId) throws JsonProcessingException, LoginException, InterruptedException {
-        DiscoGSObj discoGSObj = obtainArtistLinkAndProfile("adminmode", artistDiscogsId);
+    public DiscoGSObj manuallyFetchDiscogsInfo(String authorName, Integer artistDiscogsId) throws JsonProcessingException, LoginException, InterruptedException {
+        DiscoGSObj discoGSObj = obtainArtistLinkAndProfile(authorName, artistDiscogsId);
         return discoGSObj;
     }
 

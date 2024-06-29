@@ -35,9 +35,6 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
     @Autowired
     SongDeserializer songDeserializer;
 
-    @Autowired
-    CacheManager cacheManager;
-
     @PutMapping(value = "/positions/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     String putSubgroupPositions(@PathVariable("subgroupId") int subgroupId,
@@ -274,6 +271,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                     songService.saveNewAssignmentOfExistingGenre(genreValue, songSubgroup.getSong());
                 }
             }
+            relatedSong.setSongGenreList(songGenreService.findBySong(relatedSong));
             songService.save(relatedSong);
             if (Boolean.parseBoolean(localObjectMapper.get("propagate"))) {
                 songSubgroup.setSrcId(relatedSong.getSrcId());
@@ -429,10 +427,4 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         return objectMapper.writeValueAsString(songSubgroup);
     }
 
-    private void removeCacheEntry(String gameShort){
-        Cache cache = cacheManager.getCache("findByGameShort");
-        if (cache!=null){
-            cache.evict(gameShort);
-        }
-    }
 }

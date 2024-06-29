@@ -54,7 +54,7 @@
                         th:text="${authorSong.authorAlias.alias} "></a>
                 </th:block>
                 <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
-                    <span th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                    <span th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
                     <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                         th:text="${authorSong.authorAlias.alias}"></a>
                 </th:block>
@@ -184,7 +184,7 @@
                         th:text="${authorSong.authorAlias.alias} "></a>
                 </th:block>
                 <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
-                    <span th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                    <span th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
                     <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                         th:text="${authorSong.authorAlias.alias}"></a>
                 </th:block>

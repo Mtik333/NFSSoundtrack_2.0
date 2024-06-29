@@ -159,7 +159,7 @@
                                     <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
                                         <th:block
                                             th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
-                                            <img class="img-country img-responsive-row-icon"
+                                            <img class="img-country img-responsive-row-icon" data-toggle="tooltip" data-placement="top" th:title="${authorCountry.country.countryName}"
                                                 th:src="${authorCountry.country.countryLink}">
                                         </th:block>
                                     </th:block>
@@ -175,7 +175,7 @@
                                         <th:block
                                             th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
                                             <span
-                                                th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                                                th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
                                             <a class="table_link"
                                                 th:href="'/author/'+${authorSong.authorAlias.author.id}"
                                                 th:text="${authorSong.authorAlias.alias}"></a>

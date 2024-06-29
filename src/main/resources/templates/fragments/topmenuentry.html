@@ -25,7 +25,7 @@
         <th:block th:if="${todayssong.songSubgroup.showSubcomposer}">
             <th:block
                 th:each="authorSong,iter : ${todayssong.songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
-                <span th:text="${authorSong.subcomposerConcat!=null} ? ${authorSong.subcomposerConcat} : ''"></span>
+                <span th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
                 <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
                     th:text="${authorSong.authorAlias.alias}"></a>
             </th:block>

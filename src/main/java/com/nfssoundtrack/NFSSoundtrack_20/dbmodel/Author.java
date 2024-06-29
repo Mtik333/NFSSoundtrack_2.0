@@ -19,6 +19,9 @@ public class Author implements Serializable {
     @Column(name = "name")
     private String name;
 
+    @Column(name="skip_discogs", columnDefinition="BIT")
+    private Boolean skipDiscogs;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
     private List<AuthorCountry> authorCountries;
@@ -37,6 +40,14 @@ public class Author implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getSkipDiscogs() {
+        return skipDiscogs;
+    }
+
+    public void setSkipDiscogs(Boolean skipDiscogs) {
+        this.skipDiscogs = skipDiscogs;
     }
 
     public List<AuthorCountry> getAuthorCountries() {

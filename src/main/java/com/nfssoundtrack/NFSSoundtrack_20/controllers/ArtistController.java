@@ -204,6 +204,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         Author author = authorService.findById(Integer.parseInt(authorId)).orElseThrow(()
                 -> new ResourceNotFoundException("No author with id found " + authorId));
         author.setName(authorName);
+        Boolean setSkipDiscogs = (Boolean) mergeInfo.get("setSkipDiscogs");
+        author.setSkipDiscogs(setSkipDiscogs);
         author = authorService.save(author);
         AuthorAlias rootAlias = authorAliasService.findByAuthor(author).get(0);
         List<AuthorCountry> existingCountries = author.getAuthorCountries();
@@ -270,20 +272,22 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 authorAliasService.save(authorAlias);
             }
         }
-        Boolean updateDiscogs = (Boolean) mergeInfo.get("discogsToUpdate");
-        if (updateDiscogs){
-            String uri = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("uri"));
-            String twitter = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("twitter"));
-            String facebook = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("facebook"));
-            String instagram = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("instagram"));
-            String soundcloud = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("soundcloud"));
-            String wikipedia = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("wikipedia"));
-            String myspace = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("myspace"));
-            String profile = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("profile"));
-            String id = (String) mergeInfo.get("id");
-            DiscoGSObj discoGSObj = new DiscoGSObj(false, Integer.parseInt(id),uri, profile,
-                    twitter,facebook,instagram,soundcloud,myspace,wikipedia);
-            authorService.updateDiscoGSObj(Integer.valueOf(authorId),discoGSObj);
+        if (Boolean.FALSE.equals(author.getSkipDiscogs())){
+            Boolean updateDiscogs = (Boolean) mergeInfo.get("discogsToUpdate");
+            if (updateDiscogs){
+                String uri = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("uri"));
+                String twitter = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("twitter"));
+                String facebook = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("facebook"));
+                String instagram = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("instagram"));
+                String soundcloud = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("soundcloud"));
+                String wikipedia = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("wikipedia"));
+                String myspace = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("myspace"));
+                String profile = JustSomeHelper.returnProperValueToDb((String) mergeInfo.get("profile"));
+                String id = (String) mergeInfo.get("id");
+                DiscoGSObj discoGSObj = new DiscoGSObj(false, Integer.parseInt(id),uri, profile,
+                        twitter,facebook,instagram,soundcloud,myspace,wikipedia);
+                authorService.updateDiscoGSObj(Integer.valueOf(authorId),discoGSObj);
+            }
         }
         Boolean updateOfficialArtist = (Boolean) mergeInfo.get("changeOfficialArtist");
         if (updateOfficialArtist){
@@ -312,12 +316,14 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         }
     }
 
-    @GetMapping(value = "/discogsEntry/{input}")
+    @PostMapping(value = "/discogsEntry/{input}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
-    String findDiscogsInfoViaId(@PathVariable("input") int input)
+    String findDiscogsInfoViaId(@PathVariable("input") int input, @RequestBody String formData)
             throws JsonProcessingException, LoginException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
-        DiscoGSObj discoGSObj = authorService.manuallyFetchDiscogsInfo(input);
+        Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
+        String artistName = (String) mergeInfo.get("name");
+        DiscoGSObj discoGSObj = authorService.manuallyFetchDiscogsInfo(artistName,input);
         return objectMapper.writeValueAsString(discoGSObj);
     }
 }

@@ -12,6 +12,7 @@ $(document).ready(function () {
         divToAppend.append(rowToChangeOfficialArtist);
         rowToChangeOfficialArtist.append(colToChangeOfficialArtist);
         colToChangeOfficialArtist.append('<input type="checkbox" class="form-check-input m-3" id="changeOfficialArtist"><label class="form-check-label pl-2 pt-2" for="changeOfficialArtist">Modify official artist of songs?</label>');
+        colToChangeOfficialArtist.append('<input type="checkbox" class="form-check-input m-3" id="setSkipDiscogs"><label class="form-check-label pl-2 pt-2" for="setSkipDiscogs">Ignore DiscoGS API?</label>');
         divToAppend.append(rowDiv);
         var rowDiv = $('<div class="row p-1">');
         var leftCellDiv = $('<div class="col">');
@@ -62,6 +63,7 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
             event.preventDefault();
             $(mySelect).val(ui.item.label);
             $(mySelect).text(ui.item.label);
+            $("#setSkipDiscogs").prop("checked", ui.item.skipDiscogs);
             $(mySelectHidden).val(ui.item.value);
             $("#country-info").empty();
             $("#alias-info").empty();
@@ -196,6 +198,7 @@ $(document).on('click', '#save-artist', function (e) {
         artistToSave.id = $("#discogsIdInput").val();
     }
     artistToSave.changeOfficialArtist = $("#changeOfficialArtist").prop("checked");
+    artistToSave.setSkipDiscogs = $("#setSkipDiscogs").prop("checked");
     $.ajax({
         async: false,
         type: "PUT",
@@ -407,11 +410,15 @@ function generateDiscogsInfoDiv(foundArtist, discoGsDiv) {
 
 $(document).on('click', '#fetch-from-discogs', function (e) {
     var idToCheck = Number($("#discogsIdInput").val());
+    var artistName = {};
+    artistName.name = $("#authorInput").val();
     discogsToUpdate = true;
     $.ajax({
         async: false,
-        type: "GET",
+        type: "POST",
+        data: JSON.stringify(artistName),
         url: "/author/discogsEntry/" + idToCheck,
+        contentType: 'application/json; charset=utf-8',
         success: function (ooo) {
             var songInfo = JSON.parse(ooo);
             $("#discogsUriInput").val(songInfo.uri);

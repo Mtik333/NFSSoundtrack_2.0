@@ -60,6 +60,8 @@ public class SongController extends BaseControllerWithErrorHandling {
             if (addInGameTitle){
                 songSubgroup.setIngameDisplayTitle(songToMerge.getOfficialDisplayTitle());
             }
+            String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
+            removeCacheEntry(gameShort);
         }
         songSubgroupService.saveAll(songSubgroupList);
         List<AuthorSong> authorSongs = authorSongService.findBySong(songToMerge);
