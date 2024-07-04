@@ -357,8 +357,8 @@ function generateDiscogsInfoDiv(foundArtist, discoGsDiv) {
             discoGsDiv.append(zeroRowDiv);
             var discogsIdInput = $('<input class="form-control" type="text" id="discogsIdInput" value="' + songInfo.discogsId + '">');
             var discogsUriInput = $('<input class="form-control" type="text" id="discogsUriInput" value="' + songInfo.uri + '">');
-            var discogsTwitterInput = $('<input class="form-control" type="text" id="discogsTwitterInput" value="' + songInfo.twitter + '">');
-            var discogsFacebookInput = $('<input class="form-control" type="text" id="discogsFacebookInput" value="' + songInfo.facebook + '">');
+            var discogsTwitterInput = $('<input class="form-control" type="text" id="discogsTwitterInput" value="' + nullToString(songInfo.twitter) + '">');
+            var discogsFacebookInput = $('<input class="form-control" type="text" id="discogsFacebookInput" value="' + nullToString(songInfo.facebook) + '">');
             firstRowColDiv1.append(discogsIdInput);
             firstRowColDiv1.append('<label for="discogsIdInput">DiscoGS ID</label>');
             firstRowColDiv2.append(discogsUriInput);
@@ -377,10 +377,10 @@ function generateDiscogsInfoDiv(foundArtist, discoGsDiv) {
             var secondRowColDiv2 = $('<div class="col">');
             var secondRowColDiv3 = $('<div class="col">');
             var secondRowColDiv4 = $('<div class="col">');
-            var discogsInstagramInput = $('<input class="form-control" type="text" id="discogsInstagramInput" value="' + songInfo.instagram + '">');
-            var discogsSoundcloudInput = $('<input class="form-control" type="text" id="discogsSoundcloudInput" value="' + songInfo.soundcloud + '">');
-            var discogsWikipediaInput = $('<input class="form-control" type="text" id="discogsWikipediaInput" value="' + songInfo.wikipedia + '">');
-            var discogsMyspaceInput = $('<input class="form-control" type="text" id="discogsMyspaceInput" value="' + songInfo.myspace + '">');
+            var discogsInstagramInput = $('<input class="form-control" type="text" id="discogsInstagramInput" value="' + nullToString(songInfo.instagram) + '">');
+            var discogsSoundcloudInput = $('<input class="form-control" type="text" id="discogsSoundcloudInput" value="' + nullToString(songInfo.soundcloud) + '">');
+            var discogsWikipediaInput = $('<input class="form-control" type="text" id="discogsWikipediaInput" value="' + nullToString(songInfo.wikipedia) + '">');
+            var discogsMyspaceInput = $('<input class="form-control" type="text" id="discogsMyspaceInput" value="' + nullToString(songInfo.myspace) + '">');
             secondRowColDiv1.append(discogsInstagramInput);
             secondRowColDiv1.append('<label for="discogsInstagramInput">Instagram link</label>');
             secondRowColDiv2.append(discogsSoundcloudInput);
@@ -433,3 +433,7 @@ $(document).on('click', '#fetch-from-discogs', function (e) {
     });
 
 });
+
+function nullToString(value){
+    return (value === null) ? "" : value;
+}

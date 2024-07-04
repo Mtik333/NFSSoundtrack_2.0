@@ -28,8 +28,6 @@ public class GameController extends BaseControllerWithErrorHandling {
     @Autowired
     GameEditSerializer gameEditSerializer;
 
-    @Autowired
-    CacheManager cacheManager;
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     String saveNewGame(@RequestBody String formData) throws Exception {
@@ -75,6 +73,8 @@ public class GameController extends BaseControllerWithErrorHandling {
                 () -> new ResourceNotFoundException("No game with id found " + gameId));
         gameToEdit = objectMapper.readerForUpdating(gameToEdit).readValue(formData, Game.class);
         gameService.save(gameToEdit);
+        String gameShort = gameToEdit.getGameShort();
+        removeCacheEntry(gameShort);
         return new ObjectMapper().writeValueAsString("OK");
     }
 }

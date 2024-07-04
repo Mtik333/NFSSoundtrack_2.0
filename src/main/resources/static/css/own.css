@@ -371,6 +371,18 @@ a.game_class:hover {
   background-color: #d2dee7;
 }
 
+a.gamegroup.active{
+    border-width: 2px !important;
+    border-bottom: 0 !important;
+    border-color: rgba(var(--bs-secondary-rgb)) !important;
+}
+
+button.subgroup.active{
+    border-width: 2px !important;
+    border-bottom: 0 !important;
+    border-color: rgba(var(--bs-info-rgb)) !important;
+}
+
 #listen-music-id {
   display: table-cell;
   width: 80px;

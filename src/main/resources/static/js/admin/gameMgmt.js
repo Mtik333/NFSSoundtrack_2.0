@@ -51,11 +51,11 @@ $(document).ready(function () {
                 var tidalColDiv = $('<div class="col">');
                 var youtubeColDiv = $('<div class="col">');
                 var soundcloudColDiv = $('<div class="col">');
-                var spotifyInput = $('<input class="form-control" id="spotifyPlaylistInput" type="text" value="' + gameToEdit.spotify_id + '">');
-                var deezerInput = $('<input class="form-control" id="deezerPlaylistInput" type="text" value="' + gameToEdit.deezer_id + '">');
-                var tidalInput = $('<input class="form-control" id="tidalPlaylistInput" type="text" value="' + gameToEdit.tidal_id + '">');
-                var youtubeInput = $('<input class="form-control" id="youtubePlaylistInput" type="text" value="' + gameToEdit.youtube_id + '">');
-                var soundcloudInput = $('<input class="form-control" id="soundcloudPlaylistInput" type="text" value="' + gameToEdit.soundcloud_id + '">');
+                var spotifyInput = $('<input class="form-control" id="spotifyPlaylistInput" type="text" value="' + nullToString(gameToEdit.spotify_id) + '">');
+                var deezerInput = $('<input class="form-control" id="deezerPlaylistInput" type="text" value="' + nullToString(gameToEdit.deezer_id) + '">');
+                var tidalInput = $('<input class="form-control" id="tidalPlaylistInput" type="text" value="' + nullToString(gameToEdit.tidal_id) + '">');
+                var youtubeInput = $('<input class="form-control" id="youtubePlaylistInput" type="text" value="' + nullToString(gameToEdit.youtube_id) + '">');
+                var soundcloudInput = $('<input class="form-control" id="soundcloudPlaylistInput" type="text" value="' + nullToString(gameToEdit.soundcloud_id) + '">');
                 spotifyColDiv.append('<label for="spotifyPlaylistInput">Spotify playlist ID</label>');
                 spotifyColDiv.append(spotifyInput);
                 deezerColDiv.append('<label for="deezerPlaylistInput">Deezer playlist ID</label>');
@@ -138,3 +138,7 @@ $(document).ready(function () {
         }
     });
 });
+
+function nullToString(value){
+    return (value === null) ? "" : value;
+}

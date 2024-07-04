@@ -65,6 +65,7 @@ public class SerieController extends BaseControllerWithErrorHandling {
             serie.setPosition(position);
             serieService.save(serie);
         }
+        cacheManager.getCache("series").clear();
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -89,6 +90,7 @@ public class SerieController extends BaseControllerWithErrorHandling {
             game.setPosition(position);
             gameService.save(game);
         }
+        cacheManager.getCache("series").clear();
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -98,6 +100,7 @@ public class SerieController extends BaseControllerWithErrorHandling {
         String newSerieName = new ObjectMapper().readValue(formData, String.class);
         Serie serie = new Serie(10000L, newSerieName);
         serieService.save(serie);
+        cacheManager.getCache("series").clear();
         return new ObjectMapper().writeValueAsString("OK");
     }
 

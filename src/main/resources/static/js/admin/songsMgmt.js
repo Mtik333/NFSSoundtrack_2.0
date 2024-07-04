@@ -1355,6 +1355,7 @@ $(document).ready(function () {
                 });
             },
         });
+        firstClickToAutoFetch = true;
     });
 
     $(document).on('click', '#save-song-globally', function (e) {
@@ -1408,6 +1409,7 @@ $(document).ready(function () {
                 });
             },
         });
+        firstClickToAutoFetch = true;
     });
 
     $(document).on('click', '#new-song', function (e) {
@@ -1556,6 +1558,7 @@ $(document).ready(function () {
                 });
             },
         });
+        firstClickToAutoFetch = true;
     });
 
 
@@ -1569,6 +1572,9 @@ $(document).ready(function () {
             srcId = $("#officialSrcId").val();
         } else {
             srcId = $("#ingameSrcId").val();
+        }
+        if (srcId.length==0){
+            return;
         }
         $("#fetch-spotify-links").after("<span id='request-status'>Fetching...</span>")
         $.ajax({
