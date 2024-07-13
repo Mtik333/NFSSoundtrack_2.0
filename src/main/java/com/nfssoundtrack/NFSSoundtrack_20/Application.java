@@ -13,6 +13,9 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +27,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @EnableCaching
 @SpringBootApplication
@@ -587,6 +593,65 @@ public class Application implements CommandLineRunner {
 //                    throwable.printStackTrace();
 //                }
 //        System.exit(0);
+
+//            if (args[1].equals("FindCloseSongEntries")){
+//                try {
+//                    List<String> allStrings = FileUtils.readLines(new File("song_grouping.csv"), StandardCharsets.UTF_8);
+//                    Map<String, List<String>> authorToComparableText = new TreeMap<>();
+//                    for (String singleLine : allStrings){
+//                        String[] split = singleLine.replaceAll("\"","").split(";");
+//                        if (authorToComparableText.get(split[0])!=null){
+//                            List<String> songsList = authorToComparableText.get(split[0]);
+//                            songsList.add(split[1]);
+//                            authorToComparableText.replace(split[0], songsList);
+//                        } else {
+//                            List<String> songsList = new ArrayList<>();
+//                            songsList.add(split[1]);
+//                            authorToComparableText.put(split[0], songsList);
+//                        }
+//                    }
+                    //map filled so let's do the levenshtein comparison
+//                    LevenshteinDistance distance = LevenshteinDistance.getDefaultInstance();
+//                    for (Map.Entry<String,List<String>> entry : authorToComparableText.entrySet()){
+//                        List<String> songTitles = entry.getValue();
+//                        if (entry.getKey().startsWith("Somebodygame")){
+//                            continue;
+//                        }
+//                        for (int i=0; i<songTitles.size(); i++){
+//                            String leftSide = songTitles.get(i);
+////                            if (leftSide.length()>6){
+//                                for (int j=i+1; j<songTitles.size(); j++){
+//                                    String rightSide = songTitles.get(j);
+//                                    Integer songDistance = distance.apply(leftSide,rightSide);
+//                                    if (songDistance==4){
+//                                        System.out.println("\n\npotentially close match for\nauthor: " + entry.getKey()
+//                                                + "\nTitle 1: " + leftSide + "\nTitle 2: " + rightSide);
+//                                    }
+//                                }
+////                            }
+//                        }
+//                    }
+//                    String[] authors = authorToComparableText.keySet().toArray(new String[0]);
+//                    for (int i=0; i<authors.length; i++){
+//                        String authorString = authors[i];
+//                        if (authorString.startsWith("Somebodygame")){
+//                            continue;
+//                        }
+//                        if (authorString.length()<=4){
+//                            continue;
+//                        }
+//                        for (int j=i+1; j<authors.length; j++){
+//                            String toCompareAuthor = authors[j];
+//                            Integer songDistance = distance.apply(authorString,toCompareAuthor);
+//                            if (songDistance==3){
+//                                System.out.println("\n\npotentially close match for\n" +
+//                                        "\nAuthor 1: " + authorString + "\nAuthor 2: " + toCompareAuthor);
+//                            }
+//                        }
+//                    }
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
 
         }
     }

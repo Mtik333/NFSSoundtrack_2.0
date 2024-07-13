@@ -38,9 +38,14 @@ $(document).ready(function () {
                 var dropdownDiv = $('<div id="selectSubgroup" class="dropdown">');
                 dropdownDiv.append('<button class="btn btn-secondary dropdown-toggle" type="button" id="subgroupsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">All</button>');
                 leftCellDiv.append(dropdownDiv);
+                leftCellDiv.append('<button id="moveToDifferentGroup" type="submit" class="btn btn-primary" disabled>Move subgroup to group</button>');
+                leftCellDiv.append('<select id="selectGroup" class="form-select w-auto"></select>')
                 var allSongSubgroups = [];
                 for (let i = 0; i < fullScopeOfEdit.length; i++) {
                     const group = fullScopeOfEdit[i];
+                    if (group.groupName.localeCompare("All") != 0) {
+                        $("#selectGroup").append($("<option></option>").attr("value", group.id).text(group.groupName));
+                    }
                     for (let j = 0; j < group.subgroups.length; j++) {
                         allSongSubgroups = allSongSubgroups.concat(fullScopeOfEdit[i].subgroups[j].songSubgroupList);
                     }
@@ -121,6 +126,11 @@ $(document).ready(function () {
             $(this).prop('checked', false);
             $(this).val('');
         });
+        if ($(this).text().indexOf("All") == 1) {
+            $("#moveToDifferentGroup").prop('disabled', true);
+        } else {
+            $("#moveToDifferentGroup").prop('disabled', false);
+        }
         var subgroupId = Number($(this).attr('data-subgroupId'));
         var groupId = Number($(this).attr('data-groupId'));
         var subgroupSongs;
@@ -246,6 +256,33 @@ $(document).ready(function () {
             data: JSON.stringify(arrayOfModifiedSubgroupSongPositionDef),
             contentType: 'application/json; charset=utf-8',
             url: "/songSubgroup/positions/" + currentSubgroupId,
+            success: function (ooo) {
+                console.log("eee");
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
+                        getSubgroupsFromGame();
+                    });
+                });
+            }, error: function (ooo) {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500, function () {
+                        getSubgroupsFromGame();
+                    });
+                });
+            },
+        });
+    });
+
+    $(document).on('click', '#moveToDifferentGroup', function (e) {
+        var groupAndSubgroup = new Object();
+        groupAndSubgroup.subgroupId = Number(currentSubgroupId);
+        groupAndSubgroup.targetGroupId = Number($("#selectGroup").val());
+        $.ajax({
+            async: false,
+            type: "PUT",
+            data: JSON.stringify(groupAndSubgroup),
+            contentType: 'application/json; charset=utf-8',
+            url: "/subgroup/moveSubgroup",
             success: function (ooo) {
                 console.log("eee");
                 $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {

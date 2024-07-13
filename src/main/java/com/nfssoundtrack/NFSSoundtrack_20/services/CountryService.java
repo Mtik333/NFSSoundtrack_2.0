@@ -18,6 +18,10 @@ public class CountryService {
         return countryRepository.findById(id);
     }
 
+    public Country save(Country country) {
+        return countryRepository.save(country);
+    }
+
     public List<Country> findAll() {
         return countryRepository.findAll();
     }

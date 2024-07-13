@@ -70,13 +70,13 @@ $(document).ready(function () {
         e.preventDefault();
         var groupId = $(this).attr('data-group_id');
         //need to check if we click on 'All' meta-subgroup
-        if ($(this).text() == "All") {
+        if ($(this).text().localeCompare("All") == 0) {
             //if yes, then we un-active all subgroups
             $('.subgroup.active').each(function () {
                 $(this).removeClass('active');
             });
             //now if the group is also "All" then we hide everything in table
-            if ($(this).attr("data-gameGroupTxt") == "All") {
+            if ($(this).attr("data-gameGroupTxt").localeCompare("All") == 0) {
                 $(document).find('tr').each(function () {
                     $(this).removeClass('visually-hidden');
                 });
@@ -133,10 +133,10 @@ $(document).ready(function () {
             }
         }
         //if we are on 'all' group and 'all' subgroup then we make 'all' subgroup active
-        if ($(e.target).text() == "All" && $(e.target).attr("data-gameGroupTxt") == "All") {
+        if ($(e.target).text().localeCompare("All") == 0 && $(e.target).attr("data-gameGroupTxt").localeCompare("All") == 0) {
             $(this).addClass('active');
         }
-        if ($(e.target).text() == "All" && $(e.target).attr("data-gameGroupTxt") != "All") {
+        if ($(e.target).text().localeCompare("All") == 0 && $(e.target).attr("data-gameGroupTxt").localeCompare("All") != 0) {
             //we are in not-'all' group but in 'all' subgroup so we have to hide all trs at the moment
             $(document).find('tr:has(td)').not('.subgroup-separator').each(function () {
                 $(this).addClass('visually-hidden');

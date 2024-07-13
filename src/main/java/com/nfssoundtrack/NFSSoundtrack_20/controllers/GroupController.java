@@ -3,10 +3,7 @@ package com.nfssoundtrack.NFSSoundtrack_20.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Game;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.MainGroup;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.SongSubgroup;
-import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.Subgroup;
+import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.GroupSerializer;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.GroupWithSubgroupsSerializer;
@@ -143,6 +140,16 @@ public class GroupController extends BaseControllerWithErrorHandling {
         }
         for (Subgroup subgroup : subgroupsToDelete) {
             List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
+            for (SongSubgroup potentialCorrected : songSubgroupList) {
+                List<Correction> corrections = correctionService.findBySongSubgroup(potentialCorrected);
+                if (!corrections.isEmpty()) {
+                    for (Correction correction : corrections) {
+                        correction.setSongSubgroup(null);
+                        correction.setCorrectValue(correction.getCorrectValue() + ";;" + potentialCorrected.toCorrectionString());
+                        correctionService.save(correction);
+                    }
+                }
+            }
             songSubgroupService.deleteAllInBatch(songSubgroupList);
         }
         subgroupService.deleteAllInBatch(subgroupsToDelete);

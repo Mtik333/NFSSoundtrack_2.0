@@ -9,10 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/subgroup")
@@ -60,7 +57,7 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
                 for (Correction correction : relatedCorrections) {
                     correction.setSongSubgroup(null);
                     correction.setCorrectValue(correction.getCorrectValue()
-                            + "; deleted song-subgroup: " + songSubgroup.getId());
+                            + "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
                     correctionService.save(correction);
                 }
                 songSubgroupService.delete(songSubgroup);
@@ -91,6 +88,8 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
             songSubgroup.setSong(song1);
             songSubgroupService.save(songSubgroup);
         }
+        String gameShort = subgroup.getMainGroup().getGame().getGameShort();
+        removeCacheEntry(gameShort);
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -107,6 +106,24 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
             }
         }
         throw new Exception("you sudnt come here");
+    }
+
+    @PutMapping(value = "/moveSubgroup", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody
+    String moveSubgroupToOtherGroup(@RequestBody String formData)
+            throws Exception {
+        LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
+        long subgroupId = Long.parseLong(String.valueOf(linkedHashMap.get("subgroupId")));
+        long groupId = Long.parseLong(String.valueOf(linkedHashMap.get("targetGroupId")));
+        MainGroup mainGroup = mainGroupService.findById(Math.toIntExact(groupId))
+                .orElseThrow(() -> new ResourceNotFoundException("No mainGroup found with id " + groupId));
+        Subgroup subgroup = subgroupService.findById(Math.toIntExact(subgroupId))
+                .orElseThrow(() -> new ResourceNotFoundException("No subgroup found with id " + subgroupId));
+        subgroup.setMainGroup(mainGroup);
+        subgroupService.save(subgroup);
+        String gameShort = mainGroup.getGame().getGameShort();
+        removeCacheEntry(gameShort);
+        return new ObjectMapper().writeValueAsString("OK");
     }
 
 }

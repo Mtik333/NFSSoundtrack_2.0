@@ -105,7 +105,7 @@ $(document).ready(function () {
         formAppend.append('<div class="form-group">');
         formAppend.append('<label for="groupName">Group name</label>');
         var groupNameInput = $('<input type="text" class="form-control w-80" id="groupName" value="' + groupToEdit.groupName + '">');
-        if (groupNameInput.val() == "All") {
+        if (groupNameInput.val().localeCompare("All") == 0) {
             groupNameInput.prop("disabled", true);
         }
         formAppend.append(groupNameInput);
@@ -115,7 +115,7 @@ $(document).ready(function () {
             var divWithCols = $('<div class="row">');
             var subgroupInput = $('<input type="text" class="form-control subGroups" id="subGroups-' + i + '" data-subGroupId="' + groupToEdit.subgroups[i].id + '" data-subgroupPosition="' + groupToEdit.subgroups[i].position + '" value="' + groupToEdit.subgroups[i].subgroupName + '">');
             var inputRowDiv = $('<div class="col-sm w-80">');
-            if (subgroupInput.val() == "All") {
+            if (subgroupInput.val().localeCompare("All") == 0) {
                 subgroupInput.prop("disabled", true);
             }
             inputRowDiv.append(subgroupInput);
@@ -139,7 +139,7 @@ $(document).ready(function () {
         if (confirmDel) {
             var subgroupInput = $($(this).parent().parent()).find('input')[0];
             if ($(subgroupInput).attr('data-subgroupId') != undefined) {
-                if (subgroupInput.value != "All") {
+                if (subgroupInput.value.localeCompare("All") != 0) {
                     $(subgroupInput).addClass('text-decoration-line-through');
                 }
             } else {
