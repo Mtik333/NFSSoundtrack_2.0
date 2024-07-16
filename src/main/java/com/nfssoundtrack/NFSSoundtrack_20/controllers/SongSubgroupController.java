@@ -416,7 +416,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         }
         int beginPositionSpotify = valueToCheck.indexOf("https://open.spotify.com/track/");
         if (beginPositionSpotify > -1) {
-            int endPosition = beginPositionSpotify + 46;
+            int endPosition = beginPositionSpotify + 53;
             String spotifyLink = "spotify:track:" + valueToCheck.substring(beginPositionSpotify + 31, endPosition);
             songSubgroup.setSpotifyId(spotifyLink);
         }
