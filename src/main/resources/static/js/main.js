@@ -18,7 +18,7 @@ var spotifyApi;
 var spotifyController;
 var currentlyPlayedSpotify;
 
-async function doLoadingCrap(){
+async function doLoadingCrap() {
     var contentWidth = localStorage.getItem("content-width");
     if (localStorage.getItem("static-leftmenu") == "true") {
         $("#offcanvas").removeClass("offcanvas");
@@ -55,7 +55,8 @@ async function doLoadingCrap(){
         $("col.contextButton").css("display", "");
         $("#pin-menu").css("display", "none");
         $("#offcanvasSpan").text("");
-        $("#offcanvasSpan").prev().css("display", "")
+        $("#offcanvasSpan").prev().css("display", "");
+        $("#moreDiv").css("position", "absolute");
         $(document).find("header").addClass("sticky-top");
     } else {
         var iconsSize = localStorage.getItem("icons-size");
@@ -64,26 +65,26 @@ async function doLoadingCrap(){
             $(document).find("svg.img-responsive-row-icon").css("max-height", iconsSize + "vw");
         }
         var iconsToHide = localStorage.getItem("hide-icons");
-        if (iconsToHide != undefined && iconsToHide.length>0) {
+        if (iconsToHide != undefined && iconsToHide.length > 0) {
             iconsToHide = JSON.parse(iconsToHide);
             for (let i = 0; i < iconsToHide.length; i++) {
                 var iconToHide = iconsToHide[i];
-                $("a."+iconToHide).hide();
-                $("a."+iconToHide).css("display","none");
-                $("img."+iconToHide).hide();
-                $("img."+iconToHide).css("display","none");
-                $("svg."+iconToHide).hide();
-                $("svg."+iconToHide).css("display","none");
+                $("a." + iconToHide).hide();
+                $("a." + iconToHide).css("display", "none");
+                $("img." + iconToHide).hide();
+                $("img." + iconToHide).css("display", "none");
+                $("svg." + iconToHide).hide();
+                $("svg." + iconToHide).css("display", "none");
             }
-            if ($($("td.info_button")[0]).children(":visible").length==0){
+            if ($($("td.info_button")[0]).children(":visible").length == 0) {
                 $("td.info_button").hide();
                 $("th.info_button").hide();
             }
         }
         var flagsToHide = localStorage.getItem("hide-flags");
         if (flagsToHide == "true") {
-                $("td.countries").hide();
-                $("th.countries").hide();
+            $("td.countries").hide();
+            $("th.countries").hide();
         }
     }
     var langDisplayed = localStorage.getItem("suggest-lang");
@@ -736,6 +737,14 @@ $(document).ready(function () {
         $(this).children().tooltip('show');
     });
 
+    $(document).on("touchstart", "#moreDiv", function (e) {
+        if (e.target.id.localeCompare("moreDiv") == 0) {
+            if ($("#moreDiv").hasClass("show")) {
+                $("#moreDiv").removeClass("show").hide();
+            }
+        }
+    });
+
     $(document).on("touchstart", "svg.context_menu_thing", function (e) {
         e.preventDefault();
         var trElem = $(this).parent().parent();
@@ -981,7 +990,7 @@ $(document).ready(function () {
                 divForSpotify = $('<div id="embed-iframe"></div>');
             }
             $(elem.target.parentElement).append(divForSpotify);
-            $(divForSpotify).css("display","none");
+            $(divForSpotify).css("display", "none");
             const element = divForSpotify[0];
             const options = {
                 width: '0',

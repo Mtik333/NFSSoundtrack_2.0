@@ -60,6 +60,11 @@ public class SongController extends BaseControllerWithErrorHandling {
             if (addInGameTitle){
                 songSubgroup.setIngameDisplayTitle(songToMerge.getOfficialDisplayTitle());
             }
+            songSubgroup.setSpotifyId(targetSong.getSpotifyId());
+            songSubgroup.setDeezerId(targetSong.getDeezerId());
+            songSubgroup.setTidalLink(targetSong.getTidalLink());
+            songSubgroup.setSoundcloudLink(targetSong.getSoundcloudLink());
+            songSubgroup.setItunesLink(targetSong.getItunesLink());
             String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
             removeCacheEntry(gameShort);
         }

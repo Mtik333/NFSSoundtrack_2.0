@@ -51,7 +51,7 @@ public class SongSerializer extends JsonSerializer<Song> {
         for (int i = 0; i < subcomposers.size(); i++) {
             StringBuilder stringToWrite = new StringBuilder();
             if (i != subcomposers.size() - 1) {
-                stringToWrite.append("<span>, </span>");
+                stringToWrite.append("<span class=\"commaspan\">, </span>");
             }
             stringToWrite.append("<a class='table_link' href='/author/")
                     .append(subcomposers.get(i).getAuthorAlias().getAuthor().getId())
@@ -67,7 +67,7 @@ public class SongSerializer extends JsonSerializer<Song> {
         for (int i = 0; i < remixers.size(); i++) {
             StringBuilder stringToWrite = new StringBuilder();
             if (i != remixers.size() - 1) {
-                stringToWrite.append("<span>, </span>");
+                stringToWrite.append("<span class=\"commaspan\">, </span>");
             }
             stringToWrite.append("<a class='table_link' href='/author/").append(
                     remixers.get(i).getAuthorAlias().getAuthor().getId()).append("'>").append(
@@ -82,7 +82,7 @@ public class SongSerializer extends JsonSerializer<Song> {
         for (int i = 0; i < feats.size(); i++) {
             StringBuilder stringToWrite = new StringBuilder();
             if (i != feats.size() - 1) {
-                stringToWrite.append("<span>, </span>");
+                stringToWrite.append("<span class=\"commaspan\">, </span>");
             }
             stringToWrite.append("<a class='table_link' href='/author/").append(
                     feats.get(i).getAuthorAlias().getAuthor().getId()).append("'>").append(
@@ -96,7 +96,7 @@ public class SongSerializer extends JsonSerializer<Song> {
         for (int i = 0; i < songGenres.size(); i++) {
             StringBuilder stringToWrite = new StringBuilder();
             if (i > 0) {
-                stringToWrite.append("<span>, </span>");
+                stringToWrite.append("<span class=\"commaspan\">, </span>");
             }
             stringToWrite.append("<a class='table_link' href='/genre/").append(
                     songGenres.get(i).getGenre().getId()).append("'>").append(

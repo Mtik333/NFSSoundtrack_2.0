@@ -3,9 +3,9 @@ $(document).ready(function () {
      * method to remove all info appended to modal when modal is closed
      */
     $('#infoSongModal').on('hide.bs.modal', function (e) {
-        //we just iterate over stuff and remove elements depending on type
+        /*we just iterate over stuff and remove elements depending on type*/
         $("#officialArtist").contents().filter(function () {
-            return this.nodeType === 3; //Node.TEXT_NODE
+            return this.nodeType === 3; /*Node.TEXT_NODE*/
         }).each(function () {
             $(this).remove();
         });
@@ -36,6 +36,9 @@ $(document).ready(function () {
             $(this).remove();
         });
         $("#baseSong").parent().find("a").each(function () {
+            $(this).remove();
+        });
+        $("#songInfoContent").find("span.commaspan").each(function () {
             $(this).remove();
         });
         $("#baseSongDiv").css("display", "none");

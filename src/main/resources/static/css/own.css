@@ -425,6 +425,10 @@ svg.bi-palette {
   text-align: center;
 }
 
+.dropdown-divider{
+    margin: 0px;
+}
+
 @media screen and (max-width: 600px) {
 
   img.img-responsive-website-logo {

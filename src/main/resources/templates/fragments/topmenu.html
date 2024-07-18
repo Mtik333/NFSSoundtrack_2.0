@@ -74,16 +74,16 @@
                 <a class="nav-link d-inline p-1 dropdown-toggle" type="button" id="dropdownMenuButton"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="#{more}">
                 </a>
-                <div class="dropdown-menu no-padding" aria-labelledby="dropdownMenuButton">
-                    <ul style="padding: 0.5vw">
-                        <a class="nav-link nfs-top-item d-inline p-1" id="nfs-top-aboutus" th:href="@{/content/aboutus}"
-                            th:text="#{about}"></a>
+                <div id="moreDiv" class="dropdown-menu no-padding" aria-labelledby="dropdownMenuButton">
+                    <ul style="padding: 0px;">
+                        <div><a class="nav-link nfs-top-item p-1" id="nfs-top-aboutus" th:href="@{/content/aboutus}"
+                                th:text="#{about}"></a></div>
                         <div class="dropdown-divider"></div>
-                        <a class="nav-link nfs-top-item d-inline p-1" id="nfs-top-donate" th:href="@{/content/donate}"
-                            th:text="#{donate}"></a>
+                        <div><a class="nav-link nfs-top-item p-1" id="nfs-top-donate" th:href="@{/content/donate}"
+                                th:text="#{donate}"></a></div>
                         <div class="dropdown-divider"></div>
-                        <a class="nav-link nfs-top-item d-inline p-1" th:href="@{/content/cookies}"
-                            th:text="#{privacy}"></a>
+                        <div><a class="nav-link nfs-top-item p-1" th:href="@{/content/cookies}"
+                                th:text="#{privacy}"></a></div>
                     </ul>
                 </div>
             </li>
@@ -204,16 +204,16 @@
                         <label for="hide-icons" th:text="#{hideIcons}"></label>
                     </div>
                     <div class="col-md-6">
-                            <select id="hide-icons" multiple="multiple">
-                                <option id="plusIcon" value="add-to-custom-playlist" th:text="#{plusIcon}"></option>
-                                <option id="infoIcon" value="info-about-song" th:text="#{infoIcon}"></option>
-                                <option id="bugIcon" value="report-bug" th:text="#{bugIcon}"></option>
-                                <option id="deezerIcon" value="deezer-link" th:text="#{deezerIcon}"></option>
-                                <option id="soundcloudIcon" value="soundcloud-link" th:text="#{soundcloudIcon}"></option>
-                                <option id="appleMusicIcon" value="itunes-link" th:text="#{appleMusicIcon}"></option>
-                                <option id="tidalIcon" value="tidal-link" th:text="#{tidalIcon}"></option>
-                                <option id="spotifyIcon" value="spotify-link" th:text="#{spotifyIcon}"></option>
-                            </select>
+                        <select id="hide-icons" multiple="multiple">
+                            <option id="plusIcon" value="add-to-custom-playlist" th:text="#{plusIcon}"></option>
+                            <option id="infoIcon" value="info-about-song" th:text="#{infoIcon}"></option>
+                            <option id="bugIcon" value="report-bug" th:text="#{bugIcon}"></option>
+                            <option id="deezerIcon" value="deezer-link" th:text="#{deezerIcon}"></option>
+                            <option id="soundcloudIcon" value="soundcloud-link" th:text="#{soundcloudIcon}"></option>
+                            <option id="appleMusicIcon" value="itunes-link" th:text="#{appleMusicIcon}"></option>
+                            <option id="tidalIcon" value="tidal-link" th:text="#{tidalIcon}"></option>
+                            <option id="spotifyIcon" value="spotify-link" th:text="#{spotifyIcon}"></option>
+                        </select>
                     </div>
                 </div>
                 <div class="row">

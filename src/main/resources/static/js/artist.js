@@ -3,124 +3,133 @@ $(document).ready(function () {
      * when clicking 'group' in artist page, like 'composer', 'remix' etc.
      */
     $(document).on('click', 'a.artistgroup', function (e) {
-        //don't want to ago anywhere
+        /*don't want to ago anywhere*/
         e.preventDefault();
-        //need to check how many groups are already active
+        /*need to check how many groups are already active*/
         var howManyActiveAlready = $('.artistgroup.active').length;
-        //is the one we clicked is already active
+        /*is the one we clicked is already active*/
         var isActive = $(this).hasClass("active");
-        //is the 'all' group active now
+        /*is the 'all' group active now*/
         var isAllGroupActive = $('a[data-authorcontribution="all"]').hasClass("active");
-        //here we just fetch value of this group
+        /*here we just fetch value of this group*/
         var contributionType = $(this).attr('data-authorcontribution');
-        //we also have to track info about how many subgroups (aliases) are active
+        /*we also have to track info about how many subgroups (aliases) are active*/
         activeSubgroups = $('.aliassubgroup.active');
-        //is the 'all' subgroup active now
+        /*is the 'all' subgroup active now*/
         var isActiveAllSubgroup = $("#allaliases").hasClass("active");
         if (contributionType == 'all') {
             if (!isActive) {
-                //we clicked on 'all' group and it is not active
+                /*we clicked on 'all' group and it is not active*/
                 $('.artistgroup.active').each(function () {
                     $(this).removeClass('active');
-                    //we get rid of any previously active groups
+                    /*we get rid of any previously active groups*/
                 });
-                //we make 'all' group active
+                /*we make 'all' group active*/
                 $(this).addClass('active');
                 $("#artistStuff").find("tr.all").each(function () {
                     var trToCheck = $(this);
                     var trAliasId = $(this).attr("data-aliasid");
                     if (isActiveAllSubgroup) {
-                        //now if 'all' subgroup is active, we go through all rows in table and make them visible
+                        /*now if 'all' subgroup is active, we go through all rows in table and make them visible*/
                         trToCheck.removeClass('visually-hidden');
+                        trToCheck.attr("hidden", false);
                     } else {
-                        //otherwise we make visible only rows relevant to filter based on active subgroups (aliases)
+                        /*otherwise we make visible only rows relevant to filter based on active subgroups (aliases)*/
                         activeSubgroups.each(function () {
                             var aliasSubgroupId = $(this).attr("data-aliassubgroupid");
                             if (trAliasId == aliasSubgroupId) {
                                 trToCheck.removeClass('visually-hidden');
+                                trToCheck.attr("hidden", false);
                             }
                         });
                     }
                 });
             }
         } else {
-            //this is not 'all' group clicked
+            /*this is not 'all' group clicked*/
             if (!isActive) {
-                //we have to activate this group
+                /*we have to activate this group*/
                 $(this).addClass('active');
-                //if 'all' group was active before click
+                /*if 'all' group was active before click*/
                 if (isAllGroupActive) {
                     $('tr.all').each(function () {
                         $(this).addClass('visually-hidden');
-                        //we simply hide everything
+                        $(this).attr("hidden", true);
+                        /*we simply hide everything*/
                     });
-                    //then we also make 'all' group 'unactive'
+                    /*then we also make 'all' group 'unactive'*/
                     $('a[data-authorcontribution="all"]').each(function () {
                         $(this).removeClass('active');
-                        //we get rid of any previously active groups
+                        /*we get rid of any previously active groups*/
                     });
                 }
-                //now we iterate through the rows with songs of 'clicked type' contribution
-                //so if we selected 'subcomposer', then we go through 'subcomposer' rows
+                /*now we iterate through the rows with songs of 'clicked type' contribution*/
+                /*so if we selected 'subcomposer', then we go through 'subcomposer' rows*/
                 $("#artistStuff").find("tr." + contributionType).each(function () {
                     var trToCheck = $(this);
-                    //we have to keep eye on current subgroup filter
+                    /*we have to keep eye on current subgroup filter*/
                     var trAliasId = $(this).attr("data-aliasid");
-                    //if 'all' subgroup is used then we just show all rows
+                    /*if 'all' subgroup is used then we just show all rows*/
                     if (isActiveAllSubgroup) {
                         trToCheck.removeClass('visually-hidden');
+                        trToCheck.attr("hidden", false);
                     } else {
-                        //otherwise we go through each active subgroup (as we can have multiple when 'all' is not active)
+                        /*otherwise we go through each active subgroup (as we can have multiple when 'all' is not active)*/
                         activeSubgroups.each(function () {
                             var aliasSubgroupId = $(this).attr("data-aliassubgroupid");
-                            //and we just show all songs with currently active aliases
+                            /*and we just show all songs with currently active aliases*/
                             if (trAliasId == aliasSubgroupId) {
                                 trToCheck.removeClass('visually-hidden');
+                                trToCheck.attr("hidden", false);
                             }
                         });
                     }
                 });
             } else {
-                //this group was active so we now make it unactive
+                /*this group was active so we now make it unactive*/
                 $(this).removeClass('active');
-                //iterate over rows with this type of contribution
+                /*iterate over rows with this type of contribution*/
                 $("#artistStuff").find("tr." + contributionType).each(function () {
                     var trToCheck = $(this);
                     var trAliasId = $(this).attr("data-aliasid");
-                    //if 'all' subgroup is active, we hide all rows of this contribution type since we're disabling this group
+                    /*if 'all' subgroup is active, we hide all rows of this contribution type since we're disabling this group*/
                     if (isActiveAllSubgroup) {
                         trToCheck.addClass('visually-hidden');
+                        trToCheck.attr("hidden", true);
                     } else {
-                        //otherwise we iterate over active aliases
+                        /*otherwise we iterate over active aliases*/
                         activeSubgroups.each(function () {
                             var aliasSubgroupId = $(this).attr("data-aliassubgroupid");
-                            //and we hide stuff that was of clicked contribution type
+                            /*and we hide stuff that was of clicked contribution type*/
                             if (trAliasId == aliasSubgroupId) {
                                 trToCheck.addClass('visually-hidden');
+                                trToCheck.attr("hidden", true);
                             }
                         });
                     }
                 });
-                //let's check how many active groups we have
+                /*let's check how many active groups we have*/
                 howManyActiveAlready = $('.artistgroup.active').length;
-                //if due to this click we have 0 active groups, we automatically enable 'all' group
+                /*if due to this click we have 0 active groups, we automatically enable 'all' group*/
                 if (howManyActiveAlready == 0) {
                     $('a[data-authorcontribution="all"]').each(function () {
                         $(this).addClass('active');
                     });
-                    //and then we go through all rows in the table
+                    /*and then we go through all rows in the table*/
                     $("#artistStuff").find("tr.all").each(function () {
                         var trToCheck = $(this);
                         var trAliasId = $(this).attr("data-aliasid");
-                        //if 'all' alias subgroup is active then we just show the row
+                        /*if 'all' alias subgroup is active then we just show the row*/
                         if (isActiveAllSubgroup) {
                             trToCheck.removeClass('visually-hidden');
+                            trToCheck.attr("hidden", false);
                         } else {
-                            //otherwise we go through active subgroups, check if row has the same alias and if so, show it in the table
+                            /*otherwise we go through active subgroups, check if row has the same alias and if so, show it in the table*/
                             activeSubgroups.each(function () {
                                 var aliasSubgroupId = $(this).attr("data-aliassubgroupid");
                                 if (trAliasId == aliasSubgroupId) {
                                     trToCheck.removeClass('visually-hidden');
+                                    trToCheck.attr("hidden", false);
                                 }
                             });
                         }
@@ -154,11 +163,13 @@ $(document).ready(function () {
                     var trRoleVal = $(this).attr("data-role");
                     if (isActiveAllGroup) {
                         trToCheck.removeClass('visually-hidden');
+                        trToCheck.attr("hidden", false);
                     } else {
                         activeGroups.each(function () {
                             var aliasSubgroupId = $(this).attr("data-authorcontribution");
                             if (trRoleVal == aliasSubgroupId) {
                                 trToCheck.removeClass('visually-hidden');
+                                trToCheck.attr("hidden", false);
                             }
                         });
                     }
@@ -170,6 +181,7 @@ $(document).ready(function () {
                 if (isAllSubgroupActive) {
                     $('tr.all').each(function () {
                         $(this).addClass('visually-hidden');
+                        $(this).attr("hidden", true);
                     });
                     $('button[data-authoralias="all"]').each(function () {
                         $(this).removeClass('active');
@@ -180,11 +192,13 @@ $(document).ready(function () {
                     var trRoleVal = $(this).attr("data-role");
                     if (isActiveAllGroup) {
                         trToCheck.removeClass('visually-hidden');
+                        trToCheck.attr("hidden", false);
                     } else {
                         activeGroups.each(function () {
                             var aliasSubgroupId = $(this).attr("data-authorcontribution");
                             if (trRoleVal == aliasSubgroupId) {
                                 trToCheck.removeClass('visually-hidden');
+                                trToCheck.attr("hidden", false);
                             }
                         });
                     }
@@ -196,11 +210,13 @@ $(document).ready(function () {
                     var trRoleVal = $(this).attr("data-role");
                     if (isActiveAllGroup) {
                         trToCheck.addClass('visually-hidden');
+                        trToCheck.attr("hidden", true);
                     } else {
                         activeGroups.each(function () {
                             var aliasSubgroupId = $(this).attr("data-authorcontribution");
                             if (trRoleVal == aliasSubgroupId) {
                                 trToCheck.addClass('visually-hidden');
+                                trToCheck.attr("hidden", true);
                             }
                         });
                     }
@@ -215,11 +231,13 @@ $(document).ready(function () {
                         var trRoleVal = $(this).attr("data-role");
                         if (isActiveAllGroup) {
                             trToCheck.removeClass('visually-hidden');
+                            trToCheck.attr("hidden", false);
                         } else {
                             activeGroups.each(function () {
                                 var aliasSubgroupId = $(this).attr("data-authorcontribution");
                                 if (trRoleVal == aliasSubgroupId) {
                                     trToCheck.removeClass('visually-hidden');
+                                    trToCheck.attr("hidden", false);
                                 }
                             });
                         }
@@ -230,7 +248,7 @@ $(document).ready(function () {
     });
 
     $(document).on("click", "#report-artist-bug", function () {
-        //handling search case
+        /*handling search case*/
         $(this).tooltip('dispose');
         $("#source-url").val(window.location.href);
         $("#reportProblemModal").modal('show');
