@@ -59,10 +59,15 @@
             <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
                 th:title="#{showNewDisqus}" th:src="@{/images/fullres/disqus_big.webp}">
         </div>
-        <div class="pointable" data-bs-target="#disqusModal" data-bs-toggle="modal" id="disqusLink">
-            <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
-                th:title="#{showDisqus}" th:src="@{/images/fullres/disqus_archive_big.webp}">
-        </div>
+        <th:block th:if="${game.disqusLink!=null}">
+            <div class="pointable" data-bs-target="#disqusModal" data-bs-toggle="modal" id="disqusLink">
+                <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
+                    th:title="#{showDisqus}" th:src="@{/images/fullres/disqus_archive_big.webp}">
+            </div>
+            <div class="pointable" id="oldLayout">
+                <a class="table_link nonBlue nfs-top-item p-2 d-inline-block pointable" th:text="#{goToOld}" th:href="${#strings.replace(game.disqusLink,'nfssoundtrack.com','racingsoundtracks.com:445')}"></a>
+            </div>
+        </th:block>
         <th:block th:if="${customTheme!=null}">
             <div class="pointable" id="dynamicBackground" data-toggle="tooltip" data-placement="top"
                 th:title="#{dynamicBackground}">

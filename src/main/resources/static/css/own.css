@@ -429,6 +429,10 @@ svg.bi-palette {
     margin: 0px;
 }
 
+a.nonBlue{
+    color: var(--bs-body-color);
+}
+
 @media screen and (max-width: 600px) {
 
   img.img-responsive-website-logo {

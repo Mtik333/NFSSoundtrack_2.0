@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Controller
 @RequestMapping("/maingroup")
@@ -147,6 +148,25 @@ public class GroupController extends BaseControllerWithErrorHandling {
                         correction.setSongSubgroup(null);
                         correction.setCorrectValue(correction.getCorrectValue() + ";;" + potentialCorrected.toCorrectionString());
                         correctionService.save(correction);
+                    }
+                }
+                List<TodaysSong> todaySongs = todaysSongService.findAllBySongSubgroup(potentialCorrected);
+                if (!todaySongs.isEmpty()){
+                    TodaysSong todaysSong = todaySongs.get(0);
+                    Song mainSong = potentialCorrected.getSong();
+                    List<SongSubgroup> songSubgroups = songSubgroupService.findBySong(mainSong);
+                    Optional<SongSubgroup> otherUsageOfSong = songSubgroups.stream().filter(songSubgroup ->
+                            !songSubgroup.getId().equals(potentialCorrected.getId())).findFirst();
+                    if (otherUsageOfSong.isPresent()){
+                        todaysSong.setSongSubgroup(otherUsageOfSong.get());
+                        todaysSongService.save(todaysSong);
+                    } else {
+                        Long biggestId = songSubgroupService.findTopByOrderByIdDesc().getId();
+                        int nextSongId = ThreadLocalRandom.current().nextInt(1, Math.toIntExact(biggestId));
+                        SongSubgroup targetSong = songSubgroupService.findById(nextSongId).orElseThrow(() ->
+                                new ResourceNotFoundException("no songsubgroup found with id " + nextSongId));
+                        todaysSong.setSongSubgroup(targetSong);
+                        todaysSongService.save(todaysSong);
                     }
                 }
             }

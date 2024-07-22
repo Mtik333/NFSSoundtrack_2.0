@@ -99,4 +99,13 @@ public class TodaysSongService {
         List<TodaysSong> todaysSongs = todaysSongRepository.findByDateBetween(monthAgoDate, todayDate, Sort.by(Sort.Direction.DESC, "date"));
         return todaysSongs;
     }
+
+    public List<TodaysSong> findAllBySongSubgroup(SongSubgroup songSubgroup){
+        List<TodaysSong> todaysSongs = todaysSongRepository.findBySongSubgroup(songSubgroup);
+        return todaysSongs;
+    }
+
+    public TodaysSong save(TodaysSong todaysSong) {
+        return todaysSongRepository.save(todaysSong);
+    }
 }

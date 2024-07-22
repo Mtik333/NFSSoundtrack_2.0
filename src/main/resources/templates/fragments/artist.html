@@ -51,7 +51,7 @@
 <th:block th:each="authorCountry : ${author?.authorCountries}">
     <img class="img-country img-responsive-row-icon" data-toggle="tooltip" data-placement="top" th:title="${authorCountry.country.countryName}" th:src="${authorCountry.country.countryLink}">
 </th:block>
-<h4 th:text="'Songs associated with '+ ${author?.name}"></h4>
+<h4 th:text="#{songsAssociatedWith}+' '+ ${author?.name}"></h4>
 <div class="form-group pb-2 pt-2">
     <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
         data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
@@ -60,30 +60,30 @@
     <ul class="nav nav-tabs artistgroup">
         <li class="nav-item">
             <a class="nav-link artistgroup active" th:attr="data-authorcontribution='all'" data-toggle="tab"
-                id="allartistgroup" th:text="'All'" href="#"></a>
+                id="allartistgroup" th:text="#{all}" href="#"></a>
         </li>
         <li class="nav-item">
             <a class="nav-link artistgroup" th:attr="data-authorcontribution='composer'" data-toggle="tab"
-                th:text="'Composer'" href="#"></a>
+                th:text="#{composer}" href="#"></a>
         </li>
         <li class="nav-item">
             <a class="nav-link artistgroup" th:attr="data-authorcontribution='subcomposer'" data-toggle="tab"
-                th:text="'Subcomposer'" href="#"></a>
+                th:text="#{subcomposer}" href="#"></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link artistgroup" th:attr="data-authorcontribution='feat'" data-toggle="tab" th:text="'Feat.'"
+            <a class="nav-link artistgroup" th:attr="data-authorcontribution='feat'" data-toggle="tab" th:text="#{featuring}"
                 href="#"></a>
         </li>
         <li class="nav-item">
             <a class="nav-link artistgroup" th:attr="data-authorcontribution='remix'" data-toggle="tab"
-                th:text="'Remix'" href="#"></a>
+                th:text="#{remix}" href="#"></a>
         </li>
     </ul>
     <ul class="nav nav-tabs aliassubgroup">
         <li class="nav-item">
             <button class="nav-link aliassubgroup active"
                 th:attr="id='allaliases', data-authoralias='all',data-aliassubgroupid='all'" href=""
-                th:text="'All'"></button>
+                th:text="#{all}"></button>
         </li>
         <th:block th:each="singleAlias,iter : ${allAliases}">
             <li class="nav-item">
@@ -120,7 +120,7 @@
     <tbody>
         <th:block th:each="mapEntry : ${songsAsComposer}">
             <tr class="all composer rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id},data-role='composer'">
-                <td colspan="7" th:text="${mapEntry.key.alias}+' - Composer'"></td>
+                <td colspan="7" th:text="${mapEntry.key.alias}+' - '+#{composer}"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup composer"
@@ -155,7 +155,7 @@
                             </th:block>
                         </th:block>
                         <span>&nbsp;/</span>
-                        <span th:text="'Associated genres: '"></span>
+                        <span th:text="#{associatedGenres}+' '"></span>
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
                                 th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
@@ -261,7 +261,7 @@
         <th:block th:each="mapEntry : ${songsAsSubcomposer}">
             <tr class="all subcomposer rolegroup-separator"
                 th:attr="data-aliasid=${mapEntry.key.id},data-role='subcomposer'">
-                <td colspan="7" th:text="${mapEntry.key.alias}+' - Subcomposer'"></td>
+                <td colspan="7" th:text="${mapEntry.key.alias}+' - '+#{subcomposer}"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup subcomposer"
@@ -297,7 +297,7 @@
                         </th:block>
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
                             <span>&nbsp;/</span>
-                            <span th:text="'Associated genres: '"></span>
+                            <span th:text="#{associatedGenres}+' '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
                                 th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
@@ -389,7 +389,7 @@
         </th:block>
         <th:block th:each="mapEntry : ${songsRemixed}">
             <tr class="all remix rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id},data-role='remix'">
-                <td colspan="7" th:text="${mapEntry.key.alias}+' - Remixer'"></td>
+                <td colspan="7" th:text="${mapEntry.key.alias}+' - '+#{remix}"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup remix"
@@ -425,7 +425,7 @@
                         </th:block>
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
                             <span>&nbsp;/</span>
-                            <span th:text="'Associated genres: '"></span>
+                            <span th:text="#{associatedGenres}+' '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
                                 th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
@@ -517,7 +517,7 @@
         </th:block>
         <th:block th:each="mapEntry : ${songsAsFeat}">
             <tr class="all feat rolegroup-separator" th:attr="data-aliasid=${mapEntry.key.id},data-role='feat'">
-                <td colspan="7" th:text="${mapEntry.key.alias}+' - Feat.'"></td>
+                <td colspan="7" th:text="${mapEntry.key.alias}+' - '+#{featuring}"></td>
             </tr>
             <th:block th:each="songToSongSubgroupMap : ${mapEntry.value}">
                 <tr class="all subgroup-separator songgroup feat"
@@ -553,7 +553,7 @@
                         </th:block>
                         <th:block th:each="songGenre,iter : ${songToSongSubgroupMap.key.songGenreList}">
                             <span>&nbsp;/</span>
-                            <span th:text="'Associated genres: '"></span>
+                            <span th:text="#{associatedGenres}+' '"></span>
                             <a class="table_link" th:text="${songGenre.genre.genreName}"
                                 th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>

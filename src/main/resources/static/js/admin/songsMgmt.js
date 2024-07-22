@@ -3,6 +3,7 @@ var currentSubgroup;
 var dropdownDiv;
 var newSong = false;
 var firstClickToAutoFetch = true;
+var firstIngameIdReload = true;
 $(document).ready(function () {
 
     $(successAlertHtml).hide();
@@ -262,7 +263,7 @@ $(document).ready(function () {
                 var authorSong = songSubgroup.song.authorSongList[i];
                 var officialTitle = songSubgroup.song.officialDisplayTitle;
                 var officialArtistName = authorSong.authorAlias.author.name;
-                var aliasSelect = $('<input class="form-control w-100" id="aliasSelect-' + i + '" value="' + officialArtistName + '"/>');
+                var aliasSelect = $('<input class="form-control w-100" id="aliasSelect-' + i + '" value="' + authorSong.authorAlias.alias + '"/>');
                 var aliasSelectHidden = $('<input type="hidden" id="aliasSelectHidden-' + i + '" value="' + authorSong.authorAlias.id + '"/>');
                 if (authorSong.role == "COMPOSER") {
                     generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv, artistAndAliasDiv, aliasSelect, aliasSelectHidden, i, authorSong, instrumentalDiv, officialTitleDiv, songSubgroup.instrumental, officialTitle, songSubgroup.showFeat, songSubgroup.showSubcomposer);
@@ -1071,12 +1072,14 @@ $(document).ready(function () {
         $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
         newSong = false;
         firstClickToAutoFetch = true;
+        firstIngameIdReload = true;
     });
 
     $(document).on('click', '#cancel-song-globally', function (e) {
         getSingleSubgroupFromGame(0);
         $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
         firstClickToAutoFetch = true;
+        firstIngameIdReload = true;
     });
 
     function generateSpotifyAndLyrics(ingameDisplayDiv, songSubgroup) {
@@ -1124,7 +1127,9 @@ $(document).ready(function () {
     }
 
     $(document).on('focusin', '#authorSelect-0', function (e) {
-        $("#authorSelectHidden-0").val("");
+        if (e.target.value.length==0){
+            $("#authorSelectHidden-0").val("");
+        }
     });
 
     $(document).on('focusout', '#authorSelect-0', function (e) {
@@ -1226,6 +1231,13 @@ $(document).ready(function () {
             var indexOfTuDotBe = typedSrcId.indexOf(".be");
             if (indexOfTuDotBe > -1) {
                 $(this).val(typedSrcId.substring(indexOfTuDotBe + 4, indexOfTuDotBe + 15));
+            }
+        }
+        var ingameSrcId = $("#ingameSrcId").val();
+        if (newSong){
+            if (firstIngameIdReload && ingameSrcId.length==0){
+                firstIngameIdReload = false;
+                $("#ingameSrcId").val($(this).val());
             }
         }
         fetchMusicLinks();
@@ -1356,6 +1368,7 @@ $(document).ready(function () {
             },
         });
         firstClickToAutoFetch = true;
+        firstIngameIdReload = true;
     });
 
     $(document).on('click', '#save-song-globally', function (e) {
@@ -1410,6 +1423,7 @@ $(document).ready(function () {
             },
         });
         firstClickToAutoFetch = true;
+        firstIngameIdReload = true;
     });
 
     $(document).on('click', '#new-song', function (e) {
@@ -1559,6 +1573,7 @@ $(document).ready(function () {
             },
         });
         firstClickToAutoFetch = true;
+        firstIngameIdReload = true;
     });
 
 
