@@ -33,6 +33,10 @@ public class SongSubgroupService {
         return songSubgroupRepository.findBySong(song);
     }
 
+    public List<SongSubgroup> findByFilename(String filename) {
+        return songSubgroupRepository.findByFilename(filename);
+    }
+
     public SongSubgroup findTopByOrderByIdDesc() {
         return songSubgroupRepository.findTopByOrderByIdDesc();
     }

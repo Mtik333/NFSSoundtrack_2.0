@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
+import com.nfssoundtrack.NFSSoundtrack_20.deserializers.SongSubgroupDeserializer;
 import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.others.JustSomeHelper;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
 import com.nfssoundtrack.NFSSoundtrack_20.serializers.SongSerializer;
+import com.nfssoundtrack.NFSSoundtrack_20.serializers.SongSubgroupFilenameSerializer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -42,6 +44,9 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     @Autowired
     SongSerializer songSerializer;
+
+    @Autowired
+    SongSubgroupFilenameSerializer songSubgroupFilenameSerializer;
 
     @Autowired
     CacheManager cacheManager;
@@ -394,5 +399,15 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             return objectMapper.writeValueAsString(customTheme.get());
         }
         return objectMapper.writeValueAsString(null);
+    }
+
+    @GetMapping(value = "/filename/{song_filename}")
+    public @ResponseBody String getSongInfo(@PathVariable("song_filename") String song_filename) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(SongSubgroup.class, songSubgroupFilenameSerializer);
+        objectMapper.registerModule(simpleModule);
+        List<SongSubgroup> songByFilename = songSubgroupService.findByFilename(song_filename);
+        return objectMapper.writeValueAsString(songByFilename);
     }
 }

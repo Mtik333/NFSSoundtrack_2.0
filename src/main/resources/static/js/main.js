@@ -463,14 +463,6 @@ $(document).ready(function () {
                 }
             });
         }
-        if (localI == 0) {
-            //show modal that there is nothing to play
-            $("#errorThing").parent().fadeIn(500, function () {
-                setTimeout(function () {
-                    $("#errorThing").parent().fadeOut(500);
-                }, 3000);
-            });
-        }
         var data_song = [];
         i = 0;
         $('#playlist_progress tr').each(function () {
@@ -481,6 +473,13 @@ $(document).ready(function () {
             current_id = 0;
         }
         if ($('#playlist_progress tr:nth-child(' + (current_id + 1) + ')').hasClass("disabled")) {
+            if (current_id == 0){
+                $("#errorThing").parent().fadeIn(500, function () {
+                    setTimeout(function () {
+                        $("#errorThing").parent().fadeOut(500);
+                    }, 3000);
+                });
+            }
             initPlayer(current_id + 1);
         } else {
             $('#playlistModePlayer').html('<iframe id="player" allow="autoplay" type="text/html" src="https://www.youtube.com/embed/' + data_song[current_id] + '?enablejsapi=1&autoplay=1&autohide=0&theme=light&wmode=transparent" frameborder="0"></iframe>');
