@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.apache.commons.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,19 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(WebsiteViewsController.class);
 
+    private static String part1="Full Soundtrack Playlist:";
+    private static String part2="";
+    private static String part3="";
+    private static String part4="";
+    private static String part5="If you like what you hear, you can support me by making a small donation: https://www.paypal.me/SergiuAntoniuA\nSupported by https://RacingSoundtracks.com";
+    private static String part6="#GameRip, #RacingSoundtracks.com";
 //    @Autowired
 //    ObjectFactory<HttpSession> httpSessionFactory;
 
@@ -401,13 +409,68 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return objectMapper.writeValueAsString(null);
     }
 
-    @GetMapping(value = "/filename/{song_filename}")
+    @GetMapping(value = "/filename/{song_filename}", produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody String getSongInfo(@PathVariable("song_filename") String song_filename) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(SongSubgroup.class, songSubgroupFilenameSerializer);
         objectMapper.registerModule(simpleModule);
-        List<SongSubgroup> songByFilename = songSubgroupService.findByFilename(song_filename);
-        return objectMapper.writeValueAsString(songByFilename);
+        song_filename = URLDecoder.decode(song_filename, StandardCharsets.UTF_8);
+        List<SongSubgroup> songsByFilename = songSubgroupService.findByFilenameStartsWith(song_filename);
+        StringBuilder resultingText = new StringBuilder();
+        if (songsByFilename.size()==1){
+            SongSubgroup songSubgroup = songsByFilename.get(0);
+            String youtubePlaylistId = songSubgroup.getSubgroup().getMainGroup().getGame().getYoutubeId();
+            //if playlist exists, make this first line
+            if (youtubePlaylistId!=null){
+                String thingToAppend = "https://www.youtube.com/watch?v="+songSubgroup.getSrcId()
+                        +"&list="+youtubePlaylistId;
+                resultingText.append("Full Soundtrack Playlist: ").append(thingToAppend);
+            }
+            Song realSong = songSubgroup.getSong();
+            List<SongSubgroup> songSubgroupSameGameList = songSubgroupService.findBySong(realSong);
+            songSubgroupSameGameList = songSubgroupSameGameList.stream().filter(songSubgroup1 ->
+                    songSubgroup1.getSubgroup().getMainGroup().getGame().equals(songSubgroup.getSubgroup().getMainGroup().getGame()))
+                    .filter(songSubgroup1 -> songSubgroup1.getFilename()!=null && !songSubgroup1.getFilename().equals(songSubgroup.getFilename())).toList();
+            for (SongSubgroup songSubgroup1 : songSubgroupSameGameList){
+                resultingText.append("\n").append(songSubgroup1.getSubgroup().getSubgroupName()).append(": ")
+                        .append("https://www.youtube.com/watch?v=").append(songSubgroup1.getSrcId());
+            }
+            resultingText.append("\n====================\n\n");
+            //now second line with song info
+            resultingText.append("Track: ");
+            if (songSubgroup.getIngameDisplayTitle()!=null){
+                resultingText.append(songSubgroup.getIngameDisplayTitle());
+            } else {
+                resultingText.append(songSubgroup.getSong().getOfficialDisplayTitle());
+            }
+            resultingText.append("\n");
+            List<AuthorSong> authors = songSubgroup.getSong().getAuthorSongList();
+            if (authors.size()>1){
+                for (AuthorSong authorSong : authors){
+                    resultingText.append(WordUtils.capitalizeFully(authorSong.getRole().value())).append(": ").append(authorSong.getAuthorAlias().getAlias()).append("\n");
+                }
+            } else {
+                resultingText.append("Artist: ");
+                if (songSubgroup.getIngameDisplayBand()!=null){
+                    resultingText.append(songSubgroup.getIngameDisplayBand());
+                } else {
+                    resultingText.append(songSubgroup.getSong().getOfficialDisplayBand());
+                }
+            }
+            resultingText.append("\n");
+            resultingText.append(songSubgroup.getSubgroup().getMainGroup().getGame().getDisplayTitle());
+            //now line with filename
+            resultingText.append("\n====================\n\n");
+            resultingText.append(songSubgroup.getFilename());
+            //now line with promo
+            resultingText.append("\n====================\n\n");
+            resultingText.append("If you like what you hear, you can support me by making a small donation: https://www.paypal.me/SergiuAntoniuA");
+            resultingText.append("\nCheck website about soundtrack in racing video games: https://RacingSoundtracks.com");
+            //and line with tags
+            resultingText.append("\n====================\n\n");
+            resultingText.append("#GameRip, #RacingSoundtracks.com");
+        }
+        return resultingText.toString();
     }
 }
