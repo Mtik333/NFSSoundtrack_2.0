@@ -433,6 +433,10 @@ a.nonBlue{
     color: var(--bs-body-color);
 }
 
+button.playlist-close {
+    margin-left: 0px;
+}
+
 @media screen and (max-width: 600px) {
 
   img.img-responsive-website-logo {

@@ -3,6 +3,20 @@ $(document).ready(function () {
     /**
      * method to show spotify modal
      */
+    $('#youtubeModal').on('show.bs.modal', function (e) {
+        $("#youtubePlaylist").attr('src', "https://www.youtube.com/embed/videoseries?list=" + $("#youtubeLink").attr('data-tagVideo'));
+    });
+
+    /**
+     * method to unload spotify iframe when modal closed
+     */
+    $('#spotifyModal').on('hide.bs.modal', function (e) {
+        $("#youtubePlaylist").attr('src', '');
+    });
+
+    /**
+     * method to show spotify modal
+     */
     $('#spotifyModal').on('show.bs.modal', function (e) {
         $("#spotifyVideo").attr('src', "https://open.spotify.com/embed/playlist/" + $("#spotifyLink").attr('data-tagVideo'));
         $("#spotify-ext").attr('href', "spotify:playlist:" + $("#spotifyLink").attr('data-tagVideo'));
@@ -213,6 +227,27 @@ $(document).ready(function () {
                     changeStuffForDynamicTheme(theme);
                 },
             });
+        }
+    });
+
+    $(document).on('click', '.warn-info', function (e) {
+        if (!$(this).attr('note-clicked')) {
+            $(this).tooltip('dispose');
+            $(this).tooltip({ 'delay': { show: 0, hide: 5000 } });
+            $(this).tooltip('show');
+            $(this).attr("note-clicked", true);
+        } else {
+            $(this).tooltip('dispose');
+            $(this).tooltip({ 'delay': { show: 0, hide: 0 } });
+            $(this).removeAttr("note-clicked");
+        }
+    });
+
+    $(document).on('hide.bs.tooltip', '.warn-info', function (e) {
+        if ($(this).attr("note-clicked")) {
+            $(this).tooltip('dispose');
+            $(this).tooltip({ 'delay': { show: 0, hide: 0 } });
+            $(this).removeAttr("note-clicked");
         }
     });
 });

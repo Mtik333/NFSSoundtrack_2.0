@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.NFSSoundtrack_20.dbmodel.*;
-import com.nfssoundtrack.NFSSoundtrack_20.deserializers.SongSubgroupDeserializer;
 import com.nfssoundtrack.NFSSoundtrack_20.others.DiscoGSObj;
 import com.nfssoundtrack.NFSSoundtrack_20.others.JustSomeHelper;
 import com.nfssoundtrack.NFSSoundtrack_20.others.ResourceNotFoundException;
@@ -34,19 +33,12 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(WebsiteViewsController.class);
 
-    private static String part1="Full Soundtrack Playlist:";
-    private static String part2="";
-    private static String part3="";
-    private static String part4="";
-    private static String part5="If you like what you hear, you can support me by making a small donation: https://www.paypal.me/SergiuAntoniuA\nSupported by https://RacingSoundtracks.com";
-    private static String part6="#GameRip, #RacingSoundtracks.com";
 //    @Autowired
 //    ObjectFactory<HttpSession> httpSessionFactory;
 
@@ -418,55 +410,56 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         song_filename = URLDecoder.decode(song_filename, StandardCharsets.UTF_8);
         List<SongSubgroup> songsByFilename = songSubgroupService.findByFilenameStartsWith(song_filename);
         StringBuilder resultingText = new StringBuilder();
-        if (songsByFilename.size()==1){
+        if (songsByFilename.size() == 1) {
             SongSubgroup songSubgroup = songsByFilename.get(0);
             String youtubePlaylistId = songSubgroup.getSubgroup().getMainGroup().getGame().getYoutubeId();
             //if playlist exists, make this first line
-            if (youtubePlaylistId!=null){
-                String thingToAppend = "https://www.youtube.com/watch?v="+songSubgroup.getSrcId()
-                        +"&list="+youtubePlaylistId;
+            if (youtubePlaylistId != null) {
+                String thingToAppend = "https://www.youtube.com/watch?v=" + songSubgroup.getSrcId()
+                        + "&list=" + youtubePlaylistId;
                 resultingText.append("Full Soundtrack Playlist: ").append(thingToAppend);
             }
             Song realSong = songSubgroup.getSong();
             List<SongSubgroup> songSubgroupSameGameList = songSubgroupService.findBySong(realSong);
             songSubgroupSameGameList = songSubgroupSameGameList.stream().filter(songSubgroup1 ->
-                    songSubgroup1.getSubgroup().getMainGroup().getGame().equals(songSubgroup.getSubgroup().getMainGroup().getGame()))
-                    .filter(songSubgroup1 -> songSubgroup1.getFilename()!=null && !songSubgroup1.getFilename().equals(songSubgroup.getFilename())).toList();
-            for (SongSubgroup songSubgroup1 : songSubgroupSameGameList){
+                            songSubgroup1.getSubgroup().getMainGroup().getGame().equals(songSubgroup.getSubgroup().getMainGroup().getGame()))
+                    .filter(songSubgroup1 -> songSubgroup1.getFilename() != null && !songSubgroup1.getFilename().equals(songSubgroup.getFilename())).toList();
+            for (SongSubgroup songSubgroup1 : songSubgroupSameGameList) {
                 resultingText.append("\n").append(songSubgroup1.getSubgroup().getSubgroupName()).append(": ")
                         .append("https://www.youtube.com/watch?v=").append(songSubgroup1.getSrcId());
             }
             resultingText.append("\n====================\n\n");
             //now second line with song info
             resultingText.append("Track: ");
-            if (songSubgroup.getIngameDisplayTitle()!=null){
-                resultingText.append(songSubgroup.getIngameDisplayTitle());
-            } else {
-                resultingText.append(songSubgroup.getSong().getOfficialDisplayTitle());
-            }
+//            if (songSubgroup.getIngameDisplayTitle()!=null){
+//                resultingText.append(songSubgroup.getIngameDisplayTitle());
+//            } else {
+//                resultingText.append(songSubgroup.getSong().getOfficialDisplayTitle());
+//            }
+            resultingText.append(songSubgroup.getSong().getOfficialDisplayTitle());
             resultingText.append("\n");
             List<AuthorSong> authors = songSubgroup.getSong().getAuthorSongList();
-            if (authors.size()>1){
-                for (AuthorSong authorSong : authors){
-                    resultingText.append(WordUtils.capitalizeFully(authorSong.getRole().value())).append(": ").append(authorSong.getAuthorAlias().getAlias()).append("\n");
+            if (authors.size() > 1) {
+                for (int i = 0; i < authors.size(); i++) {
+                    resultingText.append(WordUtils.capitalizeFully("Artist ")).append((i + 1))
+                            .append(": ").append(authors.get(i).getAuthorAlias().getAlias()).append("\n");
                 }
             } else {
                 resultingText.append("Artist: ");
-                if (songSubgroup.getIngameDisplayBand()!=null){
+                if (songSubgroup.getIngameDisplayBand() != null) {
                     resultingText.append(songSubgroup.getIngameDisplayBand());
                 } else {
                     resultingText.append(songSubgroup.getSong().getOfficialDisplayBand());
                 }
             }
-            resultingText.append("\n");
             resultingText.append(songSubgroup.getSubgroup().getMainGroup().getGame().getDisplayTitle());
             //now line with filename
             resultingText.append("\n====================\n\n");
             resultingText.append(songSubgroup.getFilename());
             //now line with promo
             resultingText.append("\n====================\n\n");
-            resultingText.append("If you like what you hear, you can support me by making a small donation: https://www.paypal.me/SergiuAntoniuA");
-            resultingText.append("\nCheck website about soundtrack in racing video games: https://RacingSoundtracks.com");
+            resultingText.append("\nCheck out more Racing Game Soundtracks: https://RacingSoundtracks.com");
+            resultingText.append("\nIf you like what you hear, you can support me by making a small donation: https://www.paypal.me/SergiuAntoniuA");
             //and line with tags
             resultingText.append("\n====================\n\n");
             resultingText.append("#GameRip, #RacingSoundtracks.com");

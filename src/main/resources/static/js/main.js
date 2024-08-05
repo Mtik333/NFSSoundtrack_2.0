@@ -473,7 +473,7 @@ $(document).ready(function () {
             current_id = 0;
         }
         if ($('#playlist_progress tr:nth-child(' + (current_id + 1) + ')').hasClass("disabled")) {
-            if (current_id == 0){
+            if (current_id == 0) {
                 $("#errorThing").parent().fadeIn(500, function () {
                     setTimeout(function () {
                         $("#errorThing").parent().fadeOut(500);
@@ -1068,4 +1068,68 @@ $(document).ready(function () {
         console.log("loaded");
         spotifyApi = IFrameAPI;
     };
+
+    /**
+     * function to mark song as disabled when in playlist mode
+     */
+    $(document).keydown(function (e) {
+        if ($("#playlistModeModal").is(":visible")) {
+            var currentTr = $("tr.current")[0];
+            if (e.keyCode == 40) {
+                //down key
+                var nextTr;
+                while (nextTr == null) {
+                    var potentialNextTr = $(currentTr).next();
+                    if (!potentialNextTr.hasClass("disabled")) {
+                        nextTr = potentialNextTr;
+                    } else {
+                        currentTr = potentialNextTr;
+                    }
+                }
+                if (nextTr == null) {
+                    return;
+                }
+                var startVideo = $(nextTr).find("td.playlist_play_it");
+                if (startVideo.length > 0) {
+                    startVideo.click();
+                    if (!isScrolledIntoView(nextTr)) {
+                        $('#playlist_progress').parent().animate({
+                            scrollTop: $('#playlist_progress').parent().scrollTop() + nextTr.height() * 10
+                        }, 700);
+                    }
+                }
+            } else if (e.keyCode == 38) {
+                //up key
+                var nextTr;
+                while (nextTr == null) {
+                    var potentialNextTr = $(currentTr).prev();
+                    if (!potentialNextTr.hasClass("disabled")) {
+                        nextTr = potentialNextTr;
+                    } else {
+                        currentTr = potentialNextTr;
+                    }
+                }
+                if (nextTr == null) {
+                    return;
+                }
+                var startVideo = $(nextTr).find("td.playlist_play_it");
+                if (startVideo.length > 0) {
+                    startVideo.click();
+                    if (!isScrolledIntoView(nextTr)) {
+                        $('#playlist_progress').parent().animate({
+                            scrollTop: $('#playlist_progress').parent().scrollTop() + nextTr.height() * (-1) * 10
+                        }, 700);
+                    }
+                }
+            }
+        }
+    });
+
+    function isScrolledIntoView(elem) {
+        var docViewTop = $('#playlist_progress').parent().offset().top;
+        var docViewBottom = docViewTop + $('#playlist_progress').parent().height();
+        var elemTop = $(elem).offset().top;
+        var elemBottom = elemTop + $(elem).height() * 2;
+        return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+    }
 });

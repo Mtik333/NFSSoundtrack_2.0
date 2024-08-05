@@ -1,4 +1,8 @@
 <h2 th:text="#{searchResultsPre} + ' ' + ${searchPhrase}"></h2>
+<div class="form-group pb-2 pt-2">
+    <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
+        data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
+</div>
 <hr>
 <h3 th:text="#{allFoundAuthors}"></h3>
 <th:block th:each="authorAlias : ${authorAliases}">
@@ -54,7 +58,8 @@
                         th:text="${authorSong.authorAlias.alias} "></a>
                 </th:block>
                 <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
-                    <span th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
+                    <span
+                        th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
                     <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                         th:text="${authorSong.authorAlias.alias}"></a>
                 </th:block>
@@ -63,8 +68,7 @@
                 <span th:text="${song.key.officialDisplayTitle} "></span>
                 <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='FEAT']}">
                     <span th:text="${iter.first ? ' (feat. ' : ''}"></span>
-                    <a class="table_link"
-                        th:href="'/author/'+${authorSong.authorAlias.id}"
+                    <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                         th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
                     <th:block th:if="${authorSong.featConcat!=null}">
                         <span th:text="${!iter.last ? ' '+authorSong.featConcat : ''}"></span>
@@ -184,7 +188,8 @@
                         th:text="${authorSong.authorAlias.alias} "></a>
                 </th:block>
                 <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='SUBCOMPOSER']}">
-                    <span th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
+                    <span
+                        th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
                     <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                         th:text="${authorSong.authorAlias.alias}"></a>
                 </th:block>
@@ -193,8 +198,7 @@
                 <span th:text="${song.key.officialDisplayTitle} "></span>
                 <th:block th:each="authorSong,iter : ${song.key.authorSongList.?[role.value=='FEAT']}">
                     <span th:text="${iter.first ? ' (feat. ' : ''}"></span>
-                    <a class="table_link"
-                        th:href="'/author/'+${authorSong.authorAlias.id}"
+                    <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.id}"
                         th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
                     <th:block th:if="${authorSong.featConcat!=null}">
                         <span th:text="${!iter.last ? ' '+authorSong.featConcat : ''}"></span>
@@ -272,5 +276,6 @@
             </td>
     </tbody>
 </table>
+<th:block th:insert="~{fragments/playlistModal.html}"></th:block>
 <th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
 <script th:src="@{/js/search.js}" type="application/javascript"></script>

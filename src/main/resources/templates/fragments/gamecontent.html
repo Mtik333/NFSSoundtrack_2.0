@@ -25,6 +25,13 @@
         <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
             data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
         <div style="display: flex; align-items: center">
+            <th:block th:if="${game.youtubeId!=null && game.youtubeId!=''}">
+                <div class="pointable" data-bs-target="#youtubeModal" data-bs-toggle="modal" id="youtubeLink"
+                    th:attr="data-tagVideo=${game.youtubeId}">
+                    <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
+                        data-placement="top" th:title="#{launchYoutube}" th:src="@{/images/fullres/youtube_big.webp}">
+                </div>
+            </th:block>
             <th:block th:if="${game.spotifyId!=null && game.spotifyId!=''}">
                 <div class="pointable" data-bs-target="#spotifyModal" data-bs-toggle="modal" id="spotifyLink"
                     th:attr="data-tagVideo=${game.spotifyId}">
@@ -65,7 +72,8 @@
                     th:title="#{showDisqus}" th:src="@{/images/fullres/disqus_archive_big.webp}">
             </div>
             <div class="pointable" id="oldLayout">
-                <a class="table_link nonBlue nfs-top-item p-2 d-inline-block pointable" th:text="#{goToOld}" th:href="${#strings.replace(game.disqusLink,'nfssoundtrack.com','racingsoundtracks.com:445')}"></a>
+                <a class="table_link nonBlue nfs-top-item p-2 d-inline-block pointable" th:text="#{goToOld}"
+                    th:href="${#strings.replace(game.disqusLink,'nfssoundtrack.com','racingsoundtracks.com:445')}"></a>
             </div>
         </th:block>
         <th:block th:if="${customTheme!=null}">
@@ -148,8 +156,8 @@
                                     <img class="img-responsive-row-icon add-to-custom-playlist  pointable"
                                         data-toggle="tooltip" data-placement="right" th:title="#{addToPlaylist}"
                                         th:src="@{/images/fullres/plus_big.webp}">
-                                    <img class="img-responsive-row-icon info-about-song infoIcon pointable" data-toggle="tooltip"
-                                        data-placement="right" th:title="#{showInfo}"
+                                    <img class="img-responsive-row-icon info-about-song infoIcon pointable"
+                                        data-toggle="tooltip" data-placement="right" th:title="#{showInfo}"
                                         th:src="@{/images/fullres/info_big.webp}">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="red"
                                         class="bi bi-bug-fill img-responsive-row-icon report-bug pointable"
@@ -164,7 +172,8 @@
                                     <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
                                         <th:block
                                             th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
-                                            <img class="img-country img-responsive-row-icon" data-toggle="tooltip" data-placement="top" th:title="${authorCountry.country.countryName}"
+                                            <img class="img-country img-responsive-row-icon" data-toggle="tooltip"
+                                                data-placement="top" th:title="${authorCountry.country.countryName}"
                                                 th:src="${authorCountry.country.countryLink}">
                                         </th:block>
                                     </th:block>
@@ -195,7 +204,8 @@
                                                     th:href="'/author/'+${authorSong.authorAlias.author.id}"
                                                     th:text="${authorSong.authorAlias.alias}"></a>
                                                 <th:block th:if="${authorSong.featConcat!=null}">
-                                                    <span th:text="${!iter.last ? ' '+authorSong.featConcat : ''}"></span>
+                                                    <span
+                                                        th:text="${!iter.last ? ' '+authorSong.featConcat : ''}"></span>
                                                 </th:block>
                                             </th:block>
                                         </th:block>
@@ -214,7 +224,8 @@
                                                     th:text="${authorSong.authorAlias.alias}"></a><span
                                                     th:text="${iter.last ? ')' : ''}"></span>
                                                 <th:block th:if="${authorSong.featConcat!=null}">
-                                                    <span th:text="${!iter.last ? ' '+authorSong.featConcat : ''}"></span>
+                                                    <span
+                                                        th:text="${!iter.last ? ' '+authorSong.featConcat : ''}"></span>
                                                 </th:block>
                                             </th:block>
                                         </th:block>
@@ -261,7 +272,8 @@
                                         <textarea th:utext="${songSubgroup.lyrics}" hidden
                                             th:attr="data-lyricsState=${songSubgroup.instrumental.value=='YES' ? 'instrumental' : 'noninstrumental'},data-instrumental=#{thisIsInstrumental},data-noLyrics=#{noLyrics}"></textarea>
                                         <th:block th:if="${songSubgroup.spotifyId != null}">
-                                            <a class="a-external-music-link spotify-link" th:href="${songSubgroup.spotifyId}">
+                                            <a class="a-external-music-link spotify-link"
+                                                th:href="${songSubgroup.spotifyId}">
                                                 <img class="img-responsive-row-icon"
                                                     th:src="@{/images/fullres/spotify_big.webp}" data-toggle="tooltip"
                                                     data-placement="top" th:title="#{openInSpotify}">
@@ -274,38 +286,44 @@
                                                 data-placement="top" th:title="#{pauseSample}" style="display: none;">
                                         </th:block>
                                         <th:block th:if="${songSubgroup.deezerId != null}">
-                                            <a class="a-external-music-link deezer-link" th:href="${songSubgroup.deezerId}">
+                                            <a class="a-external-music-link deezer-link"
+                                                th:href="${songSubgroup.deezerId}">
                                                 <img class="img-responsive-row-icon"
                                                     th:src="@{/images/fullres/deezer_big.webp}" data-toggle="tooltip"
                                                     data-placement="top" th:title="#{openInDeezer}">
                                             </a>
                                         </th:block>
                                         <th:block th:if="${songSubgroup.itunesLink != null}">
-                                            <a class="a-external-music-link itunes-link" th:href="${songSubgroup.itunesLink}">
+                                            <a class="a-external-music-link itunes-link"
+                                                th:href="${songSubgroup.itunesLink}">
                                                 <img class="img-responsive-row-icon"
                                                     th:src="@{/images/fullres/itunes_big.webp}" data-toggle="tooltip"
                                                     data-placement="top" th:title="#{openInAppleMusic}">
                                             </a>
                                         </th:block>
                                         <th:block th:if="${songSubgroup.tidalLink != null}">
-                                            <a class="a-external-music-link tidal-link" th:href="${songSubgroup.tidalLink}">
+                                            <a class="a-external-music-link tidal-link"
+                                                th:href="${songSubgroup.tidalLink}">
                                                 <img class="img-responsive-row-icon"
                                                     th:src="@{/images/fullres/tidal_big.webp}" data-toggle="tooltip"
                                                     data-placement="top" th:title="#{openInTidal}">
                                             </a>
                                         </th:block>
                                         <th:block th:if="${songSubgroup.soundcloudLink != null}">
-                                            <a class="a-external-music-link soundcloud-link" th:href="${songSubgroup.soundcloudLink}">
+                                            <a class="a-external-music-link soundcloud-link"
+                                                th:href="${songSubgroup.soundcloudLink}">
                                                 <img class="img-responsive-row-icon"
-                                                    th:src="@{/images/fullres/soundcloud_big.webp}" data-toggle="tooltip"
-                                                    data-placement="top" th:title="#{openInSoundCloud}">
+                                                    th:src="@{/images/fullres/soundcloud_big.webp}"
+                                                    data-toggle="tooltip" data-placement="top"
+                                                    th:title="#{openInSoundCloud}">
                                             </a>
                                         </th:block>
                                     </div>
                                 </td>
                                 <td class="infowarn">
                                     <th:block th:if="${songSubgroup.info!=null && songSubgroup.info!=''}">
-                                        <a data-toggle="tooltip" data-placement="left" th:title="${songSubgroup.info}">
+                                        <a class="warn-info" data-toggle="tooltip" data-placement="left"
+                                            th:title="${songSubgroup.info}">
                                             <img class="img-responsive-row-icon" th:src="@{/images/warn1.webp}">
                                         </a>
                                     </th:block>
@@ -322,6 +340,29 @@
     </div>
 
     <th:block th:insert="~{fragments/ytVideoModal.html}"></th:block>
+
+    <div class="modal fade" id="youtubeModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="ratio ratio-16x9">
+                                <iframe class="externalIframe" src="" id="youtubePlaylist" frameborder="0"
+                                    allowfullscreen
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="spotifyModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
