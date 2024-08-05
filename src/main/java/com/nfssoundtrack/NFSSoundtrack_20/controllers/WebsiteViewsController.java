@@ -447,9 +447,9 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             } else {
                 resultingText.append("Artist: ");
                 if (songSubgroup.getIngameDisplayBand() != null) {
-                    resultingText.append(songSubgroup.getIngameDisplayBand());
+                    resultingText.append(songSubgroup.getIngameDisplayBand()).append("\n");
                 } else {
-                    resultingText.append(songSubgroup.getSong().getOfficialDisplayBand());
+                    resultingText.append(songSubgroup.getSong().getOfficialDisplayBand()).append("\n");
                 }
             }
             resultingText.append(songSubgroup.getSubgroup().getMainGroup().getGame().getDisplayTitle());
