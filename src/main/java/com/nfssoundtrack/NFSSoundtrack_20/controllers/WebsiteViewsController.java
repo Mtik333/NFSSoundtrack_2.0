@@ -424,6 +424,9 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             songSubgroupSameGameList = songSubgroupSameGameList.stream().filter(songSubgroup1 ->
                             songSubgroup1.getSubgroup().getMainGroup().getGame().equals(songSubgroup.getSubgroup().getMainGroup().getGame()))
                     .filter(songSubgroup1 -> songSubgroup1.getFilename() != null && !songSubgroup1.getFilename().equals(songSubgroup.getFilename())).toList();
+            if (!songSubgroupSameGameList.isEmpty()){
+                resultingText.append("\n");
+            }
             for (SongSubgroup songSubgroup1 : songSubgroupSameGameList) {
                 resultingText.append("\n").append(songSubgroup1.getSubgroup().getSubgroupName()).append(": ")
                         .append("https://www.youtube.com/watch?v=").append(songSubgroup1.getSrcId());
@@ -458,7 +461,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             resultingText.append(songSubgroup.getFilename());
             //now line with promo
             resultingText.append("\n====================\n\n");
-            resultingText.append("\nCheck out more Racing Game Soundtracks: https://RacingSoundtracks.com");
+            resultingText.append("Check out more Racing Game Soundtracks: https://RacingSoundtracks.com");
             resultingText.append("\nIf you like what you hear, you can support me by making a small donation: https://www.paypal.me/SergiuAntoniuA");
             //and line with tags
             resultingText.append("\n====================\n\n");
