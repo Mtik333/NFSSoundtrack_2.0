@@ -137,6 +137,12 @@ $(document).ready(function () {
             $(this).val(typedSrcId.substring(indexOfMark + 6, indexOfTuDotBe + 28));
         }
     });
+
+    $(document).on('focusout', '#youtubePlaylistInput', function (e) {
+        var typedSrcId = $(this).val();
+        var indexOfMark = typedSrcId.indexOf("list=");
+        $(this).val(typedSrcId.substring(indexOfMark + 5, indexOfMark + 39));
+    });
 });
 
 function nullToString(value){

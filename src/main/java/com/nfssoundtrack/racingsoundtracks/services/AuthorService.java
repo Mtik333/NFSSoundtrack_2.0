@@ -1,0 +1,343 @@
+package com.nfssoundtrack.racingsoundtracks.services;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.nfssoundtrack.racingsoundtracks.controllers.WebsiteViewsController;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Author;
+import com.nfssoundtrack.racingsoundtracks.others.AuthorToDiscoGSObj;
+import com.nfssoundtrack.racingsoundtracks.others.DiscoGSObj;
+import com.nfssoundtrack.racingsoundtracks.repository.AuthorRepository;
+import com.nfssoundtrack.racingsoundtracks.serializers.AuthorToDiscoGSSerializer;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.requests.RestAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.security.auth.login.LoginException;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+
+@Service
+public class AuthorService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthorService.class);
+    public static final String NOT_FOUND_IN_DISCO_GS_DATABASE = " not found in DiscoGS database";
+    public static final String WHAT_EXCEPTION = "what exception? {}";
+    public static final String RETRY_IN_2_MINUTES = "Seems there were too many requests to DiscoGS. Please retry in 2 minutes";
+
+    @Autowired
+    AuthorRepository authorRepository;
+
+    @Value("${discogs.key}")
+    private String discogsKey;
+
+    @Value("${discogs.secret}")
+    private String discogsSecret;
+
+    @Value("${admin.discord.id}")
+    private String adminId;
+    @Autowired
+    Map<Long, DiscoGSObj> discoGSObjMap;
+
+    @Value("${bot.token}")
+    private String botSecret;
+
+    private static Instant lastError;
+
+    public Optional<Author> findById(int authorId) {
+        return authorRepository.findById(authorId);
+    }
+
+    public Optional<Author> findByName(String name) {
+        return authorRepository.findByName(name);
+    }
+
+    public List<Author> findAllByName(String name){
+        return authorRepository.findAllByName(name);
+    }
+
+    public List<Author> findByNameContains(String name) {
+        return authorRepository.findByNameContains(name);
+    }
+
+    public void delete(Author author) {
+        authorRepository.delete(author);
+    }
+
+    public void deleteAll(List<Author> authors) {
+        authorRepository.deleteAll(authors);
+    }
+
+    public Author save(Author author) {
+        return authorRepository.save(author);
+    }
+
+
+    @CachePut(value = "discoGSMap")
+    public DiscoGSObj fetchInfoFromMap(Author author) throws JsonProcessingException, LoginException, InterruptedException {
+        Optional<Long> authorIdAlreadyThere = discoGSObjMap.keySet().stream().filter(aLong ->
+                aLong.equals(author.getId())).findFirst();
+        if (Boolean.TRUE.equals(author.getSkipDiscogs())){
+            discoGSObjMap.remove(author.getId());
+            return new DiscoGSObj(true, 0, null,
+                    author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
+        }
+        DiscoGSObj discoGSObj;
+        if (authorIdAlreadyThere.isPresent()) {
+            discoGSObj = discoGSObjMap.get(authorIdAlreadyThere.get());
+            if (discoGSObj == null) {
+                if (!checkIfCanQueryDiscoGS()) {
+                    discoGSObj = new DiscoGSObj(false, 0, null, RETRY_IN_2_MINUTES);
+                    return discoGSObj;
+                }
+                Integer artistDiscogsId = retrieveArtistId(author.getName());
+                if (artistDiscogsId != null) {
+                    discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
+                    if (discoGSObj == null) {
+                        discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, RETRY_IN_2_MINUTES);
+                        updateLastError(Instant.now());
+                    } else {
+                        discoGSObjMap.put(author.getId(), discoGSObj);
+                        createArtistJson(author.getId(), discoGSObj);
+                    }
+                } else {
+                    discoGSObj = new DiscoGSObj(true, 0, null,
+                            author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
+                    discoGSObjMap.put(author.getId(), discoGSObj);
+                    createArtistJson(author.getId(), discoGSObj);
+                }
+            } else {
+                if (!discoGSObj.isNotInDiscogs()) {
+                    if (discoGSObj.getDiscogsId() == null) {
+                        RestAction<Member> memberRestAction = WebsiteViewsController.getJda().getGuilds().get(0).retrieveMemberById(adminId);
+                        DiscoGSObj finalDiscoGSObj = discoGSObj;
+                        memberRestAction.queue(member -> member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                                .sendMessage("discoGSObj " + finalDiscoGSObj).queue()));
+                        discoGSObjMap.remove(author.getId());
+                    } else {
+                        if (discoGSObj.getUri() != null) {
+                            return discoGSObj;
+                        }
+                        if (!checkIfCanQueryDiscoGS()) {
+                            discoGSObj = new DiscoGSObj(false, 0, null, "Seems there were too many " +
+                                    "requests to DiscoGS. Please retry in 2 minutes");
+                            return discoGSObj;
+                        }
+                        discoGSObj = obtainArtistLinkAndProfile(author.getName(), discoGSObj.getDiscogsId());
+                        if (discoGSObj == null) {
+                            discoGSObj = new DiscoGSObj(null, "There was some internal error " +
+                                    "- you might reach out to admin so he can double check");
+                            updateLastError(Instant.now());
+                        } else {
+                            discoGSObjMap.put(author.getId(), discoGSObj);
+                            createArtistJson(author.getId(), discoGSObj);
+                        }
+                    }
+                }
+            }
+        } else {
+            if (!checkIfCanQueryDiscoGS()) {
+                discoGSObj = new DiscoGSObj(false, 0, null, "Seems there were too many " +
+                        "requests to DiscoGS. Please retry in 2 minutes");
+                return discoGSObj;
+            }
+            Integer artistDiscogsId = retrieveArtistId(author.getName());
+            if (artistDiscogsId != null) {
+                discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
+                if (discoGSObj == null) {
+                    discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, "There was some internal error " +
+                            "- you might reach out to admin so he can double check");
+                    updateLastError(Instant.now());
+                }
+                discoGSObjMap.put(author.getId(), discoGSObj);
+                createArtistJson(author.getId(), discoGSObj);
+            } else {
+                discoGSObj = new DiscoGSObj(true, 0, null,
+                        author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
+                discoGSObjMap.put(author.getId(), discoGSObj);
+                createArtistJson(author.getId(), discoGSObj);
+            }
+        }
+        return discoGSObj;
+    }
+
+    public DiscoGSObj manuallyFetchDiscogsInfo(String authorName, Integer artistDiscogsId) throws JsonProcessingException, LoginException, InterruptedException {
+        return obtainArtistLinkAndProfile(authorName, artistDiscogsId);
+    }
+
+    private boolean checkIfCanQueryDiscoGS() {
+        if (lastError != null) {
+            Instant currentInstant = Instant.now();
+            Duration timeElapsed = Duration.between(lastError, currentInstant);
+            if (timeElapsed.toMinutes() > 1) {
+                updateLastError(null);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Integer retrieveArtistId(String authorName) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String uri = "https://api.discogs.com/database/search"; // or any other uri
+            HttpEntity<String> entity = entityToGet();
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(uri)
+                    .queryParam("q", URLEncoder.encode(authorName, StandardCharsets.UTF_8))
+                    .queryParam("type", "artist")
+                    .queryParam("key", discogsKey)
+                    .queryParam("secret", discogsSecret)
+                    .queryParam("per_page", 5)
+                    .queryParam("page", 1);
+            HttpEntity<String> response1 = restTemplate.exchange(
+                    builder.toUriString(),
+                    HttpMethod.GET, entity, String.class);
+            String body1 = response1.getBody();
+            ObjectMapper objectMapper1 = new ObjectMapper();
+            Map<?, ?> something1 = objectMapper1.readValue(body1, Map.class);
+            List<?> results = (List<?>) something1.get("results");
+            if (!results.isEmpty()) {
+                LinkedHashMap<?, ?> resultsMap = (LinkedHashMap<?, ?>) results.get(0);
+                String artistName = String.valueOf(resultsMap.get("title"));
+                if (artistName.contains(")")) {
+                    artistName = artistName.replaceAll("\\((.+?)\\)", "").trim();
+                }
+                if (artistName.contentEquals(authorName)) {
+                    return (Integer) resultsMap.get("id");
+                }
+            } else {
+                return null;
+            }
+        } catch (Exception exp) {
+            logger.error(WHAT_EXCEPTION, exp.getMessage());
+            exp.printStackTrace();
+        }
+        return null;
+    }
+
+    private DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws InterruptedException, LoginException {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String uri2 = "https://api.discogs.com/artists/" + id;
+            HttpEntity<String> entity = entityToGet();
+            UriComponentsBuilder builder2 = UriComponentsBuilder.fromHttpUrl(uri2);
+            HttpEntity<String> response = restTemplate.exchange(
+                    builder2.toUriString(),
+                    HttpMethod.GET, entity, String.class);
+            String body = response.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<?, ?> something = objectMapper.readValue(body, Map.class);
+            DiscoGSObj discoGSObj = new DiscoGSObj();
+            String linkToArtist = String.valueOf(something.get("uri"));
+            discoGSObj.setUri(linkToArtist);
+            discoGSObj.setDiscogsId(id);
+            String profile = String.valueOf(something.get("profile"));
+            if (profile == null || profile.isEmpty()) {
+                profile = authorName + " has no profile description at DiscoGS";
+            } else {
+                profile = profile.replace("\n", "<br/>");
+            }
+            discoGSObj.setProfile(profile);
+            List<String> urls = (List<String>) something.get("urls");
+            if (urls != null && !urls.isEmpty()) {
+                for (String localUrl : urls) {
+                    if (localUrl.contains("facebook")) {
+                        discoGSObj.setFacebook(localUrl);
+                    } else if (localUrl.contains("twitter")) {
+                        discoGSObj.setTwitter(localUrl);
+                    } else if (localUrl.contains("instagram")) {
+                        discoGSObj.setInstagram(localUrl);
+                    } else if (localUrl.contains("soundcloud")) {
+                        discoGSObj.setSoundcloud(localUrl);
+                    } else if (localUrl.contains("myspace")) {
+                        discoGSObj.setMyspace(localUrl);
+                    } else if (localUrl.contains("wikipedia")) {
+                        discoGSObj.setWikipedia(localUrl);
+                    }
+                }
+            }
+            return discoGSObj;
+        } catch (Exception exp) {
+            logger.error(WHAT_EXCEPTION, exp.getMessage());
+            WebsiteViewsController.rebuildJda(botSecret);
+            RestAction<Member> memberRestAction = WebsiteViewsController.getJda().getGuilds().get(0).retrieveMemberById(adminId);
+            memberRestAction.queue(member -> {
+                member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                        .sendMessage("Error trying to obtainArtistLinkAndProfile on " +
+                                "authorName " + authorName + " id + " + id + " WHY??? " + exp.getMessage()).queue());
+                member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                        .sendMessage(Arrays.toString(exp.getStackTrace()).substring(0, 1800)).queue());
+            });
+            return null;
+        }
+    }
+
+    private HttpEntity<String> entityToGet() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.add("user-agent", "NFSSoundtrack/1.0 +https://nfssoundtrack.com");
+        return new HttpEntity<>("parameters", headers);
+    }
+
+    private void createArtistJson(Long artistId, DiscoGSObj discoGSObj) throws InterruptedException, LoginException {
+        try {
+            File folderFile = new File("discogs"+File.separator+artistId);
+            if (!folderFile.exists()){
+                logger.debug("creating folder {}", folderFile.mkdir());
+            }
+            try (RandomAccessFile randomDiscoGsFile = new RandomAccessFile( folderFile.getPath()
+                    +File.separator+"discogs.json", "rw")){
+                File discoGsFile = new File(folderFile.getPath()
+                        +File.separator+"discogs.json");
+                if (discoGsFile.canWrite()) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    SimpleModule simpleModule = new SimpleModule();
+                    simpleModule.addSerializer(AuthorToDiscoGSObj.class, new AuthorToDiscoGSSerializer());
+                    objectMapper.registerModule(simpleModule);
+                    AuthorToDiscoGSObj authorToDiscoGSObj = new AuthorToDiscoGSObj(artistId, discoGSObj);
+                    String valueAsString = objectMapper.writeValueAsString(authorToDiscoGSObj);
+                    randomDiscoGsFile.write(valueAsString.getBytes(StandardCharsets.UTF_8));
+                }
+            }
+        } catch (IOException exp) {
+            logger.error(WHAT_EXCEPTION, exp.getMessage());
+            WebsiteViewsController.rebuildJda(botSecret);
+            RestAction<Member> memberRestAction = WebsiteViewsController.getJda().getGuilds().get(0).retrieveMemberById(adminId);
+            memberRestAction.queue(member -> {
+                member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                        .sendMessage("Error trying to update map with discogs info - WHY??? " + exp.getMessage()).queue());
+                member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                        .sendMessage(Arrays.toString(exp.getStackTrace()).substring(0, 1800)).queue());
+            });
+        }
+    }
+
+    public void updateDiscoGSObj(Integer artistId, DiscoGSObj updatedDiscoGSObj) throws LoginException, InterruptedException {
+        discoGSObjMap.put((long)artistId,updatedDiscoGSObj);
+        createArtistJson((long)artistId, updatedDiscoGSObj);
+    }
+
+    private static void updateLastError(Instant instant){
+        lastError = instant;
+    }
+
+}
