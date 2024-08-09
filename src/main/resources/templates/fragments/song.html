@@ -53,7 +53,7 @@
                                 d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
                         </svg>
                     </a>
-                    <textarea th:utext="${songSubgroup.lyrics}" hidden></textarea>
+                    <textarea th:utext="${songSubgroup.lyrics!=null} ? ${songSubgroup.lyrics} : ${songSubgroup.song.lyrics}" hidden></textarea>
                     <th:block th:if="${songSubgroup.spotifyId != null}">
                         <a class="a-external-music-link spotify-link" th:href="${songSubgroup.spotifyId}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"

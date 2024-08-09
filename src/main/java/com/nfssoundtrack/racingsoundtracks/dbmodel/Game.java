@@ -232,8 +232,6 @@ public class Game implements Serializable, Comparable<Game> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
         Game game = (Game) o;
         return Objects.equals(id, game.id) && Objects.equals(serie, game.serie) && Objects.equals(position, game.position) && Objects.equals(gameTitle, game.gameTitle) && Objects.equals(displayTitle, game.displayTitle) && Objects.equals(gameShort, game.gameShort) && Objects.equals(prefix, game.prefix);
     }
