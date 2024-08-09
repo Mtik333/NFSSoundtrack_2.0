@@ -231,12 +231,6 @@ public class Game implements Serializable, Comparable<Game> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        Game game = (Game) o;
-        return Objects.equals(id, game.id) && Objects.equals(serie, game.serie) && Objects.equals(position, game.position) && Objects.equals(gameTitle, game.gameTitle) && Objects.equals(displayTitle, game.displayTitle) && Objects.equals(gameShort, game.gameShort) && Objects.equals(prefix, game.prefix);
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(id, serie, position, gameTitle, displayTitle, gameShort, prefix);
     }
