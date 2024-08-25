@@ -48,7 +48,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             firstSongSubgroup = songSubgroup;
         }
         if (!objectMapper.isEmpty()) {
-            if (firstSongSubgroup!=null){
+            if (firstSongSubgroup != null) {
                 String gameShort = firstSongSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
                 removeCacheEntry(gameShort);
             }
@@ -161,69 +161,90 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
 
     @DeleteMapping(value = "/delete/{subgroupId}")
     public @ResponseBody
-    String deleteSongSubgroup(@PathVariable("subgroupId") int subgroupId) throws JsonProcessingException {
-        try {
-            SongSubgroup songSubgroup =
-                    songSubgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No subgroup found " +
-                            "with id " + subgroupId));
-            String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
-            removeCacheEntry(gameShort);
-            Song song = songSubgroup.getSong();
-            List<SongSubgroup> allSongSubgroupEntries = songSubgroupService.findBySong(song);
-            if (allSongSubgroupEntries.size() == 1) {
-                //means we basically have to delete song entirely to avoid orphans
-                List<SongGenre> songGenresToDelete = song.getSongGenreList();
-                List<Genre> genresToDelete = new ArrayList<>();
-                for (SongGenre songGenre : songGenresToDelete) {
-                    Genre genre = songGenre.getGenre();
-                    List<SongGenre> allUsagesOfGenre = songGenreService.findByGenre(genre);
-                    if (allUsagesOfGenre.size() == 1) {
-                        genresToDelete.add(genre);
-                    }
+    String deleteSongSubgroup(@PathVariable("subgroupId") int subgroupId) throws JsonProcessingException, ResourceNotFoundException {
+        SongSubgroup songSubgroup =
+                songSubgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No subgroup found " +
+                        "with id " + subgroupId));
+        String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
+        removeCacheEntry(gameShort);
+        Song song = songSubgroup.getSong();
+        List<SongSubgroup> allSongSubgroupEntries = songSubgroupService.findBySong(song);
+        if (allSongSubgroupEntries.size() == 1) {
+            //means we basically have to delete song entirely to avoid orphans
+            List<SongGenre> songGenresToDelete = song.getSongGenreList();
+            List<Genre> genresToDelete = new ArrayList<>();
+            for (SongGenre songGenre : songGenresToDelete) {
+                Genre genre = songGenre.getGenre();
+                List<SongGenre> allUsagesOfGenre = songGenreService.findByGenre(genre);
+                if (allUsagesOfGenre.size() == 1) {
+                    genresToDelete.add(genre);
                 }
-                List<AuthorSong> authorsOfSong = song.getAuthorSongList();
-                List<AuthorAlias> authorAliasToDelete = new ArrayList<>();
-                List<Author> authorsToDelete = new ArrayList<>();
-                List<AuthorCountry> authorCountriesToDelete = new ArrayList<>();
-                for (AuthorSong authorSong : authorsOfSong) {
-                    Author author = authorSong.getAuthorAlias().getAuthor();
-                    List<AuthorSong> allUsagesOfAlias = authorSongService.findByAuthorAlias(
-                            authorSong.getAuthorAlias());
-                    if (allUsagesOfAlias.size() == 1) {
-                        authorAliasToDelete.add(authorSong.getAuthorAlias());
-                        List<AuthorAlias> authorAliases = authorAliasService.findByAuthor(author);
-                        if (authorAliases.size() == 1) {
-                            authorsToDelete.add(author);
-                            authorCountriesToDelete.addAll(author.getAuthorCountries());
-                        }
-                    }
-                }
-                authorSongService.deleteAll(authorsOfSong);
-                if (!authorsToDelete.isEmpty()) {
-                    authorCountryService.deleteAll(authorCountriesToDelete);
-                    authorAliasService.deleteAll(authorAliasToDelete);
-                    authorService.deleteAll(authorsToDelete);
-                }
-                songGenreService.deleteAll(songGenresToDelete);
-                if (!genresToDelete.isEmpty()) {
-                    genreService.deleteAll(genresToDelete);
-                }
-                songSubgroupService.delete(songSubgroup);
-                songService.delete(song);
-            } else {
-                List<Correction> relatedCorrections = correctionService.findBySongSubgroup(songSubgroup);
-                for (Correction correction : relatedCorrections) {
-                    correction.setSongSubgroup(null);
-                    correction.setCorrectValue(correction.getCorrectValue()
-                            + "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
-                    correctionService.save(correction);
-                }
-                songSubgroupService.delete(songSubgroup);
             }
-            return new ObjectMapper().writeValueAsString("OK");
-        } catch (Exception exp) {
-            return new ObjectMapper().writeValueAsString(exp);
+            List<AuthorSong> authorsOfSong = song.getAuthorSongList();
+            List<AuthorAlias> authorAliasToDelete = new ArrayList<>();
+            List<Author> authorsToDelete = new ArrayList<>();
+            List<AuthorCountry> authorCountriesToDelete = new ArrayList<>();
+            for (AuthorSong authorSong : authorsOfSong) {
+                Author author = authorSong.getAuthorAlias().getAuthor();
+                List<AuthorSong> allUsagesOfAlias = authorSongService.findByAuthorAlias(
+                        authorSong.getAuthorAlias());
+                if (allUsagesOfAlias.size() == 1) {
+                    authorAliasToDelete.add(authorSong.getAuthorAlias());
+                    List<AuthorAlias> authorAliases = authorAliasService.findByAuthor(author);
+                    if (authorAliases.size() == 1) {
+                        authorsToDelete.add(author);
+                        authorCountriesToDelete.addAll(author.getAuthorCountries());
+                    }
+                }
+            }
+            authorSongService.deleteAll(authorsOfSong);
+            if (!authorsToDelete.isEmpty()) {
+                authorCountryService.deleteAll(authorCountriesToDelete);
+                authorAliasService.deleteAll(authorAliasToDelete);
+                authorService.deleteAll(authorsToDelete);
+            }
+            songGenreService.deleteAll(songGenresToDelete);
+            if (!genresToDelete.isEmpty()) {
+                genreService.deleteAll(genresToDelete);
+            }
+            //if we remove song from subgroup but this specific one was used as today song
+            //then either we link other usage of this song or just replace it with some other song
+            List<TodaysSong> todaysSongs = todaysSongService.findAllBySongSubgroup(songSubgroup);
+            if (todaysSongs.size() == 1) {
+                List<SongSubgroup> allSongSubgroups = songSubgroupService.findBySong(song);
+                if (allSongSubgroups.size() > 1) {
+                    SongSubgroup replacementSongSubgroup = allSongSubgroups.stream().filter(songSubgroup1 -> !songSubgroup1.getId().equals(songSubgroup.getId())).findFirst().get();
+                    TodaysSong todaysSong = todaysSongs.get(0);
+                    todaysSong.setSongSubgroup(replacementSongSubgroup);
+                    todaysSongService.save(todaysSong);
+                } else {
+                    List<SongSubgroup> songSubgroupList = songSubgroup.getSubgroup().getSongSubgroupList();
+                    SongSubgroup replacementSongSubgroup = songSubgroupList.get(Math.abs(songSubgroupList.indexOf(songSubgroup) - 1));
+                    TodaysSong todaysSong = todaysSongs.get(0);
+                    todaysSong.setSongSubgroup(replacementSongSubgroup);
+                    todaysSongService.save(todaysSong);
+                }
+            }
+            List<Correction> relatedCorrections = correctionService.findBySongSubgroup(songSubgroup);
+            for (Correction correction : relatedCorrections) {
+                correction.setSongSubgroup(null);
+                correction.setCorrectValue(correction.getCorrectValue()
+                        + "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
+                correctionService.save(correction);
+            }
+            songSubgroupService.delete(songSubgroup);
+            songService.delete(song);
+        } else {
+            List<Correction> relatedCorrections = correctionService.findBySongSubgroup(songSubgroup);
+            for (Correction correction : relatedCorrections) {
+                correction.setSongSubgroup(null);
+                correction.setCorrectValue(correction.getCorrectValue()
+                        + "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
+                correctionService.save(correction);
+            }
+            songSubgroupService.delete(songSubgroup);
         }
+        return new ObjectMapper().writeValueAsString("OK");
     }
 
     @PutMapping(value = "/putGlobally/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)

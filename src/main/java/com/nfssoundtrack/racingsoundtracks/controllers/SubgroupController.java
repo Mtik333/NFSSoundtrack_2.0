@@ -58,6 +58,23 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
                             + "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
                     correctionService.save(correction);
                 }
+                //if we remove song from subgroup but this specific one was used as today song
+                //then either we link other usage of this song or just replace it with some other song
+                List<TodaysSong> todaysSongs = todaysSongService.findAllBySongSubgroup(songSubgroup);
+                if (todaysSongs.size() == 1) {
+                    List<SongSubgroup> allSongSubgroups = songSubgroupService.findBySong(mySong);
+                    if (allSongSubgroups.size() > 1) {
+                        SongSubgroup replacementSongSubgroup = allSongSubgroups.stream().filter(songSubgroup1 -> !songSubgroup1.getId().equals(songSubgroup.getId())).findFirst().get();
+                        TodaysSong todaysSong = todaysSongs.get(0);
+                        todaysSong.setSongSubgroup(replacementSongSubgroup);
+                        todaysSongService.save(todaysSong);
+                    } else {
+                        SongSubgroup replacementSongSubgroup = songSubgroupList.get(Math.abs(songSubgroupList.indexOf(songSubgroup) - 1));
+                        TodaysSong todaysSong = todaysSongs.get(0);
+                        todaysSong.setSongSubgroup(replacementSongSubgroup);
+                        todaysSongService.save(todaysSong);
+                    }
+                }
                 songSubgroupService.delete(songSubgroup);
                 //delete orphaned stuff
                 List<SongSubgroup> orphanedSong = songSubgroupService.findBySong(mySong);
