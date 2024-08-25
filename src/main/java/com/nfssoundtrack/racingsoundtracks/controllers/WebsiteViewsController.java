@@ -79,6 +79,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public String manage(Model model) {
         model.addAttribute(APP_NAME, appName);
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         return "manage";
     }
 
@@ -90,6 +91,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public String login(Model model) {
         model.addAttribute(APP_NAME, appName);
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         model.addAttribute("login", true);
         return "login";
     }
@@ -102,6 +104,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     @GetMapping(value = "/content/{value}")
     public String topMenuEntry(Model model, @PathVariable("value") String value) throws ResourceNotFoundException, LoginException, InterruptedException {
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         model.addAttribute("htmlToInject",
                 contentService.findByContentShort(value).getContentData());
         boolean isHome = value.contains("home");
@@ -127,6 +130,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         customTheme.ifPresent(theme -> model.addAttribute("customTheme", theme));
         model.addAttribute("songSubgroups", songSubgroupService.hasGameAnySongs(game));
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         return MIN_INDEX;
     }
 
@@ -156,6 +160,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         }
         model.addAttribute(APP_NAME, "Custom playlist - " + appName);
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         model.addAttribute("customPlaylist", songSubgroupList);
         return MIN_INDEX;
     }
@@ -196,6 +201,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute(APP_NAME, song.getOfficialDisplayBand()
                 + " - " + song.getOfficialDisplayTitle() + " - " + appName);
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         model.addAttribute("songToCheck", song);
         model.addAttribute("songUsages", songSubgroupService.findBySong(song));
         return MIN_INDEX;
@@ -244,6 +250,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("allAliases", allAliases);
         model.addAttribute(APP_NAME, author.getName() + " - " + appName);
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         return MIN_INDEX;
     }
 
@@ -266,6 +273,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("readFull", true);
         model.addAttribute(APP_NAME, genre.getGenreName() + " - " + appName);
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         return MIN_INDEX;
     }
 
@@ -288,6 +296,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("genre", genre);
         model.addAttribute(APP_NAME, "Full list of genre " + genre.getGenreName() + " - " + appName);
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         return MIN_INDEX;
     }
 
@@ -297,6 +306,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("todays30Songs", todays30Songs);
         model.addAttribute(APP_NAME, "Archive of today's songs - " + appName);
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         return MIN_INDEX;
     }
 

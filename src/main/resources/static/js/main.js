@@ -26,20 +26,65 @@ async function doLoadingCrap() {
         $(headerDiv).css("display", "none");
         $("#offcanvasSpan").removeAttr("data-bs-toggle");
         $("#offcanvasSpan").css("display", "none");
+        $("#filter_games_menu").css("display", "");
+        $("#filter_games_menu_pinned").css("display", "none");
         $("#unpin-menu").css("display", "");
         $("#unpin-menu").parent().css("display", "flex");
+        $("#pin-menu").prev().css("display", "none");
+        $("#pin-menu").prev().prev().css("display", "none");
         var contentDiv = $("#offcanvas").next().next();
         if (contentWidth != null) {
             contentDiv.addClass("col");
             contentDiv.removeClass("col-sm-" + contentWidth);
         }
+        //if we shouw all games, need to introduce the scrollbar to that group display as we dont want game menu to be shown entirely with 1000 or so games
+        if (localStorage.getItem("all-games") == "true") {
+            $("#all-games-div").css("overflow-y", "scroll");
+            //unpin menu button is placed after buttons to trigger alphabetical and normal order
+            $("#unpin-menu").prev().css("display", "");
+            $("#unpin-menu").prev().prev().css("display", "none");
+            //we are in case of non-game page like main one
+            if ($("div.centerKeeper").length == 3) {
+                $("#all-games-div").css("max-height",
+                    ($("div.centerKeeper").first().height() - $("#search-games-bar").height() - $("#allgames-heading").height()) + "px");
+            } else {
+                //otherwise we want to make menu not too big and not too small depending on how many songs are in the game
+                var minVw = 36;
+                var maxVw = 144;
+                var tenPercentOfWholePageHeight = Math.floor((($("header").height() + $("div.real-page-content").height()) / window.innerHeight * 100) / 20);
+                if (tenPercentOfWholePageHeight <= maxVw && tenPercentOfWholePageHeight >= minVw) {
+                    $("#all-games-div").css("max-height", tenPercentOfWholePageHeight + "vw");
+                } else if (tenPercentOfWholePageHeight > maxVw) {
+                    $("#all-games-div").css("max-height", "144vw");
+                } else if (tenPercentOfWholePageHeight < minVw) {
+                    $("#all-games-div").css("max-height", $("div.parentTabs").height()+"px");
+                }
+            }
+        } else {
+            $("#unpin-menu").prev().css("display", "none");
+            $("#unpin-menu").prev().prev().css("display", "");
+        }
     } else {
         $("#unpin-menu").css("display", "none");
         $("#unpin-menu").parent().css("display", "");
+        $("#unpin-menu").prev().css("display", "none");
+        $("#unpin-menu").prev().prev().css("display", "none");
+        $("#filter_games_menu").css("display", "none");
+        $("#filter_games_menu_pinned").css("display", "");
         var contentDiv = $("#offcanvas").next().next();
         if (contentWidth != null) {
             contentDiv.addClass("col-sm-" + contentWidth);
             contentDiv.removeClass("col");
+        }
+        //probably need to make this less convoluted as code is quite repetitive
+        if (localStorage.getItem("all-games") == "true") {
+            $("#all-games-div").css("overflow-y", "");
+            $("#all-games-div").css("max-height", "");
+            $("#pin-menu").prev().css("display", "");
+            $("#pin-menu").prev().prev().css("display", "none");
+        } else {
+            $("#pin-menu").prev().css("display", "none");
+            $("#pin-menu").prev().prev().css("display", "");
         }
     }
     if ('ontouchstart' in window) {
@@ -59,6 +104,9 @@ async function doLoadingCrap() {
         $("#moreDiv").css("position", "absolute");
         $(document).find("header").addClass("sticky-top");
     } else {
+        //in case of desktop version putting red text in the very top of the page next to links and logo
+        $("#warnUser").css("position", "absolute");
+        $("#warnUser").css("margin-top", "1vw");
         var iconsSize = localStorage.getItem("icons-size");
         if (iconsSize != undefined) {
             $(document).find("img.img-responsive-row-icon").css("max-height", iconsSize + "vw");
@@ -121,7 +169,12 @@ async function doLoadingCrap() {
         $("#offcanvas").removeClass("w-50");
         $("#offcanvas").addClass("w-" + newWidth);
     }
-
+    //if we display all games together, we show such group and hide all normal groups
+    var allGames = localStorage.getItem("all-games");
+    if (allGames == "true") {
+        $("#all-games-group").attr("hidden", false);
+        $(".single-serie").attr("hidden", true);
+    }
     //pushing content of custom playlist from local storage to related input as it is always rendered by server
     if (localStorage.getItem("custom-playlist") != undefined) {
         var customPlaylistArrayTrigger = JSON.parse(localStorage.getItem("custom-playlist"));
@@ -148,6 +201,7 @@ async function doLoadingCrap() {
     $("#searchStuff").tooltip({ 'trigger': 'focus', 'title': $("#searchStuff").attr("data-tooltip") });
     //resetting value of game filtering
     $("#filter_games_menu").val("");
+    $("#filter_games_menu_pinned").val("");
     //triggering all declared tooltips to show up
     $('[data-toggle="tooltip"]').tooltip();
     //if we are in custom playlist mode then we make button active
@@ -162,7 +216,23 @@ async function doLoadingCrap() {
                     return;
                 }
                 $(this).addClass("active");
-                $(this).parent().parent().parent().parent().find("button").click();
+                //here we scroll all-games group to the game that we are in right now
+                //since we can have either static menu or expandable, need to handle this too
+                if (!$("#all-games-group").attr("hidden")) {
+                    if (localStorage.getItem("static-leftmenu") == "true") {
+                        $($("a.active")[1]).parent().parent().parent()
+                            .animate({
+                                scrollTop: $(this).offset().top + $(this).height() * -5 + $("#search-games-bar").height() * -1
+                            }, 0)
+                    } else {
+                        $($("a.active")[1]).parent().parent().parent().parent().parent().parent()
+                            .animate({
+                                scrollTop: $(this).offset().top + $(this).height() * -5 + $("div.offcanvas-header").height() * -1
+                            }, 0)
+                    }
+                } else {
+                    $(this).parent().parent().parent().parent().find("button").click();
+                }
             } else {
                 $(this).parent().addClass("nfs-top-item-active");
             }
@@ -921,12 +991,40 @@ $(document).ready(function () {
         $("#offcanvasSpan").css("display", "none");
         $("#unpin-menu").css("display", "");
         $("#unpin-menu").parent().css("display", "flex");
+        //search inputs are duplicated on page so we need to hide the right one when we switch that pin/unpin view
+        $("#filter_games_menu_pinned").css("display", "none");
+        $("#filter_games_menu").css("display", "");
         localStorage.setItem("static-leftmenu", true);
         var contentDiv = $("#offcanvas").next().next();
         var contentWidth = localStorage.getItem("content-width");
         if (contentWidth != null) {
             contentDiv.addClass("col");
             contentDiv.removeClass("col-sm-" + contentWidth);
+        }
+        //we again scroll the group content since pin/unpin menu will reset the scroll
+        if (localStorage.getItem("all-games") == "true") {
+            $("#all-games-div").css("overflow-y", "scroll");
+            $("#unpin-menu").prev().css("display", "");
+            if ($("div.centerKeeper").length == 3) {
+                $("#all-games-div").css("max-height", $("div.centerKeeper").first().height() + "px");
+            } else {
+                var minVw = 36;
+                var maxVw = 144;
+                var tenPercentOfWholePageHeight = Math.floor((($("header").height() + $("div.real-page-content").height()) / window.innerHeight * 100) / 10);
+                if (tenPercentOfWholePageHeight <= maxVw && tenPercentOfWholePageHeight >= minVw) {
+                    $("#all-games-div").css("max-height", tenPercentOfWholePageHeight + "vw");
+                } else if (tenPercentOfWholePageHeight > maxVw) {
+                    $("#all-games-div").css("max-height", "144vw");
+                } else if (tenPercentOfWholePageHeight < minVw) {
+                    $("#all-games-div").css("max-height", $("div.parentTabs").height()+"px");
+                }
+            }
+            $($("a.active")[1]).parent().parent().parent()
+                .animate({
+                    scrollTop: $($("a.active")[1]).offset().top + $($("a.active")[1]).height() * -5 + $("#search-games-bar").height() * -2
+                }, 0)
+        } else {
+            $("#unpin-menu").prev().prev().css("display", "");
         }
     });
 
@@ -938,12 +1036,49 @@ $(document).ready(function () {
         $("#offcanvasSpan").css("display", "");
         $("#unpin-menu").css("display", "none");
         $("#unpin-menu").parent().css("display", "");
+        //just see what happens in case of clicking to pin menu, it's basically other way around
+        $("#unpin-menu").prev().css("display", "none");
+        $("#unpin-menu").prev().prev().css("display", "none");
+        $("#filter_games_menu_pinned").css("display", "");
+        $("#filter_games_menu").css("display", "none");
         localStorage.setItem("static-leftmenu", false);
         var contentDiv = $("#offcanvas").next().next();
+        var contentWidth = localStorage.getItem("content-width");
         if (contentWidth != null) {
             contentDiv.addClass("col-sm-" + contentWidth);
             contentDiv.removeClass("col");
         }
+        if (localStorage.getItem("all-games") == "true") {
+            $("#all-games-div").css("overflow-y", "");
+            $("#all-games-div").css("max-height", "");
+            $("#pin-menu").prev().css("display", "");
+            $("#pin-menu").prev().prev().css("display", "none");
+            $($("a.active")[1]).parent().parent().parent().parent().parent().parent()
+                .animate({
+                    scrollTop: $($("a.active")[1]).offset().top + $($("a.active")[1]).height() * -3 + $("div.offcanvas-header").height() * -1
+                }, 0)
+        } else {
+            $("#pin-menu").prev().css("display", "none");
+            $("#pin-menu").prev().prev().css("display", "");
+        }
+    });
+
+    //when we decide to group games normally, we hide this big group and show the other button, to display games alphabetically
+    //again since these buttons appear twice in the canvas, we use this to show the right one
+    $("button.grouped-games").on("click", function (e) {
+        localStorage.setItem("all-games", false);
+        $(this).prev().css("display", "");
+        $("button.grouped-games").css("display", "none");
+        $("#all-games-group").attr("hidden", true);
+        $(".single-serie").attr("hidden", false);
+    });
+
+    $("button.alphabetical-games").on("click", function (e) {
+        localStorage.setItem("all-games", true);
+        $("button.alphabetical-games").css("display", "none");
+        $(this).next().css("display", "");
+        $("#all-games-group").attr("hidden", false);
+        $(".single-serie").attr("hidden", true);
     });
 
     $(document).on("click", "img.30-player", function (elem) {

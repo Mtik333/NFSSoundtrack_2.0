@@ -21,6 +21,7 @@ $(document).ready(function () {
         localStorage.setItem("video-rendering-stuff", $("#video-rendering-stuff").prop("checked"));
         localStorage.setItem("hide-icons", JSON.stringify($("#hide-icons").val()));
         localStorage.setItem("hide-flags", $("#hide-flags").prop("checked"));
+        localStorage.setItem("all-games", $("#all-games").prop("checked"));
         localStorage.setItem("lang", $("#lang-select").val());
         var langAlreadyThere = window.location.toString().indexOf("?lang") > -1;
         if (langAlreadyThere) {
@@ -32,40 +33,44 @@ $(document).ready(function () {
 
     $(document).on("click", "#openPreferences", function () {
         var scrolling = localStorage.getItem("scrolling-stuff");
-        if (scrolling!=undefined){
+        if (scrolling != undefined) {
             $("#scrolling-stuff").prop("checked", JSON.parse(scrolling));
         }
         var renderingVideo = localStorage.getItem("video-rendering-stuff");
-        if (renderingVideo!=undefined){
+        if (renderingVideo != undefined) {
             $("#video-rendering-stuff").prop("checked", JSON.parse(renderingVideo));
         }
         var hideFlags = localStorage.getItem("hide-flags");
-        if (hideFlags!=undefined){
+        if (hideFlags != undefined) {
             $("#hide-flags").prop("checked", JSON.parse(hideFlags));
         }
         var staticMenu = localStorage.getItem("static-leftmenu");
-        if (staticMenu!=undefined){
+        if (staticMenu != undefined) {
             $("#static-leftmenu").prop("checked", JSON.parse(staticMenu));
         }
         var expandWidth = localStorage.getItem("expandable-width");
-        if (staticMenu!=undefined){
+        if (staticMenu != undefined) {
             $("#expandable-width").val(expandWidth);
         }
         var iconsSize = localStorage.getItem("icons-size");
-        if (iconsSize!=undefined){
+        if (iconsSize != undefined) {
             $("#icons-size").val(iconsSize);
         }
         var contentWidth = localStorage.getItem("content-width");
-        if (contentWidth!=undefined){
+        if (contentWidth != undefined) {
             $("#content-width").val(contentWidth);
         }
         var lang = localStorage.getItem("lang");
-        if (lang!=undefined){
+        if (lang != undefined) {
             $("#lang-select").val(lang);
         }
         var hideIcons = JSON.parse(localStorage.getItem("hide-icons"));
-        if (hideIcons!=undefined){
-            $("#hide-icons").multiselect('select',hideIcons);
+        if (hideIcons != undefined) {
+            $("#hide-icons").multiselect('select', hideIcons);
+        }
+        var allGames = localStorage.getItem("all-games");
+        if (allGames != undefined) {
+            $("#all-games").prop("checked", JSON.parse(allGames));
         }
     });
 

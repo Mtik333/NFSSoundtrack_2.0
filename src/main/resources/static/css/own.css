@@ -291,6 +291,10 @@ iframe.externalIframe {
   width: 100%;
 }
 
+#filter_games_menu_pinned {
+  width: 100%;
+}
+
 footer div {
   width: 98.5%;
   margin: 0vw auto;
@@ -371,16 +375,16 @@ a.game_class:hover {
   background-color: #d2dee7;
 }
 
-a.gamegroup.active{
-    border-width: 2px !important;
-    border-bottom: 0 !important;
-    border-color: rgba(var(--bs-secondary-rgb)) !important;
+a.gamegroup.active {
+  border-width: 2px !important;
+  border-bottom: 0 !important;
+  border-color: rgba(var(--bs-secondary-rgb)) !important;
 }
 
-button.subgroup.active{
-    border-width: 2px !important;
-    border-bottom: 0 !important;
-    border-color: rgba(var(--bs-info-rgb)) !important;
+button.subgroup.active {
+  border-width: 2px !important;
+  border-bottom: 0 !important;
+  border-color: rgba(var(--bs-info-rgb)) !important;
 }
 
 #listen-music-id {
@@ -418,6 +422,11 @@ svg.bi-palette {
   height: 2vw;
 }
 
+svg.bi-sort-alpha-down {
+  width: 2vw;
+  height: 2vw;
+}
+
 #warnUser {
   font-size: 1vw;
   color: red;
@@ -425,16 +434,20 @@ svg.bi-palette {
   text-align: center;
 }
 
-.dropdown-divider{
-    margin: 0px;
+.dropdown-divider {
+  margin: 0px;
 }
 
-a.nonBlue{
-    color: var(--bs-body-color);
+a.nonBlue {
+  color: var(--bs-body-color);
 }
 
 button.playlist-close {
-    margin-left: 0px;
+  margin-left: 0px;
+}
+
+.form-check-input[type="checkbox"]{
+    box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(0, 0, 255, 0.35)
 }
 
 @media screen and (max-width: 600px) {
@@ -482,6 +495,10 @@ button.playlist-close {
     width: 100%;
   }
 
+  #filter_games_menu_pinned {
+    width: 100%;
+  }
+
   table.playlist_table {
     table-layout: fixed;
     font-size: 3vw;
@@ -519,6 +536,11 @@ button.playlist-close {
   }
 
   #filter_games_menu {
+    font-size: 2.5vw;
+    width: 100%;
+  }
+
+  #filter_games_menu_pinned {
     font-size: 2.5vw;
     width: 100%;
   }
@@ -862,6 +884,11 @@ button.playlist-close {
   svg.bi-palette {
     width: 5vw;
     height: 5vw;
+  }
+
+  svg.bi-sort-alpha-down {
+    width: 7vw;
+    height: 7vw;
   }
 
   #warnUser {

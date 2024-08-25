@@ -2,6 +2,7 @@ package com.nfssoundtrack.racingsoundtracks.repository;
 
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -20,6 +21,9 @@ public interface GameRepository extends JpaRepository<Game, Integer> {
 
     @EntityGraph(value = "Game.mainGroups")
     List<Game> findAll();
+
+    @Cacheable("gamesAlpha")
+    List<Game> findAll(Sort sort);
 
     @EntityGraph(value = "Game.mainGroups")
     List<Game> findByIdNotNull();

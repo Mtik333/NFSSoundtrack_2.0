@@ -17,33 +17,33 @@ $(document).ready(function () {
     });
 
     $(document).on('click', "#fix-artist", function (e) {
-            var artistToMerge = $("#duplicateArtistInput").val();
-            var objToSubmit = {};
-            objToSubmit.artistName = artistToMerge;
-            $(successAlertHtml).hide();
-            $(failureAlertHtml).hide();
-            $.ajax({
-                async: false,
-                type: "PUT",
-                data: JSON.stringify(objToSubmit),
-                contentType: 'application/json; charset=utf-8',
-                url: "/author/fixDuplicate",
-                success: function (ooo) {
-                    $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                        $(successAlertHtml).slideUp(500, function () {
-                            var divToAppend = $('#nfs-content');
-                            divToAppend.empty();
-                        });
+        var artistToMerge = $("#duplicateArtistInput").val();
+        var objToSubmit = {};
+        objToSubmit.artistName = artistToMerge;
+        $(successAlertHtml).hide();
+        $(failureAlertHtml).hide();
+        $.ajax({
+            async: false,
+            type: "PUT",
+            data: JSON.stringify(objToSubmit),
+            contentType: 'application/json; charset=utf-8',
+            url: "/author/fixDuplicate",
+            success: function (ooo) {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
+                        var divToAppend = $('#nfs-content');
+                        divToAppend.empty();
                     });
-                }, error: function (ooo) {
-                    $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                        $(failureAlertHtml).slideUp(500, function () {
-                            var divToAppend = $('#nfs-content');
-                            divToAppend.empty();
-                        });
+                });
+            }, error: function (ooo) {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500, function () {
+                        var divToAppend = $('#nfs-content');
+                        divToAppend.empty();
                     });
-                },
-            });
+                });
+            },
         });
+    });
 
 });

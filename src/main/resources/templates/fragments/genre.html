@@ -51,29 +51,25 @@
                     data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.webp}">
             </td>
             <td class="band">
-                <th:block
-                        th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='COMPOSER']}">
+                <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='COMPOSER']}">
                     <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
-                       th:text="${songSubgroup.ingameDisplayBand!=null} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
+                        th:text="${songSubgroup.ingameDisplayBand!=null} ? ${songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
                 </th:block>
                 <th:block th:if="${songSubgroup.showSubcomposer}">
                     <th:block
-                            th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
-                                            <span
-                                                    th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
-                        <a class="table_link"
-                           th:href="'/author/'+${authorSong.authorAlias.author.id}"
-                           th:text="${authorSong.authorAlias.alias}"></a>
+                        th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
+                        <span
+                            th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
+                        <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                            th:text="${authorSong.authorAlias.alias}"></a>
                     </th:block>
                 </th:block>
                 <th:block th:if="${songSubgroup.showFeat}">
                     <th:block th:if="${songSubgroup.song.featNextToBand}">
-                        <th:block
-                                th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
+                        <th:block th:each="authorSong,iter : ${songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
                             <span th:text="${iter.first ? 'feat. ' : ''}"></span>
-                            <a class="table_link"
-                               th:href="'/author/'+${authorSong.authorAlias.author.id}"
-                               th:text="${authorSong.authorAlias.alias}"></a>
+                            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                                th:text="${authorSong.authorAlias.alias}"></a>
                             <th:block th:if="${authorSong.featConcat!=null}">
                                 <span th:text="${!iter.last ? ' '+authorSong.featConcat : ''}"></span>
                             </th:block>
@@ -127,18 +123,20 @@
                             </svg>
                         </a>
                     </th:block>
-                    <textarea th:utext="${songSubgroup.lyrics!=null} ? ${songSubgroup.lyrics} : ${songSubgroup.song.lyrics}" hidden></textarea>
+                    <textarea
+                        th:utext="${songSubgroup.lyrics!=null} ? ${songSubgroup.lyrics} : ${songSubgroup.song.lyrics}"
+                        hidden></textarea>
                     <th:block th:if="${songSubgroup.spotifyId != null}">
                         <a class="a-external-music-link spotify-link" th:href="${songSubgroup.spotifyId}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                         </a>
                         <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                             th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip"
-                             data-placement="top" th:title="#{playSample}">
+                            th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip" data-placement="top"
+                            th:title="#{playSample}">
                         <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                             th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip"
-                             data-placement="top" th:title="#{pauseSample}" style="display: none;">
+                            th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip" data-placement="top"
+                            th:title="#{pauseSample}" style="display: none;">
                     </th:block>
                     <th:block th:if="${songSubgroup.deezerId != null}">
                         <a class="a-external-music-link deezer-link" th:href="${songSubgroup.deezerId}">

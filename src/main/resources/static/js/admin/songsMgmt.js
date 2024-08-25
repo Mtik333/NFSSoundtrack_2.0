@@ -318,6 +318,9 @@ $(document).ready(function () {
         divToAppend.append(remixDiv);
         generateSpotifyAndLyrics(spotifyOthersDiv, songSubgroup);
         divToAppend.append(spotifyOthersDiv);
+        $('div.offcanvas-body').animate({
+            scrollTop: 0
+        }, 200);
     }
 
     $(document).on('click', 'button.edit-song-globally', function (e) {
@@ -1127,7 +1130,7 @@ $(document).ready(function () {
     }
 
     $(document).on('focusin', '#authorSelect-0', function (e) {
-        if (e.target.value.length==0){
+        if (e.target.value.length == 0) {
             $("#authorSelectHidden-0").val("");
         }
     });
@@ -1234,8 +1237,8 @@ $(document).ready(function () {
             }
         }
         var ingameSrcId = $("#ingameSrcId").val();
-        if (newSong){
-            if (firstIngameIdReload && ingameSrcId.length==0){
+        if (newSong) {
+            if (firstIngameIdReload && ingameSrcId.length == 0) {
                 firstIngameIdReload = false;
                 $("#ingameSrcId").val($(this).val());
             }
@@ -1357,6 +1360,13 @@ $(document).ready(function () {
                 getSingleSubgroupFromGame(0);
                 $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click(function () {
+                            setTimeout(function () {
+                                $("#songs-table").parent().animate({
+                                    scrollTop: $("#songs-table").find("tr[data-songsubgroupid='" + currentSongSubgroup.id + "']").offset().top - $("#songs-table").offset().top
+                                }, 200);
+                            }, 100);
+                        });
                         $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
                     });
                 });
@@ -1588,7 +1598,7 @@ $(document).ready(function () {
         } else {
             srcId = $("#ingameSrcId").val();
         }
-        if (srcId.length==0){
+        if (srcId.length == 0) {
             return;
         }
         $("#fetch-spotify-links").after("<span id='request-status'>Fetching...</span>")

@@ -1,12 +1,36 @@
+<!--this is the left-side menu with the static elements also there-->
 <div class="offcanvas offcanvas-start" id="offcanvas" tabindex="-1" data-bs-keyboard="false" data-bs-backdrop="false">
     <div class="offcanvas-header">
+        <!--menu header text gets displayed only when menu is expandable-->
         <div class="col">
             <h6 class="offcanvas-title d-sm-block" th:text="#{menu}"></h6>
         </div>
+        <!--here we have all-games and pin/unpin buttons-->
         <div class="col" style="text-align: right; display: contents">
+            <button type="button" class="btn text-reset alphabetical-games" data-bs-theme="light"
+                aria-label="All games">
+                <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor"
+                    class="bi bi-sort-alpha-down" viewBox="0 0 16 16" data-toggle="tooltip" th:title="#{allGames}">
+                    <path fill-rule="evenodd"
+                        d="M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371zm1.57-.785L11 2.687h-.047l-.652 2.157z" />
+                    <path
+                        d="M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293z" />
+                </svg>
+            </button>
+            <button type="button" class="btn text-reset grouped-games" data-bs-theme="light" aria-label="Grouped games"
+                style="display: none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor"
+                    class="bi bi-sort-alpha-down" viewBox="0 0 16 16" data-toggle="tooltip" th:title="#{gamesInGroups}">
+                    <path fill-rule="evenodd"
+                        d="M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371zm1.57-.785L11 2.687h-.047l-.652 2.157z" />
+                    <path
+                        d="M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293z" />
+                    <line x1='0' y1='16' x2='16' y2='0' stroke-width='1' stroke='currentColor' />
+                </svg>
+            </button>
             <button id="pin-menu" type="button" class="btn text-reset" data-bs-theme="light" aria-label="Pin">
                 <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor" class="bi bi-pin"
-                    viewBox="0 0 16 16">
+                    viewBox="0 0 16 16" data-toggle="tooltip" th:title="#{staticLeftMenu}">
                     <path
                         d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5h-4v4.5c0 .276-.224 1.5-.5 1.5s-.5-1.224-.5-1.5V10h-4a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189A6 6 0 0 1 5 6.708V2.277a3 3 0 0 1-.354-.298C4.342 1.674 4 1.179 4 .5a.5.5 0 0 1 .146-.354m1.58 1.408-.002-.001zm-.002-.001.002.001A.5.5 0 0 1 6 2v5a.5.5 0 0 1-.276.447h-.002l-.012.007-.054.03a5 5 0 0 0-.827.58c-.318.278-.585.596-.725.936h7.792c-.14-.34-.407-.658-.725-.936a5 5 0 0 0-.881-.61l-.012-.006h-.002A.5.5 0 0 1 10 7V2a.5.5 0 0 1 .295-.458 1.8 1.8 0 0 0 .351-.271c.08-.08.155-.17.214-.271H5.14q.091.15.214.271a1.8 1.8 0 0 0 .37.282" />
                 </svg>
@@ -15,21 +39,47 @@
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
     </div>
+    <!--search input when menu is expandable from left side-->
+    <input class="form-control mt-2 mb-3" id="filter_games_menu_pinned" maxlength="15" th:placeholder="#{filterGames}">
+    <!--here there should be all games and groups-->
     <div class="offcanvas-body py-0 px-0">
-        <div class="col" style="text-align: right">
+        <!--if menu is pinned to left side, we display same buttons and search input too-->
+        <div id="search-games-bar" class="col" style="text-align: right">
             <input class="form-control mt-2 mb-3" id="filter_games_menu" maxlength="15" th:placeholder="#{filterGames}">
+            <button type="button" class="btn text-reset alphabetical-games" data-bs-theme="light"
+                aria-label="All games">
+                <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor"
+                    class="bi bi-sort-alpha-down" viewBox="0 0 16 16" data-toggle="tooltip" th:title="#{allGames}">
+                    <path fill-rule="evenodd"
+                        d="M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371zm1.57-.785L11 2.687h-.047l-.652 2.157z" />
+                    <path
+                        d="M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293z" />
+                </svg>
+            </button>
+            <button type="button" class="btn text-reset grouped-games" data-bs-theme="light" aria-label="Grouped games"
+                style="display: none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor"
+                    class="bi bi-sort-alpha-down" viewBox="0 0 16 16" data-toggle="tooltip" th:title="#{gamesInGroups}">
+                    <path fill-rule="evenodd"
+                        d="M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371zm1.57-.785L11 2.687h-.047l-.652 2.157z" />
+                    <path
+                        d="M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293z" />
+                    <line x1='0' y1='16' x2='16' y2='0' stroke-width='1' stroke='currentColor' />
+                </svg>
+            </button>
             <button id="unpin-menu" type="button" class="btn text-reset" data-bs-theme="light" aria-label="Pin"
                 style="display: none">
                 <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor" class="bi bi-pin"
-                    viewBox="0 0 16 16" transform="rotate(180)">
+                    viewBox="0 0 16 16" transform="rotate(180)" data-toggle="tooltip" th:title="#{expandableMenu}">
                     <path
                         d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5h-4v4.5c0 .276-.224 1.5-.5 1.5s-.5-1.224-.5-1.5V10h-4a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189A6 6 0 0 1 5 6.708V2.277a3 3 0 0 1-.354-.298C4.342 1.674 4 1.179 4 .5a.5.5 0 0 1 .146-.354m1.58 1.408-.002-.001zm-.002-.001.002.001A.5.5 0 0 1 6 2v5a.5.5 0 0 1-.276.447h-.002l-.012.007-.054.03a5 5 0 0 0-.827.58c-.318.278-.585.596-.725.936h7.792c-.14-.34-.407-.658-.725-.936a5 5 0 0 0-.881-.61l-.012-.006h-.002A.5.5 0 0 1 10 7V2a.5.5 0 0 1 .295-.458 1.8 1.8 0 0 0 .351-.271c.08-.08.155-.17.214-.271H5.14q.091.15.214.271a1.8 1.8 0 0 0 .37.282" />
                 </svg>
             </button>
         </div>
         <div class="accordion" id="accordionExample">
+            <!--all series and games on the website grouped by series-->
             <th:block th:each="serie: ${series}">
-                <div class="accordion-item">
+                <div class="accordion-item single-serie">
                     <h2 class="accordion-header" th:attr="id='heading-'+${serie.id}">
                         <button class="accordion-button collapsed gamegroup-button" type="button"
                             data-bs-toggle="collapse" aria-expanded="true" aria-controls="collapseOne"
@@ -60,6 +110,34 @@
                     </div>
                 </div>
             </th:block>
+            <!--one group with all games from the website-->
+            <div id="all-games-group" class="accordion-item" hidden>
+                <h2 class="accordion-header" th:attr="id='allgames-heading'">
+                    <button class="accordion-button all-gamegroup-button" type="button" data-bs-toggle="collapse"
+                        aria-expanded="true" aria-controls="collapseOne" th:text="'All games alphabetically'">
+                    </button>
+                </h2>
+                <div id="all-games-div" class="accordion-collapse list-group" data-bs-parent="#accordionExample">
+                    <ul class="btn-toggle-nav list-unstyled fw-normal mb-0 small serie_class">
+                        <li th:each="game: ${gamesAlpha}">
+                            <a href="#" class="list-group-item list-group-item-action game_class"
+                                th:href="'/game/'+${game.gameShort}" th:attr="data-fullTitle=${game.displayTitle}">
+                                <span th:text="${game.displayTitle}"></span>
+                                <br>
+                                <th:block th:if="${game.gameStatus.value=='CANCELED'}">
+                                    <small th:text="#{canceledGame}"></small>
+                                </th:block>
+                                <th:block th:if="${game.gameStatus.value=='UNPLAYABLE'}">
+                                    <small th:text="#{unplayableGame}"></small>
+                                </th:block>
+                                <th:block th:if="${game.gameStatus.value=='UNRELEASED'}">
+                                    <small th:text="#{unreleasedGame}"></small>
+                                </th:block>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>

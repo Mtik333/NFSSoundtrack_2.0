@@ -434,6 +434,6 @@ $(document).on('click', '#fetch-from-discogs', function (e) {
 
 });
 
-function nullToString(value){
+function nullToString(value) {
     return (value === null) ? "" : value;
 }

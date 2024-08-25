@@ -145,6 +145,6 @@ $(document).ready(function () {
     });
 });
 
-function nullToString(value){
+function nullToString(value) {
     return (value === null) ? "" : value;
 }

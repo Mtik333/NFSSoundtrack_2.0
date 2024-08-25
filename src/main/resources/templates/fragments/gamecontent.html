@@ -269,7 +269,9 @@
                                                 </svg>
                                             </a>
                                         </th:block>
-                                        <textarea th:utext="${songSubgroup.lyrics!=null} ? ${songSubgroup.lyrics} : ${songSubgroup.song.lyrics}" hidden
+                                        <textarea
+                                            th:utext="${songSubgroup.lyrics!=null} ? ${songSubgroup.lyrics} : ${songSubgroup.song.lyrics}"
+                                            hidden
                                             th:attr="data-lyricsState=${songSubgroup.instrumental.value=='YES' ? 'instrumental' : 'noninstrumental'},data-instrumental=#{thisIsInstrumental},data-noLyrics=#{noLyrics}"></textarea>
                                         <th:block th:if="${songSubgroup.spotifyId != null}">
                                             <a class="a-external-music-link spotify-link"

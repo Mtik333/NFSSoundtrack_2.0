@@ -47,6 +47,31 @@ $(document).ready(function () {
     }
 
     /**
+     * 
+     * @param {text} searchValue The user input text
+     */
+    function funcToShowOnlyFilteredGamesSingleGroup(searchValue) {
+        //should be only one button for one big group
+        $(document).find("button.all-gamegroup-button").filter(function () {
+            //in this big group there will be also dedicated div
+            var divId = $("#all-games-div");
+            //we find all "games" from this series
+            var allA = $(divId).find("a");
+            var somethingFound = false;
+            for (let i = 0; i < allA.length; i++) {
+                //we iterate over 'full title' of each game and check if user input is within this string
+                var gameDisplayTitle = $(allA[i]).attr("data-fullTitle");
+                if (gameDisplayTitle.toLowerCase().indexOf(searchValue) > -1) {
+                    somethingFound = true;
+                    //if so then we show this game
+                    $(allA[i]).show();
+                } else {
+                    $(allA[i]).hide();
+                }
+            }
+        });
+    }
+    /**
      * we go through divs of series
      */
     $(document).find("div.accordion-collapse").each(function () {
@@ -55,7 +80,9 @@ $(document).ready(function () {
             var unscrollableMenu = localStorage.getItem("scrolling-stuff");
             if (unscrollableMenu === "false" || unscrollableMenu === null) {
                 //if filtering by game name is not active or shorter than 3
-                if ($("#filter_games_menu").val() == "" || $("#filter_games_menu").val().length < 3) {
+                //as either pinned/unpinned mode is enabled it's better to check both search inputs
+                if ($("#filter_games_menu").val() == "" || $("#filter_games_menu").val().length < 3
+                    || $("#filter_games_menu_pinned").val() == "" || $("#filter_games_menu_pinned").val().length < 3) {
                     //we simply check how far we are from top and scroll menu so that it is "on" top of the series menu
                     var currentScroll = $('div.offcanvas-body').scrollTop();
                     var origTop = $('div.offcanvas-body').offset().top;
@@ -78,13 +105,26 @@ $(document).ready(function () {
      * function when someone types letters in 'filter games' input
      */
     $("#filter_games_menu").on("keyup", function () {
-        var searchValue = $(this).val().toLowerCase();
+        filterGames($(this));
+    });
+
+    //now that we have two search inputs we have to register listener on both
+    $("#filter_games_menu_pinned").on("keyup", function () {
+        filterGames($(this));
+    });
+
+    function filterGames(info) {
+        //to avoid issues when one-group is active, new method was introduced to handle this case
+        if (localStorage.getItem("all-games") == "true") {
+            return filterAllGamesGroup(info);
+        }
+        var searchValue = info.val().toLowerCase();
         //if serach value is over 3 letters
         if (searchValue.length > 3) {
             $(document).find("button.gamegroup-button").filter(function () {
-                var divId = $(this).attr("data-bs-target");
+                var divId = info.attr("data-bs-target");
                 if ($(divId).hasClass("show")) {
-                    $(this).click();
+                    info.click();
                     //actually should listen to event of collapsing this shit and then show all filtered stuff
                 }
             });
@@ -102,7 +142,7 @@ $(document).ready(function () {
                 if ($(divId).find("a.active").length > 0) {
                     //so we definitely have to show it + related series
                     $(divId).find("a").filter(function () {
-                        $(this).show();
+                        info.show();
                     });
                     $(divId).parent().show();
                     $(divId).collapse('show');
@@ -110,20 +150,20 @@ $(document).ready(function () {
                     //otherwise we have to collapse series but show all games within the series
                     $(this).collapse('hide');
                     $(divId).find("a").filter(function () {
-                        $(this).show();
+                        info.show();
                     });
                     $(divId).parent().show();
                     $(divId).collapse('hide');
                     //not sure what this is doing, i guess we want to then expand the series
                     if ($(divId).find("a.active").length > 0) {
-                        buttonToClick = $(this);
+                        buttonToClick = info;
                         divToShow = divId;
                     }
                 }
             });
             //this is probably about expanding the series that had active game before
             if (divToShow != undefined) {
-                $($(this).attr("data-bs-target")).parent().show();
+                $(info.attr("data-bs-target")).parent().show();
                 if ($(divToShow).hasClass("collapsed")) {
                     buttonToClick.click();
                 }
@@ -131,6 +171,28 @@ $(document).ready(function () {
             }
 
         }
-    });
+    }
 
+    //filtering similarly as in previous method
+    function filterAllGamesGroup(info) {
+        var searchValue = info.val().toLowerCase();
+        //if serach value is over 3 letters
+        if (searchValue.length > 3) {
+            //doing some timeout of this filter function as some events take longer than expected
+            setTimeout(function () {
+                funcToShowOnlyFilteredGamesSingleGroup(searchValue);
+            }, 400);
+        } else {
+            var buttonToClick;
+            var divToShow;
+            //otherwise we basically have to show all games again
+            $(document).find("button.all-gamegroup-button").filter(function () {
+                var divId = $("#all-games-div");
+                //if we are on 'game' page there will be one actie element in series list
+                $(divId).find("a").filter(function () {
+                    $(this).show();
+                });
+            });
+        }
+    }
 });

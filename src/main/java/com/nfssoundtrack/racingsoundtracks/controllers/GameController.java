@@ -50,6 +50,10 @@ public class GameController extends BaseControllerWithErrorHandling {
         if (cache != null) {
             cache.clear();
         }
+        Cache cache2 = cacheManager.getCache("gamesAlpha");
+        if (cache2 != null) {
+            cache2.clear();
+        }
         return new ObjectMapper().writeValueAsString("OK");
     }
 

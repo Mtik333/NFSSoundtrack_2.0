@@ -155,7 +155,7 @@
     <div class="container-fluid">
         <div class="row mx-auto justify-content-center">
             <th:block th:insert="~{fragments/leftmenu.html}"></th:block>
-            <div class="col">
+            <div class="col real-page-content">
                 <div th:replace="~{fragments/topmenuentry.html}"></div>
                 <div th:if="${game}" th:replace="~{fragments/gamecontent.html}"></div>
                 <div th:if="${author}" th:insert="~{fragments/artist.html}"></div>

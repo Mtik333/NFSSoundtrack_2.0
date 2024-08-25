@@ -1,9 +1,10 @@
 var modifiedSubgroupSongArray = [];
 var currentSubgroupId;
 
-function ModifiedSubgroupSongDef(subgroup_id, song_id, state) {
+function ModifiedSubgroupSongDef(subgroup_id, song_id, songsubgroup_id, state) {
     this.subgroup_id = subgroup_id;
     this.song_id = song_id;
+    this.songsubgroup_id = songsubgroup_id;
     this.state = state;
 }
 
@@ -173,17 +174,18 @@ $(document).ready(function () {
         var mySubgroupChange;
         var tr = $(this).parent().parent();
         var songId = $(tr).attr("data-songid");
+        var songSubgroupId = $(tr).attr("data-songsubgroupid");
         if ($(this).is(":checked")) {
             if ($(this).val() == "") {
-                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, "ADD");
+                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, "ADD");
             } else {
-                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, "REVERT");
+                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, "REVERT");
             }
         } else {
             if ($(this).val() == "EXISTS") {
-                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, "DELETE");
+                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, "DELETE");
             } else {
-                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, "REVERT");
+                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, "REVERT");
             }
         }
         var entryFound = false;

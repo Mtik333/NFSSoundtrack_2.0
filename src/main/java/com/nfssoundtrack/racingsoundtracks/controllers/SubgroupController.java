@@ -30,14 +30,16 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
         Subgroup subgroup = subgroupService.findById(subgroupId)
                 .orElseThrow(() -> new ResourceNotFoundException("No subgroup with id found " + subgroupId));
         List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
-        List<String> songsToAssign = new ArrayList<>();
+        Map<String, String> songsToAssign = new HashMap<>();
         List<String> songsToDetach = new ArrayList<>();
         for (Object obj : objectMapper) {
             LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
             String songId = String.valueOf(linkedHashMap.get("song_id"));
+            //i want to get exact song subgroup, for example because i want to put outro version in other subgroup
+            String songSubgroupId = String.valueOf(linkedHashMap.get("songsubgroup_id"));
             String state = String.valueOf(linkedHashMap.get("state"));
             if (state.equals("ADD")) {
-                songsToAssign.add(songId);
+                songsToAssign.put(songId, songSubgroupId);
             } else if (state.equals("DELETE")) {
                 songsToDetach.add(songId);
             }
@@ -69,20 +71,32 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
             }
         }
         int position = 10 + (10 * songsToDetach.size());
-        for (String song : songsToAssign) {
+        for (Map.Entry<String, String> song : songsToAssign.entrySet()) {
             position += 10;
-            Song song1 = songService.findById(Integer.valueOf(song))
+            Song song1 = songService.findById(Integer.valueOf(song.getKey()))
                     .orElseThrow(() -> new ResourceNotFoundException("No song with id found " + song));
-            List<SongSubgroup> existingSubgroups = songSubgroupService.findBySong(song1);
-            SongSubgroup originalSongSubgroup = existingSubgroups.stream().filter(songSubgroup ->
-                            songSubgroup.getSubgroup().getMainGroup().getGame().equals(subgroup.getMainGroup().getGame()))
-                    .findFirst().orElseThrow(
-                            () -> new ResourceNotFoundException("THere should be original subgroup here but not found"));
-            SongSubgroup songSubgroup = new SongSubgroup(originalSongSubgroup);
-            songSubgroup.setPosition((long) position);
-            songSubgroup.setSubgroup(subgroup);
-            songSubgroup.setSong(song1);
-            songSubgroupService.save(songSubgroup);
+            //using logic to create new songsubgroup based on details of existing songsubgroup
+            String songSubgroupId = song.getValue();
+            if (songSubgroupId != null) {
+                SongSubgroup optionalSongSubgroup = songSubgroupService.findById(Integer.valueOf(songSubgroupId))
+                        .orElseThrow(() -> new ResourceNotFoundException("No songSubgroupId with id found " + songSubgroupId));
+                SongSubgroup songSubgroup = new SongSubgroup(optionalSongSubgroup);
+                songSubgroup.setPosition((long) position);
+                songSubgroup.setSubgroup(subgroup);
+                songSubgroup.setSong(song1);
+                songSubgroupService.save(songSubgroup);
+            } else {
+                List<SongSubgroup> existingSubgroups = songSubgroupService.findBySong(song1);
+                SongSubgroup originalSongSubgroup = existingSubgroups.stream().filter(songSubgroup1 ->
+                                songSubgroup1.getSubgroup().getMainGroup().getGame().equals(subgroup.getMainGroup().getGame()))
+                        .findFirst().orElseThrow(
+                                () -> new ResourceNotFoundException("THere should be original subgroup here but not found"));
+                SongSubgroup songSubgroup = new SongSubgroup(originalSongSubgroup);
+                songSubgroup.setPosition((long) position);
+                songSubgroup.setSubgroup(subgroup);
+                songSubgroup.setSong(song1);
+                songSubgroupService.save(songSubgroup);
+            }
         }
         String gameShort = subgroup.getMainGroup().getGame().getGameShort();
         removeCacheEntry(gameShort);
