@@ -104,8 +104,9 @@ public class SearchController extends BaseControllerWithErrorHandling {
                 genreList = genreService.findByGenreNameContains(query);
             }
         }
-        model.addAttribute("appName", "Search results at " + appName);
-        model.addAttribute("series", serieService.findAllSortedByPositionAsc());
+        model.addAttribute("appName", getLocalizedMessage("searchResultsAt", new String[]{appName}));
+        model.addAttribute(WebsiteViewsController.SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute(WebsiteViewsController.GAMES_ALPHA, gameService.findAllSortedByDisplayTitleAsc());
         model.addAttribute("authorAliases", authorAliases);
         model.addAttribute("songTitleList", songTitleList);
         model.addAttribute("songLyricsList", songLyricsList);

@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
+/**
+ * unused at this point but hopefully should be used once i rewrite the radio to use new endpoints
+ */
 @Controller
 @RequestMapping(path = "/radio")
 public class RadioController extends BaseControllerWithErrorHandling {

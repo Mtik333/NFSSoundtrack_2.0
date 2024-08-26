@@ -64,10 +64,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         try {
             SongSubgroup songSubgroup = songSubgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException(
                     "No songsubgroup found with id " + subgroupId));
-            SimpleModule module = new SimpleModule();
-            ObjectMapper objectMapper = new ObjectMapper();
-            module.addDeserializer(SongSubgroup.class, songSubgroupDeserializer);
-            objectMapper.registerModule(module);
+            ObjectMapper objectMapper = JustSomeHelper.registerDeserializerForObjectMapper(SongSubgroup.class, songSubgroupDeserializer);
             songSubgroup = objectMapper.readerForUpdating(songSubgroup).readValue(formData, SongSubgroup.class);
             Map<String, String> localObjectMapper = new ObjectMapper().readValue(formData,
                     TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class));
@@ -232,10 +229,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             SongSubgroup songSubgroup = songSubgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException(
                     "No song subgroup with id found " + subgroupId));
             Song relatedSong = songSubgroup.getSong();
-            SimpleModule module = new SimpleModule();
-            ObjectMapper objectMapper = new ObjectMapper();
-            module.addDeserializer(Song.class, songDeserializer);
-            objectMapper.registerModule(module);
+            ObjectMapper objectMapper = JustSomeHelper.registerDeserializerForObjectMapper(Song.class, songDeserializer);
             relatedSong = objectMapper.readerForUpdating(relatedSong).readValue(formData, Song.class);
             Map<String, String> localObjectMapper = new ObjectMapper().readValue(formData,
                     TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class));
@@ -289,10 +283,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
     String postNewSong(@PathVariable("subgroupId") int subgroupId, @RequestBody String formData) throws ResourceNotFoundException, JsonProcessingException {
         Subgroup subgroup = subgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No song " +
                 "subgroup found with id " + subgroupId));
-        ObjectMapper songSubgroupObjectMapper = new ObjectMapper();
-        SimpleModule subgroupModule = new SimpleModule();
-        subgroupModule.addDeserializer(SongSubgroup.class, songSubgroupDeserializer);
-        songSubgroupObjectMapper.registerModule(subgroupModule);
+        ObjectMapper songSubgroupObjectMapper = JustSomeHelper.registerDeserializerForObjectMapper(SongSubgroup.class, songSubgroupDeserializer);
         SongSubgroup songSubgroup = songSubgroupObjectMapper.readValue(formData, SongSubgroup.class);
         songSubgroup.setSubgroup(subgroup);
         Map<String, String> objectMapper = new ObjectMapper().readValue(formData,
@@ -302,10 +293,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         if (songSubgroup.getSong() != null) {
             songSubgroupService.save(songSubgroup);
         } else {
-            ObjectMapper songObjectMapper = new ObjectMapper();
-            SimpleModule songModule = new SimpleModule();
-            songModule.addDeserializer(Song.class, songDeserializer);
-            songObjectMapper.registerModule(songModule);
+            ObjectMapper songObjectMapper = JustSomeHelper.registerDeserializerForObjectMapper(Song.class, songDeserializer);
             Song song = songObjectMapper.readValue(formData, Song.class);
             song = songService.save(song);
             songSubgroup.setSong(song);

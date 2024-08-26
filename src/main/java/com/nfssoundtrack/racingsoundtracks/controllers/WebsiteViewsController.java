@@ -2,9 +2,21 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Author;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorAlias;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorSong;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Correction;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.CorrectionStatus;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.CustomTheme;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Genre;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.ProblemType;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Role;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.SongGenre;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.TodaysSong;
 import com.nfssoundtrack.racingsoundtracks.others.DiscoGSObj;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
@@ -24,14 +36,22 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class WebsiteViewsController extends BaseControllerWithErrorHandling {
@@ -41,6 +61,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public static final String MIN_INDEX = "min/index";
     public static final String DESC_BREAK = "\n====================\n\n";
     public static final String SERIES = "series";
+    public static final String GAMES_ALPHA = "gamesAlpha";
 
     @Autowired
     SongSerializer songSerializer;
@@ -77,9 +98,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @GetMapping(value = "/manage/manage")
     public String manage(Model model) {
-        model.addAttribute(APP_NAME, appName);
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
+        addCommonAttributes(model, "genericAt", new String[]{"Manage"});
         return "manage";
     }
 
@@ -89,9 +108,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @GetMapping(value = "/login")
     public String login(Model model) {
-        model.addAttribute(APP_NAME, appName);
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
+        addCommonAttributes(model, "genericAt", new String[]{"Login"});
         model.addAttribute("login", true);
         return "login";
     }
@@ -103,14 +120,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @GetMapping(value = "/content/{value}")
     public String topMenuEntry(Model model, @PathVariable("value") String value) throws ResourceNotFoundException, LoginException, InterruptedException {
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
+        addCommonAttributes(model, "genericAt", new String[]{value});
         model.addAttribute("htmlToInject",
                 contentService.findByContentShort(value).getContentData());
         boolean isHome = value.contains("home");
         model.addAttribute("home", isHome);
         model.addAttribute("todayssong", todaysSongService.getTodaysSong());
-        model.addAttribute(APP_NAME, value + " - " + appName);
         return MIN_INDEX;
     }
 
@@ -124,13 +139,10 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         Game game = gameService.findByGameShort(gameshort);
         model.addAttribute("endpoint", "/game/" + gameshort);
         model.addAttribute("game", game);
-        model.addAttribute(APP_NAME, game.getDisplayTitle() +
-                " " + getLocalizedMessage("soundtrackAt") + " " + appName);
+        addCommonAttributes(model, "gameSoundtrackAt", new String[]{game.getDisplayTitle()});
         Optional<CustomTheme> customTheme = customThemeService.findByGame(game);
         customTheme.ifPresent(theme -> model.addAttribute("customTheme", theme));
         model.addAttribute("songSubgroups", songSubgroupService.hasGameAnySongs(game));
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         return MIN_INDEX;
     }
 
@@ -158,9 +170,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                         "id " + songSubgroupId)));
             }
         }
-        model.addAttribute(APP_NAME, "Custom playlist - " + appName);
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
+        addCommonAttributes(model, "customPlaylistAt", null);
         model.addAttribute("customPlaylist", songSubgroupList);
         return MIN_INDEX;
     }
@@ -177,10 +187,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             throws JsonProcessingException, ResourceNotFoundException {
         Song song = songService.findById(songId).orElseThrow(
                 () -> new ResourceNotFoundException("No song with id found " + songId));
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Song.class, songSerializer);
-        objectMapper.registerModule(simpleModule);
+        ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Song.class, songSerializer);
         String result = objectMapper.writeValueAsString(song);
         if (logger.isDebugEnabled()) {
             logger.debug("result {}", result);
@@ -198,12 +205,10 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public String provideSongInfo(Model model, @PathVariable("songId") String songId) throws ResourceNotFoundException {
         Song song = songService.findById(Integer.valueOf(songId)).orElseThrow(
                 () -> new ResourceNotFoundException("No song found with id " + songId));
-        model.addAttribute(APP_NAME, song.getOfficialDisplayBand()
-                + " - " + song.getOfficialDisplayTitle() + " - " + appName);
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
         model.addAttribute("songToCheck", song);
         model.addAttribute("songUsages", songSubgroupService.findBySong(song));
+        addCommonAttributes(model, "genericAt", new String[]{song.getOfficialDisplayBand()
+                        + " - " + song.getOfficialDisplayTitle()});
         return MIN_INDEX;
     }
 
@@ -248,9 +253,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("songsAsFeat", songsAsFeat);
         model.addAttribute("songsRemixed", songsRemixed);
         model.addAttribute("allAliases", allAliases);
-        model.addAttribute(APP_NAME, author.getName() + " - " + appName);
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
+        addCommonAttributes(model, "genericAt", new String[]{author.getName()});
         return MIN_INDEX;
     }
 
@@ -271,9 +274,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("songSubgroupList", songSubgroupList);
         model.addAttribute("genre", genre);
         model.addAttribute("readFull", true);
-        model.addAttribute(APP_NAME, genre.getGenreName() + " - " + appName);
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
+        addCommonAttributes(model, "genericAt", new String[]{genre.getGenreName()});
         return MIN_INDEX;
     }
 
@@ -294,9 +295,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         List<SongSubgroup> songSubgroupList = songSubgroupService.findBySongInSortedByIdAsc(songs);
         model.addAttribute("songSubgroupList", songSubgroupList);
         model.addAttribute("genre", genre);
-        model.addAttribute(APP_NAME, "Full list of genre " + genre.getGenreName() + " - " + appName);
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
+        addCommonAttributes(model, "fullGenreListAt", new String[]{genre.getGenreName()});
         return MIN_INDEX;
     }
 
@@ -304,10 +303,14 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public String getTodaysSongHistory(Model model) {
         List<TodaysSong> todays30Songs = todaysSongService.findAllFromLast30Days();
         model.addAttribute("todays30Songs", todays30Songs);
-        model.addAttribute(APP_NAME, "Archive of today's songs - " + appName);
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute("gamesAlpha", gameService.findAllSortedByDisplayTitleAsc());
+        addCommonAttributes(model, "archiveOfSongsAt", null);
         return MIN_INDEX;
+    }
+
+    private void addCommonAttributes(Model model, String appNameKey, String[] params){
+        model.addAttribute(APP_NAME, getLocalizedMessage(appNameKey,params));
+        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
+        model.addAttribute(GAMES_ALPHA, gameService.findAllSortedByDisplayTitleAsc());
     }
 
     @PostMapping(value = "/correction", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -409,10 +412,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     @GetMapping(value = "/filename/{songFilename}", produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody String getSongInfo(@PathVariable("songFilename") String songFilename) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(SongSubgroup.class, songSubgroupFilenameSerializer);
-        objectMapper.registerModule(simpleModule);
+        ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(SongSubgroup.class, songSubgroupFilenameSerializer);
         songFilename = URLDecoder.decode(songFilename, StandardCharsets.UTF_8);
         List<SongSubgroup> songsByFilename = songSubgroupService.findByFilenameStartsWith(songFilename);
         StringBuilder resultingText = new StringBuilder();

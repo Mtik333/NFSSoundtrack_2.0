@@ -432,6 +432,15 @@ svg.bi-sort-alpha-down {
   color: red;
   margin-bottom: 0px;
   text-align: center;
+  z-index: 1;
+}
+
+div.logoSubDiv{
+  z-index: 2;
+}
+
+#socialButtons{
+  z-index: 3;
 }
 
 .dropdown-divider {

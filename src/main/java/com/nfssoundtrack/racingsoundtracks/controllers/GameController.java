@@ -7,80 +7,116 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.MainGroup;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Subgroup;
 import com.nfssoundtrack.racingsoundtracks.deserializers.GameDeserializer;
+import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.serializers.GameEditSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 
+/**
+ * controller used to create / modify games
+ * used in gameMgmt.js and serieMgmt.js
+ */
 @Controller
 @RequestMapping(path = "/gamedb")
 public class GameController extends BaseControllerWithErrorHandling {
 
-    @Autowired
-    GameDeserializer newGameDeserializer;
+	@Autowired
+	GameDeserializer newGameDeserializer;
 
-    @Autowired
-    GameEditSerializer gameEditSerializer;
+	@Autowired
+	GameEditSerializer gameEditSerializer;
 
-    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String saveNewGame(@RequestBody String formData) throws JsonProcessingException {
-        SimpleModule module = new SimpleModule();
-        ObjectMapper objectMapper = new ObjectMapper();
-        module.addDeserializer(Game.class, newGameDeserializer);
-        objectMapper.registerModule(module);
-        Game newGame = objectMapper.readValue(formData, Game.class);
-        gameService.save(newGame);
-        MainGroup allGroup = new MainGroup();
-        allGroup.setGame(newGame);
-        allGroup.setPosition(1);
-        allGroup.setGroupName("All");
-        mainGroupService.save(allGroup);
-        Subgroup allSubgroup = new Subgroup();
-        allSubgroup.setPosition(1);
-        allSubgroup.setMainGroup(allGroup);
-        allSubgroup.setSubgroupName("All");
-        subgroupService.save(allSubgroup);
-        Cache cache = cacheManager.getCache("series");
-        if (cache != null) {
-            cache.clear();
-        }
-        Cache cache2 = cacheManager.getCache("gamesAlpha");
-        if (cache2 != null) {
-            cache2.clear();
-        }
-        return new ObjectMapper().writeValueAsString("OK");
-    }
+	/**
+	 * method used to create new game
+	 *
+	 * @param formData consists of various fields, @see GameDeserializer
+	 * @return OK if successful
+	 * @throws JsonProcessingException
+	 */
+	@PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	String saveNewGame(@RequestBody String formData) throws JsonProcessingException {
+		ObjectMapper objectMapper = JustSomeHelper.registerDeserializerForObjectMapper(Game.class, newGameDeserializer);
+		Game newGame = objectMapper.readValue(formData, Game.class);
+		//at this point we should have game ready to save
+		gameService.save(newGame);
+		MainGroup allGroup = new MainGroup();
+		allGroup.setGame(newGame);
+		allGroup.setPosition(1);
+		allGroup.setGroupName("All");
+		//we need to automatically create "All" group as the kind of placeholder to display all the songs from the game
+		mainGroupService.save(allGroup);
+		Subgroup allSubgroup = new Subgroup();
+		allSubgroup.setPosition(1);
+		allSubgroup.setMainGroup(allGroup);
+		allSubgroup.setSubgroupName("All");
+		//we also need "All" subgroup for exactly the same purpose
+		//"All" group is supposed to have only "All" subgroup and display all of the game's soundtrack
+		subgroupService.save(allSubgroup);
+		//as we are creating new game, we clear cache for 'series' field in order to refresh content of left-side menu
+		Cache cache = cacheManager.getCache(WebsiteViewsController.SERIES);
+		if (cache != null) {
+			cache.clear();
+		}
+		//similarly we clear cache of all-games display in that left menu
+		Cache cache2 = cacheManager.getCache(WebsiteViewsController.GAMES_ALPHA);
+		if (cache2 != null) {
+			cache2.clear();
+		}
+		return new ObjectMapper().writeValueAsString("OK");
+	}
 
-    @GetMapping(value = "/read/{gameId}")
-    public @ResponseBody
-    String gameGroupManage(@PathVariable("gameId") int gameId) throws ResourceNotFoundException, JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule simpleModule = new SimpleModule();
-        Game game = gameService.findById(gameId).orElseThrow(() -> new ResourceNotFoundException("No game found with id " + gameId));
-        simpleModule.addSerializer(Game.class, gameEditSerializer);
-        objectMapper.registerModule(simpleModule);
-        return objectMapper.writeValueAsString(game);
-    }
+	/**
+	 * method gives game entity back to frontend
+	 *
+	 * @param gameId id of game to display in admin panel
+	 * @return json of game entity
+	 * @throws ResourceNotFoundException
+	 * @throws JsonProcessingException
+	 */
+	@GetMapping(value = "/read/{gameId}")
+	public @ResponseBody
+	String gameGroupManage(@PathVariable("gameId") int gameId)
+			throws ResourceNotFoundException, JsonProcessingException {
+		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Game.class, gameEditSerializer);
+		Game game = gameService.findById(gameId).orElseThrow(
+				() -> new ResourceNotFoundException("No game found with id " + gameId));
+		return objectMapper.writeValueAsString(game);
+	}
 
-    @PutMapping(value = "/put/{gameId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String modifyGame(@RequestBody String formData, @PathVariable("gameId") int gameId) throws ResourceNotFoundException, IOException {
-        SimpleModule module = new SimpleModule();
-        ObjectMapper objectMapper = new ObjectMapper();
-        module.addDeserializer(Game.class, newGameDeserializer);
-        objectMapper.registerModule(module);
-        Game gameToEdit = gameService.findById(gameId).orElseThrow(
-                () -> new ResourceNotFoundException("No game with id found " + gameId));
-        gameToEdit = objectMapper.readerForUpdating(gameToEdit).readValue(formData, Game.class);
-        gameService.save(gameToEdit);
-        String gameShort = gameToEdit.getGameShort();
-        removeCacheEntry(gameShort);
-        return new ObjectMapper().writeValueAsString("OK");
-    }
+	/**
+	 * method updates single game in database
+	 * used in gameMgmt.js
+	 *
+	 * @param formData various fields, see the deserializer
+	 * @param gameId   id of game being updated
+	 * @return OK if successful
+	 * @throws ResourceNotFoundException
+	 * @throws IOException
+	 */
+	@PutMapping(value = "/put/{gameId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	String modifyGame(@RequestBody String formData, @PathVariable("gameId") int gameId)
+			throws ResourceNotFoundException, IOException {
+		ObjectMapper objectMapper = JustSomeHelper.registerDeserializerForObjectMapper(Game.class, newGameDeserializer);
+		Game gameToEdit = gameService.findById(gameId).orElseThrow(
+				() -> new ResourceNotFoundException("No game with id found " + gameId));
+		gameToEdit = objectMapper.readerForUpdating(gameToEdit).readValue(formData, Game.class);
+		gameService.save(gameToEdit);
+		String gameShort = gameToEdit.getGameShort();
+		removeCacheEntry(gameShort);
+		return new ObjectMapper().writeValueAsString("OK");
+	}
 }

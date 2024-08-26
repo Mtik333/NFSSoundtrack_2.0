@@ -1,8 +1,14 @@
 package com.nfssoundtrack.racingsoundtracks.others;
 
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorAlias;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorSong;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Correction;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.MainGroup;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Role;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
@@ -76,5 +82,21 @@ public class JustSomeHelper {
                 todaysSongService.save(todaysSong);
             }
         }
+    }
+
+    public static ObjectMapper registerSerializerForObjectMapper(Class<?> classToUse, JsonSerializer jsonSerializer){
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(classToUse, jsonSerializer);
+        objectMapper.registerModule(simpleModule);
+        return objectMapper;
+    }
+
+    public static ObjectMapper registerDeserializerForObjectMapper(Class<?> classToUse, JsonDeserializer jsonDeserializer){
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addDeserializer(classToUse, jsonDeserializer);
+        objectMapper.registerModule(simpleModule);
+        return objectMapper;
     }
 }

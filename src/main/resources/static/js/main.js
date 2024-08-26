@@ -107,10 +107,6 @@ async function doLoadingCrap() {
         //in case of desktop version putting red text in the very top of the page next to links and logo
         $("#warnUser").css("position", "absolute");
         $("#warnUser").css("margin-top", "1vw");
-        $("#warnUser").css("left", "0");
-        $("#warnUser").css("right", "0");
-        $("#warnUser").css("max-width", "200vh");
-        $("#warnUser").css("margin-inline", "auto");
         var iconsSize = localStorage.getItem("icons-size");
         if (iconsSize != undefined) {
             $(document).find("img.img-responsive-row-icon").css("max-height", iconsSize + "vw");

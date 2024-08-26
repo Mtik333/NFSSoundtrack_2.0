@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Genre;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.MainGroup;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
@@ -33,6 +34,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * controller used for handling groups
+ * used in groupMgmt.js, subgroupMgmt.js, songsMgmt.js
+ */
 @Controller
 @RequestMapping("/maingroup")
 public class GroupController extends BaseControllerWithErrorHandling {
@@ -46,17 +51,22 @@ public class GroupController extends BaseControllerWithErrorHandling {
 	@Autowired
 	GroupSerializer groupSerializer;
 
+	/**
+	 * method to get all subgroups that belong to game we are editing
+	 * this is the "manage subgroups" button in admin panel
+	 * @param gameId id of game
+	 * @return list of groups from the game
+	 * @throws ResourceNotFoundException
+	 * @throws JsonProcessingException
+	 */
 	@GetMapping(value = "/readForEditSubgroups/{gameId}")
 	public @ResponseBody
 	String gameGroupReadSubgroups(@PathVariable("gameId") int gameId)
 			throws ResourceNotFoundException, JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
 		Game game = gameService.findById(gameId).orElseThrow(
 				() -> new ResourceNotFoundException(NO_GAME_FOUND_WITH_ID + gameId));
 		List<MainGroup> mainGroups = game.getMainGroups();
-		SimpleModule simpleModule = new SimpleModule();
-		simpleModule.addSerializer(MainGroup.class, groupWithSubgroupsSerializer);
-		objectMapper.registerModule(simpleModule);
+		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(MainGroup.class, groupWithSubgroupsSerializer);
 		return objectMapper.writeValueAsString(mainGroups);
 	}
 
@@ -64,16 +74,12 @@ public class GroupController extends BaseControllerWithErrorHandling {
 	public @ResponseBody
 	String gameGroupReadGroups(@PathVariable("gameId") int gameId)
 			throws ResourceNotFoundException, JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
 		Game game = gameService.findById(gameId).orElseThrow(
 				() -> new ResourceNotFoundException(NO_GAME_FOUND_WITH_ID + gameId));
 		List<MainGroup> mainGroups = game.getMainGroups();
-		SimpleModule simpleModule = new SimpleModule();
-		simpleModule.addSerializer(MainGroup.class, groupSerializer);
-		objectMapper.registerModule(simpleModule);
+		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(MainGroup.class, groupSerializer);
 		return objectMapper.writeValueAsString(mainGroups);
 	}
-
 
 	@GetMapping(value = "/read/{gameId}")
 	public @ResponseBody

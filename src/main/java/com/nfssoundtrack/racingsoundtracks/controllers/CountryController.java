@@ -4,86 +4,143 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Country;
+import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.serializers.CountrySerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+/**
+ * controller for handling changes to countries
+ */
 @Controller
 @RequestMapping(path = "/country")
 public class CountryController extends BaseControllerWithErrorHandling {
 
-    @Autowired
-    CountrySerializer countrySerializer;
+	@Autowired
+	CountrySerializer countrySerializer;
 
-    @GetMapping(value = "/readAll")
-    public @ResponseBody
-    String readCountries() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<Country> countries = countryService.findAll();
-        return objectMapper.writeValueAsString(countries);
-    }
+	/**
+	 * just to get all countries, used in countryMgmt.js
+	 *
+	 * @return json with all countries from database
+	 * @throws JsonProcessingException
+	 */
+	@GetMapping(value = "/readAll")
+	public @ResponseBody
+	String readCountries() throws JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<Country> countries = countryService.findAll();
+		return objectMapper.writeValueAsString(countries);
+	}
 
-    @GetMapping(value = "/read/{countryId}")
-    public @ResponseBody
-    String readCountry(@PathVariable("countryId") int countryId) throws JsonProcessingException, ResourceNotFoundException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Country country = countryService.findById(countryId).orElseThrow(() -> new ResourceNotFoundException("no country found with id " + countryId));
-        return objectMapper.writeValueAsString(country);
-    }
+	/**
+	 * method to get country based on its identifier
+	 * used in countryMgmt.js
+	 *
+	 * @param countryId id of ocuntry
+	 * @return json country entity
+	 * @throws JsonProcessingException
+	 * @throws ResourceNotFoundException
+	 */
+	@GetMapping(value = "/read/{countryId}")
+	public @ResponseBody
+	String readCountry(@PathVariable("countryId") int countryId)
+			throws JsonProcessingException, ResourceNotFoundException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		Country country = countryService.findById(countryId).orElseThrow(
+				() -> new ResourceNotFoundException("no country found with id " + countryId));
+		return objectMapper.writeValueAsString(country);
+	}
 
-    @PutMapping(value = "/put/{countryId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String updateCountry(@RequestBody String formData, @PathVariable("countryId") int countryId)
-            throws ResourceNotFoundException, JsonProcessingException {
-        LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
-        String countryName = String.valueOf(linkedHashMap.get("countryName"));
-        String countryLink = String.valueOf(linkedHashMap.get("countryLink"));
-        Country country = countryService.findById(countryId).orElseThrow(() -> new ResourceNotFoundException("no country found with id " + countryId));
-        country.setCountryName(countryName);
-        country.setCountryLink(countryLink);
-        countryService.save(country);
-        return new ObjectMapper().writeValueAsString("OK");
-    }
+	/**
+	 * method to update country based on its identifier
+	 * used in countryMgmt.js
+	 *
+	 * @param formData  consists just of country name and link (hardly possible but country can change name isn't it?)
+	 * @param countryId id of country in db
+	 * @return OK if successful
+	 * @throws ResourceNotFoundException
+	 * @throws JsonProcessingException
+	 */
+	@PutMapping(value = "/put/{countryId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	String updateCountry(@RequestBody String formData, @PathVariable("countryId") int countryId)
+			throws ResourceNotFoundException, JsonProcessingException {
+		LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
+		String countryName = String.valueOf(linkedHashMap.get("countryName"));
+		String countryLink = String.valueOf(linkedHashMap.get("countryLink"));
+		Country country = countryService.findById(countryId).orElseThrow(
+				() -> new ResourceNotFoundException("no country found with id " + countryId));
+		//just updating the entity
+		country.setCountryName(countryName);
+		country.setCountryLink(countryLink);
+		countryService.save(country);
+		return new ObjectMapper().writeValueAsString("OK");
+	}
 
-    @PostMapping(value = "/post", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String createCountry(@RequestBody String formData)
-            throws JsonProcessingException {
-        LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
-        String countryName = String.valueOf(linkedHashMap.get("countryName"));
-        String countryLink = String.valueOf(linkedHashMap.get("countryLink"));
-        Country country = new Country();
-        country.setCountryName(countryName);
-        country.setCountryLink(countryLink);
-        countryService.save(country);
-        return new ObjectMapper().writeValueAsString("OK");
-    }
+	/**
+	 * method used to create new country in database
+	 * used in countryMgmt.js
+	 *
+	 * @param formData consist of country name and link to flag as png
+	 * @return OK if successful
+	 * @throws JsonProcessingException
+	 */
+	@PostMapping(value = "/post", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	String createCountry(@RequestBody String formData)
+			throws JsonProcessingException {
+		LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
+		String countryName = String.valueOf(linkedHashMap.get("countryName"));
+		String countryLink = String.valueOf(linkedHashMap.get("countryLink"));
+		Country country = new Country();
+		country.setCountryName(countryName);
+		country.setCountryLink(countryLink);
+		countryService.save(country);
+		return new ObjectMapper().writeValueAsString("OK");
+	}
 
-    @GetMapping(value = "/countryName/{input}")
-    public @ResponseBody
-    String readCountries(@PathVariable("input") String input) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Country.class, countrySerializer);
-        objectMapper.registerModule(simpleModule);
-        if (input.length() <= 3) {
-            Optional<Country> country = countryService.findByCountryName(input);
-            if (country.isEmpty()) {
-                return objectMapper.writeValueAsString(null);
-            }
-            return objectMapper.writeValueAsString(Collections.singleton(country));
-        } else {
-            List<Country> countryList = countryService.findByCountryNameContains(input);
-            if (countryList.isEmpty()) {
-                return objectMapper.writeValueAsString(null);
-            }
-            return objectMapper.writeValueAsString(countryList);
-        }
-    }
+	/**
+	 * method to get country / countries based on name input
+	 * used in artistMgmt.js (assigning country to artist)
+	 *
+	 * @param input text to look for in countries table
+	 * @return json list of countries matching criteria
+	 * @throws JsonProcessingException
+	 */
+	@GetMapping(value = "/countryName/{countryNameInput}")
+	public @ResponseBody
+	String readCountries(@PathVariable("countryNameInput") String input) throws JsonProcessingException {
+		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Country.class, countrySerializer);
+		if (input.length() <= 3) {
+			//i dont think we have any 3-letter country but just in case we handle it similarly as in ArtistController
+			Optional<Country> country = countryService.findByCountryName(input);
+			if (country.isEmpty()) {
+				return objectMapper.writeValueAsString(null);
+			}
+			return objectMapper.writeValueAsString(Collections.singleton(country));
+		} else {
+			//for longer input we use 'contains' concept
+			List<Country> countryList = countryService.findByCountryNameContains(input);
+			if (countryList.isEmpty()) {
+				return objectMapper.writeValueAsString(null);
+			}
+			return objectMapper.writeValueAsString(countryList);
+		}
+	}
 }

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.MainGroup;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Serie;
+import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.serializers.GameSerializer;
 import com.nfssoundtrack.racingsoundtracks.serializers.SerieSerializer;
@@ -32,10 +34,7 @@ public class SerieController extends BaseControllerWithErrorHandling {
     @GetMapping(value = "/readAll")
     public @ResponseBody
     String readSeries() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Serie.class, serieSerializer);
-        objectMapper.registerModule(simpleModule);
+        ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Serie.class, serieSerializer);
         List<Serie> series = serieService.findAllSortedByPositionAsc();
         return objectMapper.writeValueAsString(series);
     }
@@ -43,10 +42,7 @@ public class SerieController extends BaseControllerWithErrorHandling {
     @GetMapping(value = "/read/{serieId}")
     public @ResponseBody
     String readGamesFromSerie(@PathVariable("serieId") int serieId) throws ResourceNotFoundException, JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Game.class, gameSerializer);
-        objectMapper.registerModule(simpleModule);
+        ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Game.class, gameSerializer);
         Serie serie = serieService.findById(serieId).orElseThrow(
                 () -> new ResourceNotFoundException("No serie found with id " + serieId));
         return objectMapper.writeValueAsString(serie.getGames());

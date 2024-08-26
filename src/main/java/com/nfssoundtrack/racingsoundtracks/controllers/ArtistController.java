@@ -60,7 +60,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	 * songMgmt.js
 	 *
 	 * @param input id of author (or rather author's alias) associated with song
-	 * @return list of aliases of author associated with looked-up song
+	 * @return json list of aliases of author associated with looked-up song
 	 * @throws ResourceNotFoundException when no author-song entry is found
 	 * @throws JsonProcessingException   issue with writing json to frontend
 	 */
@@ -68,10 +68,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	public @ResponseBody
 	String readAliasesFromArtist(@PathVariable("input") int input)
 			throws ResourceNotFoundException, JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		SimpleModule simpleModule = new SimpleModule();
-		simpleModule.addSerializer(AuthorAlias.class, authorAliasSerializer);
-		objectMapper.registerModule(simpleModule);
+		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(AuthorAlias.class, authorAliasSerializer);
 		AuthorSong authorSong = authorSongService.findById(input).orElseThrow(
 				() -> new ResourceNotFoundException("No alias with id " +
 						"found " + input));
@@ -88,17 +85,14 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	 * artistMgmt.js, songsMgmt.js
 	 *
 	 * @param input alias value
-	 * @return list or single alias related to provided input
+	 * @return json list or single alias related to provided input
 	 * @throws JsonProcessingException
 	 */
-	@GetMapping(value = "/aliasName/{input}")
+	@GetMapping(value = "/aliasName/{aliasValue}")
 	public @ResponseBody
-	String readAliases(@PathVariable("input") String input)
+	String readAliases(@PathVariable("aliasValue") String input)
 			throws JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		SimpleModule simpleModule = new SimpleModule();
-		simpleModule.addSerializer(AuthorAlias.class, authorAliasSerializer);
-		objectMapper.registerModule(simpleModule);
+		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(AuthorAlias.class, authorAliasSerializer);
 		//it might be that JS will try to send empty input for alias so double checking this
 		if (input.isEmpty()) {
 			return objectMapper.writeValueAsString(null);
@@ -126,17 +120,14 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	 * artistMgmt.js, mergeArtist.js
 	 *
 	 * @param input official name of the author
-	 * @return list of authors or just author to be managed
+	 * @return json list of authors or just author to be managed
 	 * @throws JsonProcessingException
 	 */
-	@GetMapping(value = "/authorNameMgmt/{input}")
+	@GetMapping(value = "/authorNameMgmt/{authorName}")
 	public @ResponseBody
-	String readArtistsForMgmt(@PathVariable(name = "input", required = false) String input)
+	String readArtistsForMgmt(@PathVariable(name = "authorName", required = false) String input)
 			throws JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		SimpleModule simpleModule = new SimpleModule();
-		simpleModule.addSerializer(Author.class, artistMgmtSerializer);
-		objectMapper.registerModule(simpleModule);
+		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Author.class, artistMgmtSerializer);
 		if (input == null || input.isEmpty()) {
 			return objectMapper.writeValueAsString(null);
 		}
@@ -416,18 +407,18 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	 *
 	 * @param discogsId id of author on DiscoGS
 	 * @param formData  just name of artist and it really is used only when author is not in DiscoGS
-	 * @return all info about the author on DiscoGS
+	 * @return json all info about the author on DiscoGS
 	 * @throws JsonProcessingException
 	 * @throws LoginException
 	 * @throws InterruptedException
 	 */
-	@PostMapping(value = "/discogsEntry/{input}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/discogsEntry/{discogsId}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	String findDiscogsInfoViaId(@PathVariable("discogsId") int discogsId, @RequestBody String formData)
 			throws JsonProcessingException, LoginException, InterruptedException {
 		ObjectMapper objectMapper = new ObjectMapper();
-		Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
-		String artistName = (String) mergeInfo.get("name");
+		Map<?, ?> discogsInfo = new ObjectMapper().readValue(formData, Map.class);
+		String artistName = (String) discogsInfo.get("name");
 		//calling the service to get author details and bring it back to frontend
 		//once we save the author, these fetched values will be saved to index too
 		DiscoGSObj discoGSObj = authorService.manuallyFetchDiscogsInfo(artistName, discogsId);

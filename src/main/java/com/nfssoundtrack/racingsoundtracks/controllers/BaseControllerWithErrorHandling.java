@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.io.FileNotFoundException;
 import java.util.Locale;
 
+/**
+ * just a wannabe-controller to keep track on various services across other controllers
+ */
 public class BaseControllerWithErrorHandling implements ErrorController {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseControllerWithErrorHandling.class);
@@ -76,7 +79,7 @@ public class BaseControllerWithErrorHandling implements ErrorController {
     @Autowired
     private MessageSource messageSource;
     /**
-     *
+     * when trying to access page (game) that does not really exist on website
      * @param otherval invalid input endpoint
      * @return error page
      * @throws FileNotFoundException exception that indicates wrong endpoint visited
@@ -87,11 +90,21 @@ public class BaseControllerWithErrorHandling implements ErrorController {
         throw new FileNotFoundException("Tried to access non-existing page: " + otherval);
     }
 
-    String getLocalizedMessage(String translationKey) {
+    /**
+     * used to show title bar page in specified user language
+     * @param translationKey key that you can find in message.properties
+     * @return value of title bar
+     */
+    String getLocalizedMessage(String translationKey, String[] params) {
         Locale locale = LocaleContextHolder.getLocale();
-        return messageSource.getMessage(translationKey, null, locale);
+        return messageSource.getMessage(translationKey, params, locale);
     }
 
+    /**
+     * cleaning the cache when game or its content was modified
+     * otherwise you would not see the difference in UI until application is restarted
+     * @param gameShort url of game
+     */
     void removeCacheEntry(String gameShort){
         Cache cache = cacheManager.getCache("findByGameShort");
         if (cache!=null){
