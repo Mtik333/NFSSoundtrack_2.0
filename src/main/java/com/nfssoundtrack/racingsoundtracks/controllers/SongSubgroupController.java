@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.deserializers.SongDeserializer;
 import com.nfssoundtrack.racingsoundtracks.deserializers.SongSubgroupDeserializer;
+import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -209,39 +210,15 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             }
             //if we remove song from subgroup but this specific one was used as today song
             //then either we link other usage of this song or just replace it with some other song
-            List<TodaysSong> todaysSongs = todaysSongService.findAllBySongSubgroup(songSubgroup);
-            if (todaysSongs.size() == 1) {
-                List<SongSubgroup> allSongSubgroups = songSubgroupService.findBySong(song);
-                if (allSongSubgroups.size() > 1) {
-                    SongSubgroup replacementSongSubgroup = allSongSubgroups.stream().filter(songSubgroup1 -> !songSubgroup1.getId().equals(songSubgroup.getId())).findFirst().get();
-                    TodaysSong todaysSong = todaysSongs.get(0);
-                    todaysSong.setSongSubgroup(replacementSongSubgroup);
-                    todaysSongService.save(todaysSong);
-                } else {
-                    List<SongSubgroup> songSubgroupList = songSubgroup.getSubgroup().getSongSubgroupList();
-                    SongSubgroup replacementSongSubgroup = songSubgroupList.get(Math.abs(songSubgroupList.indexOf(songSubgroup) - 1));
-                    TodaysSong todaysSong = todaysSongs.get(0);
-                    todaysSong.setSongSubgroup(replacementSongSubgroup);
-                    todaysSongService.save(todaysSong);
-                }
-            }
-            List<Correction> relatedCorrections = correctionService.findBySongSubgroup(songSubgroup);
-            for (Correction correction : relatedCorrections) {
-                correction.setSongSubgroup(null);
-                correction.setCorrectValue(correction.getCorrectValue()
-                        + "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
-                correctionService.save(correction);
-            }
+            JustSomeHelper.unlinkSongWithTodaysSong(todaysSongService,songSubgroup,song,songSubgroupService);
+            JustSomeHelper.unlinkSongWithCorrection(correctionService,songSubgroup,
+                            "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
             songSubgroupService.delete(songSubgroup);
             songService.delete(song);
         } else {
-            List<Correction> relatedCorrections = correctionService.findBySongSubgroup(songSubgroup);
-            for (Correction correction : relatedCorrections) {
-                correction.setSongSubgroup(null);
-                correction.setCorrectValue(correction.getCorrectValue()
-                        + "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
-                correctionService.save(correction);
-            }
+            JustSomeHelper.unlinkSongWithTodaysSong(todaysSongService,songSubgroup,song,songSubgroupService);
+            JustSomeHelper.unlinkSongWithCorrection(correctionService,songSubgroup,
+                    "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
             songSubgroupService.delete(songSubgroup);
         }
         return new ObjectMapper().writeValueAsString("OK");

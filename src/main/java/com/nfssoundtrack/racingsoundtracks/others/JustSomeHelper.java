@@ -1,6 +1,15 @@
 package com.nfssoundtrack.racingsoundtracks.others;
 
-import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorAlias;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorSong;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Correction;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Role;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.TodaysSong;
+import com.nfssoundtrack.racingsoundtracks.services.CorrectionService;
+import com.nfssoundtrack.racingsoundtracks.services.SongSubgroupService;
+import com.nfssoundtrack.racingsoundtracks.services.TodaysSongService;
 
 import java.util.Comparator;
 import java.util.List;
@@ -39,4 +48,33 @@ public class JustSomeHelper {
         }
     }
 
+    public static void unlinkSongWithCorrection(CorrectionService correctionService, SongSubgroup songSubgroup,
+                                                String correctValue){
+        List<Correction> relatedCorrections = correctionService.findBySongSubgroup(songSubgroup);
+        for (Correction correction : relatedCorrections) {
+            correction.setSongSubgroup(null);
+            correction.setCorrectValue(correction.getCorrectValue()+correctValue);
+            correctionService.save(correction);
+        }
+    }
+
+    public static void unlinkSongWithTodaysSong(TodaysSongService todaysSongService, SongSubgroup songSubgroup,
+                                                Song song, SongSubgroupService songSubgroupService){
+        List<TodaysSong> todaysSongs = todaysSongService.findAllBySongSubgroup(songSubgroup);
+        if (todaysSongs.size() == 1) {
+            List<SongSubgroup> allSongSubgroups = songSubgroupService.findBySong(song);
+            if (allSongSubgroups.size() > 1) {
+                SongSubgroup replacementSongSubgroup = allSongSubgroups.stream().filter(songSubgroup1 -> !songSubgroup1.getId().equals(songSubgroup.getId())).findFirst().get();
+                TodaysSong todaysSong = todaysSongs.get(0);
+                todaysSong.setSongSubgroup(replacementSongSubgroup);
+                todaysSongService.save(todaysSong);
+            } else {
+                List<SongSubgroup> songSubgroupList = songSubgroup.getSubgroup().getSongSubgroupList();
+                SongSubgroup replacementSongSubgroup = songSubgroupList.get(Math.abs(songSubgroupList.indexOf(songSubgroup) - 1));
+                TodaysSong todaysSong = todaysSongs.get(0);
+                todaysSong.setSongSubgroup(replacementSongSubgroup);
+                todaysSongService.save(todaysSong);
+            }
+        }
+    }
 }

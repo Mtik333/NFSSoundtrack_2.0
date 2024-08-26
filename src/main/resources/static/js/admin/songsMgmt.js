@@ -370,7 +370,7 @@ $(document).ready(function () {
                 $.ajax({
                     async: false,
                     type: "GET",
-                    url: "/author/authorName/" + $(mySelect).val(),
+                    url: "/author/aliasName/" + $(mySelect).val(),
                     success: function (ooo) {
                         var result = JSON.parse(ooo);
                         if (result) {
