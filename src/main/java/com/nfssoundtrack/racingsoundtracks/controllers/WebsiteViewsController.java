@@ -53,6 +53,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * main controller with all the basic endpoint for non-authenticated users
+ */
 @Controller
 public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
@@ -125,6 +128,8 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                 contentService.findByContentShort(value).getContentData());
         boolean isHome = value.contains("home");
         model.addAttribute("home", isHome);
+        //when we are at home page, we have to render todays song
+        //todo show todays song on the left side menu when it is pinned
         model.addAttribute("todayssong", todaysSongService.getTodaysSong());
         return MIN_INDEX;
     }
@@ -140,6 +145,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("endpoint", "/game/" + gameshort);
         model.addAttribute("game", game);
         addCommonAttributes(model, "gameSoundtrackAt", new String[]{game.getDisplayTitle()});
+        //for few games there's custom theme to make website background a bit more interesting
         Optional<CustomTheme> customTheme = customThemeService.findByGame(game);
         customTheme.ifPresent(theme -> model.addAttribute("customTheme", theme));
         model.addAttribute("songSubgroups", songSubgroupService.hasGameAnySongs(game));
@@ -149,7 +155,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     /**
      * @param model          view model
      * @param customPlaylist array of song ids, example ["350","357","312","315","410","425","528"]
-     * @return display of custom playlist songs table
+     * @return display of custom playlist songs table (after clicking 'custom playlist' button)
      * @throws ResourceNotFoundException exception when song subgroup not found
      * @throws JsonProcessingException   exception due to objectmapper
      */
@@ -160,10 +166,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         if (customPlaylist == null || customPlaylist.isEmpty()) {
             logger.error("do something");
         } else {
+            //yes this is stupid but i cannot find the way of sending user browser cache to the backend other than this
             String result = URLDecoder.decode(customPlaylist, StandardCharsets.UTF_8);
             String basicallyArray = result.replace("customPlaylist=", "");
             List<String> finalList = new ObjectMapper().readValue(basicallyArray,
                     TypeFactory.defaultInstance().constructCollectionType(List.class, String.class));
+            //as array consits of song-subgroup id, we are looking for it in database
             for (String songSubgroupId : finalList) {
                 songSubgroupList.add(songSubgroupService.findById(Integer.valueOf(
                         songSubgroupId)).orElseThrow(() -> new ResourceNotFoundException("No songsubgroup found with " +
@@ -177,7 +185,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     /**
      * @param songId id of song to fetch info about
-     * @return whole information about the song
+     * @return whole information about the song (once you click on 'infobutton' next to song)
      * @throws JsonProcessingException   exception due to objectmapper
      * @throws ResourceNotFoundException when song not found by id
      */
@@ -198,7 +206,8 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     /**
      * @param model  view model
      * @param songId id of song to fetch usages of it
-     * @return table with usages of the song across all games
+     * @return table with usages of the song across all games (once you click on 'find all usages' button
+     * after clicking on song infopage
      * @throws ResourceNotFoundException exception when song is not found
      */
     @GetMapping(value = "/song/{songId}")
@@ -215,7 +224,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     /**
      * @param model    view model
      * @param authorId id of author to fetch info about
-     * @return table with all songs where author is being part of
+     * @return table with all songs where author is being part of (once you click on author hyperlink)
      * @throws ResourceNotFoundException author not found by id
      * @throws JsonProcessingException   exception due to objectmapper
      */
@@ -227,11 +236,14 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                         () -> new ResourceNotFoundException("No author found with id " + authorId));
         DiscoGSObj discoGSObj = authorService.fetchInfoFromMap(author);
         List<AuthorAlias> allAliases = authorAliasService.findByAuthor(author);
+        //we build a lot of crap as author can be assigned to songs as composer, subcomposer, feat, remixer
         Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsAsComposer = new HashMap<>();
         Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsAsSubcomposer = new HashMap<>();
         Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsAsFeat = new HashMap<>();
         Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsRemixed = new HashMap<>();
         for (AuthorAlias authorAlias : allAliases) {
+            //and we have to remember that author can have multiple aliases
+            //so we have to group songs by both type of contribution and alias name
             List<AuthorSong> allAuthorSongs = authorSongService.findByAuthorAlias(authorAlias);
             for (AuthorSong authorSong : allAuthorSongs) {
                 List<SongSubgroup> songSubgroupList =
@@ -246,6 +258,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                         songSubgroupList);
             }
         }
+        //we give back info about author, discogs info and all the songs found, as well as the aliases
         model.addAttribute("discoGSObj", discoGSObj);
         model.addAttribute("author", author);
         model.addAttribute("songsAsComposer", songsAsComposer);
@@ -260,7 +273,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     /**
      * @param model   view model
      * @param genreId id of genre
-     * @return table with songs associated with genre (limited to 50 entries)
+     * @return table with songs associated with genre (limited to 50 entries) (once you click on genre link)
      * @throws ResourceNotFoundException when genre with this id not found
      */
     @GetMapping(value = "/genre/{genreId}")
@@ -270,6 +283,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                         () -> new ResourceNotFoundException("No genre found with id " + genreId));
         List<SongGenre> songGenreList = songGenreService.findByGenre(genre, 50);
         List<Song> songs = songGenreList.stream().map(SongGenre::getSong).toList();
+        //for brief look at the genre, we just render first 50 songs we find in db
         List<SongSubgroup> songSubgroupList = songSubgroupService.findBySongInSortedByIdAsc(songs);
         model.addAttribute("songSubgroupList", songSubgroupList);
         model.addAttribute("genre", genre);
@@ -281,7 +295,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     /**
      * @param model   view model
      * @param genreId id of genre
-     * @return table with songs associated with genre
+     * @return table with songs associated with genre (after you click 'do you want to see full list' from genre table)
      * @throws ResourceNotFoundException when genre with this id not found
      */
     @GetMapping(value = "/genre/readfull/{genreId}")
@@ -290,8 +304,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         Genre genre =
                 genreService.findById(genreId).orElseThrow(
                         () -> new ResourceNotFoundException("No genre found with id " + genreId));
+        //now we go full with hundreds of entries
+        //first we get song-genre associations
         List<SongGenre> songGenreList = songGenreService.findByGenre(genre);
+        //then we get just pure songs
         List<Song> songs = songGenreList.stream().map(SongGenre::getSong).toList();
+        //finally retrieve all song-subgroup entries to show where song was really used
         List<SongSubgroup> songSubgroupList = songSubgroupService.findBySongInSortedByIdAsc(songs);
         model.addAttribute("songSubgroupList", songSubgroupList);
         model.addAttribute("genre", genre);
@@ -299,6 +317,10 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return MIN_INDEX;
     }
 
+    /**
+     * @param model view model
+     * @return table with todays songs randomly picked in last 30 days
+     */
     @GetMapping(value = "/songhistory")
     public String getTodaysSongHistory(Model model) {
         List<TodaysSong> todays30Songs = todaysSongService.findAllFromLast30Days();
@@ -307,17 +329,33 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return MIN_INDEX;
     }
 
+    /**
+     * some attributes provided to model repeat with each invocation so let's group it in a single place
+     * @param model view model
+     * @param appNameKey key from message.properties to be translated
+     * @param params params to provide to the message translation
+     */
     private void addCommonAttributes(Model model, String appNameKey, String[] params){
+        //name of the app, rather unrelevant
         model.addAttribute(APP_NAME, getLocalizedMessage(appNameKey,params));
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
         model.addAttribute(GAMES_ALPHA, gameService.findAllSortedByDisplayTitleAsc());
     }
 
+    /**
+     * invoked when clicking on 'submit correction' button after clicking on 'bug' icon on game's soundtrack page
+     * can be also triggered by 'report problem' action from top menu bar
+     * @param formData consists of type of issue, info from user and potential contact
+     * @return OK if successful
+     * @throws JsonProcessingException
+     * @throws InterruptedException
+     */
     @PostMapping(value = "/correction", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     String submitCorrection(@RequestBody String formData)
             throws JsonProcessingException, InterruptedException {
         Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
+        //can be that issue is reported to specific row in game's soundtrack
         int songSubgroupId = (int) objectMapper.get("affectedSongsubgroup");
         String pageUrl = (String) objectMapper.get("sourceUrl");
         String problemType = (String) objectMapper.get("problemType");
@@ -326,6 +364,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         try {
             Optional<SongSubgroup> songSubgroup;
             Correction correction;
+            //so depending on that we will create the correction and store in database
             if (songSubgroupId != -1) {
                 songSubgroup = songSubgroupService.findById(songSubgroupId);
                 if (songSubgroup.isPresent()){
@@ -339,6 +378,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             }
             correction.setCorrectionStatus(CorrectionStatus.PENDING);
             correction = correctionService.save(correction);
+            //if user was provided, we will send the message to discord server so admin can check this correction
             rebuildJda(botSecret);
             List<Member> foundUsers;
             if (!discordUserName.isEmpty()) {
@@ -347,6 +387,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             } else {
                 foundUsers = new ArrayList<>();
             }
+            //i think i took most of that from some tutorial to make it look readable
             TextChannel textChannel = jda.getTextChannelById(channelId);
             EmbedBuilder eb = new EmbedBuilder();
             eb.setTitle("Correction", pageUrl);
@@ -369,6 +410,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             if (textChannel != null && textChannel.canTalk()) {
                 textChannel.sendMessageEmbeds(embed).queue();
             }
+            //if user was there and found in Discord list, message would be sent to thank for the correction
             if (!foundUsers.isEmpty()) {
                 foundUsers.get(0).getUser().openPrivateChannel().queue(privateChannel -> privateChannel
                         .sendMessage("Thanks for submitting correction to RacingSoundtracks.com\nI will try to handle this fast\nHere are the details of your correction").queue());
@@ -410,6 +452,14 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return objectMapper.writeValueAsString(null);
     }
 
+    /**
+     * endpoint used for stuff from Toni's Music Library - not relevant to the website
+     * he uploads a lot of music and includes original filenames
+     * now we can use filename as input to get video title for him as well as description
+     * to save a lot of time on editing hundreds of videos
+     * @param songFilename
+     * @return
+     */
     @GetMapping(value = "/filename/{songFilename}", produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody String getSongInfo(@PathVariable("songFilename") String songFilename) {
         ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(SongSubgroup.class, songSubgroupFilenameSerializer);
@@ -476,6 +526,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return resultingText.toString();
     }
 
+    /**
+     * just rebuilding the JDA to be able to send / receive messages via bot
+     * @param botSecret
+     * @throws LoginException
+     * @throws InterruptedException
+     */
     public static void rebuildJda(String botSecret) throws LoginException, InterruptedException {
         if (jda == null) {
             jda = JDABuilder.createDefault(botSecret).build();

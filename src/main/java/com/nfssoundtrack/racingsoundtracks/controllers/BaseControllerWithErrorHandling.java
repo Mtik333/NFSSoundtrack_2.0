@@ -1,6 +1,22 @@
 package com.nfssoundtrack.racingsoundtracks.controllers;
 
-import com.nfssoundtrack.racingsoundtracks.services.*;
+import com.nfssoundtrack.racingsoundtracks.services.AuthorAliasService;
+import com.nfssoundtrack.racingsoundtracks.services.AuthorCountryService;
+import com.nfssoundtrack.racingsoundtracks.services.AuthorService;
+import com.nfssoundtrack.racingsoundtracks.services.AuthorSongService;
+import com.nfssoundtrack.racingsoundtracks.services.ContentService;
+import com.nfssoundtrack.racingsoundtracks.services.CorrectionService;
+import com.nfssoundtrack.racingsoundtracks.services.CountryService;
+import com.nfssoundtrack.racingsoundtracks.services.CustomThemeService;
+import com.nfssoundtrack.racingsoundtracks.services.GameService;
+import com.nfssoundtrack.racingsoundtracks.services.GenreService;
+import com.nfssoundtrack.racingsoundtracks.services.MainGroupService;
+import com.nfssoundtrack.racingsoundtracks.services.SerieService;
+import com.nfssoundtrack.racingsoundtracks.services.SongGenreService;
+import com.nfssoundtrack.racingsoundtracks.services.SongService;
+import com.nfssoundtrack.racingsoundtracks.services.SongSubgroupService;
+import com.nfssoundtrack.racingsoundtracks.services.SubgroupService;
+import com.nfssoundtrack.racingsoundtracks.services.TodaysSongService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,95 +36,99 @@ import java.util.Locale;
  */
 public class BaseControllerWithErrorHandling implements ErrorController {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseControllerWithErrorHandling.class);
+	private static final Logger logger = LoggerFactory.getLogger(BaseControllerWithErrorHandling.class);
 
-    @Autowired
-    CacheManager cacheManager;
+	@Autowired
+	CacheManager cacheManager;
 
-    @Autowired
-    SerieService serieService;
+	@Autowired
+	SerieService serieService;
 
-    @Autowired
-    ContentService contentService;
+	@Autowired
+	ContentService contentService;
 
-    @Autowired
-    GameService gameService;
+	@Autowired
+	GameService gameService;
 
-    @Autowired
-    GenreService genreService;
+	@Autowired
+	GenreService genreService;
 
-    @Autowired
-    SongSubgroupService songSubgroupService;
+	@Autowired
+	SongSubgroupService songSubgroupService;
 
-    @Autowired
-    SongService songService;
+	@Autowired
+	SongService songService;
 
-    @Autowired
-    AuthorService authorService;
+	@Autowired
+	AuthorService authorService;
 
-    @Autowired
-    AuthorAliasService authorAliasService;
+	@Autowired
+	AuthorAliasService authorAliasService;
 
-    @Autowired
-    AuthorSongService authorSongService;
+	@Autowired
+	AuthorSongService authorSongService;
 
-    @Autowired
-    SongGenreService songGenreService;
+	@Autowired
+	SongGenreService songGenreService;
 
-    @Autowired
-    CountryService countryService;
+	@Autowired
+	CountryService countryService;
 
-    @Autowired
-    AuthorCountryService authorCountryService;
+	@Autowired
+	AuthorCountryService authorCountryService;
 
-    @Autowired
-    MainGroupService mainGroupService;
+	@Autowired
+	MainGroupService mainGroupService;
 
-    @Autowired
-    SubgroupService subgroupService;
+	@Autowired
+	SubgroupService subgroupService;
 
-    @Autowired
-    TodaysSongService todaysSongService;
+	@Autowired
+	TodaysSongService todaysSongService;
 
-    @Autowired
-    CorrectionService correctionService;
+	@Autowired
+	CorrectionService correctionService;
 
-    @Autowired
-    CustomThemeService customThemeService;
+	@Autowired
+	CustomThemeService customThemeService;
 
-    @Autowired
-    private MessageSource messageSource;
-    /**
-     * when trying to access page (game) that does not really exist on website
-     * @param otherval invalid input endpoint
-     * @return error page
-     * @throws FileNotFoundException exception that indicates wrong endpoint visited
-     */
-    @RequestMapping(value = "/{otherval}")
-    public String nonExistingPage(@PathVariable("otherval") String otherval) throws FileNotFoundException {
-        logger.error("otherval {}", otherval);
-        throw new FileNotFoundException("Tried to access non-existing page: " + otherval);
-    }
+	@Autowired
+	private MessageSource messageSource;
 
-    /**
-     * used to show title bar page in specified user language
-     * @param translationKey key that you can find in message.properties
-     * @return value of title bar
-     */
-    String getLocalizedMessage(String translationKey, String[] params) {
-        Locale locale = LocaleContextHolder.getLocale();
-        return messageSource.getMessage(translationKey, params, locale);
-    }
+	/**
+	 * when trying to access page (game) that does not really exist on website
+	 *
+	 * @param otherval invalid input endpoint
+	 * @return error page
+	 * @throws FileNotFoundException exception that indicates wrong endpoint visited
+	 */
+	@RequestMapping(value = "/{otherval}")
+	public String nonExistingPage(@PathVariable("otherval") String otherval) throws FileNotFoundException {
+		logger.error("otherval {}", otherval);
+		throw new FileNotFoundException("Tried to access non-existing page: " + otherval);
+	}
 
-    /**
-     * cleaning the cache when game or its content was modified
-     * otherwise you would not see the difference in UI until application is restarted
-     * @param gameShort url of game
-     */
-    void removeCacheEntry(String gameShort){
-        Cache cache = cacheManager.getCache("findByGameShort");
-        if (cache!=null){
-            cache.evict(gameShort);
-        }
-    }
+	/**
+	 * used to show title bar page in specified user language
+	 *
+	 * @param translationKey key that you can find in message.properties
+	 * @return value of title bar
+	 */
+	String getLocalizedMessage(String translationKey, String[] params) {
+		Locale locale = LocaleContextHolder.getLocale();
+		return messageSource.getMessage(translationKey, params, locale);
+	}
+
+	/**
+	 * cleaning the cache when game or its content was modified
+	 * otherwise you would not see the difference in UI until application is restarted
+	 *
+	 * @param gameShort url of game
+	 */
+	void removeCacheEntry(String gameShort) {
+		Cache cache = cacheManager.getCache("findByGameShort");
+		if (cache != null) {
+			cache.evict(gameShort);
+		}
+	}
 }

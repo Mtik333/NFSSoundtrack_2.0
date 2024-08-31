@@ -2,7 +2,6 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Author;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorAlias;
@@ -57,6 +56,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 
 	/**
 	 * used when editing song, we get and render alias used for the song
+	 * you can see it when typing in "alias" textfield on manage songs when creating / editing song
 	 * songMgmt.js
 	 *
 	 * @param input id of author (or rather author's alias) associated with song
@@ -68,7 +68,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	public @ResponseBody
 	String readAliasesFromArtist(@PathVariable("input") int input)
 			throws ResourceNotFoundException, JsonProcessingException {
-		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(AuthorAlias.class, authorAliasSerializer);
+		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(AuthorAlias.class,
+				authorAliasSerializer);
 		AuthorSong authorSong = authorSongService.findById(input).orElseThrow(
 				() -> new ResourceNotFoundException("No alias with id " +
 						"found " + input));
@@ -82,6 +83,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 
 	/**
 	 * used when creating song and modifying existing artist (after we selected one through input)
+	 * you can see it being used when going to 'manage artists' and once you select author, trying to type in alias
+	 * also when you type in 'feat' / 'subcomposer' text field in edit / new song in 'manage songs'
 	 * artistMgmt.js, songsMgmt.js
 	 *
 	 * @param input alias value
@@ -92,7 +95,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	public @ResponseBody
 	String readAliases(@PathVariable("aliasValue") String input)
 			throws JsonProcessingException {
-		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(AuthorAlias.class, authorAliasSerializer);
+		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(AuthorAlias.class,
+				authorAliasSerializer);
 		//it might be that JS will try to send empty input for alias so double checking this
 		if (input.isEmpty()) {
 			return objectMapper.writeValueAsString(null);
@@ -118,6 +122,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	/**
 	 * used when we just type in the author name and look for artist to edit and when merging artists
 	 * artistMgmt.js, mergeArtist.js
+	 * you can see it being used when going to 'manage artists' and you type in 'author name'
+	 * also when you type in 'author' in 'associate existing alias' module
 	 *
 	 * @param input official name of the author
 	 * @return json list of authors or just author to be managed
@@ -127,7 +133,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	public @ResponseBody
 	String readArtistsForMgmt(@PathVariable(name = "authorName", required = false) String input)
 			throws JsonProcessingException {
-		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Author.class, artistMgmtSerializer);
+		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Author.class,
+				artistMgmtSerializer);
 		if (input == null || input.isEmpty()) {
 			return objectMapper.writeValueAsString(null);
 		}
@@ -148,7 +155,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	}
 
 	/**
-	 * used when merging artists
+	 * used when merging artists in 'associate existing alias' once you click on 'save'
 	 * mergeArtist.js
 	 *
 	 * @param formData consist of author-slave that should be merged with author-master
@@ -205,6 +212,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	 * earlier there was an issue that sometimes clicking on author input when creating song would make a duplicate
 	 * artist with same name but different id
 	 * so i created method to "merge" artists with exactly the same name that got created due to this
+	 * so you can see it used when clicking 'save' in 'merge duplicate artists' module
+	 * used in fixDuplicateArtist.js
 	 *
 	 * @param formData consists just of artist name
 	 * @return OK if successful
@@ -244,6 +253,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	/**
 	 * used to update existing author info, we can update discogs links, author name, aliases, country or countries
 	 * artistMgmt.js
+	 * you can see it triggered when you click on 'save' button in 'manage artists' module
 	 *
 	 * @param formData a lot of information, need to document it somewhere
 	 * @return OK if success
@@ -381,6 +391,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 	 * used to get DiscoGS info of the author - if it exists we will render all these links and stuff
 	 * otherwise it's gonna be empty / full of nulls
 	 * artistMgmt.js
+	 * used when you select author in 'author name' in manage artists - div with DiscoGS info will be rendered
 	 *
 	 * @param input id of author that we are editing
 	 * @return json with all info from DiscoGS about author
@@ -404,6 +415,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 
 	/**
 	 * used to fetch info from DiscoGS when editing the author
+	 * you can see it being triggered when clicking 'fetch from DiscoGS' button
+	 * used in artistMgmt.js
 	 *
 	 * @param discogsId id of author on DiscoGS
 	 * @param formData  just name of artist and it really is used only when author is not in DiscoGS

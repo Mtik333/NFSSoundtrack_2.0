@@ -2,7 +2,6 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.MainGroup;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Subgroup;
@@ -39,7 +38,8 @@ public class GameController extends BaseControllerWithErrorHandling {
 	GameEditSerializer gameEditSerializer;
 
 	/**
-	 * method used to create new game
+	 * method used to create new game in serieMgmt.js
+	 * you can see when you go to 'manage series', then 'edit' of series and then 'new game'
 	 *
 	 * @param formData consists of various fields, @see GameDeserializer
 	 * @return OK if successful
@@ -79,7 +79,8 @@ public class GameController extends BaseControllerWithErrorHandling {
 	}
 
 	/**
-	 * method gives game entity back to frontend
+	 * method gives game entity back to frontend in gameMgmt.js
+	 * you can see it triggered when using 'edit game' on a game
 	 *
 	 * @param gameId id of game to display in admin panel
 	 * @return json of game entity
@@ -98,7 +99,7 @@ public class GameController extends BaseControllerWithErrorHandling {
 
 	/**
 	 * method updates single game in database
-	 * used in gameMgmt.js
+	 * used in gameMgmt.js when you click on 'save changes' when clicking 'edit game'
 	 *
 	 * @param formData various fields, see the deserializer
 	 * @param gameId   id of game being updated

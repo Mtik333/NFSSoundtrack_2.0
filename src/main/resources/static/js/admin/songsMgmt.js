@@ -73,62 +73,6 @@ $(document).ready(function () {
         }
     }
 
-    function getSubgroupsFromGame() {
-        $.ajax({
-            async: false,
-            type: "GET",
-            url: "/maingroup/read/" + gameId,
-            success: function (ooo) {
-                fullScopeOfEdit = JSON.parse(ooo);
-                var divToAppend = $('#nfs-content');
-                divToAppend.empty();
-                divToAppend.append(successAlertHtml);
-                divToAppend.append(failureAlertHtml);
-                divToAppend.addClass("vh-100");
-                divToAppend.addClass("overflow-auto");
-                var rowDiv = $('<div class="row p-1">');
-                var leftCellDiv = $('<div class="col">');
-                var rightCellDiv = $('<div class="col">');
-                divToAppend.append(rowDiv);
-                rowDiv.append(leftCellDiv);
-                rowDiv.append(rightCellDiv);
-                var newGroupSpan = $('<h2><button data-gameId=' + gameId + ' id="new-song" class="new-group btn btn-success">New song</button></h2>');
-                var dropdownDiv = $('<div id="selectSubgroup" class="dropdown">');
-                dropdownDiv.append('<button class="btn btn-secondary dropdown-toggle" type="button" id="subgroupsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">All</button>');
-                leftCellDiv.append(dropdownDiv);
-                rightCellDiv.append(newGroupSpan);
-                var tableToFill;
-                var allSongSubgroups = [];
-                for (let i = 0; i < fullScopeOfEdit.length; i++) {
-                    var group = fullScopeOfEdit[i];
-                    for (let j = 0; j < group.subgroups.length; j++) {
-                        allSongSubgroups = allSongSubgroups.concat(fullScopeOfEdit[i].subgroups[j].songSubgroupList);
-                    }
-                }
-                if (fullScopeOfEdit.length > 0) {
-                    var dropdownMenuDiv = $('<div class="dropdown-menu" style="max-height: 350px; overflow-y: auto;" aria-labelledby="subgroupsDropdown">');
-                    tableToFill = displayAllSongs(allSongSubgroups, dropdownDiv);
-                    for (let i = 0; i < fullScopeOfEdit.length; i++) {
-                        var group = fullScopeOfEdit[i];
-                        var groupName = fullScopeOfEdit[i].groupName;
-                        for (let j = 0; j < group.subgroups.length; j++) {
-                            var subgroup = group.subgroups[j];
-                            dropdownMenuDiv.append('<a class="dropdown-item songItem" href="#" data-groupId="' + group.id + '" data-subgroupId="' + subgroup.id + '">(' + subgroup.subgroupName + ') from group [' + groupName + ']');
-                        }
-                    }
-                    dropdownDiv.append(dropdownMenuDiv);
-                }
-                divToAppend.append(tableToFill);
-                $(divToAppend).find("a").first().click();
-            },
-            error: function (ooo) {
-                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(failureAlertHtml).slideUp(500);
-                });
-            },
-        });
-    }
-
     function displayAllSongs(songs, dropdownDiv) {
         if ($("#songs-table").length > 0) {
             $("#songs-table").remove();
