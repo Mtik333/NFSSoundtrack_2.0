@@ -14,6 +14,13 @@ public class AuthorToDiscoGSDeserializer extends JsonDeserializer<AuthorToDiscoG
 
     public static final String DISCOGS = "discogs";
 
+    /**
+     * used to deserialize JSON build upon modifying author using 'manage artists'
+     * @param jsonParser no idea what it is
+     * @param deserializationContext similarly
+     * @return object that consists of author id in database and all the info from discogs
+     * @throws IOException
+     */
     @Override
     public AuthorToDiscoGSObj deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);

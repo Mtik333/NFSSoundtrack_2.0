@@ -57,11 +57,17 @@ public class Song implements Serializable {
     @OneToMany(mappedBy = "song")
     private List<SongGenre> songGenreList = new ArrayList<>();
 
+    /**
+     * possibly used to link remixes to 'normal' version of song
+     */
     //@JsonBackReference
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "basesong_id")
     private Song baseSong;
 
+    /**
+     * sometimes we need to display feat author next to main author name
+     */
     @Column(name="feat_next_to_band", columnDefinition="BIT")
     private Boolean featNextToBand;
 

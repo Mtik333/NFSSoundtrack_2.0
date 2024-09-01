@@ -1,5 +1,11 @@
 $(document).ready(function () {
 
+    //once we cancel reporting problem, let's clean up the discord user and value of correction
+    $(document).on("click", "button.btn-close", function () {
+        $("#discord-username").val("");
+        $("#right-value").val("");
+    });
+
     $(document).on("click", "#submit-correction", function () {
         var correction = new Object();
         correction.affectedSongsubgroup = Number($("#affected-songsubgroup").val());

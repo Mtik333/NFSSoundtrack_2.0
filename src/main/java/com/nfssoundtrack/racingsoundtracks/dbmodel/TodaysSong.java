@@ -18,6 +18,9 @@ public class TodaysSong {
     @JoinColumn(name = "songsubgroup_id")
     private SongSubgroup songSubgroup;
 
+    /**
+     * we need to control when today's song was 'drawn'
+     */
     @Column(name = "todaydate")
     private Date date;
 

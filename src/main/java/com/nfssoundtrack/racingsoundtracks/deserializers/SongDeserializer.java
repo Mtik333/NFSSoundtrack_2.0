@@ -13,6 +13,14 @@ import java.io.IOException;
 @JsonComponent
 public class SongDeserializer extends JsonDeserializer<Song> {
 
+    /**
+     * used to PUT song to database with incoming JSON about modifications and entity to be modified
+     * @param jsonParser default thing
+     * @param ctxt default thing
+     * @param intoValue song to be modified
+     * @return song entity that should be modified in db
+     * @throws IOException
+     */
     @Override
     public Song deserialize(JsonParser jsonParser, DeserializationContext ctxt, Song intoValue)
             throws IOException {
@@ -33,6 +41,13 @@ public class SongDeserializer extends JsonDeserializer<Song> {
         return intoValue;
     }
 
+    /**
+     * used to POST song to database with incoming JSON about full song info
+     * @param jsonParser default thing
+     * @param ctxt default thing
+     * @return song entity to be created in database
+     * @throws IOException
+     */
     @Override
     public Song deserialize(JsonParser jsonParser, DeserializationContext ctxt) throws IOException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);

@@ -1,5 +1,10 @@
 package com.nfssoundtrack.racingsoundtracks.others;
 
+/**
+ * DTO that consists of id of author in discogs, all his social media
+ * and the boolean that allows us to ignore artist for purpose of looking up
+ * information on discogs which might be just not present
+ */
 public class DiscoGSObj {
 
     private boolean notInDiscogs;

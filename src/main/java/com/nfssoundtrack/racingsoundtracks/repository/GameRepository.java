@@ -25,6 +25,6 @@ public interface GameRepository extends JpaRepository<Game, Integer> {
     @Cacheable("gamesAlpha")
     List<Game> findAll(Sort sort);
 
-    @EntityGraph(value = "Game.mainGroups")
-    List<Game> findByIdNotNull();
+//    @EntityGraph(value = "Game.mainGroups")
+//    List<Game> findByIdNotNull();
 }

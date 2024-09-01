@@ -10,7 +10,6 @@ import java.util.List;
 @Repository
 public interface MainGroupRepository extends JpaRepository<MainGroup, Integer> {
 
-
     @EntityGraph(value = "MainGroup.subgroups")
     List<MainGroup> findByIdNotNull();
 }

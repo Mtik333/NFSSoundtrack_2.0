@@ -405,6 +405,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             } else {
                 eb.addField("Reported by un-identified user: ", discordUserName, false);
             }
+            //todo find if there's a way to minimize the correction (expand button or something)
             eb.setFooter("Correction ID: " + correction.getId());
             MessageEmbed embed = eb.build();
             if (textChannel != null && textChannel.canTalk()) {

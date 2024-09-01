@@ -27,10 +27,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * controller for handling subgroups, mainly reading info and updating it
+ * used in songsMgmt.js, subgroupMgmt.js
+ */
 @Controller
 @RequestMapping("/subgroup")
 public class SubgroupController extends BaseControllerWithErrorHandling {
 
+	/**
+	 * method to show all songs from the subgroup
+	 * you can see it triggered when you click on 'manage groups' and just select the subgroup from dropdown
+	 * @param subgroupId id of subgroup to show
+	 * @return json of whole subgroup including games
+	 * @throws ResourceNotFoundException
+	 * @throws JsonProcessingException
+	 */
 	@GetMapping(value = "/read/{subgroupId}")
 	public @ResponseBody
 	String subGroupManage(@PathVariable("subgroupId") int subgroupId)
@@ -41,12 +53,23 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
 		return objectMapper.writeValueAsString(subgroup);
 	}
 
+	/**
+	 * method used to update the subgroup used in subgroupMgmt.js
+	 * happens when you click on "update subgroup"
+	 * @param subgroupId id of subgroup
+	 * @param formData basically info about the song, song-subgroup entry and whether
+	 *                    it is added or deleted from subgroup
+	 * @return OK if successful
+	 * @throws ResourceNotFoundException
+	 * @throws JsonProcessingException
+	 */
 	@PutMapping(value = "/put/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	String putSubgroup(@PathVariable("subgroupId") int subgroupId, @RequestBody String formData)
 			throws ResourceNotFoundException, JsonProcessingException {
 		Subgroup subgroup = subgroupService.findById(subgroupId)
 				.orElseThrow(() -> new ResourceNotFoundException("No subgroup with id found " + subgroupId));
+		//so we get the subgroup
 		List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
 		Map<String, String> songsToAssign = new HashMap<>();
 		List<String> songsToDetach = new ArrayList<>();
@@ -56,14 +79,17 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
 			//i want to get exact song subgroup, for example because i want to put outro version in other subgroup
 			String songSubgroupId = String.valueOf(linkedHashMap.get("songsubgroup_id"));
 			String state = String.valueOf(linkedHashMap.get("state"));
+			//filling map of songs to add / delete to subgroup
 			if (state.equals("ADD")) {
 				songsToAssign.put(songId, songSubgroupId);
 			} else if (state.equals("DELETE")) {
 				songsToDetach.add(songId);
 			}
 		}
+		//first we will go through songs that we want to remove from subgroup
 		List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
 		for (String song : songsToDetach) {
+			//we will have id of song to detach in database song subgroup list
 			Optional<SongSubgroup> subgroupOptional = songSubgroupList.stream().filter(
 					songSubgroup -> String.valueOf(songSubgroup.getSong().getId()).equals(song)).findFirst();
 			if (subgroupOptional.isPresent()) {
@@ -74,11 +100,13 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
 				JustSomeHelper.unlinkSongWithTodaysSong(todaysSongService, songSubgroup, mySong, songSubgroupService);
 				JustSomeHelper.unlinkSongWithCorrection(correctionService, songSubgroup,
 						"; deleted song-subgroup: " + songSubgroup.toCorrectionString());
+				//we are then safe to delete song-subgroup association
 				songSubgroupService.delete(songSubgroup);
-				//delete orphaned stuff
+				//delete orphaned stuff - maybe song is not used anywhere else?
 				List<SongSubgroup> orphanedSong = songSubgroupService.findBySong(mySong);
 				if (orphanedSong.isEmpty()) {
 					List<SongGenre> songGenres = songGenreService.findBySong(mySong);
+					//if that's the case, we scrap song-genre, author-song associations
 					songGenreService.deleteAll(songGenres);
 					List<AuthorSong> authorSongs = authorSongService.findBySong(mySong);
 					authorSongService.deleteAll(authorSongs);
@@ -86,6 +114,7 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
 				}
 			}
 		}
+		//we will put position of new song in subgroup based on how many songs we are trying to remove / add
 		int position = 10 + (10 * songsToDetach.size());
 		for (Map.Entry<String, String> song : songsToAssign.entrySet()) {
 			position += 10;
@@ -93,6 +122,7 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
 					.orElseThrow(() -> new ResourceNotFoundException("No song with id found " + song));
 			//using logic to create new songsubgroup based on details of existing songsubgroup
 			String songSubgroupId = song.getValue();
+			//our getvalue is basically song-subgroup of song we associate with this subgroup
 			if (songSubgroupId != null) {
 				SongSubgroup optionalSongSubgroup = songSubgroupService.findById(Integer.valueOf(songSubgroupId))
 						.orElseThrow(() -> new ResourceNotFoundException(
@@ -103,6 +133,7 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
 				songSubgroup.setSong(song1);
 				songSubgroupService.save(songSubgroup);
 			} else {
+				//i feel like this is not used at all
 				List<SongSubgroup> existingSubgroups = songSubgroupService.findBySong(song1);
 				SongSubgroup originalSongSubgroup = existingSubgroups.stream().filter(songSubgroup1 ->
 								songSubgroup1.getSubgroup().getMainGroup().getGame().equals(subgroup.getMainGroup().getGame()))
@@ -116,27 +147,20 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
 				songSubgroupService.save(songSubgroup);
 			}
 		}
+		//again cleaning the cache of game when updating subgroup
 		String gameShort = subgroup.getMainGroup().getGame().getGameShort();
 		removeCacheEntry(gameShort);
 		return new ObjectMapper().writeValueAsString("OK");
 	}
 
-	@GetMapping(value = "/readAllSubgroup/{gameId}")
-	public @ResponseBody
-	String readAllSubgroupManage(@PathVariable("gameId") int gameId)
-			throws ResourceNotFoundException, JsonProcessingException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		Game game = gameService.findById(gameId)
-				.orElseThrow(() -> new ResourceNotFoundException("No game found with id " + gameId));
-		List<MainGroup> mainGroups = game.getMainGroups();
-		for (MainGroup mainGroup : mainGroups) {
-			if (mainGroup.getGroupName().contentEquals("All")) {
-				return objectMapper.writeValueAsString(mainGroup.getSubgroups().get(0));
-			}
-		}
-		throw new ResourceNotFoundException("you sudnt come here");
-	}
-
+	/**
+	 * method used for moving subgroup from one group to another
+	 * used in subgroupMgmt.js, you can click on 'move subgroup to group' after clicking 'manage subgroups'
+	 * @param formData it is just id of subgroup and main group to move this subgroup to
+	 * @return OK if successful
+	 * @throws JsonProcessingException
+	 * @throws ResourceNotFoundException
+	 */
 	@PutMapping(value = "/moveSubgroup", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	String moveSubgroupToOtherGroup(@RequestBody String formData)
@@ -148,8 +172,10 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
 				.orElseThrow(() -> new ResourceNotFoundException("No mainGroup found with id " + groupId));
 		Subgroup subgroup = subgroupService.findById(Math.toIntExact(subgroupId))
 				.orElseThrow(() -> new ResourceNotFoundException("No subgroup found with id " + subgroupId));
+		//nothing special here, we use method to change main group
 		subgroup.setMainGroup(mainGroup);
 		subgroupService.save(subgroup);
+		//need to clean cache of game after moving subgroup
 		String gameShort = mainGroup.getGame().getGameShort();
 		removeCacheEntry(gameShort);
 		return new ObjectMapper().writeValueAsString("OK");

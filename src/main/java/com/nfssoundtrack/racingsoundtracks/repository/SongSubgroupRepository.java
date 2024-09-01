@@ -18,10 +18,6 @@ public interface SongSubgroupRepository extends JpaRepository<SongSubgroup, Inte
 
     List<SongSubgroup> findBySongIn(List<Song> songs, Sort sort);
 
-    SongSubgroup findBySongAndSubgroup(Song song, Subgroup subgroup);
-
-    List<SongSubgroup> findBySubgroupIdIn(List<Subgroup> subgroups);
-
     SongSubgroup findTopByOrderByIdDesc();
 }
 

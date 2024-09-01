@@ -1,5 +1,9 @@
 package com.nfssoundtrack.racingsoundtracks.others;
 
+/**
+ * kind of overlay layer to point between author id from database
+ * and the non-DTO class to keep a lot of info about artists
+ */
 public class AuthorToDiscoGSObj {
 
     private long artistId;

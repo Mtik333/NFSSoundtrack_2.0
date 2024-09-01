@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+/**
+ * todo do i even use it?
+ */
 @Aspect
 @Component
 public class LoggingAspect {

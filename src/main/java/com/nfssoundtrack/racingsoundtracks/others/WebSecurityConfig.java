@@ -44,31 +44,42 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {
         http
+                //disabling cors/csrf to avoid stupid browser blocking it all
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
+                        //these endpoints we don't want to expose to non-admin user
+                        //or so called not-authenticated user
                         .requestMatchers("/manage/manage", "/manage/manage#", "/serie/**", "/country/**",
                                 "/maingroup/**", "/songSubgroup/**", "/subgroup/**", "/gamedb/**")
                         .hasAuthority("ADMIN"))
                 .authorizeHttpRequests(requests -> requests
+                        //those can be seen by everones
                         .requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
                                 "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
                                 "/custom/playlist", "/song/**", "/songinfo/**",
                                 "/favicon.ico", "/nfssoundtrack.ico",
                                 "favicon.ico", "nfssoundtrack.ico").permitAll()
                 )
+                //setting up login form
                 .formLogin(form -> form
                         .loginPage("/login")
                         .failureUrl("/content/donate")
                         .defaultSuccessUrl("/content/home", true)
                 )
+                //setting up logout form
                 .logout(logout -> logout
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        .permitAll()).userDetailsService(databaseUserDetailsService);
+                        .permitAll())
+                .userDetailsService(databaseUserDetailsService);
         return http.build();
     }
 
+    /**
+     * probably some dynaminc linkage to locale, no idea how this works
+     * @return
+     */
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver slr = new SessionLocaleResolver();

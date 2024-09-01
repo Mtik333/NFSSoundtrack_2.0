@@ -16,9 +16,15 @@ public class Content implements Serializable {
     @Column(name = "method")
     private Long position;
 
+    /**
+     * todo not sure what it is, maybe used during migration?
+     */
     @Column(name = "pos")
     private Long pos;
 
+    /**
+     * todo this is probably not used
+     */
     @Column(name = "visibility")
     private Long visibility;
 

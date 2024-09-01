@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 
+/**
+ * todo imagine one day we have such custom theme for all the games
+ */
 @Entity(name = "customtheme")
 public class CustomTheme implements Serializable {
 

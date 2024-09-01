@@ -27,6 +27,11 @@ public class JustSomeHelper {
     private JustSomeHelper() {
     }
 
+    /**
+     * always struggling with these damn nulls here and there
+     * @param value
+     * @return
+     */
     public static String returnProperValueToDb(String value) {
         if ("".equals(value) || "null".equals(value) || "undefined".equals(value)) {
             return null;
@@ -54,6 +59,12 @@ public class JustSomeHelper {
         }
     }
 
+    /**
+     * method to change song association with correction to another song-subgroup
+     * @param correctionService db service
+     * @param songSubgroup song-subgroup to unlink correction from
+     * @param correctValue value of correction (we're mostly writing song title in such info)
+     */
     public static void unlinkSongWithCorrection(CorrectionService correctionService, SongSubgroup songSubgroup,
                                                 String correctValue){
         List<Correction> relatedCorrections = correctionService.findBySongSubgroup(songSubgroup);
@@ -64,6 +75,13 @@ public class JustSomeHelper {
         }
     }
 
+    /**
+     * this is a bit more complicated to unlink song with today's song
+     * @param todaysSongService service of today's song table in db
+     * @param songSubgroup song-subgroup we want to unlink
+     * @param song helps finding other example of same song used
+     * @param songSubgroupService just the database service to handle various requests
+     */
     public static void unlinkSongWithTodaysSong(TodaysSongService todaysSongService, SongSubgroup songSubgroup,
                                                 Song song, SongSubgroupService songSubgroupService){
         List<TodaysSong> todaysSongs = todaysSongService.findAllBySongSubgroup(songSubgroup);
@@ -84,6 +102,12 @@ public class JustSomeHelper {
         }
     }
 
+    /**
+     * using object mapper so many times that we can move these 5 lines to one place
+     * @param classToUse class used for this purpose of serialization like game.java
+     * @param jsonSerializer type of serializer used to serialize the data
+     * @return objectmapper to use further in controllers
+     */
     public static ObjectMapper registerSerializerForObjectMapper(Class<?> classToUse, JsonSerializer jsonSerializer){
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
@@ -92,6 +116,12 @@ public class JustSomeHelper {
         return objectMapper;
     }
 
+    /**
+     * using object mapper so many times that we can move these 5 lines to one place
+     * @param classToUse class used for this purpose of serialization like game.java
+     * @param jsonDeserializer type of deserializer used to deserialize the data
+     * @return objectmapper to use further in controllers
+     */
     public static ObjectMapper registerDeserializerForObjectMapper(Class<?> classToUse, JsonDeserializer jsonDeserializer){
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();

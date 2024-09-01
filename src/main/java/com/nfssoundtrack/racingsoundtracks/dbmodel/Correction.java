@@ -12,6 +12,9 @@ public class Correction {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    /**
+     * correction can be started from page with songs from game
+     */
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "songsubgroup_id")
@@ -30,6 +33,9 @@ public class Correction {
     @Column(name = "discord_user")
     private String discordUser;
 
+    /**
+     * todo this might be expanded in the future to have some conclusion comments about the correction
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "correction_status")
     private CorrectionStatus correctionStatus;

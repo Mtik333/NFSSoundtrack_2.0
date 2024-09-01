@@ -68,6 +68,9 @@ public class SongSubgroup implements Serializable {
     @Column(name = "show_feat", columnDefinition="BIT")
     private Boolean showFeat;
 
+    /**
+     * name of file that contains this song
+     */
     @Column(name = "filename")
     private String filename;
 

@@ -1,5 +1,7 @@
 package com.nfssoundtrack.racingsoundtracks.others;
 
+import com.nfssoundtrack.racingsoundtracks.controllers.WebsiteViewsController;
+import com.nfssoundtrack.racingsoundtracks.services.GameService;
 import com.nfssoundtrack.racingsoundtracks.services.SerieService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,9 @@ public class GlobalExceptionHandler {
     @Autowired
     SerieService serieService;
 
+    @Autowired
+    GameService gameService;
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorDetails> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
@@ -32,6 +37,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * i wouldn't be surprised if this does not work at all anymore
+     *
+     * @param req default thing
+     * @param ex  default thing
+     * @return just model with all the games again
+     */
     @ExceptionHandler(FileNotFoundException.class)
     @ResponseBody
     public ModelAndView handleException(HttpServletRequest req, Exception ex) {
@@ -40,8 +52,9 @@ public class GlobalExceptionHandler {
         mav.addObject("stacktrace", ex.getStackTrace());
         mav.addObject("url", req.getRequestURL());
         mav.setViewName("error");
-        mav.addObject("appName", "Error NFSSoundtrack.com");
-        mav.addObject("series", serieService.findAllSortedByPositionAsc());
+        mav.addObject(WebsiteViewsController.APP_NAME, "Error NFSSoundtrack.com");
+        mav.addObject(WebsiteViewsController.SERIES, serieService.findAllSortedByPositionAsc());
+        mav.addObject(WebsiteViewsController.GAMES_ALPHA, gameService.findAllSortedByDisplayTitleAsc());
         return mav;
     }
 }

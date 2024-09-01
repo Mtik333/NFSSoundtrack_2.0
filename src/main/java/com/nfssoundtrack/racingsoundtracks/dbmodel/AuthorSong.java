@@ -29,6 +29,9 @@ public class AuthorSong implements Serializable {
     @Column(name = "role")
     private Role role;
 
+    /**
+     * concat is for "linking" together various composers in the song title
+     */
     @Column(name = "remix_concat")
     private String remixConcat;
 

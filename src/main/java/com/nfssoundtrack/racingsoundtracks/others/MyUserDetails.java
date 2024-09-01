@@ -8,6 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * i took it from some tutorial or stackoverflow, i only care about admin users
+ * there are no 'normal' users in the system anyway
+ */
 public class MyUserDetails implements UserDetails {
 
     private final User user;

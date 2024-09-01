@@ -20,6 +20,16 @@ public class GameDeserializer extends JsonDeserializer<Game> {
     @Autowired
     SerieService serieService;
 
+    /**
+     * used to deserialize when we do 'readyForUpdate' thing to immediately put values from
+     * json to the entity - so we do PUT operation
+     *
+     * @param jsonParser default thing
+     * @param ctxt       default thing
+     * @param intoValue  entity of game
+     * @return modified (but not saved in db yet) game entity
+     * @throws IOException
+     */
     @Override
     public Game deserialize(JsonParser jsonParser, DeserializationContext ctxt, Game intoValue)
             throws IOException {
@@ -38,6 +48,14 @@ public class GameDeserializer extends JsonDeserializer<Game> {
         return intoValue;
     }
 
+    /**
+     * used to deserialize when we want to save a new game
+     *
+     * @param jsonParser             default thing
+     * @param deserializationContext default thing
+     * @return new game entity that should be saved in db
+     * @throws IOException
+     */
     @Override
     public Game deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);

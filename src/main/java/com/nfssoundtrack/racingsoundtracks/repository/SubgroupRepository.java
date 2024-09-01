@@ -8,6 +8,4 @@ import java.util.List;
 
 public interface SubgroupRepository extends JpaRepository<Subgroup, Integer> {
 
-    @EntityGraph(value = "Subgroup.songSubgroupList")
-    List<Subgroup> findByIdNotNull();
 }

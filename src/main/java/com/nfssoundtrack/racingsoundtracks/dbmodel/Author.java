@@ -20,6 +20,9 @@ public class Author implements Serializable {
     @Column(name = "name")
     private String name;
 
+    /**
+     * boolean to mark author as not present in DiscoGS so we don't waste rendering this info
+     */
     @Column(name = "skip_discogs", columnDefinition = "BIT")
     private Boolean skipDiscogs;
 

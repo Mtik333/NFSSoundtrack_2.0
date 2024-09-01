@@ -8,9 +8,6 @@ import java.util.List;
 
 public interface SongRepository extends JpaRepository<Song, Integer> {
 
-    @EntityGraph(value = "Song.authorSongList")
-    List<Song> findByIdNotNull();
-
     List<Song> findByLyrics(String lyrics);
 
     List<Song> findByLyricsContains(String lyrics);

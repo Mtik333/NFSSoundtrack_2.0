@@ -15,6 +15,9 @@ public class Country implements Serializable {
     @Column(name = "countryname")
     private String countryName;
 
+    /**
+     * country link is always ending with PNG format
+     */
     @Column(name = "countrylink")
     private String countryLink;
 
