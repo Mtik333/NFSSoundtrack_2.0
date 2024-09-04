@@ -1,6 +1,5 @@
 package com.nfssoundtrack.racingsoundtracks.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.racingsoundtracks.controllers.WebsiteViewsController;
@@ -53,6 +52,7 @@ public class AuthorService {
 
     @Value("${admin.discord.id}")
     private String adminId;
+
     @Autowired
     Map<Long, DiscoGSObj> discoGSObjMap;
 
@@ -69,7 +69,7 @@ public class AuthorService {
         return authorRepository.findByName(name);
     }
 
-    public List<Author> findAllByName(String name){
+    public List<Author> findAllByName(String name) {
         return authorRepository.findAllByName(name);
     }
 
@@ -89,99 +89,162 @@ public class AuthorService {
         return authorRepository.save(author);
     }
 
-
+    /**
+     * a bit complicated method to handle fetching info about author from discogs (or local cache)
+     *
+     * @param author author we want to find in discogs
+     * @return discogs representation of author
+     * @throws LoginException
+     * @throws InterruptedException
+     */
     @CachePut(value = "discoGSMap")
-    public DiscoGSObj fetchInfoFromMap(Author author) throws JsonProcessingException, LoginException, InterruptedException {
+    public DiscoGSObj fetchInfoFromMap(Author author) throws LoginException, InterruptedException {
+        //this map will keep info about authors already fetched from discogs
         Optional<Long> authorIdAlreadyThere = discoGSObjMap.keySet().stream().filter(aLong ->
                 aLong.equals(author.getId())).findFirst();
-        if (Boolean.TRUE.equals(author.getSkipDiscogs())){
+        //if we want to ignore discogs for this author, we just return 'bland value'
+        if (Boolean.TRUE.equals(author.getSkipDiscogs())) {
             discoGSObjMap.remove(author.getId());
             return new DiscoGSObj(true, 0, null,
                     author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
         }
         DiscoGSObj discoGSObj;
         if (authorIdAlreadyThere.isPresent()) {
+            //otherwise, if author is already in map, we check how discogs looks like
             discoGSObj = discoGSObjMap.get(authorIdAlreadyThere.get());
             if (discoGSObj == null) {
-                if (!checkIfCanQueryDiscoGS()) {
-                    discoGSObj = new DiscoGSObj(false, 0, null, RETRY_IN_2_MINUTES);
-                    return discoGSObj;
-                }
-                Integer artistDiscogsId = retrieveArtistId(author.getName());
-                if (artistDiscogsId != null) {
-                    discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
-                    if (discoGSObj == null) {
-                        discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, RETRY_IN_2_MINUTES);
-                        updateLastError(Instant.now());
-                    } else {
-                        discoGSObjMap.put(author.getId(), discoGSObj);
-                        createArtistJson(author.getId(), discoGSObj);
-                    }
-                } else {
-                    discoGSObj = new DiscoGSObj(true, 0, null,
-                            author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
-                    discoGSObjMap.put(author.getId(), discoGSObj);
-                    createArtistJson(author.getId(), discoGSObj);
-                }
+                discoGSObj = handleAuthorNotAlreadyThere(author);
             } else {
+                //assuming author is in discogs
                 if (!discoGSObj.isNotInDiscogs()) {
                     if (discoGSObj.getDiscogsId() == null) {
+                        //i think i was notifying here the admin to manually put author info via admim panel
                         RestAction<Member> memberRestAction = WebsiteViewsController.getJda().getGuilds().get(0).retrieveMemberById(adminId);
                         DiscoGSObj finalDiscoGSObj = discoGSObj;
                         memberRestAction.queue(member -> member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
                                 .sendMessage("discoGSObj " + finalDiscoGSObj).queue()));
                         discoGSObjMap.remove(author.getId());
                     } else {
-                        if (discoGSObj.getUri() != null) {
-                            return discoGSObj;
-                        }
-                        if (!checkIfCanQueryDiscoGS()) {
-                            discoGSObj = new DiscoGSObj(false, 0, null, "Seems there were too many " +
-                                    "requests to DiscoGS. Please retry in 2 minutes");
-                            return discoGSObj;
-                        }
-                        discoGSObj = obtainArtistLinkAndProfile(author.getName(), discoGSObj.getDiscogsId());
-                        if (discoGSObj == null) {
-                            discoGSObj = new DiscoGSObj(null, "There was some internal error " +
-                                    "- you might reach out to admin so he can double check");
-                            updateLastError(Instant.now());
-                        } else {
-                            discoGSObjMap.put(author.getId(), discoGSObj);
-                            createArtistJson(author.getId(), discoGSObj);
-                        }
+                        discoGSObj = handleApiOveruse(discoGSObj, author);
                     }
                 }
             }
         } else {
-            if (!checkIfCanQueryDiscoGS()) {
-                discoGSObj = new DiscoGSObj(false, 0, null, "Seems there were too many " +
-                        "requests to DiscoGS. Please retry in 2 minutes");
-                return discoGSObj;
-            }
-            Integer artistDiscogsId = retrieveArtistId(author.getName());
-            if (artistDiscogsId != null) {
-                discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
-                if (discoGSObj == null) {
-                    discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, "There was some internal error " +
-                            "- you might reach out to admin so he can double check");
-                    updateLastError(Instant.now());
-                }
-                discoGSObjMap.put(author.getId(), discoGSObj);
-                createArtistJson(author.getId(), discoGSObj);
-            } else {
-                discoGSObj = new DiscoGSObj(true, 0, null,
-                        author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
-                discoGSObjMap.put(author.getId(), discoGSObj);
-                createArtistJson(author.getId(), discoGSObj);
-            }
+            discoGSObj = handleAuthorNotThereYet(author);
         }
         return discoGSObj;
     }
 
-    public DiscoGSObj manuallyFetchDiscogsInfo(String authorName, Integer artistDiscogsId) throws JsonProcessingException, LoginException, InterruptedException {
+    /**
+     * logic to store author in map but with a message that will try to get the data again
+     * when someone clicks on this author as maybe we overused the api threshold
+     * @param discoGSObj non-entity representing author
+     * @param author author entity
+     * @return updated non-entity representing author
+     * @throws LoginException
+     * @throws InterruptedException
+     */
+    private DiscoGSObj handleApiOveruse(DiscoGSObj discoGSObj, Author author) throws LoginException, InterruptedException {
+        //in this case we just return discogs info as we have it already
+        if (discoGSObj.getUri() != null) {
+            return discoGSObj;
+        }
+        if (!checkIfCanQueryDiscoGS()) {
+            discoGSObj = new DiscoGSObj(false, 0, null, RETRY_IN_2_MINUTES);
+            return discoGSObj;
+        }
+        //we obtain the discogs info again? not sure if this is needed here
+        discoGSObj = obtainArtistLinkAndProfile(author.getName(), discoGSObj.getDiscogsId());
+        if (discoGSObj == null) {
+            discoGSObj = new DiscoGSObj(null, "There was some internal error " +
+                    "- you might reach out to admin so he can double check");
+            updateLastError(Instant.now());
+        } else {
+            updateDiscoGSObj(author.getId(), discoGSObj);
+        }
+        return discoGSObj;
+    }
+
+    /**
+     * method to handle situation when we stored this api overuse in the map but we try again to get
+     * info about the author from discogs
+     * @param author author entity
+     * @return updated non-entity representing author
+     * @throws LoginException
+     * @throws InterruptedException
+     */
+    private DiscoGSObj handleAuthorNotAlreadyThere(Author author) throws LoginException, InterruptedException {
+        DiscoGSObj discoGSObj;
+        //in the earlier days people were clicking on authors causing discogs api to be overloaded
+        if (!checkIfCanQueryDiscoGS()) {
+            discoGSObj = new DiscoGSObj(false, 0, null, RETRY_IN_2_MINUTES);
+            return discoGSObj;
+        }
+        //otherwise we try to find discogs id of author based on name we have
+        Integer artistDiscogsId = retrieveArtistId(author.getName());
+        if (artistDiscogsId != null) {
+            //if we found id in discogs db, then we go for fetching the whole info about author from discogs
+            discoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
+            if (discoGSObj == null) {
+                discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, RETRY_IN_2_MINUTES);
+                updateLastError(Instant.now());
+            } else {
+                updateDiscoGSObj(author.getId(), discoGSObj);
+            }
+        } else {
+            //otherwise, means author is not in the discogs database
+            //we store this info in map and json too
+            discoGSObj = new DiscoGSObj(true, 0, null,
+                    author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
+            updateDiscoGSObj(author.getId(), discoGSObj);
+        }
+        return discoGSObj;
+    }
+
+    /**
+     * first time we ask discogs about this author
+     * @param author author entity
+     * @return updated non-entity representing author
+     * @throws LoginException
+     * @throws InterruptedException
+     */
+    private DiscoGSObj handleAuthorNotThereYet(Author author) throws LoginException, InterruptedException {
+        DiscoGSObj handledDiscoGSObj;
+        //here author was not yet obtained from discogs db so we do our first look-up here
+        if (!checkIfCanQueryDiscoGS()) {
+            handledDiscoGSObj = new DiscoGSObj(false, 0, null, RETRY_IN_2_MINUTES);
+            return handledDiscoGSObj;
+        }
+        //same story as above, we try to find discogs entity for author by his name
+        Integer artistDiscogsId = retrieveArtistId(author.getName());
+        if (artistDiscogsId != null) {
+            //if it's there then we try to fetchh all the links and bio
+            handledDiscoGSObj = obtainArtistLinkAndProfile(author.getName(), artistDiscogsId);
+            if (handledDiscoGSObj == null) {
+                //in case of unexpected error we will just store it in our discogs cache
+                handledDiscoGSObj = new DiscoGSObj(false, artistDiscogsId, null, "There was some internal error " +
+                        "- you might reach out to admin so he can double check");
+                updateLastError(Instant.now());
+            }
+            updateDiscoGSObj(author.getId(), handledDiscoGSObj);
+        } else {
+            //otherwise, well cannot find author by his name
+            //so admin will probably have to look up manually
+            handledDiscoGSObj = new DiscoGSObj(true, 0, null,
+                    author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
+            updateDiscoGSObj(author.getId(), handledDiscoGSObj);
+        }
+        return handledDiscoGSObj;
+    }
+
+    public DiscoGSObj manuallyFetchDiscogsInfo(String authorName, Integer artistDiscogsId) throws LoginException, InterruptedException {
         return obtainArtistLinkAndProfile(authorName, artistDiscogsId);
     }
 
+    /**
+     * to avoid problems with overuse of API we try to limit requests by a single minute
+     * @return true if we can again query discogs
+     */
     private boolean checkIfCanQueryDiscoGS() {
         if (lastError != null) {
             Instant currentInstant = Instant.now();
@@ -196,6 +259,11 @@ public class AuthorService {
         return true;
     }
 
+    /**
+     * method to get discogs id of author based on the name as input
+     * @param authorName
+     * @return
+     */
     private Integer retrieveArtistId(String authorName) {
         try {
             RestTemplate restTemplate = new RestTemplate();
@@ -211,6 +279,7 @@ public class AuthorService {
             HttpEntity<String> response1 = restTemplate.exchange(
                     builder.toUriString(),
                     HttpMethod.GET, entity, String.class);
+            //no other clever way to do this, we use such uri builder
             String body1 = response1.getBody();
             ObjectMapper objectMapper1 = new ObjectMapper();
             Map<?, ?> something1 = objectMapper1.readValue(body1, Map.class);
@@ -218,6 +287,8 @@ public class AuthorService {
             if (!results.isEmpty()) {
                 LinkedHashMap<?, ?> resultsMap = (LinkedHashMap<?, ?>) results.get(0);
                 String artistName = String.valueOf(resultsMap.get("title"));
+                //i don't remember the case but you know there can be some trims
+                //and other stupid characters that would stop associating discogs entry with our author
                 if (artistName.contains(")")) {
                     artistName = artistName.replaceAll("\\((.+?)\\)", "").trim();
                 }
@@ -234,6 +305,14 @@ public class AuthorService {
         return null;
     }
 
+    /**
+     * now we finally have id of author and we can get full info or author from discogs
+     * @param authorName name of author
+     * @param id id of author in discogs db
+     * @return
+     * @throws InterruptedException
+     * @throws LoginException
+     */
     private DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws InterruptedException, LoginException {
         try {
             RestTemplate restTemplate = new RestTemplate();
@@ -251,6 +330,8 @@ public class AuthorService {
             discoGSObj.setUri(linkToArtist);
             discoGSObj.setDiscogsId(id);
             String profile = String.valueOf(something.get("profile"));
+            //it is possible that author does not have profile description at discogs
+            //so we put his name in front of such information
             if (profile == null || profile.isEmpty()) {
                 profile = authorName + " has no profile description at DiscoGS";
             } else {
@@ -258,25 +339,13 @@ public class AuthorService {
             }
             discoGSObj.setProfile(profile);
             List<String> urls = (List<String>) something.get("urls");
+            //urls is actually a list of various social media links
             if (urls != null && !urls.isEmpty()) {
-                for (String localUrl : urls) {
-                    if (localUrl.contains("facebook")) {
-                        discoGSObj.setFacebook(localUrl);
-                    } else if (localUrl.contains("twitter")) {
-                        discoGSObj.setTwitter(localUrl);
-                    } else if (localUrl.contains("instagram")) {
-                        discoGSObj.setInstagram(localUrl);
-                    } else if (localUrl.contains("soundcloud")) {
-                        discoGSObj.setSoundcloud(localUrl);
-                    } else if (localUrl.contains("myspace")) {
-                        discoGSObj.setMyspace(localUrl);
-                    } else if (localUrl.contains("wikipedia")) {
-                        discoGSObj.setWikipedia(localUrl);
-                    }
-                }
+                discoGSObj.setLinks(urls);
             }
             return discoGSObj;
         } catch (Exception exp) {
+            //if there's an error, then we tell admin about it
             logger.error(WHAT_EXCEPTION, exp.getMessage());
             WebsiteViewsController.rebuildJda(botSecret);
             RestAction<Member> memberRestAction = WebsiteViewsController.getJda().getGuilds().get(0).retrieveMemberById(adminId);
@@ -291,6 +360,10 @@ public class AuthorService {
         }
     }
 
+    /**
+     * not sure why i extracted it this way
+     * @return
+     */
     private HttpEntity<String> entityToGet() {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -298,16 +371,25 @@ public class AuthorService {
         return new HttpEntity<>("parameters", headers);
     }
 
+    /**
+     * here we build json with all info about artist using discogs info
+     * @param artistId id of artist
+     * @param discoGSObj representation of author from discogs
+     * @throws InterruptedException
+     * @throws LoginException
+     */
     private void createArtistJson(Long artistId, DiscoGSObj discoGSObj) throws InterruptedException, LoginException {
         try {
-            File folderFile = new File("discogs"+File.separator+artistId);
-            if (!folderFile.exists()){
+            File folderFile = new File("discogs" + File.separator + artistId);
+            if (!folderFile.exists()) {
                 logger.debug("creating folder {}", folderFile.mkdir());
             }
-            try (RandomAccessFile randomDiscoGsFile = new RandomAccessFile( folderFile.getPath()
-                    +File.separator+"discogs.json", "rw")){
+            //so for each author (identified by id) we will create json file with all the info to render in profile
+            //since we don't want to fetch this info on and on, we will cache on local disk and just read when needed
+            try (RandomAccessFile randomDiscoGsFile = new RandomAccessFile(folderFile.getPath()
+                    + File.separator + "discogs.json", "rw")) {
                 File discoGsFile = new File(folderFile.getPath()
-                        +File.separator+"discogs.json");
+                        + File.separator + "discogs.json");
                 if (discoGsFile.canWrite()) {
                     ObjectMapper objectMapper = new ObjectMapper();
                     SimpleModule simpleModule = new SimpleModule();
@@ -321,6 +403,7 @@ public class AuthorService {
         } catch (IOException exp) {
             logger.error(WHAT_EXCEPTION, exp.getMessage());
             WebsiteViewsController.rebuildJda(botSecret);
+            //not sure when and how this can happen but just for the record let's inform the admin
             RestAction<Member> memberRestAction = WebsiteViewsController.getJda().getGuilds().get(0).retrieveMemberById(adminId);
             memberRestAction.queue(member -> {
                 member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
@@ -331,12 +414,12 @@ public class AuthorService {
         }
     }
 
-    public void updateDiscoGSObj(Integer artistId, DiscoGSObj updatedDiscoGSObj) throws LoginException, InterruptedException {
-        discoGSObjMap.put((long)artistId,updatedDiscoGSObj);
-        createArtistJson((long)artistId, updatedDiscoGSObj);
+    public void updateDiscoGSObj(Long artistId, DiscoGSObj updatedDiscoGSObj) throws LoginException, InterruptedException {
+        discoGSObjMap.put(artistId, updatedDiscoGSObj);
+        createArtistJson(artistId, updatedDiscoGSObj);
     }
 
-    private static void updateLastError(Instant instant){
+    private static void updateLastError(Instant instant) {
         lastError = instant;
     }
 

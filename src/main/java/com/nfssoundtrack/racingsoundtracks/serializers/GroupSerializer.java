@@ -9,6 +9,10 @@ import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 
+/**
+ * method to get all groups that belong to game we are editing,
+ * but we do not fetch info about songs in subgroups
+ */
 @JsonComponent
 public class GroupSerializer extends JsonSerializer<MainGroup> {
 
@@ -22,6 +26,7 @@ public class GroupSerializer extends JsonSerializer<MainGroup> {
         jsonGenerator.writeStartArray();
         for (Subgroup subgroup : mainGroup.getSubgroups()) {
             jsonGenerator.writeStartObject();
+            //for this purpose subgroup name and position value is sufficient
             jsonGenerator.writeObjectField("id", subgroup.getId());
             jsonGenerator.writeObjectField("subgroupName", subgroup.getSubgroupName());
             jsonGenerator.writeObjectField("position", subgroup.getPosition());

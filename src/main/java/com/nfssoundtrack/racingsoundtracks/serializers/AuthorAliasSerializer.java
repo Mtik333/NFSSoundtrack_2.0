@@ -10,6 +10,11 @@ import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 
+/**
+ * used when editing song, we get and render alias used for the song
+ * used when creating song and modifying existing artist (after we selected one through input)
+ * so we build JSON based on this info from database
+ */
 @JsonComponent
 public class AuthorAliasSerializer extends JsonSerializer<AuthorAlias> {
 

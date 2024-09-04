@@ -8,6 +8,10 @@ import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 
+/**
+ * used when editing game entity
+ * so we build JSON based on this info from database
+ */
 @JsonComponent
 public class GameEditSerializer extends JsonSerializer<Game> {
 

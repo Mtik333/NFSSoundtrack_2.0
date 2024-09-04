@@ -358,6 +358,11 @@ iframe.home_frame {
   height: 20vw;
 }
 
+iframe.left_menu_frame {
+  width: 17vw;
+  height: 17vw;
+}
+
 div.centerKeeper {
   text-align: center;
 }
@@ -856,6 +861,11 @@ button.playlist-close {
   iframe.home_frame {
     height: 45vw;
     width: 60vw;
+  }
+
+  iframe.left_menu_frame {
+    height: 30vw;
+    width: 20vw;
   }
 
   img.img-main-icon {

@@ -62,6 +62,14 @@ public class SongService {
         return songRepository.save(song);
     }
 
+    /**
+     * i think i struggled a bit when trying to change genres
+     * so this method double checks if genre not only exists in db already, but also
+     * whether it is already assigned to the song
+     * @param genreValue name of genre
+     * @param song song to edit
+     * @throws ResourceNotFoundException
+     */
     public void saveNewAssignmentOfExistingGenre(String genreValue, Song song) throws ResourceNotFoundException {
         Genre genre = genreService.findById(Integer.parseInt(genreValue)).orElseThrow(() -> new ResourceNotFoundException("No genre " +
                 "found with id " + genreValue));

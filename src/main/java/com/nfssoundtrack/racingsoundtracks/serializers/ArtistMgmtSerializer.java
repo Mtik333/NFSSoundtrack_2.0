@@ -15,6 +15,10 @@ import org.springframework.boot.jackson.JsonComponent;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * used when we just type in the author name and look for artist
+ * so we build JSON based on this info from database
+ */
 @JsonComponent
 public class ArtistMgmtSerializer extends JsonSerializer<Author> {
 
@@ -45,7 +49,6 @@ public class ArtistMgmtSerializer extends JsonSerializer<Author> {
         jsonGenerator.writeArrayFieldStart("countries");
         for (AuthorCountry authorCountry : authorCountries) {
             jsonGenerator.writeStartObject();
-            jsonGenerator.writeObjectField("countryAuthorId", authorCountry.getId());
             jsonGenerator.writeObjectField("countryName", authorCountry.getCountry().getCountryName());
             jsonGenerator.writeObjectField("countryId", authorCountry.getCountry().getId());
             jsonGenerator.writeEndObject();

@@ -7,6 +7,9 @@ import com.nfssoundtrack.racingsoundtracks.others.AuthorToDiscoGSObj;
 
 import java.io.IOException;
 
+/**
+ * used when we obtained discogs info about author, and we will store this info as JSON on disk
+ */
 public class AuthorToDiscoGSSerializer extends JsonSerializer<AuthorToDiscoGSObj> {
 
     @Override

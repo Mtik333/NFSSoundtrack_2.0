@@ -8,6 +8,9 @@ import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 
+/**
+ * endpoint used for stuff from Toni's Music Library - not relevant to the website
+ */
 @JsonComponent
 public class SongSubgroupFilenameSerializer extends JsonSerializer<SongSubgroup> {
 

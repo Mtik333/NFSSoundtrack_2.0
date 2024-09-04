@@ -370,7 +370,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 				DiscoGSObj discoGSObj = new DiscoGSObj(false, Integer.parseInt(id), uri, profile);
 				discoGSObj.setSocialLink(twitter, facebook, instagram, soundcloud, myspace, wikipedia);
 				//as during edit we maybe updated the author, we want to update the index too
-				authorService.updateDiscoGSObj(Integer.valueOf(authorId), discoGSObj);
+				authorService.updateDiscoGSObj(Long.valueOf(authorId), discoGSObj);
 			}
 		}
 		//it might be that there was a typo in author official name, so if we want to fix all the songs associated

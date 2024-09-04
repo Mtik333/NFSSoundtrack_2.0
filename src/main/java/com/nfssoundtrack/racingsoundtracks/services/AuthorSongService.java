@@ -44,8 +44,8 @@ public class AuthorSongService {
         authorSongRepository.delete(authorSong);
     }
 
-    public List<AuthorSong> saveAll(List<AuthorSong> authorSongs) {
-        return authorSongRepository.saveAll(authorSongs);
+    public void saveAll(List<AuthorSong> authorSongs) {
+        authorSongRepository.saveAll(authorSongs);
     }
 
     public void deleteAll(List<AuthorSong> authorSongs) {

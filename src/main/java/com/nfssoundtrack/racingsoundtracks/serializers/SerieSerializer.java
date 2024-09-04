@@ -8,6 +8,10 @@ import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 
+/**
+ * method to render all series from database - serializer by ootb is able of writing multiple series together
+ * and we build JSON on this
+ */
 @JsonComponent
 public class SerieSerializer extends JsonSerializer<Serie> {
 

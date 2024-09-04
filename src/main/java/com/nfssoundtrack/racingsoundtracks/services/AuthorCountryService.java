@@ -18,12 +18,8 @@ public class AuthorCountryService {
         authorCountryRepository.deleteAll(authorCountryList);
     }
 
-    public void deleteAll(Set<AuthorCountry> authorCountryList) {
-        authorCountryRepository.deleteAll(authorCountryList);
-    }
-
-    public List<AuthorCountry> saveAll(List<AuthorCountry> authorCountryList) {
-        return authorCountryRepository.saveAll(authorCountryList);
+    public void saveAll(List<AuthorCountry> authorCountryList) {
+        authorCountryRepository.saveAll(authorCountryList);
     }
 
 }

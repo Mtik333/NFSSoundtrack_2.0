@@ -100,7 +100,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @return endpoint of admin panel
      */
     @GetMapping(value = "/manage/manage")
-    public String manage(Model model) {
+    public String manage(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
         addCommonAttributes(model, "genericAt", new String[]{"Manage"});
         return "manage";
     }
@@ -110,7 +110,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @return endpoint of login
      */
     @GetMapping(value = "/login")
-    public String login(Model model) {
+    public String login(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
         addCommonAttributes(model, "genericAt", new String[]{"Login"});
         model.addAttribute("login", true);
         return "login";
@@ -128,8 +128,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                 contentService.findByContentShort(value).getContentData());
         boolean isHome = value.contains("home");
         model.addAttribute("home", isHome);
-        //when we are at home page, we have to render todays song
-        //todo show todays song on the left side menu when it is pinned
+        //when we are at home page, we have to render todays song in center
         model.addAttribute("todayssong", todaysSongService.getTodaysSong());
         return MIN_INDEX;
     }
@@ -140,7 +139,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @return whole display of game's soundtrack
      */
     @GetMapping(value = "/game/{gameshort}")
-    public String game(Model model, @PathVariable("gameshort") String gameshort/*, HttpSession httpSession*/) {
+    public String game(Model model, @PathVariable("gameshort") String gameshort/*, HttpSession httpSession*/) throws LoginException, ResourceNotFoundException, InterruptedException {
         Game game = gameService.findByGameShort(gameshort);
         model.addAttribute("endpoint", "/game/" + gameshort);
         model.addAttribute("game", game);
@@ -161,7 +160,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @PostMapping(value = "/custom/playlist")
     public String getCustomPlaylist(Model model, @RequestBody String customPlaylist)
-            throws ResourceNotFoundException, JsonProcessingException {
+            throws ResourceNotFoundException, JsonProcessingException, LoginException, InterruptedException {
         List<SongSubgroup> songSubgroupList = new ArrayList<>();
         if (customPlaylist == null || customPlaylist.isEmpty()) {
             logger.error("do something");
@@ -211,7 +210,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @throws ResourceNotFoundException exception when song is not found
      */
     @GetMapping(value = "/song/{songId}")
-    public String provideSongInfo(Model model, @PathVariable("songId") String songId) throws ResourceNotFoundException {
+    public String provideSongInfo(Model model, @PathVariable("songId") String songId) throws ResourceNotFoundException, LoginException, InterruptedException {
         Song song = songService.findById(Integer.valueOf(songId)).orElseThrow(
                 () -> new ResourceNotFoundException("No song found with id " + songId));
         model.addAttribute("songToCheck", song);
@@ -277,7 +276,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @throws ResourceNotFoundException when genre with this id not found
      */
     @GetMapping(value = "/genre/{genreId}")
-    public String readGenreInfo(Model model, @PathVariable("genreId") int genreId) throws ResourceNotFoundException {
+    public String readGenreInfo(Model model, @PathVariable("genreId") int genreId) throws ResourceNotFoundException, LoginException, InterruptedException {
         Genre genre =
                 genreService.findById(genreId).orElseThrow(
                         () -> new ResourceNotFoundException("No genre found with id " + genreId));
@@ -300,7 +299,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @GetMapping(value = "/genre/readfull/{genreId}")
     public String readGenreInfoFull(Model model, @PathVariable("genreId") int genreId)
-            throws ResourceNotFoundException {
+            throws ResourceNotFoundException, LoginException, InterruptedException {
         Genre genre =
                 genreService.findById(genreId).orElseThrow(
                         () -> new ResourceNotFoundException("No genre found with id " + genreId));
@@ -322,7 +321,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @return table with todays songs randomly picked in last 30 days
      */
     @GetMapping(value = "/songhistory")
-    public String getTodaysSongHistory(Model model) {
+    public String getTodaysSongHistory(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
         List<TodaysSong> todays30Songs = todaysSongService.findAllFromLast30Days();
         model.addAttribute("todays30Songs", todays30Songs);
         addCommonAttributes(model, "archiveOfSongsAt", null);
@@ -335,11 +334,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @param appNameKey key from message.properties to be translated
      * @param params params to provide to the message translation
      */
-    private void addCommonAttributes(Model model, String appNameKey, String[] params){
+    private void addCommonAttributes(Model model, String appNameKey, String[] params) throws LoginException, ResourceNotFoundException, InterruptedException {
         //name of the app, rather unrelevant
         model.addAttribute(APP_NAME, getLocalizedMessage(appNameKey,params));
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
         model.addAttribute(GAMES_ALPHA, gameService.findAllSortedByDisplayTitleAsc());
+        model.addAttribute("todayssong", todaysSongService.getTodaysSong());
     }
 
     /**
@@ -463,7 +463,6 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @GetMapping(value = "/filename/{songFilename}", produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody String getSongInfo(@PathVariable("songFilename") String songFilename) {
-        ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(SongSubgroup.class, songSubgroupFilenameSerializer);
         songFilename = URLDecoder.decode(songFilename, StandardCharsets.UTF_8);
         List<SongSubgroup> songsByFilename = songSubgroupService.findByFilenameStartsWith(songFilename);
         StringBuilder resultingText = new StringBuilder();

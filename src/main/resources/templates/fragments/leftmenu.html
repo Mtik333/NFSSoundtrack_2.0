@@ -140,5 +140,71 @@
             </div>
         </div>
     </div>
+    <!--when menu is pinned, we render the todays song below all series-->
+    <div id="leftMenuTodaySong" class="centerKeeper offcanvas-body py-0 px-0 border border-top-0" style="display:none">
+        <br>
+        <b>
+            <h4 th:text="#{todaySong}"></h4>
+        </b>
+        <th:block th:each="authorSong,iter : ${todayssong.songSubgroup.song.authorSongList.?[role.value=='COMPOSER']}">
+            <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
+               th:text="${todayssong.songSubgroup.ingameDisplayBand!=null} ? ${todayssong.songSubgroup.ingameDisplayBand} : ${authorSong.authorAlias.alias} "></a>
+        </th:block>
+        <th:block th:if="${todayssong.songSubgroup.showSubcomposer}">
+            <th:block
+                    th:each="authorSong,iter : ${todayssong.songSubgroup.song.authorSongList.?[role.value=='SUBCOMPOSER']}">
+                <span th:text="${authorSong.subcomposerConcat!=null} ? ' '+${authorSong.subcomposerConcat} : ''"></span>
+                <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                   th:text="${authorSong.authorAlias.alias}"></a>
+            </th:block>
+        </th:block>
+        <br>
+        <span
+                th:text="${todayssong.songSubgroup.ingameDisplayTitle!=null} ? ${todayssong.songSubgroup.ingameDisplayTitle} : ${todayssong.songSubgroup.song.officialDisplayTitle} "></span>
+        <th:block th:if="${todayssong.songSubgroup.showFeat}">
+            <th:block th:each="authorSong,iter : ${todayssong.songSubgroup.song.authorSongList.?[role.value=='FEAT']}">
+                <span th:text="${iter.first ? ' (feat. ' : ''}"></span>
+                <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                   th:text="${authorSong.authorAlias.alias}"></a><span th:text="${iter.last ? ')' : ''}"></span>
+                <th:block th:if="${authorSong.featConcat!=null}">
+                    <span th:text="${!iter.last ? ' '+authorSong.featConcat : ''}"></span>
+                </th:block>
+            </th:block>
+        </th:block>
+        <th:block th:if="${todayssong.songSubgroup.remix.value=='YES'}">
+            <th:block th:each="authorSong,iter : ${todayssong.songSubgroup.song.authorSongList.?[role.value=='REMIX']}">
+                <span th:text="${iter.first ? '(' : ''}"></span><a class="table_link"
+                                                                   th:href="'/author/'+${authorSong.authorAlias.author.id}"
+                                                                   th:text="${authorSong.authorAlias.alias}"></a>
+                <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
+                <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
+            </th:block>
+        </th:block>
+        <br>
+        <a class="table_link" th:href="'/game/'+${todayssong.songSubgroup.subgroup.mainGroup.game.gameShort}"
+           th:text="${todayssong.songSubgroup.subgroup.mainGroup.game.displayTitle}"></a>
+        <br>
+        <br>
+        <iframe class="left_menu_frame"
+                th:src="'https://www.youtube.com/embed/'+${todayssong.songSubgroup.srcId}+'?modestbranding=1&amp;showinfo=0'"
+                id="video" allow="autoplay;" allowscriptaccess="always" allowfullscreen></iframe>
+        <br><br>
+        <th:block>
+            <a class="table_link" th:href="'/songhistory'" th:text="#{archiveSongs}"></a>
+        </th:block>
+        <br>
+        <br>
+        <b>
+            <h4 th:text="#{ourPartners}"></h4>
+        </b>
+        <br>
+        <a class="table_link" href="https://nightriderz.world/" target="_blank">
+            <img class="partners" th:src="@{/images/NFSSTBanner.webp}" alt="NIGHTRIDERZ NFS World Server">
+        </a>
+        <br><br>
+        <a class="table_link" href="https://www.youtube.com/channel/UCSars_35pUP8YxpOYt7Q_gw" target="_blank">
+            <img class="partners" th:src="@{/images/loud_yt.webp}" alt="LOUD YouTube Channel">
+        </a>
+    </div>
 </div>
 <script th:src="@{/js/leftmenu.js}" type="application/javascript"></script>

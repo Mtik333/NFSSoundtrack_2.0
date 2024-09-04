@@ -36,8 +36,8 @@ public class SongGenreService {
         songGenreRepository.delete(songGenre);
     }
 
-    public List<SongGenre> saveAll(List<SongGenre> songGenres) {
-        return songGenreRepository.saveAll(songGenres);
+    public void saveAll(List<SongGenre> songGenres) {
+        songGenreRepository.saveAll(songGenres);
     }
 
     public void deleteAll(List<SongGenre> songGenres) {

@@ -8,6 +8,10 @@ import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 
+/**
+ * used to get genres with similar name from database
+ * so we build JSON based on this info from database
+ */
 @JsonComponent
 public class GenreSerializer extends JsonSerializer<Genre> {
 

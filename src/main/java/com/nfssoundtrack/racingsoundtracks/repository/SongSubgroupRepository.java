@@ -12,8 +12,6 @@ public interface SongSubgroupRepository extends JpaRepository<SongSubgroup, Inte
 
     List<SongSubgroup> findBySong(Song song);
 
-    List<SongSubgroup> findByFilename(String filename);
-
     List<SongSubgroup> findByFilenameStartsWith(String filename);
 
     List<SongSubgroup> findBySongIn(List<Song> songs, Sort sort);

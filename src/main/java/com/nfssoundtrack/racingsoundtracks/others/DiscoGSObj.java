@@ -1,5 +1,7 @@
 package com.nfssoundtrack.racingsoundtracks.others;
 
+import java.util.List;
+
 /**
  * DTO that consists of id of author in discogs, all his social media
  * and the boolean that allows us to ignore artist for purpose of looking up
@@ -126,6 +128,24 @@ public class DiscoGSObj {
 
     public void setDiscogsId(Integer artistId) {
         this.discogsId = artistId;
+    }
+
+    public void setLinks(List<String> urls){
+        for (String localUrl : urls) {
+            if (localUrl.contains("facebook")) {
+                this.setFacebook(localUrl);
+            } else if (localUrl.contains("twitter")) {
+                this.setTwitter(localUrl);
+            } else if (localUrl.contains("instagram")) {
+                this.setInstagram(localUrl);
+            } else if (localUrl.contains("soundcloud")) {
+                this.setSoundcloud(localUrl);
+            } else if (localUrl.contains("myspace")) {
+                this.setMyspace(localUrl);
+            } else if (localUrl.contains("wikipedia")) {
+                this.setWikipedia(localUrl);
+            }
+        }
     }
 
     @Override

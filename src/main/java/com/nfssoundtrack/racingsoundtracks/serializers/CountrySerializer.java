@@ -8,6 +8,10 @@ import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 
+/**
+ * method to get country / countries based on name input
+ * so we build JSON based on this info from database
+ */
 @JsonComponent
 public class CountrySerializer extends JsonSerializer<Country> {
 
@@ -15,6 +19,8 @@ public class CountrySerializer extends JsonSerializer<Country> {
     public void serialize(Country country, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
             throws IOException {
         jsonGenerator.writeStartObject();
+        //the input-select uses value and label mechanism
+        //so the label is just a country name, but value is going to be its id
         jsonGenerator.writeNumberField("value", country.getId());
         jsonGenerator.writeStringField("label", country.getCountryName());
         jsonGenerator.writeEndObject();

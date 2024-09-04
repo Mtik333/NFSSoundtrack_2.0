@@ -37,6 +37,7 @@ async function doLoadingCrap() {
             contentDiv.addClass("col");
             contentDiv.removeClass("col-sm-" + contentWidth);
         }
+        $("#leftMenuTodaySong").css("display", "");
         //if we shouw all games, need to introduce the scrollbar to that group display as we dont want game menu to be shown entirely with 1000 or so games
         if (localStorage.getItem("all-games") == "true") {
             $("#all-games-div").css("overflow-y", "scroll");
@@ -86,6 +87,7 @@ async function doLoadingCrap() {
             $("#pin-menu").prev().css("display", "none");
             $("#pin-menu").prev().prev().css("display", "");
         }
+        $("#leftMenuTodaySong").css("display", "none");
     }
     if ('ontouchstart' in window) {
         $("td.info_button").css("display", "none");
@@ -1001,6 +1003,7 @@ $(document).ready(function () {
             contentDiv.addClass("col");
             contentDiv.removeClass("col-sm-" + contentWidth);
         }
+        $("#leftMenuTodaySong").css("display", "");
         //we again scroll the group content since pin/unpin menu will reset the scroll
         if (localStorage.getItem("all-games") == "true") {
             $("#all-games-div").css("overflow-y", "scroll");
@@ -1048,6 +1051,7 @@ $(document).ready(function () {
             contentDiv.addClass("col-sm-" + contentWidth);
             contentDiv.removeClass("col");
         }
+        $("#leftMenuTodaySong").css("display", "none");
         if (localStorage.getItem("all-games") == "true") {
             $("#all-games-div").css("overflow-y", "");
             $("#all-games-div").css("max-height", "");

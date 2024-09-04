@@ -84,7 +84,7 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
      */
     @PutMapping(value = "/put/{songSubgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
-    String putSubgroup(@PathVariable("songSubgroupId") int songSubgroupId, @RequestBody String formData)
+    String putSongSubgroup(@PathVariable("songSubgroupId") int songSubgroupId, @RequestBody String formData)
             throws JsonProcessingException {
         try {
             //first let's find this song-subgroup
