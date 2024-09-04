@@ -38,6 +38,7 @@ public class TodaysSongService {
     private String botSecret;
 
     //todo use in the future for page with all corrections
+    //todo check sizing of all-games when switching do this mode while pinned
     public List<TodaysSong> findAll() {
         return todaysSongRepository.findAll();
     }

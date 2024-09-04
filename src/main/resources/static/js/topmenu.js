@@ -49,7 +49,7 @@ $(document).ready(function () {
             $("#static-leftmenu").prop("checked", JSON.parse(staticMenu));
         }
         var expandWidth = localStorage.getItem("expandable-width");
-        if (staticMenu != undefined) {
+        if (expandWidth != undefined) {
             $("#expandable-width").val(expandWidth);
         }
         var iconsSize = localStorage.getItem("icons-size");

@@ -5,6 +5,7 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Genre;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
+import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,7 +48,7 @@ public class SearchController extends BaseControllerWithErrorHandling {
 	 * @return index.html with several response parameters to the frontend
 	 */
 	@GetMapping(value = "/basic")
-	public String searchStuff(Model model, @RequestParam("searchData") String searchData) {
+	public String searchStuff(Model model, @RequestParam("searchData") String searchData) throws LoginException, ResourceNotFoundException, InterruptedException {
 		List<AuthorAlias> authorAliases = new ArrayList<>();
 		Map<Song, Set<Game>> songTitleList = new HashMap<>();
 		Map<Song, Set<Game>> songLyricsList = new HashMap<>();
@@ -141,6 +143,7 @@ public class SearchController extends BaseControllerWithErrorHandling {
 		model.addAttribute("appName", getLocalizedMessage("searchResultsAt", new String[]{appName}));
 		model.addAttribute(WebsiteViewsController.SERIES, serieService.findAllSortedByPositionAsc());
 		model.addAttribute(WebsiteViewsController.GAMES_ALPHA, gameService.findAllSortedByDisplayTitleAsc());
+		model.addAttribute("todayssong", todaysSongService.getTodaysSong());
 		model.addAttribute("authorAliases", authorAliases);
 		model.addAttribute("songTitleList", songTitleList);
 		model.addAttribute("songLyricsList", songLyricsList);
