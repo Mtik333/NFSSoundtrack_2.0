@@ -24,38 +24,38 @@ import java.util.Optional;
 @RequestMapping(path = "/genre")
 public class GenreController extends BaseControllerWithErrorHandling {
 
-	@Autowired
-	GenreSerializer genreSerializer;
+    @Autowired
+    GenreSerializer genreSerializer;
 
-	/**
-	 * method to get genres with similar name from database
-	 * used in songMgmt.js when you type in "genre" when creating new song or editing song globally
-	 *
-	 * @param input text with supposed genre name
-	 * @return json list of genres matching input criteria
-	 * @throws JsonProcessingException
-	 */
-	@GetMapping(value = "/genreName/{genreInput}")
-	public @ResponseBody
-	String readAliases(@PathVariable("genreInput") String input) throws JsonProcessingException {
-		ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Genre.class, genreSerializer);
-		if (input.isEmpty()) {
-			return objectMapper.writeValueAsString(null);
-		}
-		if (input.length() <= 3) {
-			//again if genre is short like EDM, we just look for exact value in databsae and return
-			Optional<Genre> genre = genreService.findByGenreName(input);
-			if (genre.isEmpty()) {
-				return objectMapper.writeValueAsString(null);
-			}
-			return objectMapper.writeValueAsString(Collections.singleton(genre.get()));
-		} else {
-			List<Genre> genreList = genreService.findByGenreNameContains(input);
-			if (genreList == null) {
-				return objectMapper.writeValueAsString(null);
-			}
-			return objectMapper.writeValueAsString(genreList);
-		}
-	}
+    /**
+     * method to get genres with similar name from database
+     * used in songMgmt.js when you type in "genre" when creating new song or editing song globally
+     *
+     * @param input text with supposed genre name
+     * @return json list of genres matching input criteria
+     * @throws JsonProcessingException
+     */
+    @GetMapping(value = "/genreName/{genreInput}")
+    public @ResponseBody
+    String readAliases(@PathVariable("genreInput") String input) throws JsonProcessingException {
+        ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Genre.class, genreSerializer);
+        if (input.isEmpty()) {
+            return objectMapper.writeValueAsString(null);
+        }
+        if (input.length() <= 3) {
+            //again if genre is short like EDM, we just look for exact value in databsae and return
+            Optional<Genre> genre = genreService.findByGenreName(input);
+            if (genre.isEmpty()) {
+                return objectMapper.writeValueAsString(null);
+            }
+            return objectMapper.writeValueAsString(Collections.singleton(genre.get()));
+        } else {
+            List<Genre> genreList = genreService.findByGenreNameContains(input);
+            if (genreList == null) {
+                return objectMapper.writeValueAsString(null);
+            }
+            return objectMapper.writeValueAsString(genreList);
+        }
+    }
 
 }

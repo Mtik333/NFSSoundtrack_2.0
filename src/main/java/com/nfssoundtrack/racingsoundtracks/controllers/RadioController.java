@@ -23,7 +23,7 @@ public class RadioController extends BaseControllerWithErrorHandling {
     @Autowired
     RadioSerieSerializer radioSerieSerializer;
 
-    @GetMapping(value="/series")
+    @GetMapping(value = "/series")
     public @ResponseBody
     String getAllSeries() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();

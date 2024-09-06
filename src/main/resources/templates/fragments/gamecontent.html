@@ -172,9 +172,11 @@
                                     <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
                                         <th:block
                                             th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
-                                            <img class="img-country img-responsive-row-icon" data-toggle="tooltip"
-                                                data-placement="top" th:title="${authorCountry.country.countryName}"
-                                                th:src="${authorCountry.country.countryLink}">
+                                            <a class="table_link" th:href="'/countryInfo/'+${authorCountry.country.id}">
+                                                <img class="img-country img-responsive-row-icon" data-toggle="tooltip"
+                                                    data-placement="top" th:title="${authorCountry.country.countryName}"
+                                                    th:src="${authorCountry.country.countryLink}">
+                                            </a>
                                         </th:block>
                                     </th:block>
 

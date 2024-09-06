@@ -49,8 +49,10 @@
 </th:block>
 <h5 th:text="#{associatedCountries}"></h5>
 <th:block th:each="authorCountry : ${author?.authorCountries}">
-    <img class="img-country img-responsive-row-icon" data-toggle="tooltip" data-placement="top"
-        th:title="${authorCountry.country.countryName}" th:src="${authorCountry.country.countryLink}">
+    <a class="table_link" th:href="'/countryInfo/'+${authorCountry.country.id}">
+        <img class="img-country img-responsive-row-icon" data-toggle="tooltip" data-placement="top"
+            th:title="${authorCountry.country.countryName}" th:src="${authorCountry.country.countryLink}">
+    </a>
 </th:block>
 <h4 th:text="#{songsAssociatedWith}+' '+ ${author?.name}"></h4>
 <div class="form-group pb-2 pt-2">

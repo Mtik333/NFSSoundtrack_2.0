@@ -3,7 +3,7 @@
     layout:decorate="~{layout}">
 
 <head>
-<!--    <th:block th:insert="~{fragments/tagManagerHead.html}"></th:block>-->
+    <!--    <th:block th:insert="~{fragments/tagManagerHead.html}"></th:block>-->
     <th:block th:insert="~{fragments/analytics.html}"></th:block>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -164,6 +164,7 @@
                 <div th:if="${customPlaylist}" th:insert="~{fragments/customPlaylist.html}"></div>
                 <div th:if="${songUsages}" th:insert="~{fragments/song.html}"></div>
                 <div th:if="${todays30Songs}" th:insert="~{fragments/todayssong.html}"></div>
+                <div th:if="${countryAuthors}" th:insert="~{fragments/countryAuthors.html}"></div>
             </div>
             <th:block th:insert="~{fragments/changeLanguageModal.html}"></th:block>
             <th:block th:insert="~{fragments/reportProblemModal.html}"></th:block>

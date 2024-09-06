@@ -18,7 +18,7 @@ public class AuthorToDiscoGSSerializer extends JsonSerializer<AuthorToDiscoGSObj
         jsonGenerator.writeNumberField("artistId", authorToDiscoGSObj.getArtistId());
         jsonGenerator.writeFieldName("discogs");
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeBooleanField("notInDiscogs",authorToDiscoGSObj.getDiscoGSObj().isNotInDiscogs());
+        jsonGenerator.writeBooleanField("notInDiscogs", authorToDiscoGSObj.getDiscoGSObj().isNotInDiscogs());
         jsonGenerator.writeNumberField("discogsId", authorToDiscoGSObj.getDiscoGSObj().getDiscogsId());
         jsonGenerator.writeStringField("uri", authorToDiscoGSObj.getDiscoGSObj().getUri());
         jsonGenerator.writeStringField("profile", authorToDiscoGSObj.getDiscoGSObj().getProfile());

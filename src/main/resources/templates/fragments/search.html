@@ -17,6 +17,11 @@
     </th:block>
 </th:block>
 <hr>
+<h3 th:text="#{allFoundGenres}"></h3>
+<th:block th:each="genre : ${genreList}">
+    <a class="table_link" th:href="'/genre/'+${genre.id}" th:text="${genre.genreName}"></a><br>
+</th:block>
+<hr>
 <h3 th:text="#{allFoundSongTitles}"></h3>
 <table id="searchSongTitlesTable" class="table table-hover table-striped playlist_table sortable-table">
     <colgroup>

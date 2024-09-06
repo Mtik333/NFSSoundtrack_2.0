@@ -41,7 +41,7 @@ public class DiscoGSObj {
         this.profile = profile;
     }
 
-    public void setSocialLink(String twitter, String facebook, String instagram, String soundcloud, String myspace, String wikipedia){
+    public void setSocialLink(String twitter, String facebook, String instagram, String soundcloud, String myspace, String wikipedia) {
         this.twitter = twitter;
         this.facebook = facebook;
         this.instagram = instagram;
@@ -130,7 +130,7 @@ public class DiscoGSObj {
         this.discogsId = artistId;
     }
 
-    public void setLinks(List<String> urls){
+    public void setLinks(List<String> urls) {
         for (String localUrl : urls) {
             if (localUrl.contains("facebook")) {
                 this.setFacebook(localUrl);

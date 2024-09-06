@@ -66,8 +66,9 @@ public class SongService {
      * i think i struggled a bit when trying to change genres
      * so this method double checks if genre not only exists in db already, but also
      * whether it is already assigned to the song
+     *
      * @param genreValue name of genre
-     * @param song song to edit
+     * @param song       song to edit
      * @throws ResourceNotFoundException
      */
     public void saveNewAssignmentOfExistingGenre(String genreValue, Song song) throws ResourceNotFoundException {

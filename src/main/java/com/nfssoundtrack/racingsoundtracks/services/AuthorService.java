@@ -138,8 +138,9 @@ public class AuthorService {
     /**
      * logic to store author in map but with a message that will try to get the data again
      * when someone clicks on this author as maybe we overused the api threshold
+     *
      * @param discoGSObj non-entity representing author
-     * @param author author entity
+     * @param author     author entity
      * @return updated non-entity representing author
      * @throws LoginException
      * @throws InterruptedException
@@ -168,6 +169,7 @@ public class AuthorService {
     /**
      * method to handle situation when we stored this api overuse in the map but we try again to get
      * info about the author from discogs
+     *
      * @param author author entity
      * @return updated non-entity representing author
      * @throws LoginException
@@ -203,6 +205,7 @@ public class AuthorService {
 
     /**
      * first time we ask discogs about this author
+     *
      * @param author author entity
      * @return updated non-entity representing author
      * @throws LoginException
@@ -243,6 +246,7 @@ public class AuthorService {
 
     /**
      * to avoid problems with overuse of API we try to limit requests by a single minute
+     *
      * @return true if we can again query discogs
      */
     private boolean checkIfCanQueryDiscoGS() {
@@ -261,6 +265,7 @@ public class AuthorService {
 
     /**
      * method to get discogs id of author based on the name as input
+     *
      * @param authorName
      * @return
      */
@@ -307,8 +312,9 @@ public class AuthorService {
 
     /**
      * now we finally have id of author and we can get full info or author from discogs
+     *
      * @param authorName name of author
-     * @param id id of author in discogs db
+     * @param id         id of author in discogs db
      * @return
      * @throws InterruptedException
      * @throws LoginException
@@ -362,6 +368,7 @@ public class AuthorService {
 
     /**
      * not sure why i extracted it this way
+     *
      * @return
      */
     private HttpEntity<String> entityToGet() {
@@ -373,7 +380,8 @@ public class AuthorService {
 
     /**
      * here we build json with all info about artist using discogs info
-     * @param artistId id of artist
+     *
+     * @param artistId   id of artist
      * @param discoGSObj representation of author from discogs
      * @throws InterruptedException
      * @throws LoginException

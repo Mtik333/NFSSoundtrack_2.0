@@ -33,7 +33,7 @@ public class ArtistMgmtSerializer extends JsonSerializer<Author> {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeNumberField("value", author.getId());
         jsonGenerator.writeStringField("label", author.getName());
-        if (author.getSkipDiscogs()!=null){
+        if (author.getSkipDiscogs() != null) {
             jsonGenerator.writeBooleanField("skipDiscogs", author.getSkipDiscogs());
         }
         List<AuthorAlias> authorAliases = authorAliasService.findByAuthor(author);
@@ -55,7 +55,7 @@ public class ArtistMgmtSerializer extends JsonSerializer<Author> {
         }
         jsonGenerator.writeEndArray();
         jsonGenerator.writeEndObject();
-        if (logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("resulting json: {}", jsonGenerator);
         }
     }

@@ -3,7 +3,8 @@ package com.nfssoundtrack.racingsoundtracks.others;
 import java.util.Date;
 
 /**
- * i guss i wanted to handle unexpected exception
+ * i guess i wanted to handle unexpected exception
+ *
  * @param timestamp
  * @param message
  * @param details

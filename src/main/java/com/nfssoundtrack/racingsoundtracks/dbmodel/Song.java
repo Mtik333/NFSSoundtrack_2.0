@@ -68,7 +68,7 @@ public class Song implements Serializable {
     /**
      * sometimes we need to display feat author next to main author name
      */
-    @Column(name="feat_next_to_band", columnDefinition="BIT")
+    @Column(name = "feat_next_to_band", columnDefinition = "BIT")
     private Boolean featNextToBand;
 
     public Long getId() {
@@ -201,7 +201,7 @@ public class Song implements Serializable {
         this.lyrics = lyrics;
     }
 
-    public void setLinks(String spotifyId, String deezerId, String itunesLink, String tidalLink, String soundcloudLink){
+    public void setLinks(String spotifyId, String deezerId, String itunesLink, String tidalLink, String soundcloudLink) {
         this.spotifyId = spotifyId;
         this.deezerId = deezerId;
         this.itunesLink = itunesLink;

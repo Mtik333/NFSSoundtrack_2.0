@@ -58,7 +58,7 @@ async function doLoadingCrap() {
                 } else if (tenPercentOfWholePageHeight > maxVw) {
                     $("#all-games-div").css("max-height", "144vw");
                 } else if (tenPercentOfWholePageHeight < minVw) {
-                    $("#all-games-div").css("max-height", $("div.parentTabs").height()+"px");
+                    $("#all-games-div").css("max-height", $("div.parentTabs").height() + "px");
                 }
             }
         } else {
@@ -104,6 +104,7 @@ async function doLoadingCrap() {
         $("#offcanvasSpan").text("");
         $("#offcanvasSpan").prev().css("display", "");
         $("#moreDiv").css("position", "absolute");
+        $("#moreCountriesDiv").css("position", "absolute");
         $(document).find("header").addClass("sticky-top");
     } else {
         //in case of desktop version putting red text in the very top of the page next to links and logo
@@ -808,6 +809,14 @@ $(document).ready(function () {
         $(this).children().tooltip('show');
     });
 
+    $(document).on("touchstart", "#moreCountriesDiv", function (e) {
+        if (e.target.id.localeCompare("moreCountriesDiv") == 0) {
+            if ($("#moreCountriesDiv").hasClass("show")) {
+                $("#moreCountriesDiv").removeClass("show").hide();
+            }
+        }
+    });
+
     $(document).on("touchstart", "#moreDiv", function (e) {
         if (e.target.id.localeCompare("moreDiv") == 0) {
             if ($("#moreDiv").hasClass("show")) {
@@ -1019,7 +1028,7 @@ $(document).ready(function () {
                 } else if (tenPercentOfWholePageHeight > maxVw) {
                     $("#all-games-div").css("max-height", "144vw");
                 } else if (tenPercentOfWholePageHeight < minVw) {
-                    $("#all-games-div").css("max-height", $("div.parentTabs").height()+"px");
+                    $("#all-games-div").css("max-height", $("div.parentTabs").height() + "px");
                 }
             }
             $($("a.active")[1]).parent().parent().parent()
@@ -1083,6 +1092,22 @@ $(document).ready(function () {
         $(this).next().css("display", "");
         $("#all-games-group").attr("hidden", false);
         $(".single-serie").attr("hidden", true);
+        if (localStorage.getItem("static-leftmenu") == "true") {
+            if ($("div.centerKeeper").length == 3) {
+                $("#all-games-div").css("max-height", ($("div.centerKeeper").first().height() - $("#search-games-bar").height() - $("#allgames-heading").height()) + "px");
+            } else {
+                var minVw = 36;
+                var maxVw = 144;
+                var tenPercentOfWholePageHeight = Math.floor((($("header").height() + $("div.real-page-content").height()) / window.innerHeight * 100) / 20);
+                if (tenPercentOfWholePageHeight <= maxVw && tenPercentOfWholePageHeight >= minVw) {
+                    $("#all-games-div").css("max-height", tenPercentOfWholePageHeight + "vw");
+                } else if (tenPercentOfWholePageHeight > maxVw) {
+                    $("#all-games-div").css("max-height", "144vw");
+                } else if (tenPercentOfWholePageHeight < minVw) {
+                    $("#all-games-div").css("max-height", $("div.parentTabs").height() + "px");
+                }
+            }
+        }
     });
 
     $(document).on("click", "img.30-player", function (elem) {

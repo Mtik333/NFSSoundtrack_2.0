@@ -3,25 +3,11 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Author;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorAlias;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorSong;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Correction;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.CorrectionStatus;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.CustomTheme;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Genre;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.ProblemType;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Role;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.SongGenre;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.TodaysSong;
-import com.nfssoundtrack.racingsoundtracks.others.DiscoGSObj;
-import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
-import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
+import com.nfssoundtrack.racingsoundtracks.others.*;
 import com.nfssoundtrack.racingsoundtracks.serializers.SongSerializer;
 import com.nfssoundtrack.racingsoundtracks.serializers.SongSubgroupFilenameSerializer;
+import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -36,22 +22,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * main controller with all the basic endpoint for non-authenticated users
@@ -65,6 +43,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public static final String DESC_BREAK = "\n====================\n\n";
     public static final String SERIES = "series";
     public static final String GAMES_ALPHA = "gamesAlpha";
+    public static List<TranslationObj> translationObjs = new ArrayList();
 
     @Autowired
     SongSerializer songSerializer;
@@ -216,7 +195,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("songToCheck", song);
         model.addAttribute("songUsages", songSubgroupService.findBySong(song));
         addCommonAttributes(model, "genericAt", new String[]{song.getOfficialDisplayBand()
-                        + " - " + song.getOfficialDisplayTitle()});
+                + " - " + song.getOfficialDisplayTitle()});
         return MIN_INDEX;
     }
 
@@ -324,27 +303,91 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public String getTodaysSongHistory(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
         List<TodaysSong> todays30Songs = todaysSongService.findAllFromLast30Days();
         model.addAttribute("todays30Songs", todays30Songs);
+        model.addAttribute("readFull", true);
         addCommonAttributes(model, "archiveOfSongsAt", null);
         return MIN_INDEX;
     }
 
     /**
-     * some attributes provided to model repeat with each invocation so let's group it in a single place
      * @param model view model
+     * @return table with all todays songs ever calculated or fetched
+     * @throws LoginException
+     * @throws ResourceNotFoundException
+     * @throws InterruptedException
+     */
+    @GetMapping(value = "/songhistory/readfull")
+    public String getTodaysSongHistoryFull(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+        List<TodaysSong> todays30Songs = todaysSongService.findAll();
+        model.addAttribute("todays30Songs", todays30Songs);
+        addCommonAttributes(model, "archiveOfSongsAt", null);
+        return MIN_INDEX;
+    }
+
+    @GetMapping(value = "/countryInfo/{countryId}")
+    public String getArtistsFromCountry(Model model, @PathVariable("countryId") int countryId)
+            throws ResourceNotFoundException, LoginException, InterruptedException {
+        Country country =
+                countryService.findById(countryId).orElseThrow(
+                        () -> new ResourceNotFoundException("No country found with id " + countryId));
+        List<Country> allCountries = countryService.findAll();
+        List<AuthorCountry> authorsFromCountry = authorCountryService.findByCountry(country);
+        List<AuthorGameObj> rowsToDisplay = new ArrayList<>();
+        for (AuthorCountry authorCountry : authorsFromCountry) {
+            Author author = authorCountry.getAuthor();
+            List<AuthorAlias> aliases = authorAliasService.findByAuthor(author);
+            Map<Game, Integer> songsPerGame = new HashMap<>();
+            Set<Game> games = new HashSet<>();
+            int countSongs = 0;
+            for (AuthorAlias alias : aliases) {
+                List<AuthorSong> authorSongs = authorSongService.findByAuthorAlias(alias);
+                countSongs += authorSongs.size();
+                for (AuthorSong authorSong : authorSongs) {
+                    Song song = authorSong.getSong();
+                    List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                    //it can be that one song appears in more than one subgroup in a game
+                    //so i don't want to screw up counting and make a distinct game check here
+                    songSubgroupList = songSubgroupList.stream().filter(JustSomeHelper.distinctByKey(songSubgroup ->
+                            songSubgroup.getSubgroup().getMainGroup().getGame())).toList();
+                    for (SongSubgroup songSubgroup : songSubgroupList) {
+                        Game game = songSubgroup.getSubgroup().getMainGroup().getGame();
+                        if (!songsPerGame.containsKey(game)) {
+                            songsPerGame.put(game, 1);
+                        } else {
+                            songsPerGame.put(game, songsPerGame.get(game) + 1);
+                        }
+                    }
+                }
+            }
+            AuthorGameObj authorGameObj = new AuthorGameObj(author, countSongs, songsPerGame);
+            rowsToDisplay.add(authorGameObj);
+        }
+        model.addAttribute("countryAuthors", rowsToDisplay);
+        model.addAttribute("selectedCountry", country);
+        model.addAttribute("allCountries", allCountries);
+        addCommonAttributes(model, "countryAuthorsAt", new String[]{country.getCountryName()});
+        return MIN_INDEX;
+    }
+
+    /**
+     * some attributes provided to model repeat with each invocation so let's group it in a single place
+     *
+     * @param model      view model
      * @param appNameKey key from message.properties to be translated
-     * @param params params to provide to the message translation
+     * @param params     params to provide to the message translation
      */
     private void addCommonAttributes(Model model, String appNameKey, String[] params) throws LoginException, ResourceNotFoundException, InterruptedException {
         //name of the app, rather unrelevant
-        model.addAttribute(APP_NAME, getLocalizedMessage(appNameKey,params));
+        model.addAttribute(APP_NAME, getLocalizedMessage(appNameKey, params));
         model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
         model.addAttribute(GAMES_ALPHA, gameService.findAllSortedByDisplayTitleAsc());
+        model.addAttribute("translations", translationObjs);
         model.addAttribute("todayssong", todaysSongService.getTodaysSong());
     }
 
     /**
      * invoked when clicking on 'submit correction' button after clicking on 'bug' icon on game's soundtrack page
      * can be also triggered by 'report problem' action from top menu bar
+     *
      * @param formData consists of type of issue, info from user and potential contact
      * @return OK if successful
      * @throws JsonProcessingException
@@ -367,7 +410,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             //so depending on that we will create the correction and store in database
             if (songSubgroupId != -1) {
                 songSubgroup = songSubgroupService.findById(songSubgroupId);
-                if (songSubgroup.isPresent()){
+                if (songSubgroup.isPresent()) {
                     correction = new Correction(songSubgroup.get(), pageUrl, ProblemType.valueOf(problemType), correctValue, discordUserName);
                 } else {
                     throw new ResourceNotFoundException("no songSubgroup found with id " + songSubgroupId);
@@ -458,6 +501,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * he uploads a lot of music and includes original filenames
      * now we can use filename as input to get video title for him as well as description
      * to save a lot of time on editing hundreds of videos
+     *
      * @param songFilename
      * @return
      */
@@ -528,6 +572,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     /**
      * just rebuilding the JDA to be able to send / receive messages via bot
+     *
      * @param botSecret
      * @throws LoginException
      * @throws InterruptedException
@@ -537,5 +582,47 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             jda = JDABuilder.createDefault(botSecret).build();
             jda.awaitReady();
         }
+    }
+
+    /**
+     * used in that little dropdown to select language via flag
+     */
+    @PostConstruct
+    private void setupTranslationList() {
+        Country england = countryService.findByCountryName("England").orElse(new Country());
+        Country germany = countryService.findByCountryName("Germany").orElse(new Country());
+        Country greece = countryService.findByCountryName("Greece").orElse(new Country());
+        Country spain = countryService.findByCountryName("Spain").orElse(new Country());
+        Country france = countryService.findByCountryName("France").orElse(new Country());
+        Country india = countryService.findByCountryName("India").orElse(new Country());
+        Country hungary = countryService.findByCountryName("Hungary").orElse(new Country());
+        Country indonesia = countryService.findByCountryName("Indonesia").orElse(new Country());
+        Country italy = countryService.findByCountryName("Italy").orElse(new Country());
+        Country japan = countryService.findByCountryName("Japan").orElse(new Country());
+        Country poland = countryService.findByCountryName("Poland").orElse(new Country());
+        Country portugal = countryService.findByCountryName("Portugal").orElse(new Country());
+        Country russia = countryService.findByCountryName("Russia").orElse(new Country());
+        Country turkey = countryService.findByCountryName("Turkey").orElse(new Country());
+        Country ukraine = countryService.findByCountryName("Ukraine").orElse(new Country());
+        Country china = countryService.findByCountryName("China").orElse(new Country());
+        translationObjs.add(new TranslationObj("en", england.getCountryName(), england.getCountryLink(), "english"));
+        translationObjs.add(new TranslationObj("ar", "Arabic",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Flag_of_the_Arabic_language.svg/34px-Flag_of_the_Arabic_language.svg.png",
+                "arabic"));
+        translationObjs.add(new TranslationObj("de", germany.getCountryName(), germany.getCountryLink(), "german"));
+        translationObjs.add(new TranslationObj("el", greece.getCountryName(), greece.getCountryLink(), "greek"));
+        translationObjs.add(new TranslationObj("es", spain.getCountryName(), spain.getCountryLink(), "spanish"));
+        translationObjs.add(new TranslationObj("fr", france.getCountryName(), france.getCountryLink(), "french"));
+        translationObjs.add(new TranslationObj("hi", india.getCountryName(), india.getCountryLink(), "hindi"));
+        translationObjs.add(new TranslationObj("hu", hungary.getCountryName(), hungary.getCountryLink(), "hungarian"));
+        translationObjs.add(new TranslationObj("id", indonesia.getCountryName(), indonesia.getCountryLink(), "indonesian"));
+        translationObjs.add(new TranslationObj("it", italy.getCountryName(), italy.getCountryLink(), "italian"));
+        translationObjs.add(new TranslationObj("jp", japan.getCountryName(), japan.getCountryLink(), "japanese"));
+        translationObjs.add(new TranslationObj("pl", poland.getCountryName(), poland.getCountryLink(), "polish"));
+        translationObjs.add(new TranslationObj("pt", portugal.getCountryName(), portugal.getCountryLink(), "portuguese"));
+        translationObjs.add(new TranslationObj("ru", russia.getCountryName(), russia.getCountryLink(), "russian"));
+        translationObjs.add(new TranslationObj("tr", turkey.getCountryName(), turkey.getCountryLink(), "turkish"));
+        translationObjs.add(new TranslationObj("uk", ukraine.getCountryName(), ukraine.getCountryLink(), "ukrainian"));
+        translationObjs.add(new TranslationObj("zh", china.getCountryName(), china.getCountryLink(), "chinese"));
     }
 }

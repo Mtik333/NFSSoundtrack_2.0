@@ -14,7 +14,7 @@ public class CustomThemeService {
     @Autowired
     CustomThemeRepository customThemeRepository;
 
-    public Optional<CustomTheme> findById(Integer id){
+    public Optional<CustomTheme> findById(Integer id) {
         return customThemeRepository.findById(id);
     }
 

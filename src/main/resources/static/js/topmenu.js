@@ -7,6 +7,12 @@ $(document).ready(function () {
             button: '<button type="button" class="form-select multiselect dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><span class="multiselect-selected-text"></span></button>',
         },
     });
+    if (localStorage.getItem("lang")!=undefined){
+        var lang = localStorage.getItem("lang");
+        var foundImg = $(document).find("img[data-countryval='"+lang+"']").first()[0].src;
+        $("#dropdownCountryImg")[0].src=foundImg;
+    } 
+
     /**
      * method to save preferences
      */
@@ -144,6 +150,17 @@ $(document).ready(function () {
                     changeStuffForDynamicTheme();
                 },
             });
+        }
+    });
+
+    $(document).on("click", "a.translate-link", function () {
+        var langValue = $(this).children().first().attr("data-countryval");
+        localStorage.setItem("lang", langValue);
+        var langAlreadyThere = window.location.toString().indexOf("?lang") > -1;
+        if (langAlreadyThere) {
+            window.location.search = "?lang=" + langValue;
+        } else {
+            window.location = window.location + "?lang=" + langValue;
         }
     });
 });

@@ -13,6 +13,7 @@ public class RadioSerieSerializer extends JsonSerializer<Serie> {
 
     /**
      * i don't recall now why it is even needed, maybe for the future of radio rewritten?
+     *
      * @param serie
      * @param jsonGenerator
      * @param serializerProvider

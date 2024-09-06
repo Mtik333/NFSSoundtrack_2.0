@@ -31,7 +31,7 @@ public class GroupWithSubgroupsSerializer extends JsonSerializer<MainGroup> {
             jsonGenerator.writeObjectField("position", subgroup.getPosition());
             jsonGenerator.writeFieldName("songSubgroupList");
             jsonGenerator.writeStartArray();
-            for (SongSubgroup songSubgroup : subgroup.getSongSubgroupList()){
+            for (SongSubgroup songSubgroup : subgroup.getSongSubgroupList()) {
                 //again here we don't really need all the info for editing purpose, just basic stuff to render in manage songs menu
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeObjectField("id", songSubgroup.getId());

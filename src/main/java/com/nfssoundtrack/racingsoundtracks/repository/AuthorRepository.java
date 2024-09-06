@@ -1,7 +1,6 @@
 package com.nfssoundtrack.racingsoundtracks.repository;
 
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Author;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

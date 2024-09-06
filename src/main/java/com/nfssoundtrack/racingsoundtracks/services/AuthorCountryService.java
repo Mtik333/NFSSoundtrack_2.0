@@ -1,12 +1,12 @@
 package com.nfssoundtrack.racingsoundtracks.services;
 
 import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorCountry;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Country;
 import com.nfssoundtrack.racingsoundtracks.repository.AuthorCountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class AuthorCountryService {
@@ -20,6 +20,10 @@ public class AuthorCountryService {
 
     public void saveAll(List<AuthorCountry> authorCountryList) {
         authorCountryRepository.saveAll(authorCountryList);
+    }
+
+    public List<AuthorCountry> findByCountry(Country country) {
+        return authorCountryRepository.findByCountry(country);
     }
 
 }

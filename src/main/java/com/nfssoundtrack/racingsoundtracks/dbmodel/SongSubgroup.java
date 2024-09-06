@@ -65,7 +65,7 @@ public class SongSubgroup implements Serializable {
     @Column(name = "info")
     private String info;
 
-    @Column(name = "show_feat", columnDefinition="BIT")
+    @Column(name = "show_feat", columnDefinition = "BIT")
     private Boolean showFeat;
 
     /**
@@ -77,7 +77,7 @@ public class SongSubgroup implements Serializable {
     @Column(name = "remix_text")
     private String remixText;
 
-    @Column(name = "show_subcomposer", columnDefinition="BIT")
+    @Column(name = "show_subcomposer", columnDefinition = "BIT")
     private Boolean showSubcomposer;
 
     public Long getId() {
@@ -250,7 +250,7 @@ public class SongSubgroup implements Serializable {
         this.filename = filename;
     }
 
-    public void setLinks(String spotifyId, String deezerId, String itunesLink, String tidalLink, String soundcloudLink){
+    public void setLinks(String spotifyId, String deezerId, String itunesLink, String tidalLink, String soundcloudLink) {
         this.spotifyId = spotifyId;
         this.deezerId = deezerId;
         this.itunesLink = itunesLink;
@@ -258,7 +258,7 @@ public class SongSubgroup implements Serializable {
         this.soundcloudLink = soundcloudLink;
     }
 
-    public void setRemixFeatSubcomposer(Instrumental instrumental, Remix remix, String remixText, Boolean showFeat, Boolean showSubcomposer){
+    public void setRemixFeatSubcomposer(Instrumental instrumental, Remix remix, String remixText, Boolean showFeat, Boolean showSubcomposer) {
         this.instrumental = instrumental;
         this.remix = remix;
         this.remixText = remixText;
@@ -278,7 +278,7 @@ public class SongSubgroup implements Serializable {
                 songSubgroup.remixText, songSubgroup.showFeat, songSubgroup.showSubcomposer);
     }
 
-    public String toCorrectionString(){
+    public String toCorrectionString() {
         return this.getSong().getOfficialDisplayBand() + " - " + this.getSong().getOfficialDisplayTitle()
                 + " from " + this.getSubgroup().getMainGroup().getGame().getDisplayTitle() + "\nSubgroup: "
                 + this.getSubgroup().getSubgroupName() + " -- Group: " + this.getSubgroup().getMainGroup().getGroupName();

@@ -16,7 +16,8 @@ public class AuthorToDiscoGSDeserializer extends JsonDeserializer<AuthorToDiscoG
 
     /**
      * used to deserialize JSON build upon modifying author using 'manage artists'
-     * @param jsonParser no idea what it is
+     *
+     * @param jsonParser             no idea what it is
      * @param deserializationContext similarly
      * @return object that consists of author id in database and all the info from discogs
      * @throws IOException
@@ -36,7 +37,7 @@ public class AuthorToDiscoGSDeserializer extends JsonDeserializer<AuthorToDiscoG
         String wikipedia = JustSomeHelper.returnProperValueToDb(node.get(DISCOGS).get("wikipedia").asText());
         boolean notInDiscogs = node.get(DISCOGS).get("notInDiscogs").asBoolean();
         DiscoGSObj discoGSObj = new DiscoGSObj(notInDiscogs, discogsId, uri, profile);
-        discoGSObj.setSocialLink(twitter,facebook,instagram,soundcloud,myspace,wikipedia);
+        discoGSObj.setSocialLink(twitter, facebook, instagram, soundcloud, myspace, wikipedia);
         return new AuthorToDiscoGSObj(artistId, discoGSObj);
     }
 }

@@ -1,4 +1,9 @@
 <h2 th:text="#{archiveSongs}"></h2>
+<th:block th:if="${readFull!=null}">
+    <h5 th:text="#{todaysSongsLast30Days}"></h5>
+    <a class="table_link" th:href="@{/songhistory/readfull}" th:text="#{seeFullTodaysSongList}"></a>
+    <br>
+</th:block>
 <div class="form-group pb-2 pt-2">
     <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
         data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
@@ -93,18 +98,20 @@
                                 d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
                         </svg>
                     </a>
-                    <textarea th:utext="${todaysSong.songSubgroup.lyrics!=null} ? ${todaysSong.songSubgroup.lyrics} : ${todaysSong.songSubgroup.song.lyrics}" hidden></textarea>
+                    <textarea
+                        th:utext="${todaysSong.songSubgroup.lyrics!=null} ? ${todaysSong.songSubgroup.lyrics} : ${todaysSong.songSubgroup.song.lyrics}"
+                        hidden></textarea>
                     <th:block th:if="${todaysSong.songSubgroup.spotifyId != null}">
                         <a class="a-external-music-link spotify-link" th:href="${todaysSong.songSubgroup.spotifyId}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
                         </a>
                         <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                             th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip"
-                             data-placement="top" th:title="#{playSample}">
+                            th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip" data-placement="top"
+                            th:title="#{playSample}">
                         <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
-                             th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip"
-                             data-placement="top" th:title="#{pauseSample}" style="display: none;">
+                            th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip" data-placement="top"
+                            th:title="#{pauseSample}" style="display: none;">
                     </th:block>
                     <th:block th:if="${todaysSong.songSubgroup.deezerId != null}">
                         <a class="a-external-music-link deezer-link" th:href="${todaysSong.songSubgroup.deezerId}">
@@ -125,7 +132,8 @@
                         </a>
                     </th:block>
                     <th:block th:if="${todaysSong.songSubgroup.soundcloudLink != null}">
-                        <a class="a-external-music-link soundcloud-link" th:href="${todaysSong.songSubgroup.soundcloudLink}">
+                        <a class="a-external-music-link soundcloud-link"
+                            th:href="${todaysSong.songSubgroup.soundcloudLink}">
                             <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.webp}"
                                 data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
                         </a>

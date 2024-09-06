@@ -31,7 +31,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @EnableCaching
 @SpringBootApplication
@@ -117,14 +118,14 @@ public class Application implements CommandLineRunner {
                 List<String> tidalSqlStatements = new ArrayList<>();
                 List<String> soundcloudSqlStatements = new ArrayList<>();
                 List<String> deezerSqlStatements = new ArrayList<>();
-                Song song=null;
-                for (int i=0; i<1000; i++) {
+                Song song = null;
+                for (int i = 0; i < 1000; i++) {
 //                for (Song song : songs) {
                     System.out.println("index " + i);
                     try {
                         StringBuilder content = new StringBuilder();
                         song = songs.get(i);
-                        URL url = new URL("https://odesli.co/embed?url="+song.getSpotifyId());
+                        URL url = new URL("https://odesli.co/embed?url=" + song.getSpotifyId());
                         URLConnection urlConnection = url.openConnection();
                         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                         String line;
@@ -134,46 +135,46 @@ public class Application implements CommandLineRunner {
                         bufferedReader.close();
                         String valueToCheck = content.toString();
                         int beginPositionITunes = valueToCheck.indexOf("https://geo.music.apple.com");
-                        if (beginPositionITunes>-1){
+                        if (beginPositionITunes > -1) {
                             int endPosition = valueToCheck.indexOf("0026mt=1");
-                            String iTunesLink = valueToCheck.substring(beginPositionITunes,endPosition-2);
-                            String fixItunesSql = "update nfs.song set itunes_link='"+iTunesLink+"' where id='"+song.getId()+"' and spotify_id='"+song.getSpotifyId()+"';";
+                            String iTunesLink = valueToCheck.substring(beginPositionITunes, endPosition - 2);
+                            String fixItunesSql = "update nfs.song set itunes_link='" + iTunesLink + "' where id='" + song.getId() + "' and spotify_id='" + song.getSpotifyId() + "';";
                             iTunesSqlStatements.add(fixItunesSql);
-                            String fixItunesSql2 = "update nfs.song_subgroup set itunes_link='"+iTunesLink+"' where  spotify_id='"+song.getSpotifyId()+"';";
+                            String fixItunesSql2 = "update nfs.song_subgroup set itunes_link='" + iTunesLink + "' where  spotify_id='" + song.getSpotifyId() + "';";
                             iTunesSqlStatements.add(fixItunesSql2);
 //                            System.out.println("???");
                         }
                         int beginPositionTidal = valueToCheck.indexOf("https://listen.tidal.com");
-                        if (beginPositionTidal>-1){
-                            int endPosition = beginPositionTidal+40;
-                            String tidalLink = valueToCheck.substring(beginPositionTidal,endPosition);
-                            String fixTidalLink = "update nfs.song set tidal_link='"+tidalLink+"' where id='"+song.getId()+"' and spotify_id='"+song.getSpotifyId()+"';";
-                            fixTidalLink = fixTidalLink.replace("\"","").replace("}","").replace(",","");
+                        if (beginPositionTidal > -1) {
+                            int endPosition = beginPositionTidal + 40;
+                            String tidalLink = valueToCheck.substring(beginPositionTidal, endPosition);
+                            String fixTidalLink = "update nfs.song set tidal_link='" + tidalLink + "' where id='" + song.getId() + "' and spotify_id='" + song.getSpotifyId() + "';";
+                            fixTidalLink = fixTidalLink.replace("\"", "").replace("}", "").replace(",", "");
                             tidalSqlStatements.add(fixTidalLink);
-                            String fixTidalLink2 = "update nfs.song_subgroup set tidal_link='"+tidalLink+"' where spotify_id='"+song.getSpotifyId()+"';";
-                            fixTidalLink2 = fixTidalLink2.replace("\"","").replace("}","").replace(",","");
+                            String fixTidalLink2 = "update nfs.song_subgroup set tidal_link='" + tidalLink + "' where spotify_id='" + song.getSpotifyId() + "';";
+                            fixTidalLink2 = fixTidalLink2.replace("\"", "").replace("}", "").replace(",", "");
                             tidalSqlStatements.add(fixTidalLink2);
 //                            System.out.println("???");
                         }
                         int beginPositionDeezer = valueToCheck.indexOf("www.deezer.com");
-                        if (beginPositionDeezer>-1){
-                            int endPosition = beginPositionDeezer+30;
-                            String deezerId = "deezer://"+valueToCheck.substring(beginPositionDeezer,endPosition);
-                            String fixDeezerId = "update nfs.song set deezer_id='"+deezerId+"' where id='"+song.getId()+"' and spotify_id='"+song.getSpotifyId()+"';";
-                            fixDeezerId = fixDeezerId.replace("\"","").replace("}","").replace(",","");
+                        if (beginPositionDeezer > -1) {
+                            int endPosition = beginPositionDeezer + 30;
+                            String deezerId = "deezer://" + valueToCheck.substring(beginPositionDeezer, endPosition);
+                            String fixDeezerId = "update nfs.song set deezer_id='" + deezerId + "' where id='" + song.getId() + "' and spotify_id='" + song.getSpotifyId() + "';";
+                            fixDeezerId = fixDeezerId.replace("\"", "").replace("}", "").replace(",", "");
                             deezerSqlStatements.add(fixDeezerId);
-                            String fixDeezerId2 = "update nfs.song_subgroup set deezer_id='"+deezerId+"' where spotify_id='"+song.getSpotifyId()+"';";
-                            fixDeezerId2 = fixDeezerId2.replace("\"","").replace("}","").replace(",","");
+                            String fixDeezerId2 = "update nfs.song_subgroup set deezer_id='" + deezerId + "' where spotify_id='" + song.getSpotifyId() + "';";
+                            fixDeezerId2 = fixDeezerId2.replace("\"", "").replace("}", "").replace(",", "");
                             deezerSqlStatements.add(fixDeezerId2);
 //                            System.out.println("???");
                         }
                         int beginPositionSoundcloud = valueToCheck.indexOf("https://soundcloud.com");
-                        if (beginPositionSoundcloud>-1){
-                            int endPosition = valueToCheck.indexOf("\"",beginPositionSoundcloud);
-                            String soundcloudLink = valueToCheck.substring(beginPositionSoundcloud,endPosition);
-                            String fixSoundcloudLink = "update nfs.song set soundcloud_link='"+soundcloudLink+"' where id='"+song.getId()+"' and spotify_id='"+song.getSpotifyId()+"';";
+                        if (beginPositionSoundcloud > -1) {
+                            int endPosition = valueToCheck.indexOf("\"", beginPositionSoundcloud);
+                            String soundcloudLink = valueToCheck.substring(beginPositionSoundcloud, endPosition);
+                            String fixSoundcloudLink = "update nfs.song set soundcloud_link='" + soundcloudLink + "' where id='" + song.getId() + "' and spotify_id='" + song.getSpotifyId() + "';";
                             soundcloudSqlStatements.add(fixSoundcloudLink);
-                            String fixSoundcloudLink2 = "update nfs.song_subgroup set soundcloud_link='"+soundcloudLink+"' where spotify_id='"+song.getSpotifyId()+"';";
+                            String fixSoundcloudLink2 = "update nfs.song_subgroup set soundcloud_link='" + soundcloudLink + "' where spotify_id='" + song.getSpotifyId() + "';";
                             soundcloudSqlStatements.add(fixSoundcloudLink2);
 //                            System.out.println("???");
                         }
@@ -222,7 +223,7 @@ public class Application implements CommandLineRunner {
                         Files.writeString(fullFixPath, str + System.lineSeparator(),
                                 StandardOpenOption.APPEND);
                     }
-                } catch (Throwable ttt){
+                } catch (Throwable ttt) {
                     System.out.println("couldn't creating files");
                     System.out.println(ttt.getMessage());
                     ttt.printStackTrace();
@@ -603,7 +604,7 @@ public class Application implements CommandLineRunner {
 //                            authorToComparableText.put(split[0], songsList);
 //                        }
 //                    }
-                    //map filled so let's do the levenshtein comparison
+            //map filled so let's do the levenshtein comparison
 //                    LevenshteinDistance distance = LevenshteinDistance.getDefaultInstance();
 //                    for (Map.Entry<String,List<String>> entry : authorToComparableText.entrySet()){
 //                        List<String> songTitles = entry.getValue();

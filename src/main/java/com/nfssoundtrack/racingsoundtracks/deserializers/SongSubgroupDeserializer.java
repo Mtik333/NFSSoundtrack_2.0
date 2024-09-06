@@ -29,9 +29,10 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
 
     /**
      * doing PUT on song-subgroup to save changes to entity immediately
+     *
      * @param jsonParser default thing
-     * @param ctxt default thing
-     * @param intoValue song-subgroup to save changes on
+     * @param ctxt       default thing
+     * @param intoValue  song-subgroup to save changes on
      * @return song-subgroup entity to do database save on
      * @throws IOException
      */
@@ -63,8 +64,9 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
 
     /**
      * used to POST new song-subgroup to database (here we just prepare entity)
+     *
      * @param jsonParser default thing
-     * @param ctxt default thing
+     * @param ctxt       default thing
      * @return song-subgroup entity to be stored in database for first time
      * @throws IOException
      */
@@ -77,18 +79,18 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
         String soundcloudLink = JustSomeHelper.returnProperValueToDb(node.get("soundcloud").asText());
         String deezerLink = JustSomeHelper.returnProperValueToDb(node.get("deezer").asText());
         String tidalink = JustSomeHelper.returnProperValueToDb(node.get("tidal").asText());
-        String ingameBand=null;
+        String ingameBand = null;
         //since we are not always going to have different in-game display of band/song
         //we need to do these null safe checks
-        if (node.get(INGAME_BAND)!=null){
+        if (node.get(INGAME_BAND) != null) {
             ingameBand = JustSomeHelper.returnProperValueToDb(node.get(INGAME_BAND).asText());
         }
-        String ingameTitle=null;
-        if (node.get(INGAME_TITLE)!=null){
+        String ingameTitle = null;
+        if (node.get(INGAME_TITLE) != null) {
             ingameTitle = JustSomeHelper.returnProperValueToDb(node.get(INGAME_TITLE).asText());
         }
-        String ingameSrcId=null;
-        if (node.get(INGAME_SRC_ID)!=null){
+        String ingameSrcId = null;
+        if (node.get(INGAME_SRC_ID) != null) {
             ingameSrcId = JustSomeHelper.returnProperValueToDb(node.get(INGAME_SRC_ID).asText());
         }
         String lyrics = JustSomeHelper.returnProperValueToDb(node.get("lyrics").asText());
@@ -102,15 +104,15 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
         Boolean showSubcomposer = node.get("showSubcomposer").asBoolean();
         Instrumental instrumental = Instrumental.fromBoolean(node.get("instrumental").asBoolean());
         Remix remix = Remix.NO;
-        if (node.get(REMIX)!=null){
+        if (node.get(REMIX) != null) {
             remix = Remix.fromBoolean(node.get(REMIX).asBoolean());
         }
         SongSubgroup songSubgroup = new SongSubgroup(ingameSrcId, ingameBand, ingameTitle, 10000L, lyrics, info, filename);
         songSubgroup.setLinks(spotifyLink, deezerLink, itunesLink, tidalink, soundcloudLink);
-        songSubgroup.setRemixFeatSubcomposer(instrumental, remix,remixText, showFeat, showSubcomposer);
+        songSubgroup.setRemixFeatSubcomposer(instrumental, remix, remixText, showFeat, showSubcomposer);
         //i recall having trouble to get service to be used here, but it seems to work
         JsonNode existingSongNode = node.get("existingSongId");
-        if (existingSongNode!=null && existingSongNode.isInt()) {
+        if (existingSongNode != null && existingSongNode.isInt()) {
             Integer existingSongId = existingSongNode.asInt();
             Optional<Song> existingSong = songService.findById(existingSongId);
             if (existingSong.isPresent()) {

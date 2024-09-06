@@ -4,15 +4,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorAlias;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorSong;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Correction;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.MainGroup;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Role;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.TodaysSong;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.services.CorrectionService;
 import com.nfssoundtrack.racingsoundtracks.services.SongSubgroupService;
 import com.nfssoundtrack.racingsoundtracks.services.TodaysSongService;
@@ -21,6 +13,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class JustSomeHelper {
 
@@ -29,6 +24,7 @@ public class JustSomeHelper {
 
     /**
      * always struggling with these damn nulls here and there
+     *
      * @param value
      * @return
      */
@@ -61,29 +57,31 @@ public class JustSomeHelper {
 
     /**
      * method to change song association with correction to another song-subgroup
+     *
      * @param correctionService db service
-     * @param songSubgroup song-subgroup to unlink correction from
-     * @param correctValue value of correction (we're mostly writing song title in such info)
+     * @param songSubgroup      song-subgroup to unlink correction from
+     * @param correctValue      value of correction (we're mostly writing song title in such info)
      */
     public static void unlinkSongWithCorrection(CorrectionService correctionService, SongSubgroup songSubgroup,
-                                                String correctValue){
+                                                String correctValue) {
         List<Correction> relatedCorrections = correctionService.findBySongSubgroup(songSubgroup);
         for (Correction correction : relatedCorrections) {
             correction.setSongSubgroup(null);
-            correction.setCorrectValue(correction.getCorrectValue()+correctValue);
+            correction.setCorrectValue(correction.getCorrectValue() + correctValue);
             correctionService.save(correction);
         }
     }
 
     /**
      * this is a bit more complicated to unlink song with today's song
-     * @param todaysSongService service of today's song table in db
-     * @param songSubgroup song-subgroup we want to unlink
-     * @param song helps finding other example of same song used
+     *
+     * @param todaysSongService   service of today's song table in db
+     * @param songSubgroup        song-subgroup we want to unlink
+     * @param song                helps finding other example of same song used
      * @param songSubgroupService just the database service to handle various requests
      */
     public static void unlinkSongWithTodaysSong(TodaysSongService todaysSongService, SongSubgroup songSubgroup,
-                                                Song song, SongSubgroupService songSubgroupService){
+                                                Song song, SongSubgroupService songSubgroupService) {
         List<TodaysSong> todaysSongs = todaysSongService.findAllBySongSubgroup(songSubgroup);
         if (todaysSongs.size() == 1) {
             List<SongSubgroup> allSongSubgroups = songSubgroupService.findBySong(song);
@@ -104,11 +102,12 @@ public class JustSomeHelper {
 
     /**
      * using object mapper so many times that we can move these 5 lines to one place
-     * @param classToUse class used for this purpose of serialization like game.java
+     *
+     * @param classToUse     class used for this purpose of serialization like game.java
      * @param jsonSerializer type of serializer used to serialize the data
      * @return objectmapper to use further in controllers
      */
-    public static ObjectMapper registerSerializerForObjectMapper(Class<?> classToUse, JsonSerializer jsonSerializer){
+    public static ObjectMapper registerSerializerForObjectMapper(Class<?> classToUse, JsonSerializer jsonSerializer) {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(classToUse, jsonSerializer);
@@ -118,15 +117,29 @@ public class JustSomeHelper {
 
     /**
      * using object mapper so many times that we can move these 5 lines to one place
-     * @param classToUse class used for this purpose of serialization like game.java
+     *
+     * @param classToUse       class used for this purpose of serialization like game.java
      * @param jsonDeserializer type of deserializer used to deserialize the data
      * @return objectmapper to use further in controllers
      */
-    public static ObjectMapper registerDeserializerForObjectMapper(Class<?> classToUse, JsonDeserializer jsonDeserializer){
+    public static ObjectMapper registerDeserializerForObjectMapper(Class<?> classToUse, JsonDeserializer jsonDeserializer) {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(classToUse, jsonDeserializer);
         objectMapper.registerModule(simpleModule);
         return objectMapper;
+    }
+
+    /**
+     * i just copied that from somewhere
+     *
+     * @param keyExtractor probably attribute we filter by
+     * @param <T>          just generic type?
+     * @return predicate used to get distinct objects from stream
+     */
+    public static <T> Predicate<T> distinctByKey(
+            Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 }

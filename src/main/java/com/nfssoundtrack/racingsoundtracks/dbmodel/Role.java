@@ -1,10 +1,7 @@
 package com.nfssoundtrack.racingsoundtracks.dbmodel;
 
 public enum Role {
-    COMPOSER("COMPOSER"),
-    SUBCOMPOSER("SUBCOMPOSER"),
-    FEAT("FEAT"),
-    REMIX("REMIX");
+    COMPOSER("COMPOSER"), SUBCOMPOSER("SUBCOMPOSER"), FEAT("FEAT"), REMIX("REMIX");
 
     public String value() {
         return value;

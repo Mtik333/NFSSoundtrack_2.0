@@ -1,0 +1,54 @@
+<div class="row">
+    <div class="col-6">
+        <h2 th:text="#{countryAuthors} + ' ' + ${selectedCountry.countryName}"></h2>
+        <img class="img-country img-responsive-row-icon" data-toggle="tooltip" data-placement="right"
+            th:title="${selectedCountry.countryName}" th:src="${selectedCountry.countryLink}">
+    </div>
+    <div class="col-6">
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="selectCountryButton"
+                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="#{selectCountry}">
+            </button>
+            <div id="selectCountryDropdown" class="dropdown-menu scroll-menu" style="display: none"
+                aria-labelledby="selectCountryButton">
+                <th:block th:each="singleCountry : ${allCountries}">
+                    <a class="table_link dropdown-item" th:href="'/countryInfo/'+${singleCountry.id}"
+                        th:text="${singleCountry.countryName}"></a>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="countryAuthorsTable" class="table table-hover table-striped sortable-table">
+    <colgroup>
+        <col class="countryAuthors-band" />
+        <col class="countryAuthors-count" />
+        <col class="countryAuthors-games" />
+    </colgroup>
+    <thead>
+        <tr>
+            <th class="game_content_th band" scope="col" th:text="#{band}"></th>
+            <th class="game_content_th" scope="col" th:text="#{countSongs}"></th>
+            <th class="game_content_th" scope="col" th:text="#{associatedGames}"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <th:block th:each="authorGameObj : ${countryAuthors}">
+            <tr>
+                <td class="band">
+                    <a class="table_link" th:href="'/author/'+${authorGameObj.author.id}"
+                        th:text="${authorGameObj.author.name}"></a>
+                </td>
+                <td th:text="${authorGameObj.countSongs}"></td>
+                <td>
+                    <th:block th:each="songsPerGame,iter : ${authorGameObj.songsPerGame}">
+                        <a class="table_link" th:text="${songsPerGame.key.displayTitle}"
+                            th:href="'/game/'+${songsPerGame.key.gameShort}"></a><span
+                            th:text="' ('+${songsPerGame.value}+')'+${!iter.last ? ', ' : ''}"></span>
+                    </th:block>
+                </td>
+            </tr>
+        </th:block>
+    </tbody>
+</table>
+<script th:src="@{/js/countryAuthors.js}" type="application/javascript"></script>

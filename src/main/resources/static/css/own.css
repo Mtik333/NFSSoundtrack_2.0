@@ -440,12 +440,16 @@ svg.bi-sort-alpha-down {
   z-index: 1;
 }
 
-div.logoSubDiv{
+div.logoSubDiv {
   z-index: 2;
 }
 
-#socialButtons{
+#socialButtons {
   z-index: 3;
+}
+
+.dropdown-menu {
+  --bs-dropdown-min-width: fit-content;
 }
 
 .dropdown-divider {
@@ -460,8 +464,18 @@ button.playlist-close {
   margin-left: 0px;
 }
 
-.form-check-input[type="checkbox"]{
-    box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(0, 0, 255, 0.35)
+.form-check-input[type="checkbox"] {
+  box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(0, 0, 255, 0.35)
+}
+
+header.container-fluid {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+#topNavbar {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 @media screen and (max-width: 600px) {

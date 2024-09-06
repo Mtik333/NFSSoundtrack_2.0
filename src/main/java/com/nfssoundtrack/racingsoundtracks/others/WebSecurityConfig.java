@@ -57,7 +57,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         //those can be seen by everones
                         .requestMatchers("/**", "/content/**", "/css/**", "/js/**", "/images/**",
                                 "/fragments/**", "/game/**", "/author/**", "/genre/**", "/search/**",
-                                "/custom/playlist", "/song/**", "/songinfo/**",
+                                "/custom/playlist", "/song/**", "/songinfo/**", "/countryInfo/**",
                                 "/favicon.ico", "/nfssoundtrack.ico",
                                 "favicon.ico", "nfssoundtrack.ico").permitAll()
                 )
@@ -78,6 +78,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     /**
      * probably some dynaminc linkage to locale, no idea how this works
+     *
      * @return
      */
     @Bean
