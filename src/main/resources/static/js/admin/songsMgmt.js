@@ -1604,22 +1604,24 @@ $(document).ready(function () {
 
     function obtainSubgroupMusicLinks() {
         var subgroupToPropagate = Number($("#obtain-links").attr("data-subgroupid"));
+        alert("Links will be obtained in the background, just continue");
         $.ajax({
-            async: false,
+            async: true,
             type: "GET",
             url: "/songSubgroup/obtainLinks/" + subgroupToPropagate,
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (links) {
-                getSingleSubgroupFromGame(0);
-                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-                    $(successAlertHtml).slideUp(500, function () {
-                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
-                    });
-                });
+            //since this is async, not going to refresh the page really
+//                getSingleSubgroupFromGame(0);
+//                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+//                    $(successAlertHtml).slideUp(500, function () {
+//                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+//                    });
+//                });
             },
             error: function (ooo) {
-                alert("error obtaining music links, check the logs");
+//                alert("error obtaining music links, check the logs");
             },
         });
     }
