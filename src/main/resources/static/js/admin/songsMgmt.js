@@ -1356,6 +1356,13 @@ $(document).ready(function () {
                 getSingleSubgroupFromGame(0);
                 $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click(function () {
+                            setTimeout(function () {
+                                $("#songs-table").parent().animate({
+                                    scrollTop: $("#songs-table").find("tr[data-songsubgroupid='" + currentSongSubgroup.id + "']").offset().top - $("#songs-table").offset().top
+                                }, 200);
+                            }, 100);
+                        });
                         $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
                     });
                 });
