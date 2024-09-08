@@ -250,6 +250,14 @@ public class SongSubgroup implements Serializable {
         this.filename = filename;
     }
 
+    public void setLinks(Song song) {
+        this.spotifyId = song.getSpotifyId();
+        this.deezerId = song.getDeezerId();
+        this.itunesLink = song.getItunesLink();
+        this.tidalLink = song.getTidalLink();
+        this.soundcloudLink = song.getSoundcloudLink();
+    }
+
     public void setLinks(String spotifyId, String deezerId, String itunesLink, String tidalLink, String soundcloudLink) {
         this.spotifyId = spotifyId;
         this.deezerId = deezerId;

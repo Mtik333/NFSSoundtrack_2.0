@@ -208,4 +208,12 @@ public class Song implements Serializable {
         this.tidalLink = tidalLink;
         this.soundcloudLink = soundcloudLink;
     }
+
+    public void setLinks(SongSubgroup songSubgroup) {
+        this.spotifyId = songSubgroup.getSpotifyId();
+        this.deezerId = songSubgroup.getDeezerId();
+        this.itunesLink = songSubgroup.getItunesLink();
+        this.tidalLink = songSubgroup.getTidalLink();
+        this.soundcloudLink = songSubgroup.getSoundcloudLink();
+    }
 }

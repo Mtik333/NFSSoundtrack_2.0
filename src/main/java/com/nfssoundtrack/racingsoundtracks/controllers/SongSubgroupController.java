@@ -8,6 +8,8 @@ import com.nfssoundtrack.racingsoundtracks.deserializers.SongDeserializer;
 import com.nfssoundtrack.racingsoundtracks.deserializers.SongSubgroupDeserializer;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,8 @@ import java.util.*;
 @Controller
 @RequestMapping("/songSubgroup")
 public class SongSubgroupController extends BaseControllerWithErrorHandling {
+
+    private static final Logger logger = LoggerFactory.getLogger(SongSubgroupController.class);
 
     @Autowired
     SongSubgroupDeserializer songSubgroupDeserializer;
@@ -482,57 +486,114 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
      * @return json of music links
      * @throws IOException
      */
-    @GetMapping(value = "/links/{songSubgroup}")
+    @GetMapping(value = "/links/{youtubeId}")
     public @ResponseBody
-    String getLinksFromYoutubeId(@PathVariable("songSubgroup") String youtubeId)
+    String getLinksFromYoutubeId(@PathVariable("youtubeId") String youtubeId)
             throws IOException {
         //todo show how the answer from odesli.co looks like
-        StringBuilder content = new StringBuilder();
-        URL url = new URL("https://odesli.co/embed?url=" + "https://www.youtube.com/watch?v=" + youtubeId);
-        URLConnection urlConnection = url.openConnection();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            content.append(line).append("\n");
-        }
-        bufferedReader.close();
-        String valueToCheck = content.toString();
         SongSubgroup songSubgroup = new SongSubgroup();
-        //we just do some stupif substring crap to get necessary links and build them properly
-        int beginPositionITunes = valueToCheck.indexOf("https://geo.music.apple.com");
-        if (beginPositionITunes > -1) {
-            int endPosition = valueToCheck.indexOf("0026mt=1");
-            String iTunesLink = valueToCheck.substring(beginPositionITunes, endPosition - 2);
-            songSubgroup.setItunesLink(iTunesLink);
-        }
-        int beginPositionTidal = valueToCheck.indexOf("https://listen.tidal.com");
-        if (beginPositionTidal > -1) {
-            int endPosition = beginPositionTidal + 40;
-            String tidalLink = valueToCheck.substring(beginPositionTidal, endPosition);
-            tidalLink = tidalLink.replace("\"", "").replace("}", "").replace(",", "");
-            songSubgroup.setTidalLink(tidalLink);
-        }
-        int beginPositionDeezer = valueToCheck.indexOf("www.deezer.com");
-        if (beginPositionDeezer > -1) {
-            int endPosition = beginPositionDeezer + 30;
-            String deezerId = "deezer://" + valueToCheck.substring(beginPositionDeezer, endPosition);
-            deezerId = deezerId.replace("\"", "").replace("}", "").replace(",", "");
-            songSubgroup.setDeezerId(deezerId);
-        }
-        int beginPositionSoundcloud = valueToCheck.indexOf("\"https://soundcloud.com");
-        if (beginPositionSoundcloud > -1) {
-            int endPosition = valueToCheck.indexOf("\"", beginPositionSoundcloud + 1);
-            String soundcloudLink = valueToCheck.substring(beginPositionSoundcloud + 1, endPosition);
-            songSubgroup.setSoundcloudLink(soundcloudLink);
-        }
-        int beginPositionSpotify = valueToCheck.indexOf("https://open.spotify.com/track/");
-        if (beginPositionSpotify > -1) {
-            int endPosition = beginPositionSpotify + 53;
-            String spotifyLink = "spotify:track:" + valueToCheck.substring(beginPositionSpotify + 31, endPosition);
-            songSubgroup.setSpotifyId(spotifyLink);
-        }
+        setLinksFromOdesliCo(youtubeId, songSubgroup, false);
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(songSubgroup);
     }
 
+    @GetMapping(value = "/copyLinks/{subgroupId}")
+    public @ResponseBody
+    String copyLinksFromGlobalSongToSubgroupEntries(@PathVariable("subgroupId") int subgroupId)
+            throws IOException, ResourceNotFoundException {
+        Subgroup subgroup = subgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No song " +
+                "subgroup found with id " + subgroupId));
+        //fetching all songs from subgroup
+        List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
+        for (SongSubgroup songSubgroup : songSubgroupList) {
+            Song song = songSubgroup.getSong();
+            //and just copy links from official song to this entry
+            //this is because when you propagate links from official song entry
+            //to local entry, it will only consider song from that subgroup you accessed global song from
+            songSubgroup.setLinks(song);
+            songSubgroupService.save(songSubgroup);
+        }
+        String gameShort = subgroup.getMainGroup().getGame().getGameShort();
+        //as we updated links, it's worth also unloading game cache
+        removeCacheEntry(gameShort);
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
+    @GetMapping(value = "/obtainLinks/{subgroupId}")
+    public @ResponseBody
+    String obtainMusicLinksFromOdesliCo(@PathVariable("subgroupId") int subgroupId)
+            throws IOException, ResourceNotFoundException {
+        Subgroup subgroup = subgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No song " +
+                "subgroup found with id " + subgroupId));
+        //fetching all songs from subgroup
+        List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
+        for (SongSubgroup songSubgroup : songSubgroupList) {
+            Song song = songSubgroup.getSong();
+            //this time doing other way around - as i created method earlier
+            //first we set links on subgroup, then on main song
+            if (song.getSrcId() != null) {
+                setLinksFromOdesliCo(song.getSrcId(), songSubgroup, true);
+            }
+            songSubgroupService.save(songSubgroup);
+            songService.save(song);
+        }
+        String gameShort = subgroup.getMainGroup().getGame().getGameShort();
+        //as we updated links, it's worth also unloading game cache
+        removeCacheEntry(gameShort);
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
+    private void setLinksFromOdesliCo(String youtubeId, SongSubgroup songSubgroup, boolean setSong) {
+        try {
+            StringBuilder content = new StringBuilder();
+            URL url = new URL("https://odesli.co/embed?url=" + "https://www.youtube.com/watch?v=" + youtubeId);
+            URLConnection urlConnection = url.openConnection();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+            bufferedReader.close();
+            String valueToCheck = content.toString();
+            //we just do some stupid substring crap to get necessary links and build them properly
+            int beginPositionITunes = valueToCheck.indexOf("https://geo.music.apple.com");
+            if (beginPositionITunes > -1) {
+                int endPosition = valueToCheck.indexOf("0026mt=1");
+                String iTunesLink = valueToCheck.substring(beginPositionITunes, endPosition - 2);
+                songSubgroup.setItunesLink(iTunesLink);
+            }
+            int beginPositionTidal = valueToCheck.indexOf("https://listen.tidal.com");
+            if (beginPositionTidal > -1) {
+                int endPosition = beginPositionTidal + 40;
+                String tidalLink = valueToCheck.substring(beginPositionTidal, endPosition);
+                tidalLink = tidalLink.replace("\"", "").replace("}", "").replace(",", "");
+                songSubgroup.setTidalLink(tidalLink);
+            }
+            int beginPositionDeezer = valueToCheck.indexOf("www.deezer.com");
+            if (beginPositionDeezer > -1) {
+                int endPosition = beginPositionDeezer + 30;
+                String deezerId = "deezer://" + valueToCheck.substring(beginPositionDeezer, endPosition);
+                deezerId = deezerId.replace("\"", "").replace("}", "").replace(",", "");
+                songSubgroup.setDeezerId(deezerId);
+            }
+            int beginPositionSoundcloud = valueToCheck.indexOf("\"https://soundcloud.com");
+            if (beginPositionSoundcloud > -1) {
+                int endPosition = valueToCheck.indexOf("\"", beginPositionSoundcloud + 1);
+                String soundcloudLink = valueToCheck.substring(beginPositionSoundcloud + 1, endPosition);
+                songSubgroup.setSoundcloudLink(soundcloudLink);
+            }
+            int beginPositionSpotify = valueToCheck.indexOf("https://open.spotify.com/track/");
+            if (beginPositionSpotify > -1) {
+                int endPosition = beginPositionSpotify + 53;
+                String spotifyLink = "spotify:track:" + valueToCheck.substring(beginPositionSpotify + 31, endPosition);
+                songSubgroup.setSpotifyId(spotifyLink);
+            }
+            if (setSong) {
+                songSubgroup.getSong().setLinks(songSubgroup);
+            }
+        } catch (IOException e) {
+            logger.error("unknown error, maybe API limit violated? {}", e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

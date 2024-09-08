@@ -44,7 +44,14 @@ $(document).ready(function () {
                     divToAppend.append(rowDiv);
                     rowDiv.append(leftCellDiv);
                     rowDiv.append(rightCellDiv);
-                    var newGroupSpan = $('<h2><button data-gameId=' + gameId + ' id="new-song" class="new-group btn btn-success">New song</button></h2>');
+                    var newGroupSpan = $('<h2></h2>');
+                    var newSongButton = $('<button data-gameId=' + gameId + ' id="new-song" class="new-group btn btn-success">New song</button>');
+                    var copySongLinksButton = $('<button data-subgroupId=' + currentSubgroup + ' id="copy-links" class="btn btn-primary">Copy music links to subgroup</button>');
+                    var obtainLinksButton = $('<button data-subgroupId=' + currentSubgroup + ' id="obtain-links" class="btn btn-primary">Get music links from Odesli.co</button>');
+                    newGroupSpan.append(newSongButton);
+                    newGroupSpan.append(copySongLinksButton);
+                    newGroupSpan.append(obtainLinksButton);
+                    //todo make a button to copy song links from global entry to subgroup entries
                     dropdownDiv = $('<div id="selectSubgroup" class="dropdown">');
                     dropdownDiv.append('<button class="btn btn-secondary dropdown-toggle" type="button" id="subgroupsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">All</button>');
                     leftCellDiv.append(dropdownDiv);
@@ -446,28 +453,8 @@ $(document).ready(function () {
         currentSubgroup = Number(subgroupId);
         getSingleSubgroupFromGame(currentSubgroup);
         currentSubgroupId = subgroupId;
-        // var groupId = Number($(this).attr('data-groupId'));
-        // var subgroupSongs;
-        // for (let i = 0; i < fullScopeOfEdit.length; i++) {
-        //     if (fullScopeOfEdit[i].id == groupId) {
-        //         for (let j = 0; j < fullScopeOfEdit[i].subgroups.length; j++) {
-        //             if (fullScopeOfEdit[i].subgroups[j].id == subgroupId) {
-        //                 subgroupSongs = fullScopeOfEdit[i].subgroups[j].songSubgroupList;
-        //             }
-        //         }
-        //     }
-        // }
-        // currentSubgroupId = subgroupId;
-        // console.log("e");
-        // $("#songs-table").find('tr').each(function (e) {
-        //     $(this).addClass("visually-hidden");
-        // });
-        // for (let i = 0; i < subgroupSongs.length; i++) {
-        //     var songId = subgroupSongs[i].song.id;
-        //     var songToMark = $("#songs-table").find('tr[data-songId="' + songId + '"][data-songsubgroupid="' + subgroupSongs[i].id + '"]').first();
-        //     songToMark.attr("data-songSubgroupId", subgroupSongs[i].id);
-        //     songToMark.removeClass("visually-hidden");
-        // };
+        $("#copy-links").attr("data-subgroupid", currentSubgroupId);
+        $("#obtain-links").attr("data-subgroupid", currentSubgroupId);
     });
 
     function generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv,
@@ -1192,6 +1179,9 @@ $(document).ready(function () {
     //https://open.spotify.com/track/7zI6uJWfq93wgV20V2euv6?si=873a9557277548ac
     $(document).on('focusout', '#spotifyInput', function (e) {
         var typedSrcId = $(this).val();
+        if (typedSrcId.length == 0) {
+            return;
+        }
         var indexOfMark = typedSrcId.indexOf("track/");
         var indexOfSi = typedSrcId.indexOf("?si");
         if (indexOfSi > -1) {
@@ -1530,9 +1520,16 @@ $(document).ready(function () {
         firstIngameIdReload = true;
     });
 
-
     $(document).on('click', '#fetch-spotify-links', function (e) {
         fetchMusicLinks();
+    });
+
+    $(document).on('click', '#copy-links', function (e) {
+        copyMusicLinks();
+    });
+
+    $(document).on('click', '#obtain-links', function (e) {
+        obtainSubgroupMusicLinks();
     });
 
     function fetchMusicLinks() {
@@ -1572,6 +1569,50 @@ $(document).ready(function () {
             },
             error: function (ooo) {
                 alert("error fetching music links, check the logs");
+            },
+        });
+    }
+
+    function copyMusicLinks() {
+        var subgroupToPropagate = Number($("#copy-links").attr("data-subgroupid"));
+        $.ajax({
+            async: false,
+            type: "GET",
+            url: "/songSubgroup/copyLinks/" + subgroupToPropagate,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (links) {
+                getSingleSubgroupFromGame(0);
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                    });
+                });
+            },
+            error: function (ooo) {
+                alert("error copying music links, check the logs");
+            },
+        });
+    }
+
+    function obtainSubgroupMusicLinks() {
+        var subgroupToPropagate = Number($("#obtain-links").attr("data-subgroupid"));
+        $.ajax({
+            async: false,
+            type: "GET",
+            url: "/songSubgroup/obtainLinks/" + subgroupToPropagate,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (links) {
+                getSingleSubgroupFromGame(0);
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                    });
+                });
+            },
+            error: function (ooo) {
+                alert("error obtaining music links, check the logs");
             },
         });
     }

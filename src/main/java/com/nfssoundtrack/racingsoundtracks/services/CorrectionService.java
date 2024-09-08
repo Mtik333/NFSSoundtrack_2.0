@@ -5,6 +5,7 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.CorrectionStatus;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
 import com.nfssoundtrack.racingsoundtracks.repository.CorrectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,10 @@ public class CorrectionService {
 
     public Correction save(Correction correction) {
         return correctionRepository.save(correction);
+    }
+
+    public List<Correction> findAll(){
+        return correctionRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     public List<Correction> findBySongSubgroup(SongSubgroup songSubgroup) {

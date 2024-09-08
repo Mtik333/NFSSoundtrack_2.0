@@ -368,6 +368,14 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         return MIN_INDEX;
     }
 
+    @GetMapping(value = "/corrections")
+    public String corrections(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+        List<Correction> corrections = correctionService.findAll();
+        model.addAttribute("corrections", corrections);
+        addCommonAttributes(model, "genericAt", new String[]{"Corrections"});
+        return MIN_INDEX;
+    }
+
     /**
      * some attributes provided to model repeat with each invocation so let's group it in a single place
      *
