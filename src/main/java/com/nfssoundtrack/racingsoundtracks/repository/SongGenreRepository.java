@@ -15,4 +15,6 @@ public interface SongGenreRepository extends JpaRepository<SongGenre, Integer> {
     List<SongGenre> findByGenre(Genre genre);
 
     List<SongGenre> findByGenre(Genre genre, Pageable pageable);
+
+    SongGenre findByGenreAndSong(Genre genre, Song song);
 }

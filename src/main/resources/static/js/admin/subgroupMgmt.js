@@ -40,7 +40,7 @@ $(document).ready(function () {
                 dropdownDiv.append('<button class="btn btn-secondary dropdown-toggle" type="button" id="subgroupsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">All</button>');
                 leftCellDiv.append(dropdownDiv);
                 leftCellDiv.append('<button id="moveToDifferentGroup" type="submit" class="btn btn-primary" disabled>Move subgroup to group</button>');
-                leftCellDiv.append('<select id="selectGroup" class="form-select w-auto"></select>')
+                leftCellDiv.append('<select id="selectGroup" class="form-select w-auto"></select>');
                 var allSongSubgroups = [];
                 for (let i = 0; i < fullScopeOfEdit.length; i++) {
                     const group = fullScopeOfEdit[i];

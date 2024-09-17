@@ -361,11 +361,17 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         //with such author, we will go through all songs and correct this value there
         Boolean updateOfficialArtist = (Boolean) formDataMap.get("changeOfficialArtist");
         if (Boolean.TRUE.equals(updateOfficialArtist)) {
+            String artistOldName = (String) formDataMap.get("artistOldName");
             List<AuthorSong> authorSongs = authorSongService.findByAuthorAlias(rootAlias);
-            for (AuthorSong authorSong : authorSongs) {
-                Song song = authorSong.getSong();
-                song.setOfficialDisplayBand(authorName);
-                songService.save(song);
+            if (artistOldName!=null) {
+                for (AuthorSong authorSong : authorSongs) {
+                    // in case songs consist of multiple artists in official band
+                    // we rather want to replace old value of band by new value
+                    Song song = authorSong.getSong();
+                    String oldOfficialDisplayBand = song.getOfficialDisplayBand();
+                    song.setOfficialDisplayBand(oldOfficialDisplayBand.replace(artistOldName,authorName));
+                    songService.save(song);
+                }
             }
         }
         return new ObjectMapper().writeValueAsString("OK");

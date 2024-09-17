@@ -1,8 +1,10 @@
 <h2 th:text="#{searchResultsPre} + ' ' + ${searchPhrase}"></h2>
-<div class="form-group pb-2 pt-2">
-    <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
-        data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
-</div>
+<th:block th:if="${#lists.size(songTitleList.keySet())>0 or #lists.size(songLyricsList.keySet())>0}">
+    <div class="form-group pb-2 pt-2">
+        <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
+            data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
+    </div>
+</th:block>
 <hr>
 <h3 th:text="#{allFoundAuthors}"></h3>
 <th:block th:each="authorAlias : ${authorAliases}">

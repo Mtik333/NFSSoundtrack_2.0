@@ -18,6 +18,8 @@ public class GenreService {
         return genreRepository.findById(id);
     }
 
+    public List<Genre> findAll(){return genreRepository.findAll();}
+
     public Optional<Genre> findByGenreName(String genreName) {
         return genreRepository.findByGenreName(genreName);
     }

@@ -83,8 +83,7 @@ public class SongSubgroupService {
     }
 
     /**
-     * method used to update info about feat / subcomposer / feat
-     * todo maybe rename this method to updateSubcomposers?
+     * method used to update info about feat / subcomposer
      *
      * @param objectMapper      just ootb mapper
      * @param comingInput       type of role really
@@ -95,8 +94,8 @@ public class SongSubgroupService {
      * @param propagate         used to propagate concat between feat / remix to song-subgroup entry
      * @throws ResourceNotFoundException
      */
-    public void updateFeat(Map<String, String> objectMapper, String comingInput, String comingConcatInput,
-                           SongSubgroup songSubgroup, Role role, Song relatedSong, Boolean propagate) throws ResourceNotFoundException {
+    public void updateSubcomposersFeat(Map<String, String> objectMapper, String comingInput, String comingConcatInput,
+                                       SongSubgroup songSubgroup, Role role, Song relatedSong, Boolean propagate) throws ResourceNotFoundException {
         List<String> comingFeats = objectMapper.keySet().stream().filter(
                 o -> o.contains(comingInput)).toList();
         Iterator<String> comingConcats = objectMapper.keySet().stream().filter(

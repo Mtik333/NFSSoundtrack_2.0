@@ -161,15 +161,15 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             }
             //three below are supposed to update feat / subcomposer / remix roles in the song
             if (subcomposer) {
-                songSubgroupService.updateFeat(localObjectMapper, "subcomposerSelect",
+                songSubgroupService.updateSubcomposersFeat(localObjectMapper, "subcomposerSelect",
                         "subcomposerConcatInput", songSubgroup, Role.SUBCOMPOSER, relatedSong, propagate);
             }
             if (feat) {
-                songSubgroupService.updateFeat(localObjectMapper, "featSelect",
+                songSubgroupService.updateSubcomposersFeat(localObjectMapper, "featSelect",
                         "featConcatInput", songSubgroup, Role.FEAT, relatedSong, propagate);
             }
             if (remix) {
-                songSubgroupService.updateFeat(localObjectMapper, "remixSelect",
+                songSubgroupService.updateSubcomposersFeat(localObjectMapper, "remixSelect",
                         "remixConcatInput", songSubgroup, Role.REMIX, relatedSong, propagate);
             }
             //here we will associate song (if is now considered as remix) with the 'main' song
@@ -442,15 +442,15 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             boolean subcomposer = Boolean.parseBoolean(objectMapper.get("subcomposer"));
             boolean remix = Boolean.parseBoolean(objectMapper.get("remix"));
             if (subcomposer) {
-                songSubgroupService.updateFeat(objectMapper, "subcomposerSelect", "subcomposerConcatInput",
+                songSubgroupService.updateSubcomposersFeat(objectMapper, "subcomposerSelect", "subcomposerConcatInput",
                         songSubgroup, Role.SUBCOMPOSER, song, false);
             }
             if (feat) {
-                songSubgroupService.updateFeat(objectMapper, "featSelect", "featConcatInput",
+                songSubgroupService.updateSubcomposersFeat(objectMapper, "featSelect", "featConcatInput",
                         songSubgroup, Role.FEAT, song, false);
             }
             if (remix) {
-                songSubgroupService.updateFeat(objectMapper, "remixSelect", "remixConcatInput",
+                songSubgroupService.updateSubcomposersFeat(objectMapper, "remixSelect", "remixConcatInput",
                         songSubgroup, Role.REMIX, song, false);
             }
             //similarly as in other place, we will create new genre and make song-genre association
@@ -536,6 +536,34 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             }
             songSubgroupService.save(songSubgroup);
             songService.save(song);
+        }
+        String gameShort = subgroup.getMainGroup().getGame().getGameShort();
+        //as we updated links, it's worth also unloading game cache
+        removeCacheEntry(gameShort);
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
+    @PutMapping(value = "/setMultiSongGenre/{subgroupId}")
+    public @ResponseBody
+    String setGenresOnMultipleSongs(@RequestBody String formData,
+                                    @PathVariable("subgroupId") int subgroupId)
+            throws IOException, ResourceNotFoundException {
+        Subgroup subgroup = subgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No song " +
+                "subgroup found with id " + subgroupId));
+        LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
+        int genreId = Integer.parseInt(String.valueOf(linkedHashMap.get("genreId")));
+        Genre genre = genreService.findById(genreId).orElseThrow(() -> new ResourceNotFoundException("No genre " +
+                "subgroup found with id " + genreId));
+        List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
+        for (SongSubgroup songSubgroup : songSubgroupList) {
+            Song song = songSubgroup.getSong();
+            SongGenre existingSongGenre = songGenreService.findByGenreAndSong(genre,song);
+            if (existingSongGenre==null){
+                SongGenre songGenre = new SongGenre();
+                songGenre.setGenre(genre);
+                songGenre.setSong(song);
+                songGenreService.save(songGenre);
+            }
         }
         String gameShort = subgroup.getMainGroup().getGame().getGameShort();
         //as we updated links, it's worth also unloading game cache

@@ -28,6 +28,10 @@ public class SongGenreService {
         return songGenreRepository.findBySong(song);
     }
 
+    public SongGenre findByGenreAndSong(Genre genre, Song song) {
+        return songGenreRepository.findByGenreAndSong(genre,song);
+    }
+
     public SongGenre save(SongGenre songGenre) {
         return songGenreRepository.save(songGenre);
     }

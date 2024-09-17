@@ -1,4 +1,5 @@
 var foundArtist;
+var artistOldName;
 var discogsToUpdate = false;
 
 $(document).ready(function () {
@@ -69,11 +70,13 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
             $("#alias-info").empty();
             if (foundArtist.length == 1) {
                 setupCountryAndAliasFields(foundArtist[0]);
+                artistOldName = foundArtist[0].label;
             } else {
                 for (let i = 0; i < foundArtist.length; i++) {
                     var foundArtistId = foundArtist[i].value;
                     if (ui.item.value == foundArtistId) {
                         setupCountryAndAliasFields(foundArtist[i]);
+                        artistOldName = foundArtist[i].label;
                         break;
                     }
                 }
@@ -199,6 +202,7 @@ $(document).on('click', '#save-artist', function (e) {
     }
     artistToSave.changeOfficialArtist = $("#changeOfficialArtist").prop("checked");
     artistToSave.setSkipDiscogs = $("#setSkipDiscogs").prop("checked");
+    artistToSave.artistOldName = artistOldName;
     $.ajax({
         async: false,
         type: "PUT",

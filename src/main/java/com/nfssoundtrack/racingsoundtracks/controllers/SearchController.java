@@ -30,7 +30,6 @@ public class SearchController extends BaseControllerWithErrorHandling {
     /**
      * at this point we just search for the information in the database
      * we can search for author (band), song title, lyrics
-     * todo return and render genres as well
      * todo make search interpret input like: "artist:Something" for artist, song title or lyrics
      *
      * @param model      just a spring model to put results to for thymeleaf

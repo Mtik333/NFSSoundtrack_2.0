@@ -4,6 +4,7 @@ var dropdownDiv;
 var newSong = false;
 var firstClickToAutoFetch = true;
 var firstIngameIdReload = true;
+var allGenres;
 $(document).ready(function () {
 
     $(successAlertHtml).hide();
@@ -19,6 +20,9 @@ $(document).ready(function () {
                     var allSongsInSubgroup = JSON.parse(ooo);
                     tableToFill = displayAllSongs(allSongsInSubgroup.songSubgroupList, dropdownDiv);
                     $('#nfs-content').append(tableToFill);
+                    if (allGenres == undefined) {
+                        getAllGenres();
+                    }
                 }, error: function (ooo) {
                     $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                         $(failureAlertHtml).slideUp(500);
@@ -48,9 +52,12 @@ $(document).ready(function () {
                     var newSongButton = $('<button data-gameId=' + gameId + ' id="new-song" class="new-group btn btn-success">New song</button>');
                     var copySongLinksButton = $('<button data-subgroupId=' + currentSubgroup + ' id="copy-links" class="btn btn-primary">Copy music links to subgroup</button>');
                     var obtainLinksButton = $('<button data-subgroupId=' + currentSubgroup + ' id="obtain-links" class="btn btn-primary">Get music links from Odesli.co</button>');
+                    var addGenreButton = $('<button data-subgroupId=' + currentSubgroup + ' id="obtain-genres" class="btn btn-primary">Add genre to all songs in subgroup</button>');
                     newGroupSpan.append(newSongButton);
                     newGroupSpan.append(copySongLinksButton);
                     newGroupSpan.append(obtainLinksButton);
+                    newGroupSpan.append(addGenreButton);
+                    newGroupSpan.append('<select id="selectGenre" class="form-select w-auto"></select>');
                     //todo make a button to copy song links from global entry to subgroup entries
                     dropdownDiv = $('<div id="selectSubgroup" class="dropdown">');
                     dropdownDiv.append('<button class="btn btn-secondary dropdown-toggle" type="button" id="subgroupsDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">All</button>');
@@ -1539,6 +1546,10 @@ $(document).ready(function () {
         obtainSubgroupMusicLinks();
     });
 
+    $(document).on('click', '#obtain-genres', function (e) {
+        setGenreOnMultipleSongs();
+    });
+
     function fetchMusicLinks() {
         var srcId;
         if ($("#officialSrcId").length > 0) {
@@ -1612,16 +1623,61 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (links) {
-            //since this is async, not going to refresh the page really
-//                getSingleSubgroupFromGame(0);
-//                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
-//                    $(successAlertHtml).slideUp(500, function () {
-//                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
-//                    });
-//                });
+                //since this is async, not going to refresh the page really
+                //                getSingleSubgroupFromGame(0);
+                //                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                //                    $(successAlertHtml).slideUp(500, function () {
+                //                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                //                    });
+                //                });
             },
             error: function (ooo) {
-//                alert("error obtaining music links, check the logs");
+                //                alert("error obtaining music links, check the logs");
+            },
+        });
+    }
+
+    function getAllGenres() {
+        $.ajax({
+            async: false,
+            type: "GET",
+            url: "/genre/readAll",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (genres) {
+                allGenres = genres;
+                for (let i = 0; i < genres.length; i++) {
+                    const genre = genres[i];
+                    $("#selectGenre").append($("<option></option>").attr("value", Number(genre.id)).text(genre.genreName));
+                }
+            },
+            error: function (ooo) {
+                alert("error adding genres, check the logs");
+            },
+        });
+    }
+
+    function setGenreOnMultipleSongs() {
+        var subgroupToPropagate = Number($("#obtain-links").attr("data-subgroupid"));
+        var genre = new Object();
+        genre.genreId = Number($("#selectGenre").val());
+        $.ajax({
+            async: false,
+            type: "PUT",
+            data: JSON.stringify(genre),
+            url: "/songSubgroup/setMultiSongGenre/" + subgroupToPropagate,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (links) {
+                getSingleSubgroupFromGame(0);
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                    });
+                });
+            },
+            error: function (ooo) {
+                alert("error adding genres, check the logs");
             },
         });
     }

@@ -412,17 +412,8 @@ div.no-padding {
   padding-bottom: 0;
 }
 
-svg.bi-moon {
-  width: 2vw;
-  height: 2vw;
-}
-
-svg.bi-sun {
-  width: 2vw;
-  height: 2vw;
-}
-
-svg.bi-palette {
+svg.top-svg {
+  margin-inline: 0.2vw;
   width: 2vw;
   height: 2vw;
 }
@@ -904,24 +895,15 @@ header.container-fluid {
     margin: 0.3vw;
   }
 
-  svg.bi-moon {
-    width: 5vw;
-    height: 5vw;
-  }
-
-  svg.bi-sun {
-    width: 5vw;
-    height: 5vw;
-  }
-
-  svg.bi-palette {
-    width: 5vw;
-    height: 5vw;
-  }
-
   svg.bi-sort-alpha-down {
     width: 7vw;
     height: 7vw;
+  }
+
+  svg.top-svg {
+    margin-inline: 0.5vw;
+    width: 5vw;
+    height: 5vw;
   }
 
   #warnUser {

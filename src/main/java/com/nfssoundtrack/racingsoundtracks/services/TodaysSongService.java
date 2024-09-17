@@ -37,8 +37,6 @@ public class TodaysSongService {
     @Value("${bot.token}")
     private String botSecret;
 
-    //todo use in the future for page with all corrections
-    //todo check sizing of all-games when switching do this mode while pinned
     public List<TodaysSong> findAll() {
         return todaysSongRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
     }
@@ -105,7 +103,6 @@ public class TodaysSongService {
 
     /**
      * here we just get all todays songs from 30 days perspective
-     * todo make page with all corrections
      *
      * @return list of todays song
      */

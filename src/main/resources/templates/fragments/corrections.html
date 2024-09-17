@@ -14,36 +14,46 @@
         <col class="corrections-comment" />
     </colgroup>
     <thead>
-    <tr>
-        <th class="game_content_th band" scope="col" th:text="#{id}"></th>
-        <th class="game_content_th" scope="col" th:text="#{correctionType}"></th>
-        <th class="game_content_th no-sort" scope="col" th:text="#{correctionText}"></th>
-        <th class="game_content_th" scope="col" th:text="#{correctionUrl}"></th>
-        <th class="game_content_th no-sort" scope="col" th:text="#{correctionSong}"></th>
-        <th class="game_content_th" scope="col" th:text="#{correctionStatus}"></th>
-        <th class="game_content_th" scope="col" th:text="#{correctionComment}"></th>
-    </tr>
+        <tr>
+            <th class="game_content_th band" scope="col" th:text="#{id}"></th>
+            <th class="game_content_th" scope="col" th:text="#{correctionType}"></th>
+            <th class="game_content_th no-sort" scope="col" th:text="#{correctionText}"></th>
+            <th class="game_content_th" scope="col" th:text="#{correctionUrl}"></th>
+            <th class="game_content_th no-sort" scope="col" th:text="#{correctionSong}"></th>
+            <th class="game_content_th" scope="col" th:text="#{correctionStatus}"></th>
+            <th class="game_content_th" scope="col" th:text="#{correctionComment}"></th>
+        </tr>
     </thead>
     <tbody>
-    <th:block th:each="correction : ${corrections}">
-        <tr>
-            <td th:text="${correction.id}"></td>
-            <td th:text="${correction.problemType.value}"></td>
-            <td th:text="${correction.correctValue}"></td>
-            <td><a class="table_link" th:href="${correction.pageUrl}" th:text="${correction.pageUrl}"></a></td>
-            <th:block th:if="${correction.songSubgroup==null}">
-                <td th:text="#{correctionUnrelated}"></td>
-            </th:block>
-            <th:block th:unless="${correction.songSubgroup==null}">
-                <td th:utext="${correction.songSubgroup.song.officialDisplayBand}+' - '
+        <th:block th:each="correction : ${corrections}">
+            <tr>
+                <td th:text="${correction.id}"></td>
+                <td th:text="${correction.problemType.value}"></td>
+                <th:block th:if="${#strings.length(correction.correctValue)>150}">
+                    <td>
+                        <details>
+                            <summary th:text="#{revealCorrection}"></summary>
+                            <span th:text="${correction.correctValue}"></span>
+                        </details>
+                    </td>
+                </th:block>
+                <th:block th:unless="${#strings.length(correction.correctValue)>150}">
+                    <td th:text="${correction.correctValue}"></td>
+                </th:block>
+                <td><a class="table_link" th:href="${correction.pageUrl}" th:text="${correction.pageUrl}"></a></td>
+                <th:block th:if="${correction.songSubgroup==null}">
+                    <td th:text="#{correctionUnrelated}"></td>
+                </th:block>
+                <th:block th:unless="${correction.songSubgroup==null}">
+                    <td th:utext="${correction.songSubgroup.song.officialDisplayBand}+' - '
                 +${correction.songSubgroup.song.officialDisplayTitle}
                 +'<br/><br/>Group: ' +${correction.songSubgroup.subgroup.mainGroup.groupName}
                 +' - Subgroup: ' + ${correction.songSubgroup.subgroup.subgroupName}"></td>
-            </th:block>
-            <td th:text="${correction.correctionStatus.value}"></td>
-            <td>nothing</td>
-        </tr>
-    </th:block>
+                </th:block>
+                <td th:text="${correction.correctionStatus.value}"></td>
+                <td>nothing</td>
+            </tr>
+        </th:block>
     </tbody>
 </table>
 <script th:src="@{/js/corrections.js}" type="application/javascript"></script>
