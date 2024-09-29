@@ -519,6 +519,25 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         return new ObjectMapper().writeValueAsString("OK");
     }
 
+    @GetMapping(value = "/removeNotes/{subgroupId}")
+    public @ResponseBody
+    String removeNotesFromSongs(@PathVariable("subgroupId") int subgroupId)
+            throws IOException, ResourceNotFoundException {
+        Subgroup subgroup = subgroupService.findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No " +
+                "subgroup found with id " + subgroupId));
+        //fetching all songs from subgroup
+        List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
+        for (SongSubgroup songSubgroup : songSubgroupList) {
+            //we clear all the notes from each song in a subgroup
+            songSubgroup.setInfo(null);
+            songSubgroupService.save(songSubgroup);
+        }
+        String gameShort = subgroup.getMainGroup().getGame().getGameShort();
+        //it's worth also unloading game cache
+        removeCacheEntry(gameShort);
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
     @GetMapping(value = "/obtainLinks/{subgroupId}")
     public @ResponseBody
     String obtainMusicLinksFromOdesliCo(@PathVariable("subgroupId") int subgroupId)

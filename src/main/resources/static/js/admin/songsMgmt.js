@@ -52,10 +52,12 @@ $(document).ready(function () {
                     var newSongButton = $('<button data-gameId=' + gameId + ' id="new-song" class="new-group btn btn-success">New song</button>');
                     var copySongLinksButton = $('<button data-subgroupId=' + currentSubgroup + ' id="copy-links" class="btn btn-primary">Copy music links to subgroup</button>');
                     var obtainLinksButton = $('<button data-subgroupId=' + currentSubgroup + ' id="obtain-links" class="btn btn-primary">Get music links from Odesli.co</button>');
+                    var removeNotesButton = $('<button data-subgroupId=' + currentSubgroup + ' id="remove-notes" class="btn btn-primary">Remove notes from all songs</button>');
                     var addGenreButton = $('<button data-subgroupId=' + currentSubgroup + ' id="obtain-genres" class="btn btn-primary">Add genre to all songs in subgroup</button>');
                     newGroupSpan.append(newSongButton);
                     newGroupSpan.append(copySongLinksButton);
                     newGroupSpan.append(obtainLinksButton);
+                    newGroupSpan.append(removeNotesButton);
                     newGroupSpan.append(addGenreButton);
                     newGroupSpan.append('<select id="selectGenre" class="form-select w-auto"></select>');
                     //todo make a button to copy song links from global entry to subgroup entries
@@ -462,6 +464,7 @@ $(document).ready(function () {
         currentSubgroupId = subgroupId;
         $("#copy-links").attr("data-subgroupid", currentSubgroupId);
         $("#obtain-links").attr("data-subgroupid", currentSubgroupId);
+        $("#remove-notes").attr("data-subgroupid", currentSubgroupId);
     });
 
     function generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv,
@@ -1546,6 +1549,10 @@ $(document).ready(function () {
         obtainSubgroupMusicLinks();
     });
 
+    $(document).on('click', '#remove-notes', function (e) {
+        removeSongNotes();
+    });
+
     $(document).on('click', '#obtain-genres', function (e) {
         setGenreOnMultipleSongs();
     });
@@ -1609,6 +1616,28 @@ $(document).ready(function () {
             },
             error: function (ooo) {
                 alert("error copying music links, check the logs");
+            },
+        });
+    }
+
+    function removeSongNotes() {
+        var subgroupToPropagate = Number($("#remove-notes").attr("data-subgroupid"));
+        $.ajax({
+            async: false,
+            type: "GET",
+            url: "/songSubgroup/removeNotes/" + subgroupToPropagate,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (links) {
+                getSingleSubgroupFromGame(0);
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                    });
+                });
+            },
+            error: function (ooo) {
+                alert("error removing notes, check the logs");
             },
         });
     }
