@@ -612,24 +612,23 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         Country turkey = countryService.findByCountryName("Turkey").orElse(new Country());
         Country ukraine = countryService.findByCountryName("Ukraine").orElse(new Country());
         Country china = countryService.findByCountryName("China").orElse(new Country());
-        translationObjs.add(new TranslationObj("en", england.getCountryName(), england.getCountryLink(), "english"));
-        translationObjs.add(new TranslationObj("ar", "Arabic",
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Flag_of_the_Arabic_language.svg/34px-Flag_of_the_Arabic_language.svg.png",
-                "arabic"));
-        translationObjs.add(new TranslationObj("de", germany.getCountryName(), germany.getCountryLink(), "german"));
-        translationObjs.add(new TranslationObj("el", greece.getCountryName(), greece.getCountryLink(), "greek"));
-        translationObjs.add(new TranslationObj("es", spain.getCountryName(), spain.getCountryLink(), "spanish"));
-        translationObjs.add(new TranslationObj("fr", france.getCountryName(), france.getCountryLink(), "french"));
-        translationObjs.add(new TranslationObj("hi", india.getCountryName(), india.getCountryLink(), "hindi"));
-        translationObjs.add(new TranslationObj("hu", hungary.getCountryName(), hungary.getCountryLink(), "hungarian"));
-        translationObjs.add(new TranslationObj("id", indonesia.getCountryName(), indonesia.getCountryLink(), "indonesian"));
-        translationObjs.add(new TranslationObj("it", italy.getCountryName(), italy.getCountryLink(), "italian"));
-        translationObjs.add(new TranslationObj("jp", japan.getCountryName(), japan.getCountryLink(), "japanese"));
-        translationObjs.add(new TranslationObj("pl", poland.getCountryName(), poland.getCountryLink(), "polish"));
-        translationObjs.add(new TranslationObj("pt", portugal.getCountryName(), portugal.getCountryLink(), "portuguese"));
-        translationObjs.add(new TranslationObj("ru", russia.getCountryName(), russia.getCountryLink(), "russian"));
-        translationObjs.add(new TranslationObj("tr", turkey.getCountryName(), turkey.getCountryLink(), "turkish"));
-        translationObjs.add(new TranslationObj("uk", ukraine.getCountryName(), ukraine.getCountryLink(), "ukrainian"));
-        translationObjs.add(new TranslationObj("zh", china.getCountryName(), china.getCountryLink(), "chinese"));
+        Country arabia = countryService.findByCountryName("Saudi Arabia").orElse(new Country());
+        translationObjs.add(new TranslationObj("en", england.getCountryName(), england.getLocalLink(), "english"));
+        translationObjs.add(new TranslationObj("ar", "Arabic", arabia.getLocalLink(), "arabic"));
+        translationObjs.add(new TranslationObj("de", germany.getCountryName(), germany.getLocalLink(), "german"));
+        translationObjs.add(new TranslationObj("el", greece.getCountryName(), greece.getLocalLink(), "greek"));
+        translationObjs.add(new TranslationObj("es", spain.getCountryName(), spain.getLocalLink(), "spanish"));
+        translationObjs.add(new TranslationObj("fr", france.getCountryName(), france.getLocalLink(), "french"));
+        translationObjs.add(new TranslationObj("hi", india.getCountryName(), india.getLocalLink(), "hindi"));
+        translationObjs.add(new TranslationObj("hu", hungary.getCountryName(), hungary.getLocalLink(), "hungarian"));
+        translationObjs.add(new TranslationObj("id", indonesia.getCountryName(), indonesia.getLocalLink(), "indonesian"));
+        translationObjs.add(new TranslationObj("it", italy.getCountryName(), italy.getLocalLink(), "italian"));
+        translationObjs.add(new TranslationObj("jp", japan.getCountryName(), japan.getLocalLink(), "japanese"));
+        translationObjs.add(new TranslationObj("pl", poland.getCountryName(), poland.getLocalLink(), "polish"));
+        translationObjs.add(new TranslationObj("pt", portugal.getCountryName(), portugal.getLocalLink(), "portuguese"));
+        translationObjs.add(new TranslationObj("ru", russia.getCountryName(), russia.getLocalLink(), "russian"));
+        translationObjs.add(new TranslationObj("tr", turkey.getCountryName(), turkey.getLocalLink(), "turkish"));
+        translationObjs.add(new TranslationObj("uk", ukraine.getCountryName(), ukraine.getLocalLink(), "ukrainian"));
+        translationObjs.add(new TranslationObj("zh", china.getCountryName(), china.getLocalLink(), "chinese"));
     }
 }

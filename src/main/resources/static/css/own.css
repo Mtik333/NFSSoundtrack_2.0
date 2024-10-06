@@ -48,7 +48,9 @@ img.img-responsive-author-info {
 }
 
 img.img-country {
-  max-height: 3vw;
+  max-height: 2vw;
+  margin: 0.05vw;
+  max-width: 2.5vw;
 }
 
 .a-external-music-link {

@@ -51,7 +51,7 @@
 <th:block th:each="authorCountry : ${author?.authorCountries}">
     <a class="table_link" th:href="'/countryInfo/'+${authorCountry.country.id}">
         <img class="img-country img-responsive-row-icon" data-toggle="tooltip" data-placement="top"
-            th:title="${authorCountry.country.countryName}" th:src="${authorCountry.country.countryLink}">
+            th:title="${authorCountry.country.countryName}" th:src="@{/images/countryflags/}+${authorCountry.country.localLink}">
     </a>
 </th:block>
 <h4 th:text="#{songsAssociatedWith}+' '+ ${author?.name}"></h4>

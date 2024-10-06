@@ -91,17 +91,16 @@
                 <a class="nav-link d-inline p-1 dropdown-toggle" type="button" id="dropdownCountryMenuButton"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <img id="dropdownCountryImg" class="img-country img-responsive-row-icon" data-toggle="tooltip"
-                        data-placement="left"
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Flag_of_England.svg/34px-Flag_of_England.svg.png">
+                        data-placement="left" th:src="@{/images/countryflags/}+'gb-eng.svg'">
                 </a>
                 <div id="moreCountriesDiv" class="dropdown-menu no-padding" aria-labelledby="dropdownCountryMenuButton">
                     <ul style="padding: 0px;">
                         <th:block th:each="translationObj : ${translations}">
                             <div>
                                 <a class="nav-link nfs-top-item p-1 translate-link">
-                                    <img class="img-country img-responsive-row-icon translate-img" data-toggle="tooltip"
+                                    <img class="img-country translate-img" data-toggle="tooltip"
                                         data-placement="top" th:title="#{${translationObj.translationKey}}"
-                                        th:src="${translationObj.imageLink}"
+                                        th:src="@{/images/countryflags/}+${translationObj.imageLink}"
                                         th:attr="data-countryVal=${translationObj.value}">
                                 </a>
                             </div>

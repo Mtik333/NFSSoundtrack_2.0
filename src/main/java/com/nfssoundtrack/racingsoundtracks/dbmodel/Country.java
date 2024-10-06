@@ -21,6 +21,9 @@ public class Country implements Serializable {
     @Column(name = "countrylink")
     private String countryLink;
 
+    @Column(name = "locallink")
+    private String localLink;
+
     public Long getId() {
         return id;
     }
@@ -43,5 +46,13 @@ public class Country implements Serializable {
 
     public void setCountryLink(String countryLink) {
         this.countryLink = countryLink;
+    }
+
+    public String getLocalLink() {
+        return localLink;
+    }
+
+    public void setLocalLink(String localLink) {
+        this.localLink = localLink;
     }
 }
