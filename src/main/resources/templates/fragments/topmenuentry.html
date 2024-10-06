@@ -6,7 +6,8 @@
         <br>
         [(${htmlToInject})]
         <a class="table_link" href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModal" id="newDisqusLink"
-            th:text="#{shareOpinions}"></a> or
+            th:text="#{shareOpinions}"></a>
+        <span th:text="' '+#{or}+' '"></span>
         <a class="table_link" href="#Disqus" data-bs-toggle="modal" data-bs-target="#disqusModal" id="disqusLink"
             th:text="#{oldComments}"></a>
         <br>

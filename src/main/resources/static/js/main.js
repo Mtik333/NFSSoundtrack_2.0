@@ -253,7 +253,8 @@ $(document).ready(function () {
         var imgsOfCountries = $(this).children();
         var arrayOfLinks = [];
         for (let i = 0; i < imgsOfCountries.length; i++) {
-            var srcOfImg = imgsOfCountries[i].src;
+            //since image has now this a-href parent, need to change this
+            var srcOfImg = imgsOfCountries[i].children[0].src;
             if (arrayOfLinks.indexOf(srcOfImg) == -1) {
                 arrayOfLinks.push(srcOfImg);
             } else {
