@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.commons.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public static final String DESC_BREAK = "\n====================\n\n";
     public static final String SERIES = "series";
     public static final String GAMES_ALPHA = "gamesAlpha";
-    public static List<TranslationObj> translationObjs = new ArrayList();
+    public static List<TranslationObj> translationObjs = new ArrayList<>();
 
     @Autowired
     SongSerializer songSerializer;

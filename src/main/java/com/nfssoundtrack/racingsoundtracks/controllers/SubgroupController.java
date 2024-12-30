@@ -57,17 +57,18 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
                 .orElseThrow(() -> new ResourceNotFoundException("No subgroup with id found " + subgroupId));
         //so we get the subgroup
         List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
-        Map<String, String> songsToAssign = new HashMap<>();
+        Map<String, String[]> songsToAssign = new HashMap<>();
         List<String> songsToDetach = new ArrayList<>();
         for (Object obj : objectMapper) {
             LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
             String songId = String.valueOf(linkedHashMap.get("song_id"));
             //i want to get exact song subgroup, for example because i want to put outro version in other subgroup
             String songSubgroupId = String.valueOf(linkedHashMap.get("songsubgroup_id"));
+            String position = String.valueOf(linkedHashMap.get("position"));
             String state = String.valueOf(linkedHashMap.get("state"));
             //filling map of songs to add / delete to subgroup
             if (state.equals("ADD")) {
-                songsToAssign.put(songId, songSubgroupId);
+                songsToAssign.put(songId, new String[]{songSubgroupId, position});
             } else if (state.equals("DELETE")) {
                 songsToDetach.add(songId);
             }
@@ -101,13 +102,13 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
             }
         }
         //we will put position of new song in subgroup based on how many songs we are trying to remove / add
-        int position = 10 + (10 * songsToDetach.size());
-        for (Map.Entry<String, String> song : songsToAssign.entrySet()) {
-            position += 10;
+        int positionPrefix = 10 * songsToDetach.size();
+        for (Map.Entry<String, String[]> song : songsToAssign.entrySet()) {
             Song song1 = songService.findById(Integer.valueOf(song.getKey()))
                     .orElseThrow(() -> new ResourceNotFoundException("No song with id found " + song));
             //using logic to create new songsubgroup based on details of existing songsubgroup
-            String songSubgroupId = song.getValue();
+            String songSubgroupId = song.getValue()[0];
+            int position = Integer.parseInt(song.getValue()[1]) + positionPrefix;
             //our getvalue is basically song-subgroup of song we associate with this subgroup
             if (songSubgroupId != null) {
                 SongSubgroup optionalSongSubgroup = songSubgroupService.findById(Integer.valueOf(songSubgroupId))

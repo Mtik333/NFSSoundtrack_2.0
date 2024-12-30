@@ -79,6 +79,7 @@ $(document).ready(function () {
                 var countryInput = $('<input class="form-control" id="countryInput" value="' + countryScope.countryName + '"/>');
                 var countryInputHidden = $('<input type="hidden" id="countyInputHidden" value="' + countryScope.id + '"/>');
                 var countryLink = $('<input class="form-control w-100" id="countryLink" value="' + countryScope.countryLink + '"/>');
+                var localLink = $('<input class="form-control w-100" id="localLink" value="' + countryScope.localLink + '"/>');
                 var countryPreview = $('<img id="countryPreview" src="' + countryScope.countryLink + '"/>');
                 leftCellDiv.append('<button id="modifyCountry" type="submit" class="btn btn-primary">Save</button>');
                 leftCellDiv.append('<button id="cancelCountry" type="submit" class="btn btn-warning">Cancel</button>');
@@ -88,6 +89,8 @@ $(document).ready(function () {
                 leftCellDiv.append(countryInputHidden);
                 leftCellDiv.append('<label for="countryLink">Country link</label>');
                 leftCellDiv.append(countryLink);
+                leftCellDiv.append('<label for="localLink">Country code (enter only 2 letters)</label>');
+                leftCellDiv.append(localLink);
                 leftCellDiv.append('<br>');
                 leftCellDiv.append(countryPreview);
             },
@@ -109,6 +112,7 @@ $(document).ready(function () {
         rowDiv.append(leftCellDiv);
         var countryInput = $('<input class="form-control" id="countryInput"/>');
         var countryLink = $('<input class="form-control w-100" id="countryLink"/>');
+        var localLink = $('<input class="form-control w-100" id="localLink"/>');
         var countryPreview = $('<img id="countryPreview" src=""/>');
         leftCellDiv.append('<button id="saveCountry" type="submit" class="btn btn-primary">Save</button>');
         leftCellDiv.append('<button id="cancelCountry" type="submit" class="btn btn-warning">Cancel</button>');
@@ -117,6 +121,8 @@ $(document).ready(function () {
         leftCellDiv.append(countryInput);
         leftCellDiv.append('<label for="countryLink">Country link</label>');
         leftCellDiv.append(countryLink);
+        leftCellDiv.append('<label for="localLink">Country code (enter only 2 letters)</label>');
+        leftCellDiv.append(localLink);
         leftCellDiv.append('<br>');
         leftCellDiv.append(countryPreview);
     });
@@ -130,6 +136,7 @@ $(document).ready(function () {
         countryToSave.id = Number(currentlyEditedCountryId);
         countryToSave.countryName = $("#countryInput").val();
         countryToSave.countryLink = $("#countryLink").val();
+        countryToSave.localLink = $("#localLink").val();
         $.ajax({
             async: false,
             type: "PUT",
@@ -157,6 +164,7 @@ $(document).ready(function () {
         var countryToSave = new Object();
         countryToSave.countryName = $("#countryInput").val();
         countryToSave.countryLink = $("#countryLink").val();
+        countryToSave.localLink = $("#localLink").val();
         $.ajax({
             async: false,
             type: "POST",

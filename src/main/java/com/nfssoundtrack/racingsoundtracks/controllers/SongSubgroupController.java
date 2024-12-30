@@ -365,6 +365,20 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 songSubgroup.setSoundcloudLink(relatedSong.getSoundcloudLink());
                 songSubgroup.setTidalLink(relatedSong.getTidalLink());
                 songSubgroupService.save(songSubgroup);
+            } else if (Boolean.parseBoolean(localObjectMapper.get("propagateAll"))) {
+                Game game = songSubgroup.getSubgroup().getMainGroup().getGame();
+                List<SongSubgroup> allSongSubgroups = songSubgroupService.findBySong(relatedSong);
+                allSongSubgroups = allSongSubgroups.stream().filter(localSongSubgroup ->
+                        localSongSubgroup.getSubgroup().getMainGroup().getGame().equals(game)).toList();
+                for (SongSubgroup gameSongSubgroup : allSongSubgroups) {
+                    gameSongSubgroup.setSrcId(relatedSong.getSrcId());
+                    gameSongSubgroup.setSpotifyId(relatedSong.getSpotifyId());
+                    gameSongSubgroup.setDeezerId(relatedSong.getDeezerId());
+                    gameSongSubgroup.setItunesLink(relatedSong.getItunesLink());
+                    gameSongSubgroup.setSoundcloudLink(relatedSong.getSoundcloudLink());
+                    gameSongSubgroup.setTidalLink(relatedSong.getTidalLink());
+                    songSubgroupService.save(gameSongSubgroup);
+                }
             }
             //we updated song globally so we again clear game from which this edit comes
             String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
@@ -576,8 +590,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
         for (SongSubgroup songSubgroup : songSubgroupList) {
             Song song = songSubgroup.getSong();
-            SongGenre existingSongGenre = songGenreService.findByGenreAndSong(genre,song);
-            if (existingSongGenre==null){
+            SongGenre existingSongGenre = songGenreService.findByGenreAndSong(genre, song);
+            if (existingSongGenre == null) {
                 SongGenre songGenre = new SongGenre();
                 songGenre.setGenre(genre);
                 songGenre.setSong(song);

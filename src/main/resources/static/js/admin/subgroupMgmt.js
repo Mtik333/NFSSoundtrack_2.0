@@ -1,10 +1,13 @@
 var modifiedSubgroupSongArray = [];
 var currentSubgroupId;
+var biggestPosition = 10;
+var skipUnCheck;
 
-function ModifiedSubgroupSongDef(subgroup_id, song_id, songsubgroup_id, state) {
+function ModifiedSubgroupSongDef(subgroup_id, song_id, songsubgroup_id, position, state) {
     this.subgroup_id = subgroup_id;
     this.song_id = song_id;
     this.songsubgroup_id = songsubgroup_id;
+    this.position = position;
     this.state = state;
 }
 
@@ -17,6 +20,7 @@ $(document).ready(function () {
     $(successAlertHtml).hide();
     $(failureAlertHtml).hide();
     function getSubgroupsFromGame() {
+        biggestPosition = 10;
         $.ajax({
             async: false,
             type: "GET",
@@ -116,8 +120,11 @@ $(document).ready(function () {
         if (e.target.checked != undefined) {
             //checkboxToChange.trigger('change');
         } else {
-            checkboxToChange.prop('checked', !checkboxToChange.prop('checked'));
-            checkboxToChange.trigger('change');
+            if (!skipUnCheck) {
+                checkboxToChange.prop('checked', !checkboxToChange.prop('checked'));
+                checkboxToChange.trigger('change');
+            }
+            skipUnCheck = false;
         }
     });
 
@@ -171,40 +178,7 @@ $(document).ready(function () {
     });
 
     $(document).on('change', '.songSubgroupRow', function (e) {
-        var mySubgroupChange;
-        var tr = $(this).parent().parent();
-        var songId = $(tr).attr("data-songid");
-        var songSubgroupId = $(tr).attr("data-songsubgroupid");
-        if ($(this).is(":checked")) {
-            if ($(this).val() == "") {
-                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, "ADD");
-            } else {
-                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, "REVERT");
-            }
-        } else {
-            if ($(this).val() == "EXISTS") {
-                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, "DELETE");
-            } else {
-                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, "REVERT");
-            }
-        }
-        var entryFound = false;
-        var detachEntry;
-        for (let i = 0; i < modifiedSubgroupSongArray.length; i++) {
-            var curSubgroupSong = modifiedSubgroupSongArray[i];
-            if (curSubgroupSong.song_id == mySubgroupChange.song_id) {
-                if (mySubgroupChange.state == "REVERT") {
-                    detachEntry = i;
-                    entryFound = true;
-                }
-            }
-        }
-        if (!entryFound) {
-            modifiedSubgroupSongArray.push(mySubgroupChange);
-        }
-        if (detachEntry != undefined) {
-            modifiedSubgroupSongArray.splice(detachEntry, 1);
-        }
+        handleInputClick($(this));
     });
 
     $(document).on('click', '#updateSubgroupSongs', function (e) {
@@ -302,7 +276,48 @@ $(document).ready(function () {
         });
     });
 
-    $(document).on('focusout', '.songSubgroupPosition', sortTable);
+    $(document).on('focusout', '.songSubgroupPosition', function (e) {
+        skipUnCheck = true;
+        sortTable();
+    });
+
+    function handleInputClick(rowElem) {
+        buildHighestPosition();
+        var mySubgroupChange;
+        var tr = rowElem.parent().parent();
+        var songId = $(tr).attr("data-songid");
+        var songSubgroupId = $(tr).attr("data-songsubgroupid");
+        if (rowElem.is(":checked")) {
+            if (rowElem.val() == "") {
+                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, biggestPosition, "ADD");
+            } else {
+                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, -1, "REVERT");
+            }
+        } else {
+            if (rowElem.val() == "EXISTS") {
+                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, -1, "DELETE");
+            } else {
+                mySubgroupChange = new ModifiedSubgroupSongDef(currentSubgroupId, songId, songSubgroupId, -1, "REVERT");
+            }
+        }
+        var entryFound = false;
+        var detachEntry;
+        for (let i = 0; i < modifiedSubgroupSongArray.length; i++) {
+            var curSubgroupSong = modifiedSubgroupSongArray[i];
+            if (curSubgroupSong.song_id == mySubgroupChange.song_id) {
+                if (mySubgroupChange.state == "REVERT") {
+                    detachEntry = i;
+                    entryFound = true;
+                }
+            }
+        }
+        if (!entryFound) {
+            modifiedSubgroupSongArray.push(mySubgroupChange);
+        }
+        if (detachEntry != undefined) {
+            modifiedSubgroupSongArray.splice(detachEntry, 1);
+        }
+    }
 
     function sortTable() {
         var $tbody = $('#subgroups-table tbody');
@@ -316,5 +331,19 @@ $(document).ready(function () {
                     // else they are equal - return 0    
                     : 0;
         }).appendTo($tbody);
+    }
+
+    function buildHighestPosition() {
+        var allSelectedAlready = $("input.songSubgroupRow");
+        if (allSelectedAlready.length !== 0) {
+            allSelectedAlready.each(function () {
+                var parentTr = $(this).parent().parent();
+                var parentTrValue = Number($(parentTr).find("input.songSubgroupPosition")[0].value);
+                if (parentTrValue != 1000000 && parentTrValue > biggestPosition) {
+                    biggestPosition = parentTrValue;
+                }
+            });
+        }
+        biggestPosition += 10;
     }
 });

@@ -183,7 +183,8 @@ $(document).ready(function () {
             saveCol.append('<button id="save-new-song" type="submit" class="btn btn-success m-2">Save new song </button>');
         }
         saveCol.append('<button id="cancel-song" type="submit" class="btn btn-primary">Cancel</button>');
-        saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate links to in-game entry?</label>');
+        saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate links to related in-game entry?</label>');
+        saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagateAll"><label class="form-check-label pl-2 pt-2" for="propagateAll">Propagate links to all in-game entries?</label>');
         saveOrCancelDiv.append(saveCol);
         var artistAndAliasDiv = $('<div class="row p-1">');
         var artistDiv = $('<div class="col">');
@@ -303,6 +304,7 @@ $(document).ready(function () {
                 saveCol.append('<button id="save-song-globally" type="submit" class="btn btn-success m-2">Save</button>');
                 saveCol.append('<button id="cancel-song-globally" type="submit" class="btn btn-primary">Cancel</button>');
                 saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate links to in-game entry?</label>');
+                saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagateAll"><label class="form-check-label pl-2 pt-2" for="propagateAll">Propagate links to all in-game entries?</label>');
                 globallySaveOrCancelDiv.append(saveCol);
                 var officialDisplayDiv = $('<div class="form-group officialDisplay" id="officialDisplay">');
                 generateOfficialDisplayDiv(officialDisplayDiv, songSubgroup);
@@ -1220,6 +1222,7 @@ $(document).ready(function () {
         songToSave.ingameTitle = $("#ingameTitle").val();
         songToSave.ingameSrcId = $("#ingameSrcId").val();
         songToSave.propagate = $("#propagate").prop("checked");
+        songToSave.propagateAll = $("#propagateAll").prop("checked");
         var feats = $("#featDiv").find("input.feat-select");
         songToSave.feat = false;
         for (let i = 0; i < feats.length; i++) {
@@ -1340,6 +1343,7 @@ $(document).ready(function () {
         songGloballyToSave.info = $("#ingameInfo").val();
         songGloballyToSave.featNextToComposer = $("#featNextToComposer").prop("checked");
         songGloballyToSave.propagate = $("#propagate").prop("checked");
+        songGloballyToSave.propagateAll = $("#propagateAll").prop("checked");
         var genres = $("#genreDisplay").find("input.genre-select");
         for (let i = 0; i < genres.length; i++) {
             var genreInput = genres[i];

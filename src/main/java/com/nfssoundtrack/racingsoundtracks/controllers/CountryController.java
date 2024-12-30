@@ -74,11 +74,13 @@ public class CountryController extends BaseControllerWithErrorHandling {
         LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
         String countryName = String.valueOf(linkedHashMap.get("countryName"));
         String countryLink = String.valueOf(linkedHashMap.get("countryLink"));
+        String localLink = String.valueOf(linkedHashMap.get("localLink"));
         Country country = countryService.findById(countryId).orElseThrow(
                 () -> new ResourceNotFoundException("no country found with id " + countryId));
         //just updating the entity
         country.setCountryName(countryName);
         country.setCountryLink(countryLink);
+        country.setLocalLink(localLink.substring(0, 2).toLowerCase() + ".svg");
         countryService.save(country);
         return new ObjectMapper().writeValueAsString("OK");
     }
@@ -98,9 +100,11 @@ public class CountryController extends BaseControllerWithErrorHandling {
         LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
         String countryName = String.valueOf(linkedHashMap.get("countryName"));
         String countryLink = String.valueOf(linkedHashMap.get("countryLink"));
+        String localLink = String.valueOf(linkedHashMap.get("localLink"));
         Country country = new Country();
         country.setCountryName(countryName);
         country.setCountryLink(countryLink);
+        country.setLocalLink(localLink.substring(0, 2).toLowerCase() + ".svg");
         countryService.save(country);
         return new ObjectMapper().writeValueAsString("OK");
     }

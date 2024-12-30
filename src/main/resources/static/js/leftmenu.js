@@ -30,13 +30,15 @@ $(document).ready(function () {
                 if (somethingFound) {
                     if (!$(divId).is(":visible")) {
                         $(divId).parent().show();
+                        //if it was already shown, then just some magic to re-show it
+                        if (!$(divId).hasClass("show")) {
+                            $(this).click();
+                            $(this).removeClass("collapsed");
+                        }
+                    } else {
+                        //otherwise, we reveal the series displayed afte page loaded since it contains the game we are in
+                        $(divId).addClass("show");
                     }
-                    //if it was already shown, then just some magic to re-show it
-                    if (!$(divId).hasClass("show")) {
-                        $(this).click();
-                        $(this).removeClass("collapsed");
-                    }
-                    // }
                 } else {
                     //otherwise we hide series entirely
                     $(divId).parent().hide();
@@ -81,8 +83,8 @@ $(document).ready(function () {
             if (unscrollableMenu === "false" || unscrollableMenu === null) {
                 //if filtering by game name is not active or shorter than 3
                 //as either pinned/unpinned mode is enabled it's better to check both search inputs
-                if ($("#filter_games_menu").val() == "" || $("#filter_games_menu").val().length < 3
-                    || $("#filter_games_menu_pinned").val() == "" || $("#filter_games_menu_pinned").val().length < 3) {
+                if (($("#filter_games_menu").val() == "" || $("#filter_games_menu").val().length < 3)
+                    && ($("#filter_games_menu_pinned").val() == "" || $("#filter_games_menu_pinned").val().length < 3)) {
                     //we simply check how far we are from top and scroll menu so that it is "on" top of the series menu
                     var currentScroll = $('div.offcanvas-body').scrollTop();
                     var origTop = $('div.offcanvas-body').offset().top;
@@ -103,14 +105,27 @@ $(document).ready(function () {
     });
     /**
      * function when someone types letters in 'filter games' input
+     * doing some timeout to avoid immediate reaction
      */
     $("#filter_games_menu").on("keyup", function () {
-        filterGames($(this));
+        var textInput = $(this);
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(function () {
+            filterGames(textInput);
+        }, delay);
     });
 
     //now that we have two search inputs we have to register listener on both
     $("#filter_games_menu_pinned").on("keyup", function () {
-        filterGames($(this));
+        var textInput = $(this);
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(function () {
+            filterGames(textInput);
+        }, delay);
     });
 
     function filterGames(info) {
@@ -131,6 +146,10 @@ $(document).ready(function () {
             //doing some timeout of this filter function as some events take longer than expected
             setTimeout(function () {
                 funcToShowOnlyFilteredGames(searchValue);
+                //we scroll to top of list so user can really go through all possible games matching criteria
+                $('div.offcanvas-body').animate({
+                    scrollTop: 0
+                }, 500);
             }, 400);
         } else {
             var buttonToClick;
@@ -138,14 +157,20 @@ $(document).ready(function () {
             //otherwise we basically have to show all games again
             $(document).find("button.gamegroup-button").filter(function () {
                 var divId = $(this).attr("data-bs-target");
-                //if we are on 'game' page there will be one actie element in series list
+                //if we are on 'game' page there will be one active element in series list
                 if ($(divId).find("a.active").length > 0) {
                     //so we definitely have to show it + related series
+                    var activeA = $($(divId).find("a.active")[0]);
                     $(divId).find("a").filter(function () {
-                        info.show();
+                        $(this).show();
                     });
+                    //this "show" method does 
                     $(divId).parent().show();
-                    $(divId).collapse('show');
+                    $(divId).addClass("show");
+                    var mainDivForMenu = $(this).parent().parent().parent().parent();
+                    $(this).parent().parent().parent().parent().animate({
+                        scrollTop: mainDivForMenu.offset().top + scrollTopAfterLoad * (-1)
+                    }, 500)
                 } else {
                     //otherwise we have to collapse series but show all games within the series
                     $(this).collapse('hide');
@@ -167,9 +192,7 @@ $(document).ready(function () {
                 if ($(divToShow).hasClass("collapsed")) {
                     buttonToClick.click();
                 }
-                //$(this).show();
             }
-
         }
     }
 

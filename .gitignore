@@ -40,3 +40,7 @@ out/
 /gradle/wrapper/gradle-wrapper.properties
 /gradlew
 /gradlew.bat
+
+logs
+discogs
+garbage

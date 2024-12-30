@@ -1,3 +1,6 @@
+//using this to wait until user finishes typing before filtering out the games
+var timeout;
+var delay = 300;
 /**
  * id of currently used video in playlist mode
  */
@@ -17,6 +20,10 @@ var lastActivePlayButton;
 var spotifyApi;
 var spotifyController;
 var currentlyPlayedSpotify;
+/**
+ * using this to know, how far the non-static left menu is scrolled into
+ */
+var scrollTopAfterLoad;
 
 async function doLoadingCrap() {
     var contentWidth = localStorage.getItem("content-width");
@@ -219,27 +226,40 @@ async function doLoadingCrap() {
                     return;
                 }
                 $(this).addClass("active");
-                //here we scroll all-games group to the game that we are in right now
-                //since we can have either static menu or expandable, need to handle this too
-                if (!$("#all-games-group").attr("hidden")) {
-                    if (localStorage.getItem("static-leftmenu") == "true") {
-                        $($("a.active")[1]).parent().parent().parent()
-                            .animate({
-                                scrollTop: $(this).offset().top + $(this).height() * -5 + $("#search-games-bar").height() * -1
-                            }, 0)
-                    } else {
-                        $($("a.active")[1]).parent().parent().parent().parent().parent().parent()
-                            .animate({
-                                scrollTop: $(this).offset().top + $(this).height() * -5 + $("div.offcanvas-header").height() * -1
-                            }, 0)
-                    }
-                } else {
-                    $(this).parent().parent().parent().parent().find("button").click();
-                }
+                //moved logic to separate function as it sometimes just didn't fire because of lack of delay
+                var aHrefElem = $(this);
+                setTimeout(function () {
+                    rollGamesDuringPageLoad(aHrefElem);
+                }, delay);
             } else {
                 $(this).parent().addClass("nfs-top-item-active");
             }
         });
+    }
+}
+
+//here we scroll all-games group to the game that we are in right now
+//since we can have either static menu or expandable, need to handle this too
+function rollGamesDuringPageLoad(gameAHrefElem) {
+    if (!$("#all-games-group").attr("hidden")) {
+        if (localStorage.getItem("static-leftmenu") == "true") {
+            scrollTopAfterLoad = gameAHrefElem.offset().top + gameAHrefElem.height() * -5 + $("#search-games-bar").height() * -1;
+            $($("a.active")[1]).parent().parent().parent()
+                .animate({
+                    scrollTop: scrollTopAfterLoad
+                }, 0)
+        } else {
+            scrollTopAfterLoad = gameAHrefElem.offset().top + gameAHrefElem.height() * -5 + $("div.offcanvas-header").height() * -1
+            $($("a.active")[1]).parent().parent().parent().parent().parent().parent()
+                .animate({
+                    scrollTop: scrollTopAfterLoad
+                }, 0)
+        }
+    } else {
+        gameAHrefElem.parent().parent().parent().parent().find("button").click();
+        setTimeout(function () {
+            scrollTopAfterLoad = $("#accordionExample").offset().top;
+        }, 1000);
     }
 }
 
