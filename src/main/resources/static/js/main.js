@@ -225,6 +225,9 @@ async function doLoadingCrap() {
                 if ($(this).hasClass("genreLink")) {
                     return;
                 }
+                if (currentGame.indexOf('game/')==-1){
+                    return;
+                }
                 $(this).addClass("active");
                 //moved logic to separate function as it sometimes just didn't fire because of lack of delay
                 var aHrefElem = $(this);

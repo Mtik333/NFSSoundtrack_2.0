@@ -50,7 +50,7 @@
                     th:href="'/author/'+${authorSong.authorAlias.author.id}"
                     th:text="${authorSong.authorAlias.alias}"></a>
                 <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
-                <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
+                <span th:text="${iter.last ? todayssong.songSubgroup.remixText + ')' : ''}"></span>
             </th:block>
         </th:block>
         <span>from</span>

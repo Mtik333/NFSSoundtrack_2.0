@@ -198,7 +198,7 @@
                                 th:href="'/author/'+${authorSong.authorAlias.id}"
                                 th:text="${authorSong.authorAlias.alias}"></a>
                             <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
-                            <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
+                            <span th:text="${iter.last ? songSubgroup.remixText + ')' : ''}"></span>
                         </th:block>
                     </td>
                     <td th:text="${songSubgroup.instrumental}"></td>
@@ -343,7 +343,7 @@
                                 th:href="'/author/'+${authorSong.authorAlias.id}"
                                 th:text="${authorSong.authorAlias.alias}"></a>
                             <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
-                            <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
+                            <span th:text="${iter.last ? songSubgroup.remixText + ')' : ''}"></span>
                         </th:block>
                     </td>
                     <td th:text="${songSubgroup.instrumental}"></td>
@@ -474,7 +474,7 @@
                                 th:href="'/author/'+${authorSong.authorAlias.id}"
                                 th:text="${authorSong.authorAlias.alias}"></a>
                             <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
-                            <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
+                            <span th:text="${iter.last ? songSubgroup.remixText + ')' : ''}"></span>
                         </th:block>
                     </td>
                     <td th:text="${songSubgroup.instrumental}"></td>
@@ -605,7 +605,7 @@
                                 th:href="'/author/'+${authorSong.authorAlias.id}"
                                 th:text="${authorSong.authorAlias.alias}"></a>
                             <span th:text="${authorSong.remixConcat!=null} ? ${authorSong.remixConcat} : ''"></span>
-                            <span th:text="${iter.last ? songSubgroup.remixText : ''}"></span>
+                            <span th:text="${iter.last ? songSubgroup.remixText + ')' : ''}"></span>
                         </th:block>
                     </td>
                     <td th:text="${songSubgroup.instrumental}"></td>
