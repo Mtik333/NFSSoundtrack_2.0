@@ -143,6 +143,6 @@ public class SearchController extends BaseControllerWithErrorHandling {
         model.addAttribute("search", true);
         model.addAttribute("searchPhrase", searchData);
         model.addAttribute("translations", WebsiteViewsController.translationObjs);
-        return "min/index";
+        return "index";
     }
 }

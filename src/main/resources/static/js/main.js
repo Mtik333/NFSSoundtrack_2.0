@@ -25,6 +25,8 @@ var currentlyPlayedSpotify;
  */
 var scrollTopAfterLoad;
 
+var isMobileAgent = navigator.userAgent.localeCompare("mobile")==1;
+
 async function doLoadingCrap() {
     var contentWidth = localStorage.getItem("content-width");
     if (localStorage.getItem("static-leftmenu") == "true") {
@@ -96,13 +98,11 @@ async function doLoadingCrap() {
         }
         $("#leftMenuTodaySong").css("display", "none");
     }
-    if ('ontouchstart' in window) {
+    if ('ontouchstart' in window && isMobileAgent) {
         $("td.info_button").css("display", "none");
         $("th.info_button").css("display", "none");
         $("col.info_button").css("display", "none");
         $(".a-external-music-link").css("display", "none");
-        var currentColspan = $("td.subgroup-separator-td").attr("colspan");
-        $("td.subgroup-separator-td").attr("colspan", currentColspan - 1);
         $("td.info_button").css("display", "none");
         $("td.contextButton").css("display", "");
         $("th.contextButton").css("display", "");
@@ -336,7 +336,7 @@ $(document).ready(function () {
                 var lyricsDiv = $('<div id="lyrics_main">');
                 var clearDiv = $('<div style="clear:both;">');
                 var pElem = $('<p>');
-                if (noLyricsAtAll && 'ontouchstart' in window) {
+                if (noLyricsAtAll && 'ontouchstart' in window && isMobileAgent) {
                     lyricsDiv.width("20%");
                     iframeToPut.width("76%");
                 }
@@ -732,8 +732,8 @@ $(document).ready(function () {
     });
 
     /**
-         * function to render modal with song information
-         */
+    * function to render modal with song information
+    */
     function fetchInfoSong(songIdAttr, infoLabel, filenameLabel) {
         $("#getAllUsages").attr("href", "/song/" + Number(songIdAttr));
         //we have to call server to provide info about the song
@@ -817,13 +817,13 @@ $(document).ready(function () {
     }
 
     $(document).on("touchstart", "td:not(.infowarn)", function (e) {
-        if ('ontouchstart' in window) {
+        if ('ontouchstart' in window && isMobileAgent) {
             $(document).find("div.tooltip").hide();
         }
     });
 
     $(document).on("touchstart", "#dynamic_bg", function (e) {
-        if ('ontouchstart' in window) {
+        if ('ontouchstart' in window && isMobileAgent) {
             $(document).find("div.tooltip").hide();
         }
     });
@@ -862,9 +862,15 @@ $(document).ready(function () {
         $("#playSpotifySample").attr("data-songsubgroup-id", songSubgroupIdAttr);
         var additionalInfoA = $(trElem).find("td.infowarn>a");
         var infoLabel = null;
+        var filenameLabel = null;
         if (additionalInfoA.length > 0) {
             infoLabel = additionalInfoA.attr("aria-label");
             $("#mobileShowSongInfo").attr("infoLabel", infoLabel);
+        }
+        var additionalFileName = $(trElem).find("td.infowarn>span");
+        if (additionalFileName.length > 0) {
+            filenameLabel = additionalFileName.text();
+            $("#mobileShowSongInfo").attr("filenameLabel", filenameLabel);
         }
         var youtubeElem = $(trElem).find("a.externalYT");
         var spotifyElem = null;
@@ -974,7 +980,8 @@ $(document).ready(function () {
     $("#mobileShowSongInfo").on("click", function (e) {
         var songIdAttr = $(this).attr("data-song_id");
         var infoLabel = $(this).attr("infoLabel");
-        fetchInfoSong(songIdAttr, infoLabel);
+        var filenameLabel = $(this).attr("filenameLabel");
+        fetchInfoSong(songIdAttr, infoLabel, filenameLabel);
         $("#mobile_context").removeClass("show").hide();
         $("#mobileLaunchSpotify").css("display", "");
         $("#playSpotifySample").css("display", "");

@@ -5,7 +5,7 @@ $(document).ready(function () {
 	 * @returns result of filtering
 	 */
 
-	if ('ontouchstart' in window) {
+	if ('ontouchstart' in window && isMobileAgent) {
 		$("td.song-instrumental").css("display", "none");
 		$("th.song-instrumental").css("display", "none");
 		$("col.song-instrumental").css("display", "none");

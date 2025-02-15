@@ -39,7 +39,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     private static final Logger logger = LoggerFactory.getLogger(WebsiteViewsController.class);
     public static final String APP_NAME = "appName";
-    public static final String MIN_INDEX = "min/index";
+    public static final String MIN_INDEX = "index";
     public static final String DESC_BREAK = "\n====================\n\n";
     public static final String SERIES = "series";
     public static final String GAMES_ALPHA = "gamesAlpha";

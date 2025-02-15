@@ -61,7 +61,7 @@
                     theme = JSON.parse(ooo);
                 }
                 changeStuffForDarkMode(theme.nightMode);
-                if ('ontouchstart' in window) {
+                if ('ontouchstart' in window && isMobileAgent) {
                     $("body").css("background", theme.mobileTheme);
                 } else {
                     $("body").css("background", theme.pcTheme);
@@ -79,7 +79,7 @@
                 $("span").css("color", theme.textColor);
                 $(".nav-link").css("color", theme.hyperlinkColor);
                 $("#navbarSupportedContent").css("background-color", "transparent");
-                if ('ontouchstart' in window) {
+                if ('ontouchstart' in window && isMobileAgent) {
                     $("header").removeClass("sticky-top");
                 }
                 $("#logoDiv").removeClass("bg-dark");
@@ -113,7 +113,7 @@
                 $("#logoDiv").css("background", "");
                 $("#topNavbar").css("background", "");
                 $("#navbarSupportedContent").css("background", "");
-                if ('ontouchstart' in window) {
+                if ('ontouchstart' in window && isMobileAgent) {
                     $("header").addClass("sticky-top");
                 }
                 $(".nav-link").css("color", "");
