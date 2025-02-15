@@ -220,7 +220,7 @@ async function doLoadingCrap() {
         $("#customPlaylistSubmit").parent().parent().addClass("nfs-top-item-active");
     } else {
         //then depending on value we active top menu
-        $(document).find("a[href='" + currentGame + "']").each(function (e) {
+        $(document).find("a.list-group-item[href='" + currentGame + "']").each(function (e) {
             if (!$(this).hasClass("nav-link")) {
                 if ($(this).hasClass("genreLink")) {
                     return;
