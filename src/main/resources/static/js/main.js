@@ -25,7 +25,7 @@ var currentlyPlayedSpotify;
  */
 var scrollTopAfterLoad;
 
-var isMobileAgent = navigator.userAgent.localeCompare("mobile")==1;
+var isMobileAgent = navigator.userAgent.includes("Mobile");
 
 async function doLoadingCrap() {
     var contentWidth = localStorage.getItem("content-width");
