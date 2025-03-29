@@ -21,7 +21,7 @@ import java.util.*;
 
 /**
  * controller for various author-related operations
- * used in fixDuplicateArtist.js, artistMgmt.js, mergeArtist.js, songsMgmt.js
+ * used in fixDuplicateArtist.js, artistMgmt.js, mergeArtist.js, songsMgmt.js, associateArtist.js
  */
 @Controller
 @RequestMapping(path = "/author")
@@ -105,7 +105,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
 
     /**
      * used when we just type in the author name and look for artist to edit and when merging artists
-     * artistMgmt.js, mergeArtist.js
+     * artistMgmt.js, mergeArtist.js, associateArtist.js
      * you can see it being used when going to 'manage artists' and you type in 'author name'
      * also when you type in 'author' in 'associate existing alias' module
      *
@@ -189,6 +189,34 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         List<AuthorAlias> aliasesToDelete = authorAliasService.findByAuthor(authorToDelete);
         authorAliasService.deleteAll(aliasesToDelete);
         authorService.delete(authorToDelete);
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
+    /**
+     * used when associating one artist into another in 'Add artist as member' once you click on 'save'
+     * associateArtist.js
+     *
+     * @param formData consist of author-slave that should be merged with author-master
+     *                 as database can have duplicates, allowing to create alias in author-master
+     *                 based on value of author-slave
+     * @return OK string if successful merge
+     * @throws JsonProcessingException
+     * @throws ResourceNotFoundException
+     */
+    @PutMapping(value = "/associateArtist", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody
+    String associateArtist(@RequestBody String formData) throws ResourceNotFoundException, JsonProcessingException {
+        Map<?, ?> associateInfo = new ObjectMapper().readValue(formData, Map.class);
+        int memberAuthorId = (int) associateInfo.get("authorToBeMemberId");
+        int targetAuthorId = (int) associateInfo.get("authorToAssignMemberId");
+        Author newMemberAuthor =
+                authorService.findById(memberAuthorId).orElseThrow(() -> new ResourceNotFoundException("No author " +
+                        "with id found" + memberAuthorId));
+        Author targetAuthor = authorService.findById(targetAuthorId).orElseThrow(
+                () -> new ResourceNotFoundException("No author with " +
+                        "id found " + targetAuthorId));
+        AuthorMember authorMember = new AuthorMember(newMemberAuthor, targetAuthor);
+        authorMemberService.save(authorMember);
         return new ObjectMapper().writeValueAsString("OK");
     }
 

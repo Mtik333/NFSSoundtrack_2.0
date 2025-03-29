@@ -28,8 +28,8 @@ import javax.security.auth.login.LoginException;
 import java.awt.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 /**
  * main controller with all the basic endpoint for non-authenticated users
@@ -236,6 +236,32 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                         songSubgroupList);
             }
         }
+        List<AuthorMember> artistsAuthorIsMemberOf = authorMemberService.findByMember(author);
+        List<AuthorMember> artistsBeingMembersOfAuthor = authorMemberService.findByAuthor(author);
+        List<AuthorAlias> relatedAuthorAliases = null;
+        List<Author> relatedAuthors = null;
+        if (!artistsAuthorIsMemberOf.isEmpty()) {
+            relatedAuthorAliases = new ArrayList<>();
+            relatedAuthors = new ArrayList<>();
+            for (AuthorMember authorMember : artistsAuthorIsMemberOf) {
+                relatedAuthors.add(authorMember.getAuthor());
+                relatedAuthorAliases.addAll(authorAliasService.findByAuthor(authorMember.getAuthor()));
+            }
+        }
+        Map<AuthorAlias, Map<Song, List<SongSubgroup>>> memberOfAsComposer = new HashMap<>();
+        if (relatedAuthorAliases != null) {
+            for (AuthorAlias memberOfAlias : relatedAuthorAliases) {
+                //and we have to remember that author can have multiple aliases
+                //so we have to group songs by both type of contribution and alias name
+                List<AuthorSong> allAuthorSongs = authorSongService.findByAuthorAlias(memberOfAlias);
+                for (AuthorSong authorSong : allAuthorSongs) {
+                    List<SongSubgroup> songSubgroupList =
+                            songSubgroupService.findBySong(authorSong.getSong());
+                    JustSomeHelper.fillMapForArtistDisplay(memberOfAlias, authorSong, Role.COMPOSER, songsAsComposer,
+                            songSubgroupList);
+                }
+            }
+        }
         //we give back info about author, discogs info and all the songs found, as well as the aliases
         model.addAttribute("discoGSObj", discoGSObj);
         model.addAttribute("author", author);
@@ -244,6 +270,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("songsAsFeat", songsAsFeat);
         model.addAttribute("songsRemixed", songsRemixed);
         model.addAttribute("allAliases", allAliases);
+        if (relatedAuthorAliases!=null){
+            model.addAttribute("relatedAuthorAliases", relatedAuthorAliases);
+            model.addAttribute("relatedAuthors", relatedAuthors);
+            model.addAttribute("memberOfAsComposer", memberOfAsComposer);
+        }
+        model.addAttribute("artistsBeingMembersOfAuthor", artistsBeingMembersOfAuthor);
         addCommonAttributes(model, "genericAt", new String[]{author.getName()});
         return MIN_INDEX;
     }

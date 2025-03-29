@@ -85,6 +85,9 @@ public class Application implements CommandLineRunner {
     private AuthorSongRepository authorSongRepository;
 
     @Autowired
+    private AuthorMemberRepository authorMemberRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Override

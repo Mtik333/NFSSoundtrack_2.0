@@ -77,6 +77,9 @@ public class BaseControllerWithErrorHandling implements ErrorController {
     CustomThemeService customThemeService;
 
     @Autowired
+    AuthorMemberService authorMemberService;
+
+    @Autowired
     private MessageSource messageSource;
 
     /**
