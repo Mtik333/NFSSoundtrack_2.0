@@ -35,6 +35,10 @@ public class AuthorAliasService {
         return authorAliasRepository.save(authorAlias);
     }
 
+    public AuthorAlias saveUpdate(AuthorAlias authorAlias) {
+        return authorAliasRepository.save(authorAlias);
+    }
+
     public void delete(AuthorAlias authorAlias) {
         authorAliasRepository.delete(authorAlias);
     }

@@ -101,8 +101,11 @@ public class GroupController extends BaseControllerWithErrorHandling {
                 () -> new ResourceNotFoundException(NO_GAME_FOUND_WITH_ID + gameId));
         String groupName = objectMapper.get("groupName").toString();
         MainGroup mainGroup = new MainGroup(groupName, game);
+        String message = "Saving group " + mainGroup.getGroupName() + " in game " + game.getDisplayTitle();
         //first we save the new group
         mainGroup = mainGroupService.save(mainGroup);
+        sendMessageToChannel(EntityType.MAIN_GROUP, "create", message,
+                EntityUrl.GAME, game.getDisplayTitle(), game.getGameShort());
         //we will likely have some groups created when doing such request
         List<String> subgroups = (List<String>) objectMapper.get("subgroupsNames");
         for (String subgroup : subgroups) {
@@ -111,7 +114,10 @@ public class GroupController extends BaseControllerWithErrorHandling {
                 String[] subgroupNamePosition = subgroup.split(POS);
                 Subgroup targetSubgroup = new Subgroup(subgroupNamePosition[0],
                         Integer.valueOf(subgroupNamePosition[1]), mainGroup);
+                String localMessage = "Creating subgroup " + targetSubgroup.getSubgroupName();
                 subgroupService.save(targetSubgroup);
+                sendMessageToChannel(EntityType.SUBGROUP, "create", localMessage,
+                        EntityUrl.GAME, game.getDisplayTitle(), game.getGameShort());
             }
         }
         ObjectMapper objectMapper2 = new ObjectMapper();
@@ -132,6 +138,7 @@ public class GroupController extends BaseControllerWithErrorHandling {
     String deleteGroup(@PathVariable("groupId") int groupId) throws ResourceNotFoundException {
         MainGroup mainGroup = mainGroupService.findById(groupId).orElseThrow(
                 () -> new ResourceNotFoundException("no group found with id " + groupId));
+        String message = "Deleting group " + mainGroup.getGroupName() + " in game " + mainGroup.getGame().getDisplayTitle();
         List<Subgroup> subgroups = mainGroup.getSubgroups();
         //first we delete entries of songs linked to subgroups that are in this group
         for (Subgroup subgroup : subgroups) {
@@ -141,6 +148,8 @@ public class GroupController extends BaseControllerWithErrorHandling {
         }
         //now we can delete subgroups and finally the main group
         subgroupService.deleteAllInBatch(subgroups);
+        sendMessageToChannel(EntityType.MAIN_GROUP, "delete", message,
+                EntityUrl.GAME, mainGroup.getGame().getDisplayTitle(), mainGroup.getGame().getGameShort());
         mainGroupService.delete(mainGroup);
         return "Delete successful " + groupId;
     }
@@ -162,6 +171,7 @@ public class GroupController extends BaseControllerWithErrorHandling {
             throws ResourceNotFoundException, JsonProcessingException {
         MainGroup mainGroup = mainGroupService.findById(groupId).orElseThrow(
                 () -> new ResourceNotFoundException("no group with id found " + groupId));
+        String message = "Updating group " + mainGroup.getGroupName() + " in game " + mainGroup.getGame().getDisplayTitle();
         List<Subgroup> subgroups = mainGroup.getSubgroups();
         HashMap<?, ?> objectMapper = new ObjectMapper().readValue(formData,
                 TypeFactory.defaultInstance().constructMapType(HashMap.class, String.class, Object.class));
@@ -200,10 +210,18 @@ public class GroupController extends BaseControllerWithErrorHandling {
         }
         //for modifying subgroups its easy, just save to db
         for (Subgroup subgroup : subgroupsToUpdate) {
+            String localMessage = "Updating subgroup " + subgroup.getSubgroupName()
+                    + " in group " + subgroup.getMainGroup().getGroupName() + " in game "
+                    + subgroup.getMainGroup().getGame().getDisplayTitle();
             subgroupService.save(subgroup);
+            sendMessageToChannel(EntityType.SUBGROUP, "update", localMessage,
+                    EntityUrl.GAME, mainGroup.getGame().getDisplayTitle(), mainGroup.getGame().getGameShort());
         }
         for (Subgroup subgroup : subgroupsToDelete) {
             //for deleting subgroups there are more problems
+            String localMessage = "Deleting subgroup " + subgroup.getSubgroupName()
+                    + " in group " + subgroup.getMainGroup().getGroupName() + " in game "
+                    + subgroup.getMainGroup().getGame().getDisplayTitle();
             List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
             for (SongSubgroup potentialCorrected : songSubgroupList) {
                 //some of the songs might have been reported in corrections, so we have to
@@ -236,11 +254,15 @@ public class GroupController extends BaseControllerWithErrorHandling {
             }
             //now we can finally delete associations with songs as there will be no foreign key violation
             songSubgroupService.deleteAllInBatch(songSubgroupList);
+            sendMessageToChannel(EntityType.SUBGROUP, "delete", localMessage,
+                    EntityUrl.GAME, mainGroup.getGame().getDisplayTitle(), mainGroup.getGame().getGameShort());
         }
         //if songs are deleted from subgroup that are are deleting, we can delete subgroups as well
         subgroupService.deleteAllInBatch(subgroupsToDelete);
         ObjectMapper objectMapper2 = new ObjectMapper();
-        mainGroup = mainGroupService.save(mainGroup);
+        mainGroup = mainGroupService.saveUpdate(mainGroup);
+        sendMessageToChannel(EntityType.MAIN_GROUP, "update", message,
+                EntityUrl.GAME, mainGroup.getGame().getDisplayTitle(), mainGroup.getGame().getGameShort());
         return objectMapper2.writeValueAsString(mainGroup);
     }
 
@@ -264,8 +286,14 @@ public class GroupController extends BaseControllerWithErrorHandling {
             Integer position = Integer.parseInt(String.valueOf(linkedHashMap.get("position")));
             MainGroup mainGroup = mainGroupService.findById(Math.toIntExact(groupId)).orElseThrow(
                     () -> new ResourceNotFoundException("no serie with id found " + groupId));
+            if (!position.equals(mainGroup.getPosition()) && position % 10 != 0) {
+                String localMessage = "Updating position of group in game "
+                        + mainGroup.getGame().getDisplayTitle() + " to " + position;
+                sendMessageToChannel(EntityType.MAIN_GROUP, "update", localMessage,
+                        EntityUrl.GAME, mainGroup.getGame().getDisplayTitle(), mainGroup.getGame().getGameShort());
+            }
             mainGroup.setPosition(position);
-            mainGroupService.save(mainGroup);
+            mainGroupService.saveUpdate(mainGroup);
         }
         return new ObjectMapper().writeValueAsString("OK");
     }

@@ -291,4 +291,21 @@ public class SongSubgroup implements Serializable {
                 + " from " + this.getSubgroup().getMainGroup().getGame().getDisplayTitle() + "\nSubgroup: "
                 + this.getSubgroup().getSubgroupName() + " -- Group: " + this.getSubgroup().getMainGroup().getGroupName();
     }
+
+    @Override
+    public String toString() {
+        return "SongSubgroup{" +
+                "id=" + id +
+                ", song=" + song +
+                ", subgroup=" + subgroup +
+                ", srcId='" + srcId + '\'' +
+                ", ingameDisplayBand='" + ingameDisplayBand + '\'' +
+                ", ingameDisplayTitle='" + ingameDisplayTitle + '\'' +
+                ", position=" + position +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return "song: " + song.toChangeLogString() + " in subgroup: " + subgroup.toChangeLogString();
+    }
 }

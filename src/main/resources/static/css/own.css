@@ -1,7 +1,8 @@
 img.img-responsive-global-logo {
-  max-height: 5vw;
+  max-height: 3vw;
   margin: 0.1vw;
   padding: 0.2vw;
+  transform: translateY(25%);
 }
 
 img.img-responsive-website-logo {
@@ -26,7 +27,7 @@ svg.img-responsive-row-icon {
 }
 
 img.img-main-icon {
-  max-height: 6vw;
+  max-height: 3vw;
   margin: 0.35vw;
 }
 
@@ -482,6 +483,7 @@ header.container-fluid {
   img.img-responsive-global-logo {
     max-height: 8vw;
     margin: 0.3vw;
+    transform: translateY(0%);
   }
 
   img.img-responsive-song-info {
@@ -911,6 +913,11 @@ header.container-fluid {
   #warnUser {
     font-size: 2.8vw;
   }
+
+  img.img-country {
+    max-height: 6vw;
+    max-width: 6vw;
+  }
 }
 
 @media screen and (max-width: 400px) {
@@ -918,6 +925,7 @@ header.container-fluid {
   img.img-responsive-global-logo {
     max-height: 6vw;
     margin: 0.3vw;
+    transform: translateY(0%);
   }
 }
 

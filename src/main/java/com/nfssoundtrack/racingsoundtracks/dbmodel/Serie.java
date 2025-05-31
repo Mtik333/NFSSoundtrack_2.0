@@ -66,4 +66,17 @@ public class Serie implements Serializable {
         this.position = position;
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "Serie{" +
+                "id=" + id +
+                ", position=" + position +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return name + ", position: " + position + ", (id: " + id + ")";
+    }
 }

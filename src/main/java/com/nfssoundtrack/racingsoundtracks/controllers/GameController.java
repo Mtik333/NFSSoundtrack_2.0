@@ -2,9 +2,7 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.MainGroup;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Subgroup;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.deserializers.GameDeserializer;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
@@ -45,6 +43,7 @@ public class GameController extends BaseControllerWithErrorHandling {
         ObjectMapper objectMapper = JustSomeHelper.registerDeserializerForObjectMapper(Game.class, newGameDeserializer);
         Game newGame = objectMapper.readValue(formData, Game.class);
         //at this point we should have game ready to save
+        String message = "Creating game " + newGame.getDisplayTitle() + " in series: " + newGame.getSerie().getName();
         gameService.save(newGame);
         MainGroup allGroup = new MainGroup();
         allGroup.setGame(newGame);
@@ -69,6 +68,8 @@ public class GameController extends BaseControllerWithErrorHandling {
         if (cache2 != null) {
             cache2.clear();
         }
+        sendMessageToChannel(EntityType.GAME, "create", message,
+                EntityUrl.GAME, newGame.getDisplayTitle(), newGame.getGameShort());
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -108,10 +109,13 @@ public class GameController extends BaseControllerWithErrorHandling {
         ObjectMapper objectMapper = JustSomeHelper.registerDeserializerForObjectMapper(Game.class, newGameDeserializer);
         Game gameToEdit = gameService.findById(gameId).orElseThrow(
                 () -> new ResourceNotFoundException("No game with id found " + gameId));
+        String message = "Updating game " + gameToEdit.getDisplayTitle();
         gameToEdit = objectMapper.readerForUpdating(gameToEdit).readValue(formData, Game.class);
         gameService.save(gameToEdit);
         String gameShort = gameToEdit.getGameShort();
         removeCacheEntry(gameShort);
+        sendMessageToChannel(EntityType.GAME, "update", message,
+                EntityUrl.GAME, gameToEdit.getDisplayTitle(), gameToEdit.getGameShort());
         return new ObjectMapper().writeValueAsString("OK");
     }
 }

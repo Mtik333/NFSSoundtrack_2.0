@@ -55,4 +55,17 @@ public class Country implements Serializable {
     public void setLocalLink(String localLink) {
         this.localLink = localLink;
     }
+
+    @Override
+    public String toString() {
+        return "Country{" +
+                "id=" + id +
+                ", countryName='" + countryName + '\'' +
+                ", countryLink='" + countryLink + '\'' +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return countryName + " (id: " + id + ")";
+    }
 }

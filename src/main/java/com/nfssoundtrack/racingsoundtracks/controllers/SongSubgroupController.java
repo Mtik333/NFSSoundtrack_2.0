@@ -62,6 +62,15 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             SongSubgroup songSubgroup =
                     songSubgroupService.findById(Math.toIntExact(songSubgroupId)).orElseThrow(() -> new ResourceNotFoundException("no" +
                             " songsubgroup found with id " + subgroupId));
+            if (!position.equals(songSubgroup.getPosition()) && position % 10 != 0) {
+                String message = "Set position of song " + songSubgroup.getSong().toAnotherChangeLogString()
+                        + " in subgroup " + songSubgroup.getSubgroup().getSubgroupName()
+                        + " in group " + songSubgroup.getSubgroup().getMainGroup().getGroupName()
+                        + " in game " + songSubgroup.getSubgroup().getMainGroup().getGame().getDisplayTitle()
+                        + " to " + position;
+                sendMessageToChannel(EntityType.SONG_SUBGROUP, "update", message,
+                        EntityUrl.SONG, songSubgroup.getSong().toAnotherChangeLogString(), String.valueOf(songSubgroup.getSong().getId()));
+            }
             //we just find the song-subgroup based on id and just change position
             songSubgroup.setPosition(position);
             songSubgroupService.save(songSubgroup);
@@ -94,6 +103,10 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             //first let's find this song-subgroup
             SongSubgroup songSubgroup = songSubgroupService.findById(songSubgroupId).orElseThrow(() -> new ResourceNotFoundException(
                     "No songsubgroup found with id " + songSubgroupId));
+            String message = "Updating song " + songSubgroup.getSong().toAnotherChangeLogString()
+                    + " in subgroup " + songSubgroup.getSubgroup().getSubgroupName()
+                    + " in group " + songSubgroup.getSubgroup().getMainGroup().getGroupName()
+                    + " in game " + songSubgroup.getSubgroup().getMainGroup().getGame().getDisplayTitle();
             ObjectMapper objectMapper = JustSomeHelper.registerDeserializerForObjectMapper(SongSubgroup.class, songSubgroupDeserializer);
             //readForUpdating is capable of opening entity to be updated based on incoming data, somehow
             songSubgroup = objectMapper.readerForUpdating(songSubgroup).readValue(formData, SongSubgroup.class);
@@ -119,7 +132,10 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 //if that's a new author in DB, we create entity
                 mainComposer = new Author();
                 mainComposer.setName(newAuthor);
+                String localMessage = "Creating new author " + newAuthor;
                 mainComposer = authorService.save(mainComposer);
+                sendMessageToChannel(EntityType.AUTHOR, "create", localMessage,
+                        EntityUrl.AUTHOR, mainComposer.getName(), String.valueOf(mainComposer.getId()));
                 composerAlias = new AuthorAlias(mainComposer, newAuthor);
                 authorAliasService.save(composerAlias);
             } else {
@@ -131,7 +147,10 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 if (mainAliasId.startsWith("NEW")) {
                     String newAlias = mainAliasId.replace("NEW-", "");
                     composerAlias = new AuthorAlias(author, newAlias);
+                    String localMessage = "Creating new alias " + newAlias + " of author " + author.getName();
                     composerAlias = authorAliasService.save(composerAlias);
+                    sendMessageToChannel(EntityType.AUTHOR_ALIAS, "create", localMessage,
+                            EntityUrl.AUTHOR, author.getName(), String.valueOf(author.getId()));
                 } else {
                     composerAlias = authorAliasService.findById(Integer.parseInt(mainAliasId)).orElseThrow(
                             () -> new ResourceNotFoundException("No author" +
@@ -148,11 +167,21 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                             AuthorAlias persistedAuthorAlias = authorSong.getAuthorAlias();
                             if (!persistedAuthorAlias.equals(composerAlias)) {
                                 authorSong.setAuthorAlias(composerAlias);
+                                String localMessage = "Associating author " + author.getName()
+                                        + " by new alias " + composerAlias + " with song "
+                                        + authorSong.getSong().toAnotherChangeLogString();
                                 authorSongService.save(authorSong);
+                                sendMessageToChannel(EntityType.AUTHOR_SONG, "create", localMessage,
+                                        EntityUrl.AUTHOR, author.getName(), String.valueOf(author.getId()));
                             }
                         } else {
                             AuthorSong newAuthorSong = new AuthorSong(composerAlias, relatedSong, Role.COMPOSER);
+                            String localMessage = "Associating author " + author.getName()
+                                    + " by alias " + composerAlias + " with song "
+                                    + authorSong.getSong().toAnotherChangeLogString();
                             authorSongService.save(newAuthorSong);
+                            sendMessageToChannel(EntityType.AUTHOR_SONG, "create", localMessage,
+                                    EntityUrl.AUTHOR, author.getName(), String.valueOf(author.getId()));
                             //case when we completely change the author
                             authorSongService.delete(authorSong);
                         }
@@ -161,15 +190,15 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             }
             //three below are supposed to update feat / subcomposer / remix roles in the song
             if (subcomposer) {
-                songSubgroupService.updateSubcomposersFeat(localObjectMapper, "subcomposerSelect",
+                updateSubcomposersFeat(localObjectMapper, "subcomposerSelect",
                         "subcomposerConcatInput", songSubgroup, Role.SUBCOMPOSER, relatedSong, propagate);
             }
             if (feat) {
-                songSubgroupService.updateSubcomposersFeat(localObjectMapper, "featSelect",
+                updateSubcomposersFeat(localObjectMapper, "featSelect",
                         "featConcatInput", songSubgroup, Role.FEAT, relatedSong, propagate);
             }
             if (remix) {
-                songSubgroupService.updateSubcomposersFeat(localObjectMapper, "remixSelect",
+                updateSubcomposersFeat(localObjectMapper, "remixSelect",
                         "remixConcatInput", songSubgroup, Role.REMIX, relatedSong, propagate);
             }
             //here we will associate song (if is now considered as remix) with the 'main' song
@@ -186,6 +215,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
             removeCacheEntry(gameShort);
             songSubgroupService.save(songSubgroup);
+            sendMessageToChannel(EntityType.SONG_SUBGROUP, "update", message,
+                    EntityUrl.SONG, songSubgroup.getSong().toAnotherChangeLogString(), String.valueOf(songSubgroup.getSong().getId()));
             return new ObjectMapper().writeValueAsString("OK");
         } catch (Exception exp) {
             return new ObjectMapper().writeValueAsString(exp);
@@ -233,6 +264,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         List<SongSubgroup> allSongSubgroupEntries = songSubgroupService.findBySong(song);
         if (allSongSubgroupEntries.size() == 1) {
             //means we basically have to delete song entirely to avoid orphans
+            String message = "Deleting song " + song.toAnotherChangeLogString()
+                    + " from database completely";
             List<SongGenre> songGenresToDelete = song.getSongGenreList();
             List<Genre> genresToDelete = new ArrayList<>();
             for (SongGenre songGenre : songGenresToDelete) {
@@ -269,6 +302,12 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             //so here we can safely remove association between song and author
             authorSongService.deleteAll(authorsOfSong);
             if (!authorsToDelete.isEmpty()) {
+                for (Author authorToDelete : authorsToDelete) {
+                    String localMessage = "Deleting author " + authorToDelete.getName()
+                            + " from database completely";
+                    sendMessageToChannel(EntityType.AUTHOR, "delete", localMessage,
+                            EntityUrl.AUTHOR, authorToDelete.getName(), String.valueOf(authorToDelete.getId()));
+                }
                 //then, if that's the case, delete the author and his associations too
                 authorCountryService.deleteAll(authorCountriesToDelete);
                 authorAliasService.deleteAll(authorAliasToDelete);
@@ -277,6 +316,12 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             //now we can delete genre-song associations
             songGenreService.deleteAll(songGenresToDelete);
             if (!genresToDelete.isEmpty()) {
+                for (Genre genre : genresToDelete) {
+                    String localMessage = "Deleting genre " + genre.getGenreName()
+                            + " from database completely";
+                    sendMessageToChannel(EntityType.GENRE, "delete", localMessage,
+                            EntityUrl.GENRE, genre.getGenreName(), String.valueOf(genre.getId()));
+                }
                 //and in case of orphaned entry we will delete genre too
                 genreService.deleteAll(genresToDelete);
             }
@@ -288,11 +333,19 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             //finally we get rid of song-subgroup association and the song in the end
             songSubgroupService.delete(songSubgroup);
             songService.delete(song);
+            sendMessageToChannel(EntityType.SONG, "delete", message,
+                    EntityUrl.SONG, song.toAnotherChangeLogString(), String.valueOf(song.getId()));
         } else {
+            String message = "Deleting song " + song.toAnotherChangeLogString()
+                    + " from subgroup " + songSubgroup.getSubgroup().getSubgroupName()
+                    + " from group " + songSubgroup.getSubgroup().getMainGroup().getGroupName()
+                    + " from game " + songSubgroup.getSubgroup().getMainGroup().getGame().getDisplayTitle();
             //song used more than once in database, so we just make sure it is not associated with any today-song or correction
             JustSomeHelper.unlinkSongWithTodaysSong(todaysSongService, songSubgroup, song, songSubgroupService);
             JustSomeHelper.unlinkSongWithCorrection(correctionService, songSubgroup,
                     "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
+            sendMessageToChannel(EntityType.SONG_SUBGROUP, "delete", message,
+                    EntityUrl.SONG, song.toAnotherChangeLogString(), String.valueOf(song.getId()));
             songSubgroupService.delete(songSubgroup);
         }
         removeCacheEntry(gameShort);
@@ -315,6 +368,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         try {
             SongSubgroup songSubgroup = songSubgroupService.findById(songSubgroupId).orElseThrow(() -> new ResourceNotFoundException(
                     "No song subgroup with id found " + songSubgroupId));
+            String message = "Updating official info of the song " + songSubgroup.getSong().toAnotherChangeLogString()
+                    + " for all games";
             //so this time we are going to go for main song as we're going to modify it
             Song relatedSong = songSubgroup.getSong();
             ObjectMapper objectMapper = JustSomeHelper.registerDeserializerForObjectMapper(Song.class, songDeserializer);
@@ -331,10 +386,14 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                     String actualGenreValue = genreValue.replace("NEW-", "");
                     Genre genre = new Genre();
                     genre.setGenreName(actualGenreValue);
+                    String localMessage = "Creating new genre " + genre.getGenreName()
+                            + " used for the song " + songSubgroup.getSong().toAnotherChangeLogString();
                     genre = genreService.save(genre);
                     //and we associate genre with song
                     SongGenre songGenre = new SongGenre(songSubgroup.getSong(), genre);
                     songGenreService.save(songGenre);
+                    sendMessageToChannel(EntityType.GENRE, "create", localMessage,
+                            EntityUrl.GENRE, genre.getGenreName(), String.valueOf(genre.getId()));
                 } else if (genreValue.startsWith("DELETE")) {
                     //if delete is expected (clicked minus red button), we're going to remove genre association
                     String deleteGenreId = genreValue.replace("DELETE-", "");
@@ -343,7 +402,11 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                     List<SongGenre> existingGenres = songSubgroup.getSong().getSongGenreList();
                     for (SongGenre songGenre : existingGenres) {
                         if (songGenre.getGenre().equals(genre)) {
+                            String localMessage = "Unlinking genre " + genre.getGenreName()
+                                    + " from the song " + songGenre.getSong().toAnotherChangeLogString();
                             songGenreService.delete(songGenre);
+                            sendMessageToChannel(EntityType.GENRE, "create", localMessage,
+                                    EntityUrl.GENRE, genre.getGenreName(), String.valueOf(genre.getId()));
                             break;
                         }
                     }
@@ -354,19 +417,28 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             }
             //so now we can save genres
             relatedSong.setSongGenreList(songGenreService.findBySong(relatedSong));
+            sendMessageToChannel(EntityType.SONG, "update", message,
+                    EntityUrl.SONG, relatedSong.toAnotherChangeLogString(), String.valueOf(relatedSong.getId()));
             songService.save(relatedSong);
             //so for editing song globally, we always come from a subgroup entry so we also update related links
             //for both global song entry and this single local subgroup entry too
             if (Boolean.parseBoolean(localObjectMapper.get("propagate"))) {
+                String localMessage = "Updating music services links for song "
+                        + songSubgroup.getSong().toAnotherChangeLogString()
+                        + " in game " + songSubgroup.getSubgroup().getMainGroup().getGame().getDisplayTitle();
                 songSubgroup.setSrcId(relatedSong.getSrcId());
                 songSubgroup.setSpotifyId(relatedSong.getSpotifyId());
                 songSubgroup.setDeezerId(relatedSong.getDeezerId());
                 songSubgroup.setItunesLink(relatedSong.getItunesLink());
                 songSubgroup.setSoundcloudLink(relatedSong.getSoundcloudLink());
                 songSubgroup.setTidalLink(relatedSong.getTidalLink());
+                sendMessageToChannel(EntityType.SONG_SUBGROUP, "update", localMessage,
+                        EntityUrl.SONG, relatedSong.toAnotherChangeLogString(), String.valueOf(relatedSong.getId()));
                 songSubgroupService.save(songSubgroup);
             } else if (Boolean.parseBoolean(localObjectMapper.get("propagateAll"))) {
                 Game game = songSubgroup.getSubgroup().getMainGroup().getGame();
+                String localMessage = "Updating music services links for song "
+                        + songSubgroup.getSong().toAnotherChangeLogString() + " in all games";
                 List<SongSubgroup> allSongSubgroups = songSubgroupService.findBySong(relatedSong);
                 allSongSubgroups = allSongSubgroups.stream().filter(localSongSubgroup ->
                         localSongSubgroup.getSubgroup().getMainGroup().getGame().equals(game)).toList();
@@ -379,6 +451,8 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                     gameSongSubgroup.setTidalLink(relatedSong.getTidalLink());
                     songSubgroupService.save(gameSongSubgroup);
                 }
+                sendMessageToChannel(EntityType.SONG_SUBGROUP, "update", localMessage,
+                        EntityUrl.SONG, relatedSong.toAnotherChangeLogString(), String.valueOf(relatedSong.getId()));
             }
             //we updated song globally so we again clear game from which this edit comes
             String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
@@ -413,13 +487,22 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         //fetching alias and author id to determine if we need new entitites in such tables
         String mainAliasId = objectMapper.get("aliasId");
         String authorId = objectMapper.get("authorId");
+        String message;
         if (songSubgroup.getSong() != null) {
+            message = "Adding song " + songSubgroup.getSong().toAnotherChangeLogString()
+                    + " to subgroup " + subgroup.getSubgroupName()
+                    + " to group " + subgroup.getMainGroup().getGroupName()
+                    + " to game " + subgroup.getMainGroup().getGame().getDisplayTitle();
             //this is the case when we just use existing song in a new game (new subgroup)
             songSubgroupService.save(songSubgroup);
         } else {
             ObjectMapper songObjectMapper = JustSomeHelper.registerDeserializerForObjectMapper(Song.class, songDeserializer);
             //form data is so similar in song and song-subgroup that we can prepare song this way and save it to db
             Song song = songObjectMapper.readValue(formData, Song.class);
+            message = "Creating song " + song.toAnotherChangeLogString()
+                    + " to subgroup " + subgroup.getSubgroupName()
+                    + " to group " + subgroup.getMainGroup().getGroupName()
+                    + " to game " + subgroup.getMainGroup().getGame().getDisplayTitle();
             song = songService.save(song);
             //we can now associate song with song-subgroup
             songSubgroup.setSong(song);
@@ -430,9 +513,12 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                 String newAuthor = authorId.replace("NEW-", "");
                 mainComposer = new Author();
                 mainComposer.setName(newAuthor);
+                String localMessage = "Creating new author " + newAuthor;
                 mainComposer = authorService.save(mainComposer);
                 composerAlias = new AuthorAlias(mainComposer, newAuthor);
                 composerAlias = authorAliasService.save(composerAlias);
+                sendMessageToChannel(EntityType.AUTHOR, "create", localMessage,
+                        EntityUrl.AUTHOR, mainComposer.getName(), String.valueOf(mainComposer.getId()));
             } else {
                 //then we just have this author in the system already but maybe that is a new alias?
                 Author author = authorService.findById(Integer.parseInt(authorId))
@@ -441,7 +527,11 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                     //if so, then we create new alias in system
                     String newAlias = mainAliasId.replace("NEW-", "");
                     composerAlias = new AuthorAlias(author, newAlias);
+                    String localMessage = "Creating new alias " + newAlias
+                            + " for author " + author.getName();
                     composerAlias = authorAliasService.save(composerAlias);
+                    sendMessageToChannel(EntityType.AUTHOR_ALIAS, "create", localMessage,
+                            EntityUrl.AUTHOR, author.getName(), String.valueOf(author.getId()));
                 } else {
                     //otherwise we use existing alias
                     composerAlias = authorAliasService.findById(Integer.parseInt(mainAliasId))
@@ -456,15 +546,15 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             boolean subcomposer = Boolean.parseBoolean(objectMapper.get("subcomposer"));
             boolean remix = Boolean.parseBoolean(objectMapper.get("remix"));
             if (subcomposer) {
-                songSubgroupService.updateSubcomposersFeat(objectMapper, "subcomposerSelect", "subcomposerConcatInput",
+                updateSubcomposersFeat(objectMapper, "subcomposerSelect", "subcomposerConcatInput",
                         songSubgroup, Role.SUBCOMPOSER, song, false);
             }
             if (feat) {
-                songSubgroupService.updateSubcomposersFeat(objectMapper, "featSelect", "featConcatInput",
+                updateSubcomposersFeat(objectMapper, "featSelect", "featConcatInput",
                         songSubgroup, Role.FEAT, song, false);
             }
             if (remix) {
-                songSubgroupService.updateSubcomposersFeat(objectMapper, "remixSelect", "remixConcatInput",
+                updateSubcomposersFeat(objectMapper, "remixSelect", "remixConcatInput",
                         songSubgroup, Role.REMIX, song, false);
             }
             //similarly as in other place, we will create new genre and make song-genre association
@@ -476,11 +566,19 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
                     String actualGenreValue = genreValue.replace("NEW-", "");
                     Genre genre = new Genre();
                     genre.setGenreName(actualGenreValue);
+                    String localMessage = "Creating new genre " + genre.getGenreName()
+                            + " and linking to song " + song.toAnotherChangeLogString();
                     genre = genreService.save(genre);
                     SongGenre songGenre = new SongGenre(song, genre);
                     songGenreService.save(songGenre);
+                    sendMessageToChannel(EntityType.SONG_GENRE, "create", localMessage,
+                            EntityUrl.GENRE, genre.getGenreName(), String.valueOf(genre.getId()));
                 } else {
+                    String localMessage = "Linking existing genre " + genreValue
+                            + " to song " + song.toAnotherChangeLogString();
                     songService.saveNewAssignmentOfExistingGenre(genreValue, songSubgroup.getSong());
+                    sendMessageToChannel(EntityType.SONG_GENRE, "create", localMessage,
+                            EntityUrl.SONG, songSubgroup.getSong().toAnotherChangeLogString(), String.valueOf(songSubgroup.getSong().getId()));
                 }
             }
             songSubgroupService.save(songSubgroup);
@@ -488,6 +586,9 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
         //again new song means we have to clean game cache
         String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
         removeCacheEntry(gameShort);
+        sendMessageToChannel(EntityType.SONG_SUBGROUP, "create", message,
+                EntityUrl.GAME, subgroup.getMainGroup().getGame().getDisplayTitle(),
+                subgroup.getMainGroup().getGame().getGameShort());
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -657,4 +758,91 @@ public class SongSubgroupController extends BaseControllerWithErrorHandling {
             e.printStackTrace();
         }
     }
+
+
+    /**
+     * method used to update info about feat / subcomposer
+     *
+     * @param objectMapper      just ootb mapper
+     * @param comingInput       type of role really
+     * @param comingConcatInput text between composers of this role
+     * @param songSubgroup      entity of song-subgroup
+     * @param role              type of role used for specific song
+     * @param relatedSong       the song itself for some reason
+     * @param propagate         used to propagate concat between feat / remix to song-subgroup entry
+     * @throws ResourceNotFoundException
+     */
+    private void updateSubcomposersFeat(Map<String, String> objectMapper, String comingInput, String comingConcatInput,
+                                        SongSubgroup songSubgroup, Role role, Song relatedSong, Boolean propagate) throws ResourceNotFoundException {
+        List<String> comingFeats = objectMapper.keySet().stream().filter(
+                o -> o.contains(comingInput)).toList();
+        Iterator<String> comingConcats = objectMapper.keySet().stream().filter(
+                o -> o.contains(comingConcatInput)).toList().iterator();
+        //so we have list of feat-artists and concat like & or , to render pretty display
+        for (String comingFeat : comingFeats) {
+            String concatVal = null;
+            if (comingConcats.hasNext()) {
+                concatVal = objectMapper.get(comingConcats.next());
+            }
+            String featValue = objectMapper.get(comingFeat);
+            //we can either create totally new artist connected to song
+            if (featValue.startsWith("NEW")) {
+                //thing after minus is going to be name of this new artist
+                String actualFeatValue = featValue.replace("NEW-", "");
+                saveNewFeatOrRemixer(actualFeatValue, songSubgroup, role, concatVal, propagate);
+            } else if (featValue.startsWith("DELETE")) {
+                //or we want to remove association between author and song
+                String deleteFeatId = featValue.replace("DELETE-", "");
+                //here however after delete we have id of artist
+                AuthorAlias authorAlias = authorAliasService.findById(Integer.parseInt(deleteFeatId))
+                        .orElseThrow(() -> new ResourceNotFoundException("No authoralias found with id " + deleteFeatId));
+                AuthorSong authorSong = authorSongService.findByAuthorAliasAndSong(authorAlias, relatedSong)
+                        .orElseThrow(() -> new ResourceNotFoundException("No authorsong found"));
+                String localMessage = "Unlinking " + role.value() + " artist " + authorAlias.getAuthor().getName()
+                        + " from song " + authorSong.getSong().toAnotherChangeLogString();
+                //given we found association, we can delete it and in case of remix - un-remix the field
+                authorSongService.delete(authorSong);
+                sendMessageToChannel(EntityType.AUTHOR_SONG, "delete", localMessage,
+                        EntityUrl.SONG, authorSong.getSong().toAnotherChangeLogString(), String.valueOf(authorSong.getSong().getId()));
+                if (Role.REMIX.equals(role)) {
+                    songSubgroup.setRemix(Remix.NO);
+                }
+            } else {
+                //here we just add association between song and existing artist
+                songSubgroupService.saveNewAssignmentOfExistingFeatRemixer(featValue, songSubgroup, role, concatVal, propagate);
+            }
+        }
+    }
+
+    /**
+     * method to save new author and assign to the song under specific role
+     *
+     * @param actualRemixValue
+     * @param songSubgroup
+     * @param role
+     * @param concatValue
+     * @param propagate
+     */
+    private void saveNewFeatOrRemixer(String actualRemixValue, SongSubgroup songSubgroup, Role role,
+                                      String concatValue, Boolean propagate) {
+        Author author = new Author();
+        author.setName(actualRemixValue);
+        String localMessage = "Creating new author " + author.getName() + " in role " + role.value()
+                + " to song " + songSubgroup.getSong().toAnotherChangeLogString();
+        author = authorService.save(author);
+        AuthorAlias authorAlias = new AuthorAlias(author, actualRemixValue);
+        authorAlias = authorAliasService.save(authorAlias);
+        //created author and alias
+        AuthorSong authorSong = new AuthorSong(authorAlias, songSubgroup.getSong(), role);
+        if (role.equals(Role.REMIX)) {
+            songSubgroupService.propagateRemixToSongOccurrences(songSubgroup, propagate, authorSong);
+        }
+        songSubgroupService.setConcatsToAuthorSong(role, authorSong, concatValue);
+        //for feat / subcomposer it is easier
+        authorSongService.save(authorSong);
+        sendMessageToChannel(EntityType.AUTHOR_SONG, "create", localMessage,
+                EntityUrl.SONG, songSubgroup.getSong().toAnotherChangeLogString(),
+                String.valueOf(songSubgroup.getSong().getId()));
+    }
+
 }

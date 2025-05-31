@@ -1,0 +1,43 @@
+<h2 th:text="#{changelog}"></h2>
+<th:block th:if="${#lists.size(changelogs)>=10 and readFull!=null}">
+    <h5 th:text="#{listOfChangelogOver50}"></h5>
+    <a class="table_link" th:href="@{/changelog/readfull}" th:text="#{seeFullGenreList}"></a>
+    <br>
+</th:block>
+<table id="changelogTable" class="table table-hover table-striped sortable-table playlist_table">
+    <colgroup>
+        <col class="changelog-id" />
+        <col class="changelog-text" />
+        <col class="changelog-url" />
+        <col class="changelog-type" />
+        <col class="changelog-timestamp" />
+    </colgroup>
+    <thead>
+        <tr>
+            <th class="game_content_th band" scope="col" th:text="#{id}"></th>
+            <th class="game_content_th no-sort" scope="col" th:text="#{changelogInfo}"></th>
+            <th class="game_content_th" scope="col" th:text="#{changelogEntity}"></th>
+            <th class="game_content_th no-sort" scope="col" th:text="#{changelogObjectType}"></th>
+            <th class="game_content_th" scope="col" th:text="#{changelogTimestamp}"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <th:block th:each="changelog : ${changelogs}">
+            <tr>
+                <td th:text="${changelog.id}"></td>
+                <td th:text="${changelog.logText}"></td>
+                <th:block th:if="${changelog.urlValue!=null}">
+                    <td><a class="table_link"
+                            th:href="'https://racingsoundtracks.com/'+${changelog.entityUrl.value}+'/'+${changelog.urlValue}"
+                            th:text="${changelog.urlLabel}"></a></td>
+                </th:block>
+                <th:block th:unless="${changelog.urlValue!=null}">
+                    <td th:text="${changelog.urlLabel}"></td>
+                </th:block>
+                <td th:text="${changelog.entityType.value}"></td>
+                <td th:text="${changelog.logDate}"></td>
+            </tr>
+        </th:block>
+    </tbody>
+</table>
+<script th:src="@{/min/js/changelog.js}" type="application/javascript"></script>

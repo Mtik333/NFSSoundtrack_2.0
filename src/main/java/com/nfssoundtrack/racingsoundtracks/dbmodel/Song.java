@@ -216,4 +216,27 @@ public class Song implements Serializable {
         this.tidalLink = songSubgroup.getTidalLink();
         this.soundcloudLink = songSubgroup.getSoundcloudLink();
     }
+
+    @Override
+    public String toString() {
+        return "Song{" +
+                "id=" + id +
+                ", officialDisplayBand='" + officialDisplayBand + '\'' +
+                ", officialDisplayTitle='" + officialDisplayTitle + '\'' +
+                ", srcId='" + srcId + '\'' +
+                ", spotifyId='" + spotifyId + '\'' +
+                ", deezerId='" + deezerId + '\'' +
+                ", itunesLink='" + itunesLink + '\'' +
+                ", tidalLink='" + tidalLink + '\'' +
+                ", soundcloudLink='" + soundcloudLink + '\'' +
+                '}';
+    }
+
+    public String toAnotherChangeLogString() {
+        return officialDisplayBand + " - " + officialDisplayTitle;
+    }
+
+    public String toChangeLogString() {
+        return officialDisplayBand + " - " + officialDisplayTitle + ", srcId: " + srcId + ", (id: " + id + ")";
+    }
 }

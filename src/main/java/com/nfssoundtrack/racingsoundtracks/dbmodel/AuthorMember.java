@@ -52,4 +52,17 @@ public class AuthorMember {
         this.member = member;
         this.author = author;
     }
+
+    @Override
+    public String toString() {
+        return "AuthorMember{" +
+                "id=" + id +
+                ", member=" + member +
+                ", author=" + author +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return "member: " + member.toChangeLogString() + " of author: " + author.toChangeLogString();
+    }
 }

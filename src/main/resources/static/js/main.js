@@ -29,7 +29,30 @@ var isMobileAgent = navigator.userAgent.includes("Mobile");
 
 async function doLoadingCrap() {
     var contentWidth = localStorage.getItem("content-width");
-    if (localStorage.getItem("static-leftmenu") == "true") {
+    if (localStorage.getItem("static-leftmenu") == "false") {
+        $("#unpin-menu").css("display", "none");
+        $("#unpin-menu").parent().css("display", "");
+        $("#unpin-menu").prev().css("display", "none");
+        $("#unpin-menu").prev().prev().css("display", "none");
+        $("#filter_games_menu").css("display", "none");
+        $("#filter_games_menu_pinned").css("display", "");
+        var contentDiv = $("#offcanvas").next().next();
+        if (contentWidth != null) {
+            contentDiv.addClass("col-sm-" + contentWidth);
+            contentDiv.removeClass("col");
+        }
+        //probably need to make this less convoluted as code is quite repetitive
+        if (localStorage.getItem("all-games") == "true") {
+            $("#all-games-div").css("overflow-y", "");
+            $("#all-games-div").css("max-height", "");
+            $("#pin-menu").prev().css("display", "");
+            $("#pin-menu").prev().prev().css("display", "none");
+        } else {
+            $("#pin-menu").prev().css("display", "none");
+            $("#pin-menu").prev().prev().css("display", "");
+        }
+        $("#leftMenuTodaySong").css("display", "none");
+    } else if (!isMobileAgent) {
         $("#offcanvas").removeClass("offcanvas");
         var headerDiv = $("#offcanvas").find(".offcanvas-header")[0];
         $(headerDiv).css("display", "none");
@@ -74,29 +97,6 @@ async function doLoadingCrap() {
             $("#unpin-menu").prev().css("display", "none");
             $("#unpin-menu").prev().prev().css("display", "");
         }
-    } else {
-        $("#unpin-menu").css("display", "none");
-        $("#unpin-menu").parent().css("display", "");
-        $("#unpin-menu").prev().css("display", "none");
-        $("#unpin-menu").prev().prev().css("display", "none");
-        $("#filter_games_menu").css("display", "none");
-        $("#filter_games_menu_pinned").css("display", "");
-        var contentDiv = $("#offcanvas").next().next();
-        if (contentWidth != null) {
-            contentDiv.addClass("col-sm-" + contentWidth);
-            contentDiv.removeClass("col");
-        }
-        //probably need to make this less convoluted as code is quite repetitive
-        if (localStorage.getItem("all-games") == "true") {
-            $("#all-games-div").css("overflow-y", "");
-            $("#all-games-div").css("max-height", "");
-            $("#pin-menu").prev().css("display", "");
-            $("#pin-menu").prev().prev().css("display", "none");
-        } else {
-            $("#pin-menu").prev().css("display", "none");
-            $("#pin-menu").prev().prev().css("display", "");
-        }
-        $("#leftMenuTodaySong").css("display", "none");
     }
     if ('ontouchstart' in window && isMobileAgent) {
         $("td.info_button").css("display", "none");
@@ -330,6 +330,8 @@ $(document).ready(function () {
                 }
                 var parentTr = $(this).parent().parent().parent();
                 var newTr = $('<tr id="listen-music">');
+                newTr.attr("data-el_id",parentTr.attr("data-el_id"));
+                newTr.attr("data-group_id",parentTr.attr("data-group_id"));
                 var visibleTh = parentTr.parent().parent().find('th:visible').length;
                 var newTd = $('<td colspan="' + visibleTh + '" id="listen-music-id">');
                 var iframeToPut = $('<iframe id="ytrow" frameborder="0">');

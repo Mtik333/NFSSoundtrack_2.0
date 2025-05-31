@@ -3,6 +3,8 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Country;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.EntityType;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.EntityUrl;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.serializers.CountrySerializer;
@@ -81,7 +83,10 @@ public class CountryController extends BaseControllerWithErrorHandling {
         country.setCountryName(countryName);
         country.setCountryLink(countryLink);
         country.setLocalLink(localLink.substring(0, 2).toLowerCase() + ".svg");
-        countryService.save(country);
+        String message = "Updating country " + country.getCountryName();
+        countryService.saveUpdate(country);
+        sendMessageToChannel(EntityType.COUNTRY, "update", message,
+                EntityUrl.COUNTRYINFO, country.getCountryName(), String.valueOf(country.getId()));
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -105,7 +110,10 @@ public class CountryController extends BaseControllerWithErrorHandling {
         country.setCountryName(countryName);
         country.setCountryLink(countryLink);
         country.setLocalLink(localLink.substring(0, 2).toLowerCase() + ".svg");
+        String message = "Creating country " + country.getCountryName();
         countryService.save(country);
+        sendMessageToChannel(EntityType.COUNTRY, "create", message,
+                EntityUrl.COUNTRYINFO, country.getCountryName(), String.valueOf(country.getId()));
         return new ObjectMapper().writeValueAsString("OK");
     }
 

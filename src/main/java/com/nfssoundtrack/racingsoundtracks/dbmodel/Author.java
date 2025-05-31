@@ -75,4 +75,16 @@ public class Author implements Serializable {
     public int hashCode() {
         return Objects.hash(id, name, skipDiscogs, authorCountries);
     }
+
+    @Override
+    public String toString() {
+        return "Author{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return name + " (id: " + id + ")";
+    }
 }

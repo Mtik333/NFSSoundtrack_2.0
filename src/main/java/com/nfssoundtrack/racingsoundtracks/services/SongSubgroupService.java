@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -83,82 +81,6 @@ public class SongSubgroupService {
     }
 
     /**
-     * method used to update info about feat / subcomposer
-     *
-     * @param objectMapper      just ootb mapper
-     * @param comingInput       type of role really
-     * @param comingConcatInput text between composers of this role
-     * @param songSubgroup      entity of song-subgroup
-     * @param role              type of role used for specific song
-     * @param relatedSong       the song itself for some reason
-     * @param propagate         used to propagate concat between feat / remix to song-subgroup entry
-     * @throws ResourceNotFoundException
-     */
-    public void updateSubcomposersFeat(Map<String, String> objectMapper, String comingInput, String comingConcatInput,
-                                       SongSubgroup songSubgroup, Role role, Song relatedSong, Boolean propagate) throws ResourceNotFoundException {
-        List<String> comingFeats = objectMapper.keySet().stream().filter(
-                o -> o.contains(comingInput)).toList();
-        Iterator<String> comingConcats = objectMapper.keySet().stream().filter(
-                o -> o.contains(comingConcatInput)).toList().iterator();
-        //so we have list of feat-artists and concat like & or , to render pretty display
-        for (String comingFeat : comingFeats) {
-            String concatVal = null;
-            if (comingConcats.hasNext()) {
-                concatVal = objectMapper.get(comingConcats.next());
-            }
-            String featValue = objectMapper.get(comingFeat);
-            //we can either create totally new artist connected to song
-            if (featValue.startsWith("NEW")) {
-                //thing after minus is going to be name of this new artist
-                String actualFeatValue = featValue.replace("NEW-", "");
-                saveNewFeatOrRemixer(actualFeatValue, songSubgroup, role, concatVal, propagate);
-            } else if (featValue.startsWith("DELETE")) {
-                //or we want to remove association between author and song
-                String deleteFeatId = featValue.replace("DELETE-", "");
-                //here however after delete we have id of artist
-                AuthorAlias authorAlias = authorAliasService.findById(Integer.parseInt(deleteFeatId))
-                        .orElseThrow(() -> new ResourceNotFoundException("No authoralias found with id " + deleteFeatId));
-                AuthorSong authorSong = authorSongService.findByAuthorAliasAndSong(authorAlias, relatedSong)
-                        .orElseThrow(() -> new ResourceNotFoundException("No authorsong found"));
-                //given we found association, we can delete it and in case of remix - un-remix the field
-                authorSongService.delete(authorSong);
-                if (Role.REMIX.equals(role)) {
-                    songSubgroup.setRemix(Remix.NO);
-                }
-            } else {
-                //here we just add association between song and existing artist
-                saveNewAssignmentOfExistingFeatRemixer(featValue, songSubgroup, role, concatVal, propagate);
-            }
-        }
-    }
-
-    /**
-     * method to save new author and assign to the song under specific role
-     *
-     * @param actualRemixValue
-     * @param songSubgroup
-     * @param role
-     * @param concatValue
-     * @param propagate
-     */
-    private void saveNewFeatOrRemixer(String actualRemixValue, SongSubgroup songSubgroup, Role role,
-                                      String concatValue, Boolean propagate) {
-        Author author = new Author();
-        author.setName(actualRemixValue);
-        author = authorService.save(author);
-        AuthorAlias authorAlias = new AuthorAlias(author, actualRemixValue);
-        authorAlias = authorAliasService.save(authorAlias);
-        //created author and alias
-        AuthorSong authorSong = new AuthorSong(authorAlias, songSubgroup.getSong(), role);
-        if (role.equals(Role.REMIX)) {
-            propagateRemixToSongOccurrences(songSubgroup, propagate, authorSong);
-        }
-        setConcatsToAuthorSong(role, authorSong, concatValue);
-        //for feat / subcomposer it is easier
-        authorSongService.save(authorSong);
-    }
-
-    /**
      * method to assign existing artist to existing song
      *
      * @param remixValue
@@ -168,8 +90,8 @@ public class SongSubgroupService {
      * @param propagate
      * @throws ResourceNotFoundException
      */
-    private void saveNewAssignmentOfExistingFeatRemixer(String remixValue, SongSubgroup songSubgroup, Role role,
-                                                        String concatValue, Boolean propagate) throws ResourceNotFoundException {
+    public void saveNewAssignmentOfExistingFeatRemixer(String remixValue, SongSubgroup songSubgroup, Role role,
+                                                       String concatValue, Boolean propagate) throws ResourceNotFoundException {
         AuthorAlias authorAlias = authorAliasService.findById(Integer.parseInt(remixValue))
                 .orElseThrow(() -> new ResourceNotFoundException("No authoralias with id found " + remixValue));
         //we're looking for id of author (which is alias id apparently)
@@ -209,7 +131,7 @@ public class SongSubgroupService {
      * @param propagate    other song occurrences only get changed if boolean is set by admin
      * @param authorSong   author-song association
      */
-    private void propagateRemixToSongOccurrences(SongSubgroup songSubgroup, Boolean propagate, AuthorSong authorSong) {
+    public void propagateRemixToSongOccurrences(SongSubgroup songSubgroup, Boolean propagate, AuthorSong authorSong) {
         if (Boolean.TRUE.equals(propagate)) {
             List<SongSubgroup> entriesToUpdateConcat = songSubgroupRepository.findBySong(songSubgroup.getSong());
             entriesToUpdateConcat.remove(songSubgroup);
@@ -228,7 +150,7 @@ public class SongSubgroupService {
      * @param authorSong  song-author association
      * @param concatValue value to pretty display between authors
      */
-    private void setConcatsToAuthorSong(Role role, AuthorSong authorSong, String concatValue) {
+    public void setConcatsToAuthorSong(Role role, AuthorSong authorSong, String concatValue) {
         if (Role.SUBCOMPOSER.equals(role)) {
             authorSong.setSubcomposerConcat(concatValue);
         } else if (Role.REMIX.equals(role)) {

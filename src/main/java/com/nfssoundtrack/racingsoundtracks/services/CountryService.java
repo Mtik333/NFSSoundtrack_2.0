@@ -22,6 +22,10 @@ public class CountryService {
         return countryRepository.save(country);
     }
 
+    public Country saveUpdate(Country country) {
+        return countryRepository.save(country);
+    }
+
     public List<Country> findAll() {
         return countryRepository.findAll();
     }

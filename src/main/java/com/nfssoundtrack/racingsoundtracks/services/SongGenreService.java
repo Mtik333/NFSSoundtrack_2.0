@@ -29,7 +29,7 @@ public class SongGenreService {
     }
 
     public SongGenre findByGenreAndSong(Genre genre, Song song) {
-        return songGenreRepository.findByGenreAndSong(genre,song);
+        return songGenreRepository.findByGenreAndSong(genre, song);
     }
 
     public SongGenre save(SongGenre songGenre) {

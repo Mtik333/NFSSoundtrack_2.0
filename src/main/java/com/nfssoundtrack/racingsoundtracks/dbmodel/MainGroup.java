@@ -86,4 +86,18 @@ public class MainGroup implements Serializable {
     public MainGroup(MainGroup mainGroup) {
         this(mainGroup.groupName, mainGroup.game);
     }
+
+    @Override
+    public String toString() {
+        return "MainGroup{" +
+                "id=" + id +
+                ", groupName='" + groupName + '\'' +
+                ", game=" + game +
+                ", position=" + position +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return groupName + ", position: " + position + ", (id: " + id + ")" + " of game: " + game.toChangeLogString();
+    }
 }

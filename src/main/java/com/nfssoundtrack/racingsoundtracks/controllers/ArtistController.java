@@ -168,6 +168,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         Author authorToUpdate = authorService.findById(targetAuthor).orElseThrow(
                 () -> new ResourceNotFoundException("No author with " +
                         "id found " + targetAuthor));
+        String message = "Merging " + authorToDelete.getName() + " into " + authorToUpdate.getName()
+                + (!deleteTargetAlias ? " - old name is deleted" : "");
         AuthorAlias authorAlias;
         //if we want to make alias on target author due to merge, here's this done
         if (!deleteTargetAlias) {
@@ -189,6 +191,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         List<AuthorAlias> aliasesToDelete = authorAliasService.findByAuthor(authorToDelete);
         authorAliasService.deleteAll(aliasesToDelete);
         authorService.delete(authorToDelete);
+        sendMessageToChannel(EntityType.AUTHOR_ALIAS, "merge", message, EntityUrl.AUTHOR,
+                authorToUpdate.getName(), String.valueOf(authorToUpdate.getId()));
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -215,8 +219,11 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         Author targetAuthor = authorService.findById(targetAuthorId).orElseThrow(
                 () -> new ResourceNotFoundException("No author with " +
                         "id found " + targetAuthorId));
+        String message = "Adding " + newMemberAuthor.getName() + " as member of " + targetAuthor.getName();
         AuthorMember authorMember = new AuthorMember(newMemberAuthor, targetAuthor);
         authorMemberService.save(authorMember);
+        sendMessageToChannel(EntityType.AUTHOR_MEMBER, "save", message, EntityUrl.AUTHOR,
+                targetAuthor.getName(), String.valueOf(targetAuthor.getId()));
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -242,6 +249,7 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         List<Author> authorList = authorService.findAllByName(artistName);
         authorList.sort(Comparator.comparing(Author::getId));
         Author targetAuthor = authorList.get(0);
+        String message = "Fixing duplicate entries of author " + targetAuthor.getName();
         authorList.remove(targetAuthor);
         //so for each duplicate artist, gonna change song assignment to master artist
         //then just deleting alias of such author, countries, and the author in the end
@@ -259,6 +267,8 @@ public class ArtistController extends BaseControllerWithErrorHandling {
             }
             authorService.delete(author);
         }
+        sendMessageToChannel(EntityType.AUTHOR, "fix", message, EntityUrl.AUTHOR,
+                targetAuthor.getName(), String.valueOf(targetAuthor.getId()));
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -286,10 +296,11 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         Author author = authorService.findById(Integer.parseInt(authorId)).orElseThrow(()
                 -> new ResourceNotFoundException("No author with id found " + authorId));
         author.setName(authorName);
+        String message = "Updating author " + author.getName() + " finished";
         //it might be that author is so obscure that it is not on DiscoGS so we skip looking him up there
         Boolean setSkipDiscogs = (Boolean) formDataMap.get("setSkipDiscogs");
         author.setSkipDiscogs(setSkipDiscogs);
-        author = authorService.save(author);
+        author = authorService.saveUpdate(author);
         //now we have to check if there are ID of countries that have to be assigned
         AuthorAlias rootAlias = authorAliasService.findByAuthor(author).get(0);
         List<AuthorCountry> existingCountries = author.getAuthorCountries();
@@ -307,6 +318,13 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 Optional<AuthorCountry> authorCountryToDelete =
                         existingCountries.stream().filter(authorCountry -> authorCountry.getCountry().getId()
                                 .equals(Long.parseLong(actualCountryId))).findFirst();
+                if (authorCountryToDelete.isEmpty()) {
+                    continue;
+                }
+                String localMessage = "Unlinking country " + authorCountryToDelete.get().getCountry().getCountryName()
+                        + " from author " + author.getName();
+                sendMessageToChannel(EntityType.AUTHOR_COUNTRY, "delete", localMessage,
+                        EntityUrl.AUTHOR, author.getName(), String.valueOf(author.getId()));
                 authorCountryToDelete.ifPresent(countriesToUnlink::add);
             } else {
                 //otherwise we wll simply create association between author and country if it does not exist
@@ -319,6 +337,10 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                     if (country.isPresent()) {
                         AuthorCountry authorCountry = new AuthorCountry(author, country.get());
                         countriesToCreate.add(authorCountry);
+                        String localMessage = "Adding country " + authorCountry.getCountry().getCountryName()
+                                + " to author " + author.getName();
+                        sendMessageToChannel(EntityType.AUTHOR_COUNTRY, "create", localMessage,
+                                EntityUrl.AUTHOR, author.getName(), String.valueOf(author.getId()));
                     }
                 }
                 targetCountrIds.add(countryId);
@@ -347,13 +369,21 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 for (AuthorSong authorSong : authorSongs) {
                     authorSong.setAuthorAlias(rootAlias);
                 }
+                String localMessage = "Deleting alias " + authorAlias.getAlias()
+                        + " from author " + author.getName();
                 authorSongService.saveAll(authorSongs);
                 authorAliasService.delete(authorAlias);
+                sendMessageToChannel(EntityType.AUTHOR_ALIAS, "delete", localMessage, EntityUrl.AUTHOR,
+                        author.getName(), String.valueOf(author.getId()));
             } else if (valueToGet.contains("NEW")) {
                 //second case - just create a new alias for author
                 String actualNewAlias = valueToGet.replace("NEW-", "");
                 AuthorAlias authorAlias = new AuthorAlias(author, actualNewAlias);
+                String localMessage = "Creating alias " + authorAlias.getAlias()
+                        + " for author " + author.getName();
                 authorAliasService.save(authorAlias);
+                sendMessageToChannel(EntityType.AUTHOR_ALIAS, "create", localMessage, EntityUrl.AUTHOR,
+                        author.getName(), String.valueOf(author.getId()));
             } else if (valueToGet.contains("EXISTING")) {
                 //if exists, we might want to just change its value so we will do it here
                 String[] existingAlias = valueToGet.split("-VAL-");
@@ -362,8 +392,15 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                         authorAliasService.findById(Integer.parseInt(existingId)).orElseThrow(
                                 () -> new ResourceNotFoundException("No" +
                                         " authoralias with id found " + existingId));
+                if (authorAlias.getAlias().equals(existingAlias[1])) {
+                    continue;
+                }
+                String localMessage = "Updating alias " + authorAlias.getAlias() + " to " + existingAlias[1]
+                        + " for author " + author.getName();
                 authorAlias.setAlias(existingAlias[1]);
-                authorAliasService.save(authorAlias);
+                authorAliasService.saveUpdate(authorAlias);
+                sendMessageToChannel(EntityType.AUTHOR_ALIAS, "update", localMessage, EntityUrl.AUTHOR,
+                        author.getName(), String.valueOf(author.getId()));
             }
         }
         //if we do care about DiscoGS, all links will be updated in "DiscoGS" index stored locally on the server
@@ -381,8 +418,11 @@ public class ArtistController extends BaseControllerWithErrorHandling {
                 String id = (String) formDataMap.get("id");
                 DiscoGSObj discoGSObj = new DiscoGSObj(false, Integer.parseInt(id), uri, profile);
                 discoGSObj.setSocialLink(twitter, facebook, instagram, soundcloud, myspace, wikipedia);
+                String localMessage = "Updating DiscoGS info for author " + author.getName();
                 //as during edit we maybe updated the author, we want to update the index too
                 authorService.updateDiscoGSObj(Long.valueOf(authorId), discoGSObj);
+                sendMessageToChannel(EntityType.AUTHOR, "update", localMessage,
+                        EntityUrl.AUTHOR, author.getName(), String.valueOf(author.getId()));
             }
         }
         //it might be that there was a typo in author official name, so if we want to fix all the songs associated
@@ -391,17 +431,23 @@ public class ArtistController extends BaseControllerWithErrorHandling {
         if (Boolean.TRUE.equals(updateOfficialArtist)) {
             String artistOldName = (String) formDataMap.get("artistOldName");
             List<AuthorSong> authorSongs = authorSongService.findByAuthorAlias(rootAlias);
-            if (artistOldName!=null) {
+            if (artistOldName != null) {
+                String localMessage = "Changing official display of artist from " + artistOldName +
+                        " to " + authorName + " on " + authorSongs.size() + " songs";
                 for (AuthorSong authorSong : authorSongs) {
                     // in case songs consist of multiple artists in official band
                     // we rather want to replace old value of band by new value
                     Song song = authorSong.getSong();
                     String oldOfficialDisplayBand = song.getOfficialDisplayBand();
-                    song.setOfficialDisplayBand(oldOfficialDisplayBand.replace(artistOldName,authorName));
+                    song.setOfficialDisplayBand(oldOfficialDisplayBand.replace(artistOldName, authorName));
                     songService.save(song);
                 }
+                sendMessageToChannel(EntityType.AUTHOR_SONG, "update", localMessage,
+                        EntityUrl.AUTHOR, author.getName(), String.valueOf(author.getId()));
             }
         }
+        sendMessageToChannel(EntityType.AUTHOR, "update", message,
+                EntityUrl.AUTHOR, author.getName(), String.valueOf(author.getId()));
         return new ObjectMapper().writeValueAsString("OK");
     }
 

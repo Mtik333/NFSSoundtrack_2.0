@@ -85,6 +85,10 @@ public class AuthorService {
         authorRepository.deleteAll(authors);
     }
 
+    public Author saveUpdate(Author author) {
+        return authorRepository.save(author);
+    }
+
     public Author save(Author author) {
         return authorRepository.save(author);
     }
@@ -319,7 +323,7 @@ public class AuthorService {
      * @throws InterruptedException
      * @throws LoginException
      */
-    private DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws InterruptedException, LoginException {
+    public DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws InterruptedException, LoginException {
         try {
             RestTemplate restTemplate = new RestTemplate();
             String uri2 = "https://api.discogs.com/artists/" + id;

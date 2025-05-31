@@ -2,7 +2,6 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Country;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Genre;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.serializers.GenreSerializer;
@@ -35,6 +34,7 @@ public class GenreController extends BaseControllerWithErrorHandling {
         List<Genre> genres = genreService.findAll();
         return objectMapper.writeValueAsString(genres);
     }
+
     /**
      * method to get genres with similar name from database
      * used in songMgmt.js when you type in "genre" when creating new song or editing song globally

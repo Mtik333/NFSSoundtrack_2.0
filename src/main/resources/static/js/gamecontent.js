@@ -122,6 +122,15 @@ $(document).ready(function () {
                     $(this).attr("hidden", true);
                 });
                 activeSubgroups--;
+                /* we enabled some subgroup and potentially music played while in All subgroup, 
+                so if we now have only one subgroup that does not have this music, we need to stop the music */
+                var existingTr = $("#listen-music");
+                if (existingTr.length != 0) {
+                    var playedMusicSubgroup = existingTr.attr("data-el_id");
+                    if (playedMusicSubgroup.localeCompare(aId)!=0) {
+                        existingTr.remove();
+                    }
+                }                    
             }
             /*if this subgroup was already active*/
             if ($(this).hasClass("active")) {
@@ -132,6 +141,15 @@ $(document).ready(function () {
                     $(this).attr("hidden", true);
                 });
                 activeSubgroups--;
+                /* we just disabled some subgroup (but some other still remain active), 
+                so if it had music played, we need to remove it too */
+                var existingTr = $("#listen-music");
+                if (existingTr.length != 0 && activeSubgroups!=0) {
+                    var playedMusicSubgroup = existingTr.attr("data-el_id");
+                    if (playedMusicSubgroup.localeCompare(aId)==0) {
+                        existingTr.remove();
+                    }
+                }                
             } else {
                 /*otherwise we make subgroup active and show all rows associated with this*/
                 $(this).addClass('active');
@@ -176,7 +194,7 @@ $(document).ready(function () {
      */
     $(document).on('click', 'a.gamegroup', function (e) {
         /*preventing stupid redirects*/
-        e.preventDefault();
+        e.preventDefault();               
         $('.gamegroup.active').each(function () {
             $(this).removeClass('active');
             /*we get rid of any previously active groups*/
@@ -184,6 +202,16 @@ $(document).ready(function () {
         /*making group active and fetching its id*/
         $(this).addClass('active');
         var aId = $(this).attr('data-el_id');
+        var justGroupId = aId.replace("gamegroupid","");
+        /* if we switch to group where music is not present, we have to remove played song */
+        var existingTr = $("#listen-music");
+        if (existingTr.length != 0) {
+            var playedMusicGroup = existingTr.attr("data-group_id");
+            /* of course if we swich from current group to 'all', then we don't stop the music */
+            if ($(this).text().localeCompare("All")!=0 && playedMusicGroup.localeCompare(justGroupId)!=0){
+                existingTr.remove();
+            }
+        } 
         $(document).find('ul.subgroup[data-el_id="' + aId + '"]').each(function () {
             $(this).removeClass('visually-hidden');
             $(this).attr("hidden", false);

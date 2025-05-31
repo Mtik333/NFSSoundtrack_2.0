@@ -125,11 +125,11 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         File discoGsFile = new File(artistDir.getPath() + File.separator + "discogs.json");
                         AuthorToDiscoGSObj obj = mapper.readValue(discoGsFile, AuthorToDiscoGSObj.class);
                         String profile = obj.getDiscoGSObj().getProfile();
-                        if (profile!=null && !profile.isEmpty()){
+                        if (profile != null && !profile.isEmpty()) {
                             obj.getDiscoGSObj().setProfile(profile
-                                    .replace("[b]","<b>").replace("[/b]","</b>")
-                                    .replace("[u]","<u>").replace("[/u]","</u>")
-                                    .replace("[i]","<i>").replace("[/i]","</i>"));
+                                    .replace("[b]", "<b>").replace("[/b]", "</b>")
+                                    .replace("[u]", "<u>").replace("[/u]", "</u>")
+                                    .replace("[i]", "<i>").replace("[/i]", "</i>"));
                         }
                         discogsMap.put(obj.getArtistId(), obj.getDiscoGSObj());
                     } catch (NumberFormatException e1) {

@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,6 +60,9 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     @Value("${textchannel.id}")
     private String channelId;
+
+    @Value("${changelog.id}")
+    private String changeLogId;
 
     static JDA jda;
 
@@ -270,7 +274,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         model.addAttribute("songsAsFeat", songsAsFeat);
         model.addAttribute("songsRemixed", songsRemixed);
         model.addAttribute("allAliases", allAliases);
-        if (relatedAuthorAliases!=null){
+        if (relatedAuthorAliases != null) {
             model.addAttribute("relatedAuthorAliases", relatedAuthorAliases);
             model.addAttribute("relatedAuthors", relatedAuthors);
             model.addAttribute("memberOfAsComposer", memberOfAsComposer);
@@ -401,13 +405,32 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     }
 
     @GetMapping(value = "/corrections")
-    public String corrections(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+    public String getAllCorrections(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+//        Page<Correction> correctionsPage = correctionService.findAll(0);
+//        List<Correction> corrections = correctionsPage.get().toList();
         List<Correction> corrections = correctionService.findAll();
         model.addAttribute("corrections", corrections);
         addCommonAttributes(model, "genericAt", new String[]{"Corrections"});
         return MIN_INDEX;
     }
 
+    @GetMapping(value = "/changelog")
+    public String getLatestChangelogs(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+        Page<Changelog> changelogsPage = changelogService.findAll(10);
+        List<Changelog> changelogs = changelogsPage.stream().toList();
+        model.addAttribute("changelogs", changelogs);
+        model.addAttribute("readFull", true);
+        addCommonAttributes(model, "genericAt", new String[]{"Changelog"});
+        return MIN_INDEX;
+    }
+
+    @GetMapping(value = "/changelog/readfull")
+    public String getAllChangelogs(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+        List<Changelog> changelogs = changelogService.findAll();
+        model.addAttribute("changelogs", changelogs);
+        addCommonAttributes(model, "genericAt", new String[]{"Changelog"});
+        return MIN_INDEX;
+    }
     /**
      * some attributes provided to model repeat with each invocation so let's group it in a single place
      *
@@ -616,11 +639,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @throws LoginException
      * @throws InterruptedException
      */
-    public static void rebuildJda(String botSecret) throws LoginException, InterruptedException {
+    public static JDA rebuildJda(String botSecret) throws LoginException, InterruptedException {
         if (jda == null) {
             jda = JDABuilder.createDefault(botSecret).build();
             jda.awaitReady();
         }
+        return jda;
     }
 
     /**

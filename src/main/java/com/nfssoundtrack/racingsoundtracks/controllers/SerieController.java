@@ -2,6 +2,8 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.EntityType;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.EntityUrl;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Serie;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
@@ -61,7 +63,7 @@ public class SerieController extends BaseControllerWithErrorHandling {
             throws ResourceNotFoundException, JsonProcessingException {
         ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Game.class, gameSerializer);
         Serie serie = serieService.findById(serieId).orElseThrow(
-                () -> new ResourceNotFoundException("No serie found with id " + serieId));
+                () -> new ResourceNotFoundException("No series found with id " + serieId));
         return objectMapper.writeValueAsString(serie.getGames());
     }
 
@@ -84,6 +86,11 @@ public class SerieController extends BaseControllerWithErrorHandling {
             Long position = Long.parseLong(String.valueOf(linkedHashMap.get("position")));
             Serie serie = serieService.findById(Math.toIntExact(serieId)).orElseThrow(
                     () -> new ResourceNotFoundException("no serie with id found " + serieId));
+            if (!position.equals(serie.getPosition()) && position % 10 != 0) {
+                String message = "Updating position of game series " + serie.getName() + " to " + position;
+                sendMessageToChannel(EntityType.SERIE, "update", message,
+                        null, serie.getName(), null);
+            }
             serie.setPosition(position);
             serieService.save(serie);
         }
@@ -114,6 +121,7 @@ public class SerieController extends BaseControllerWithErrorHandling {
         List<?> arrayOfGames = (List<?>) objectMapper.get("arrayOfGames");
         Serie serie = serieService.findById(Integer.parseInt(serieId)).orElseThrow(
                 () -> new ResourceNotFoundException("no serie with id found " + serieId));
+        String message = "Updating game series " + serie.getName();
         //we save the serie name although 99% of situation we will not change it
         serie.setName(serieName);
         serieService.save(serie);
@@ -124,6 +132,13 @@ public class SerieController extends BaseControllerWithErrorHandling {
             Game game = gameService.findById(Math.toIntExact(gameId)).orElseThrow(
                     () -> new ResourceNotFoundException("No game with id " +
                             "found " + gameId));
+            //repositioning things means we set them all to values divided by 10 so let's avoid spamming
+            if (!position.equals(game.getPosition()) && position % 10 != 0) {
+                String localMessage = "Updating position of game " + game.getDisplayTitle()
+                        + " in game series " + serie.getName() + " to " + position;
+                sendMessageToChannel(EntityType.GAME, "update", localMessage,
+                        EntityUrl.GAME, game.getDisplayTitle(), game.getGameShort());
+            }
             //for each found game we gonna just update game's position in series
             game.setPosition(position);
             gameService.save(game);
@@ -134,6 +149,8 @@ public class SerieController extends BaseControllerWithErrorHandling {
         if (cache != null) {
             cache.clear();
         }
+        sendMessageToChannel(EntityType.SERIE, "update", message,
+                null, serie.getName(), null);
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -150,11 +167,14 @@ public class SerieController extends BaseControllerWithErrorHandling {
     String saveNewSerie(@RequestBody String formData) throws JsonProcessingException {
         String newSerieName = new ObjectMapper().readValue(formData, String.class);
         Serie serie = new Serie(10000L, newSerieName);
+        String message = "Creating new game series " + serie.getName();
         serieService.save(serie);
         Cache cache = cacheManager.getCache(SERIES);
         if (cache != null) {
             cache.clear();
         }
+        sendMessageToChannel(EntityType.SERIE, "create", message,
+                null, serie.getName(), null);
         return new ObjectMapper().writeValueAsString("OK");
     }
 

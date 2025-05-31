@@ -85,4 +85,18 @@ public class Subgroup implements Serializable {
     public Subgroup(Subgroup subgroup) {
         this(subgroup.subgroupName, subgroup.position, subgroup.mainGroup);
     }
+
+    @Override
+    public String toString() {
+        return "Subgroup{" +
+                "id=" + id +
+                ", subgroupName='" + subgroupName + '\'' +
+                ", position=" + position +
+                ", mainGroup=" + mainGroup +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return subgroupName + ", position: " + position + ", (id: " + id + ")" + " of group: " + mainGroup.toChangeLogString();
+    }
 }

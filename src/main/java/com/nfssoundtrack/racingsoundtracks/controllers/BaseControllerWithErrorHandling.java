@@ -1,5 +1,6 @@
 package com.nfssoundtrack.racingsoundtracks.controllers;
 
+import com.nfssoundtrack.racingsoundtracks.aspects.ChangelogAspect;
 import com.nfssoundtrack.racingsoundtracks.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ import java.util.Locale;
 /**
  * just a wannabe-controller to keep track on various services across other controllers
  */
-public class BaseControllerWithErrorHandling implements ErrorController {
+public class BaseControllerWithErrorHandling extends ChangelogAspect implements ErrorController {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseControllerWithErrorHandling.class);
 
@@ -78,6 +79,9 @@ public class BaseControllerWithErrorHandling implements ErrorController {
 
     @Autowired
     AuthorMemberService authorMemberService;
+
+    @Autowired
+    ChangelogService changelogService;
 
     @Autowired
     private MessageSource messageSource;

@@ -59,4 +59,17 @@ public class AuthorCountry implements Serializable {
     public AuthorCountry(AuthorCountry authorCountry) {
         this(authorCountry.author, authorCountry.country);
     }
+
+    @Override
+    public String toString() {
+        return "AuthorCountry{" +
+                "id=" + id +
+                ", author=" + author +
+                ", country=" + country +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return "country: " + country.toChangeLogString() + " of author: " + author.toChangeLogString();
+    }
 }

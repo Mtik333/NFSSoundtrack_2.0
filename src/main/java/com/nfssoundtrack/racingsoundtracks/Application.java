@@ -20,6 +20,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -36,6 +37,7 @@ import java.util.List;
 
 @EnableCaching
 @SpringBootApplication
+@EnableAspectJAutoProxy
 @Transactional
 //public class Application  {
 public class Application implements CommandLineRunner {

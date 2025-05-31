@@ -2,10 +2,7 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorSong;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.SongGenre;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -51,6 +48,8 @@ public class SongController extends BaseControllerWithErrorHandling {
         Song targetSong = songService.findById(Integer.valueOf(targetId)).orElseThrow(
                 () -> new ResourceNotFoundException("No song with id " +
                         "found " + idToMerge));
+        String message = "Merging song " + songToMerge.toAnotherChangeLogString()
+                + " into song " + targetSong.toAnotherChangeLogString();
         //aside from the songs found, we need to check the genres of both songs
         List<SongGenre> songGenresFromMerge = songGenreService.findBySong(songToMerge);
         List<SongGenre> songGenresFromTarget = songGenreService.findBySong(targetSong);
@@ -93,6 +92,8 @@ public class SongController extends BaseControllerWithErrorHandling {
         //song can be associated with 1 or more composers so we delete associations too
         authorSongService.deleteAll(authorSongs);
         songService.delete(songToMerge);
+        sendMessageToChannel(EntityType.SONG, "update", message,
+                EntityUrl.SONG, targetSong.toAnotherChangeLogString(), String.valueOf(targetSong.getId()));
         return new ObjectMapper().writeValueAsString("OK");
     }
 

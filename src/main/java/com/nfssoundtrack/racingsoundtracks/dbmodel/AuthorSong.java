@@ -105,4 +105,18 @@ public class AuthorSong implements Serializable {
         this.song = song;
         this.role = role;
     }
+
+    @Override
+    public String toString() {
+        return "AuthorSong{" +
+                "id=" + id +
+                ", authorAlias=" + authorAlias +
+                ", song=" + song +
+                ", role=" + role +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return "author: " + authorAlias.toChangeLogString() + " to song: " + song.toChangeLogString();
+    }
 }

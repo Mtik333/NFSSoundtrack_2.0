@@ -55,6 +55,8 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
             throws ResourceNotFoundException, JsonProcessingException {
         Subgroup subgroup = subgroupService.findById(subgroupId)
                 .orElseThrow(() -> new ResourceNotFoundException("No subgroup with id found " + subgroupId));
+        String message = "Updating subgroup " + subgroup.getSubgroupName() + " in group " + subgroup.getMainGroup().getGroupName()
+                + " in game " + subgroup.getMainGroup().getGame().getDisplayTitle();
         //so we get the subgroup
         List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
         Map<String, String[]> songsToAssign = new HashMap<>();
@@ -87,16 +89,26 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
                 JustSomeHelper.unlinkSongWithTodaysSong(todaysSongService, songSubgroup, mySong, songSubgroupService);
                 JustSomeHelper.unlinkSongWithCorrection(correctionService, songSubgroup,
                         "; deleted song-subgroup: " + songSubgroup.toCorrectionString());
+                String localMessage = "Removing song " + mySong.toAnotherChangeLogString()
+                        + " from subgroup " + subgroup.getSubgroupName()
+                        + " in group " + subgroup.getMainGroup().getGroupName()
+                        + " in game " + subgroup.getMainGroup().getGame().getDisplayTitle();
                 //we are then safe to delete song-subgroup association
                 songSubgroupService.delete(songSubgroup);
+                sendMessageToChannel(EntityType.SONG_SUBGROUP, "delete", localMessage,
+                        EntityUrl.SONG, mySong.toAnotherChangeLogString(), String.valueOf(mySong.getId()));
                 //delete orphaned stuff - maybe song is not used anywhere else?
                 List<SongSubgroup> orphanedSong = songSubgroupService.findBySong(mySong);
                 if (orphanedSong.isEmpty()) {
+                    String localDeepMessage = "Removing song " + mySong.toAnotherChangeLogString()
+                            + " from database completely";
                     List<SongGenre> songGenres = songGenreService.findBySong(mySong);
                     //if that's the case, we scrap song-genre, author-song associations
                     songGenreService.deleteAll(songGenres);
                     List<AuthorSong> authorSongs = authorSongService.findBySong(mySong);
                     authorSongService.deleteAll(authorSongs);
+                    sendMessageToChannel(EntityType.SONG, "delete", localDeepMessage,
+                            EntityUrl.SONG, mySong.toAnotherChangeLogString(), String.valueOf(mySong.getId()));
                     songService.delete(mySong);
                 }
             }
@@ -118,7 +130,13 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
                 songSubgroup.setPosition((long) position);
                 songSubgroup.setSubgroup(subgroup);
                 songSubgroup.setSong(song1);
+                String localMessage = "Adding song " + song1.toAnotherChangeLogString()
+                        + " to subgroup " + subgroup.getSubgroupName()
+                        + " in group " + subgroup.getMainGroup().getGroupName()
+                        + " in game " + subgroup.getMainGroup().getGame().getDisplayTitle();
                 songSubgroupService.save(songSubgroup);
+                sendMessageToChannel(EntityType.SONG_SUBGROUP, "create", localMessage,
+                        EntityUrl.SONG, song1.toAnotherChangeLogString(), String.valueOf(song1.getId()));
             } else {
                 //i feel like this is not used at all
                 List<SongSubgroup> existingSubgroups = songSubgroupService.findBySong(song1);
@@ -131,12 +149,21 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
                 songSubgroup.setPosition((long) position);
                 songSubgroup.setSubgroup(subgroup);
                 songSubgroup.setSong(song1);
+                String localMessage = "[temp] Adding song " + song1.toAnotherChangeLogString()
+                        + " to subgroup " + subgroup.getSubgroupName()
+                        + " in group " + subgroup.getMainGroup().getGroupName()
+                        + " in game " + subgroup.getMainGroup().getGame().getDisplayTitle();
                 songSubgroupService.save(songSubgroup);
+                sendMessageToChannel(EntityType.SONG_SUBGROUP, "create", localMessage,
+                        EntityUrl.SONG, song1.toAnotherChangeLogString(), String.valueOf(song1.getId()));
             }
         }
         //again cleaning the cache of game when updating subgroup
         String gameShort = subgroup.getMainGroup().getGame().getGameShort();
         removeCacheEntry(gameShort);
+        sendMessageToChannel(EntityType.SUBGROUP, "update", message,
+                EntityUrl.GAME, subgroup.getMainGroup().getGame().getDisplayTitle(),
+                subgroup.getMainGroup().getGame().getGameShort());
         return new ObjectMapper().writeValueAsString("OK");
     }
 
@@ -160,12 +187,17 @@ public class SubgroupController extends BaseControllerWithErrorHandling {
                 .orElseThrow(() -> new ResourceNotFoundException("No mainGroup found with id " + groupId));
         Subgroup subgroup = subgroupService.findById(Math.toIntExact(subgroupId))
                 .orElseThrow(() -> new ResourceNotFoundException("No subgroup found with id " + subgroupId));
+        String message = "Moving subgroup " + subgroup.getSubgroupName() + " from group " + subgroup.getMainGroup().getGroupName()
+                + " to group " + mainGroup.getGroupName() + " in game " + subgroup.getMainGroup().getGame().getDisplayTitle();
         //nothing special here, we use method to change main group
         subgroup.setMainGroup(mainGroup);
         subgroupService.save(subgroup);
         //need to clean cache of game after moving subgroup
         String gameShort = mainGroup.getGame().getGameShort();
         removeCacheEntry(gameShort);
+        sendMessageToChannel(EntityType.SUBGROUP, "update", message,
+                EntityUrl.GAME, subgroup.getMainGroup().getGame().getDisplayTitle(),
+                subgroup.getMainGroup().getGame().getGameShort());
         return new ObjectMapper().writeValueAsString("OK");
     }
 

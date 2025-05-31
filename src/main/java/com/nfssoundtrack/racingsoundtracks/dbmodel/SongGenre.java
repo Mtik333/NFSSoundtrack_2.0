@@ -55,4 +55,17 @@ public class SongGenre implements Serializable {
         this.song = song;
         this.genre = genre;
     }
+
+    @Override
+    public String toString() {
+        return "SongGenre{" +
+                "id=" + id +
+                ", song=" + song +
+                ", genre=" + genre +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return "genre: " + genre.toChangeLogString() + " of song: " + song.toChangeLogString();
+    }
 }

@@ -234,4 +234,21 @@ public class Game implements Serializable, Comparable<Game> {
     public int hashCode() {
         return Objects.hash(id, serie, position, gameTitle, displayTitle, gameShort, prefix);
     }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "id=" + id +
+                ", serie=" + serie +
+                ", position=" + position +
+                ", gameTitle='" + gameTitle + '\'' +
+                ", gameShort='" + gameShort + '\'' +
+                ", displayTitle='" + displayTitle + '\'' +
+                ", gameStatus=" + gameStatus +
+                '}';
+    }
+
+    public String toChangeLogString() {
+        return displayTitle + ", url: " + gameShort + ", status: " + gameStatus + ", (id: " + id + ")";
+    }
 }

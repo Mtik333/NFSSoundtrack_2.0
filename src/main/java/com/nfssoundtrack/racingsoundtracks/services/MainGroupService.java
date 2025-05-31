@@ -17,6 +17,10 @@ public class MainGroupService {
         return mainGroupRepository.save(mainGroup);
     }
 
+    public MainGroup saveUpdate(MainGroup mainGroup) {
+        return mainGroupRepository.save(mainGroup);
+    }
+
     public Optional<MainGroup> findById(int id) {
         return mainGroupRepository.findById(id);
     }

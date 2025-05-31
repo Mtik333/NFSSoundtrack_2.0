@@ -57,5 +57,16 @@ public class AuthorAlias implements Serializable {
         this(authorAlias.author, authorAlias.alias);
     }
 
+    @Override
+    public String toString() {
+        return "AuthorAlias{" +
+                "id=" + id +
+                ", author=" + author +
+                ", alias='" + alias + '\'' +
+                '}';
+    }
 
+    public String toChangeLogString() {
+        return "alias: " + alias + " of author: " + author.toChangeLogString();
+    }
 }

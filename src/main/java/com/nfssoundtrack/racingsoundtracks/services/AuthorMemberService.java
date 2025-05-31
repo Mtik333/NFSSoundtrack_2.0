@@ -14,11 +14,11 @@ public class AuthorMemberService {
     @Autowired
     AuthorMemberRepository authorMemberRepository;
 
-    public List<AuthorMember> findByMember(Author member){
+    public List<AuthorMember> findByMember(Author member) {
         return authorMemberRepository.findByMember(member);
     }
 
-    public List<AuthorMember> findByAuthor(Author author){
+    public List<AuthorMember> findByAuthor(Author author) {
         return authorMemberRepository.findByAuthor(author);
     }
 
