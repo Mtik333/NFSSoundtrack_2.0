@@ -42,7 +42,7 @@ public class DiscoGSAPISearch {
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         //we only use endpoint for purpose of artists
         //making 1 value return is shorter to handle
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(uri)
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uri)
                 .queryParam("type", "artist")
                 .queryParam("q", URLEncoder.encode("Sound Banks", StandardCharsets.UTF_8))
                 .queryParam("key", discogsKey)
@@ -66,7 +66,7 @@ public class DiscoGSAPISearch {
         }
         //125246
         String uri2 = "https://api.discogs.com/artists/346242"; // or any other uri
-        UriComponentsBuilder builder2 = UriComponentsBuilder.fromHttpUrl(uri2);
+        UriComponentsBuilder builder2 = UriComponentsBuilder.fromUriString(uri2);
         //here having the url to artist, we can get all the details about him
         HttpEntity<String> response = restTemplate.exchange(
                 builder2.toUriString(),

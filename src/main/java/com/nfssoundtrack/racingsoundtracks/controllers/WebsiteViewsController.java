@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.*;
 import com.nfssoundtrack.racingsoundtracks.serializers.SongSerializer;
-import com.nfssoundtrack.racingsoundtracks.serializers.SongSubgroupFilenameSerializer;
 import jakarta.annotation.PostConstruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -17,7 +16,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.commons.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -36,7 +34,7 @@ import java.util.List;
  * main controller with all the basic endpoint for non-authenticated users
  */
 @Controller
-public class WebsiteViewsController extends BaseControllerWithErrorHandling {
+public class WebsiteViewsController  {
 
     private static final Logger logger = LoggerFactory.getLogger(WebsiteViewsController.class);
     public static final String APP_NAME = "appName";
@@ -44,13 +42,15 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public static final String DESC_BREAK = "\n====================\n\n";
     public static final String SERIES = "series";
     public static final String GAMES_ALPHA = "gamesAlpha";
-    public static List<TranslationObj> translationObjs = new ArrayList<>();
+    static List<TranslationObj> translationObjs = new ArrayList<>();
 
-    @Autowired
-    SongSerializer songSerializer;
+    private final SongSerializer songSerializer;
+    private final BaseControllerWithErrorHandling baseController;
 
-    @Autowired
-    SongSubgroupFilenameSerializer songSubgroupFilenameSerializer;
+    public WebsiteViewsController(SongSerializer songSerializer, BaseControllerWithErrorHandling baseController) {
+        this.songSerializer = songSerializer;
+        this.baseController = baseController;
+    }
 
     @Value("${spring.application.name}")
     String appName;
@@ -108,11 +108,11 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public String topMenuEntry(Model model, @PathVariable("value") String value) throws ResourceNotFoundException, LoginException, InterruptedException {
         addCommonAttributes(model, "genericAt", new String[]{value});
         model.addAttribute("htmlToInject",
-                contentService.findByContentShort(value).getContentData());
+                baseController.getContentService().findByContentShort(value).getContentData());
         boolean isHome = value.contains("home");
         model.addAttribute("home", isHome);
         //when we are at home page, we have to render todays song in center
-        model.addAttribute("todayssong", todaysSongService.getTodaysSong());
+        model.addAttribute("todayssong", baseController.getTodaysSongService().getTodaysSong());
         return MIN_INDEX;
     }
 
@@ -123,14 +123,14 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @GetMapping(value = "/game/{gameshort}")
     public String game(Model model, @PathVariable("gameshort") String gameshort/*, HttpSession httpSession*/) throws LoginException, ResourceNotFoundException, InterruptedException {
-        Game game = gameService.findByGameShort(gameshort);
+        Game game = baseController.getGameService().findByGameShort(gameshort);
         model.addAttribute("endpoint", "/game/" + gameshort);
         model.addAttribute("game", game);
         addCommonAttributes(model, "gameSoundtrackAt", new String[]{game.getDisplayTitle()});
         //for few games there's custom theme to make website background a bit more interesting
-        Optional<CustomTheme> customTheme = customThemeService.findByGame(game);
+        Optional<CustomTheme> customTheme = baseController.getCustomThemeService().findByGame(game);
         customTheme.ifPresent(theme -> model.addAttribute("customTheme", theme));
-        model.addAttribute("songSubgroups", songSubgroupService.hasGameAnySongs(game));
+        model.addAttribute("songSubgroups", baseController.getSongSubgroupService().hasGameAnySongs(game));
         return MIN_INDEX;
     }
 
@@ -155,7 +155,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                     TypeFactory.defaultInstance().constructCollectionType(List.class, String.class));
             //as array consits of song-subgroup id, we are looking for it in database
             for (String songSubgroupId : finalList) {
-                songSubgroupList.add(songSubgroupService.findById(Integer.valueOf(
+                songSubgroupList.add(baseController.getSongSubgroupService().findById(Integer.valueOf(
                         songSubgroupId)).orElseThrow(() -> new ResourceNotFoundException("No songsubgroup found with " +
                         "id " + songSubgroupId)));
             }
@@ -175,7 +175,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public @ResponseBody
     String provideSongModalInfo(@PathVariable("songId") int songId)
             throws JsonProcessingException, ResourceNotFoundException {
-        Song song = songService.findById(songId).orElseThrow(
+        Song song = baseController.getSongService().findById(songId).orElseThrow(
                 () -> new ResourceNotFoundException("No song with id found " + songId));
         ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Song.class, songSerializer);
         String result = objectMapper.writeValueAsString(song);
@@ -194,10 +194,10 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @GetMapping(value = "/song/{songId}")
     public String provideSongInfo(Model model, @PathVariable("songId") String songId) throws ResourceNotFoundException, LoginException, InterruptedException {
-        Song song = songService.findById(Integer.valueOf(songId)).orElseThrow(
+        Song song = baseController.getSongService().findById(Integer.valueOf(songId)).orElseThrow(
                 () -> new ResourceNotFoundException("No song found with id " + songId));
         model.addAttribute("songToCheck", song);
-        model.addAttribute("songUsages", songSubgroupService.findBySong(song));
+        model.addAttribute("songUsages", baseController.getSongSubgroupService().findBySong(song));
         addCommonAttributes(model, "genericAt", new String[]{song.getOfficialDisplayBand()
                 + " - " + song.getOfficialDisplayTitle()});
         return MIN_INDEX;
@@ -214,10 +214,10 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public String readAuthor(Model model, @PathVariable("authorId") int authorId)
             throws ResourceNotFoundException, JsonProcessingException, LoginException, InterruptedException {
         Author author =
-                authorService.findById(authorId).orElseThrow(
+                baseController.getAuthorService().findById(authorId).orElseThrow(
                         () -> new ResourceNotFoundException("No author found with id " + authorId));
-        DiscoGSObj discoGSObj = authorService.fetchInfoFromMap(author);
-        List<AuthorAlias> allAliases = authorAliasService.findByAuthor(author);
+        DiscoGSObj discoGSObj = baseController.getAuthorService().fetchInfoFromMap(author);
+        List<AuthorAlias> allAliases = baseController.getAuthorAliasService().findByAuthor(author);
         //we build a lot of crap as author can be assigned to songs as composer, subcomposer, feat, remixer
         Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsAsComposer = new HashMap<>();
         Map<AuthorAlias, Map<Song, List<SongSubgroup>>> songsAsSubcomposer = new HashMap<>();
@@ -226,10 +226,10 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
         for (AuthorAlias authorAlias : allAliases) {
             //and we have to remember that author can have multiple aliases
             //so we have to group songs by both type of contribution and alias name
-            List<AuthorSong> allAuthorSongs = authorSongService.findByAuthorAlias(authorAlias);
+            List<AuthorSong> allAuthorSongs = baseController.getAuthorSongService().findByAuthorAlias(authorAlias);
             for (AuthorSong authorSong : allAuthorSongs) {
                 List<SongSubgroup> songSubgroupList =
-                        songSubgroupService.findBySong(authorSong.getSong());
+                        baseController.getSongSubgroupService().findBySong(authorSong.getSong());
                 JustSomeHelper.fillMapForArtistDisplay(authorAlias, authorSong, Role.COMPOSER, songsAsComposer,
                         songSubgroupList);
                 JustSomeHelper.fillMapForArtistDisplay(authorAlias, authorSong, Role.SUBCOMPOSER, songsAsSubcomposer,
@@ -240,8 +240,8 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                         songSubgroupList);
             }
         }
-        List<AuthorMember> artistsAuthorIsMemberOf = authorMemberService.findByMember(author);
-        List<AuthorMember> artistsBeingMembersOfAuthor = authorMemberService.findByAuthor(author);
+        List<AuthorMember> artistsAuthorIsMemberOf = baseController.getAuthorMemberService().findByMember(author);
+        List<AuthorMember> artistsBeingMembersOfAuthor = baseController.getAuthorMemberService().findByAuthor(author);
         List<AuthorAlias> relatedAuthorAliases = null;
         List<Author> relatedAuthors = null;
         if (!artistsAuthorIsMemberOf.isEmpty()) {
@@ -249,7 +249,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             relatedAuthors = new ArrayList<>();
             for (AuthorMember authorMember : artistsAuthorIsMemberOf) {
                 relatedAuthors.add(authorMember.getAuthor());
-                relatedAuthorAliases.addAll(authorAliasService.findByAuthor(authorMember.getAuthor()));
+                relatedAuthorAliases.addAll(baseController.getAuthorAliasService().findByAuthor(authorMember.getAuthor()));
             }
         }
         Map<AuthorAlias, Map<Song, List<SongSubgroup>>> memberOfAsComposer = new HashMap<>();
@@ -257,10 +257,10 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             for (AuthorAlias memberOfAlias : relatedAuthorAliases) {
                 //and we have to remember that author can have multiple aliases
                 //so we have to group songs by both type of contribution and alias name
-                List<AuthorSong> allAuthorSongs = authorSongService.findByAuthorAlias(memberOfAlias);
+                List<AuthorSong> allAuthorSongs = baseController.getAuthorSongService().findByAuthorAlias(memberOfAlias);
                 for (AuthorSong authorSong : allAuthorSongs) {
                     List<SongSubgroup> songSubgroupList =
-                            songSubgroupService.findBySong(authorSong.getSong());
+                            baseController.getSongSubgroupService().findBySong(authorSong.getSong());
                     JustSomeHelper.fillMapForArtistDisplay(memberOfAlias, authorSong, Role.COMPOSER, songsAsComposer,
                             songSubgroupList);
                 }
@@ -293,12 +293,12 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     @GetMapping(value = "/genre/{genreId}")
     public String readGenreInfo(Model model, @PathVariable("genreId") int genreId) throws ResourceNotFoundException, LoginException, InterruptedException {
         Genre genre =
-                genreService.findById(genreId).orElseThrow(
+                baseController.getGenreService().findById(genreId).orElseThrow(
                         () -> new ResourceNotFoundException("No genre found with id " + genreId));
-        List<SongGenre> songGenreList = songGenreService.findByGenre(genre, 50);
+        List<SongGenre> songGenreList = baseController.getSongGenreService().findByGenre(genre, 50);
         List<Song> songs = songGenreList.stream().map(SongGenre::getSong).toList();
         //for brief look at the genre, we just render first 50 songs we find in db
-        List<SongSubgroup> songSubgroupList = songSubgroupService.findBySongInSortedByIdAsc(songs);
+        List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySongInSortedByIdAsc(songs);
         model.addAttribute("songSubgroupList", songSubgroupList);
         model.addAttribute("genre", genre);
         model.addAttribute("readFull", true);
@@ -316,15 +316,15 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public String readGenreInfoFull(Model model, @PathVariable("genreId") int genreId)
             throws ResourceNotFoundException, LoginException, InterruptedException {
         Genre genre =
-                genreService.findById(genreId).orElseThrow(
+                baseController.getGenreService().findById(genreId).orElseThrow(
                         () -> new ResourceNotFoundException("No genre found with id " + genreId));
         //now we go full with hundreds of entries
         //first we get song-genre associations
-        List<SongGenre> songGenreList = songGenreService.findByGenre(genre);
+        List<SongGenre> songGenreList = baseController.getSongGenreService().findByGenre(genre);
         //then we get just pure songs
         List<Song> songs = songGenreList.stream().map(SongGenre::getSong).toList();
         //finally retrieve all song-subgroup entries to show where song was really used
-        List<SongSubgroup> songSubgroupList = songSubgroupService.findBySongInSortedByIdAsc(songs);
+        List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySongInSortedByIdAsc(songs);
         model.addAttribute("songSubgroupList", songSubgroupList);
         model.addAttribute("genre", genre);
         addCommonAttributes(model, "fullGenreListAt", new String[]{genre.getGenreName()});
@@ -337,7 +337,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @GetMapping(value = "/songhistory")
     public String getTodaysSongHistory(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
-        List<TodaysSong> todays30Songs = todaysSongService.findAllFromLast30Days();
+        List<TodaysSong> todays30Songs = baseController.getTodaysSongService().findAllFromLast30Days();
         model.addAttribute("todays30Songs", todays30Songs);
         model.addAttribute("readFull", true);
         addCommonAttributes(model, "archiveOfSongsAt", null);
@@ -353,7 +353,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @GetMapping(value = "/songhistory/readfull")
     public String getTodaysSongHistoryFull(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
-        List<TodaysSong> todays30Songs = todaysSongService.findAll();
+        List<TodaysSong> todays30Songs = baseController.getTodaysSongService().findAll();
         model.addAttribute("todays30Songs", todays30Songs);
         addCommonAttributes(model, "archiveOfSongsAt", null);
         return MIN_INDEX;
@@ -363,23 +363,22 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     public String getArtistsFromCountry(Model model, @PathVariable("countryId") int countryId)
             throws ResourceNotFoundException, LoginException, InterruptedException {
         Country country =
-                countryService.findById(countryId).orElseThrow(
+                baseController.getCountryService().findById(countryId).orElseThrow(
                         () -> new ResourceNotFoundException("No country found with id " + countryId));
-        List<Country> allCountries = countryService.findAll();
-        List<AuthorCountry> authorsFromCountry = authorCountryService.findByCountry(country);
+        List<Country> allCountries = baseController.getCountryService().findAll();
+        List<AuthorCountry> authorsFromCountry = baseController.getAuthorCountryService().findByCountry(country);
         List<AuthorGameObj> rowsToDisplay = new ArrayList<>();
         for (AuthorCountry authorCountry : authorsFromCountry) {
             Author author = authorCountry.getAuthor();
-            List<AuthorAlias> aliases = authorAliasService.findByAuthor(author);
+            List<AuthorAlias> aliases = baseController.getAuthorAliasService().findByAuthor(author);
             Map<Game, Integer> songsPerGame = new HashMap<>();
-            Set<Game> games = new HashSet<>();
             int countSongs = 0;
             for (AuthorAlias alias : aliases) {
-                List<AuthorSong> authorSongs = authorSongService.findByAuthorAlias(alias);
+                List<AuthorSong> authorSongs = baseController.getAuthorSongService().findByAuthorAlias(alias);
                 countSongs += authorSongs.size();
                 for (AuthorSong authorSong : authorSongs) {
                     Song song = authorSong.getSong();
-                    List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                    List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(song);
                     //it can be that one song appears in more than one subgroup in a game
                     //so i don't want to screw up counting and make a distinct game check here
                     songSubgroupList = songSubgroupList.stream().filter(JustSomeHelper.distinctByKey(songSubgroup ->
@@ -406,9 +405,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     @GetMapping(value = "/corrections")
     public String getAllCorrections(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
-//        Page<Correction> correctionsPage = correctionService.findAll(0);
-//        List<Correction> corrections = correctionsPage.get().toList();
-        List<Correction> corrections = correctionService.findAll();
+        List<Correction> corrections = baseController.getCorrectionService().findAll();
         model.addAttribute("corrections", corrections);
         addCommonAttributes(model, "genericAt", new String[]{"Corrections"});
         return MIN_INDEX;
@@ -416,7 +413,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     @GetMapping(value = "/changelog")
     public String getLatestChangelogs(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
-        Page<Changelog> changelogsPage = changelogService.findAll(10);
+        Page<Changelog> changelogsPage = baseController.getChangelogService().findAll(50);
         List<Changelog> changelogs = changelogsPage.stream().toList();
         model.addAttribute("changelogs", changelogs);
         model.addAttribute("readFull", true);
@@ -426,7 +423,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
 
     @GetMapping(value = "/changelog/readfull")
     public String getAllChangelogs(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
-        List<Changelog> changelogs = changelogService.findAll();
+        List<Changelog> changelogs = baseController.getChangelogService().findAll();
         model.addAttribute("changelogs", changelogs);
         addCommonAttributes(model, "genericAt", new String[]{"Changelog"});
         return MIN_INDEX;
@@ -440,11 +437,11 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     private void addCommonAttributes(Model model, String appNameKey, String[] params) throws LoginException, ResourceNotFoundException, InterruptedException {
         //name of the app, rather unrelevant
-        model.addAttribute(APP_NAME, getLocalizedMessage(appNameKey, params));
-        model.addAttribute(SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute(GAMES_ALPHA, gameService.findAllSortedByDisplayTitleAsc());
+        model.addAttribute(APP_NAME, baseController.getLocalizedMessage(appNameKey, params));
+        model.addAttribute(SERIES, baseController.getSerieService().findAllSortedByPositionAsc());
+        model.addAttribute(GAMES_ALPHA, baseController.getGameService().findAllSortedByDisplayTitleAsc());
         model.addAttribute("translations", translationObjs);
-        model.addAttribute("todayssong", todaysSongService.getTodaysSong());
+        model.addAttribute("todayssong", baseController.getTodaysSongService().getTodaysSong());
     }
 
     /**
@@ -472,7 +469,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
             Correction correction;
             //so depending on that we will create the correction and store in database
             if (songSubgroupId != -1) {
-                songSubgroup = songSubgroupService.findById(songSubgroupId);
+                songSubgroup = baseController.getSongSubgroupService().findById(songSubgroupId);
                 if (songSubgroup.isPresent()) {
                     correction = new Correction(songSubgroup.get(), pageUrl, ProblemType.valueOf(problemType), correctValue, discordUserName);
                 } else {
@@ -483,7 +480,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                 correction = new Correction(null, pageUrl, ProblemType.valueOf(problemType), correctValue, discordUserName);
             }
             correction.setCorrectionStatus(CorrectionStatus.PENDING);
-            correction = correctionService.save(correction);
+            correction = baseController.getCorrectionService().save(correction);
             //if user was provided, we will send the message to discord server so admin can check this correction
             rebuildJda(botSecret);
             List<Member> foundUsers;
@@ -523,7 +520,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                 foundUsers.get(0).getUser().openPrivateChannel().queue(privateChannel -> privateChannel
                         .sendMessageEmbeds(embed).queue());
             }
-        } catch (LoginException | ResourceNotFoundException | InterruptedException e) {
+        } catch (ResourceNotFoundException | InterruptedException e) {
             throw new InterruptedException(e.getMessage());
         }
         return new ObjectMapper().writeValueAsString("OK");
@@ -538,9 +535,9 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     @GetMapping(value = "/customtheme/{gameId}")
     public @ResponseBody String getCustomTheme(@PathVariable("gameId") Integer gameId) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        Optional<Game> game = gameService.findById(gameId);
+        Optional<Game> game = baseController.getGameService().findById(gameId);
         if (game.isPresent()) {
-            Optional<CustomTheme> customTheme = customThemeService.findByGame(game.get());
+            Optional<CustomTheme> customTheme = baseController.getCustomThemeService().findByGame(game.get());
             if (customTheme.isPresent()) {
                 return objectMapper.writeValueAsString(customTheme.get());
             }
@@ -551,7 +548,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     @GetMapping(value = "/dynamictheme/{bgId}")
     public @ResponseBody String getDynamicTheme(@PathVariable("bgId") Integer bgId) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        Optional<CustomTheme> customTheme = customThemeService.findById(bgId);
+        Optional<CustomTheme> customTheme = baseController.getCustomThemeService().findById(bgId);
         if (customTheme.isPresent()) {
             return objectMapper.writeValueAsString(customTheme.get());
         }
@@ -570,7 +567,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
     @GetMapping(value = "/filename/{songFilename}", produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody String getSongInfo(@PathVariable("songFilename") String songFilename) {
         songFilename = URLDecoder.decode(songFilename, StandardCharsets.UTF_8);
-        List<SongSubgroup> songsByFilename = songSubgroupService.findByFilenameStartsWith(songFilename);
+        List<SongSubgroup> songsByFilename = baseController.getSongSubgroupService().findByFilenameStartsWith(songFilename);
         StringBuilder resultingText = new StringBuilder();
         if (songsByFilename.size() == 1) {
             SongSubgroup songSubgroup = songsByFilename.get(0);
@@ -582,7 +579,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
                 resultingText.append("Full Soundtrack Playlist: ").append(thingToAppend);
             }
             Song realSong = songSubgroup.getSong();
-            List<SongSubgroup> songSubgroupSameGameList = songSubgroupService.findBySong(realSong);
+            List<SongSubgroup> songSubgroupSameGameList = baseController.getSongSubgroupService().findBySong(realSong);
             songSubgroupSameGameList = songSubgroupSameGameList.stream().filter(songSubgroup1 ->
                             songSubgroup1.getSubgroup().getMainGroup().getGame().equals(songSubgroup.getSubgroup().getMainGroup().getGame()))
                     .filter(songSubgroup1 -> songSubgroup1.getFilename() != null && !songSubgroup1.getFilename().equals(songSubgroup.getFilename())).toList();
@@ -639,7 +636,7 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      * @throws LoginException
      * @throws InterruptedException
      */
-    public static JDA rebuildJda(String botSecret) throws LoginException, InterruptedException {
+    public static JDA rebuildJda(String botSecret) throws InterruptedException {
         if (jda == null) {
             jda = JDABuilder.createDefault(botSecret).build();
             jda.awaitReady();
@@ -652,23 +649,23 @@ public class WebsiteViewsController extends BaseControllerWithErrorHandling {
      */
     @PostConstruct
     private void setupTranslationList() {
-        Country england = countryService.findByCountryName("England").orElse(new Country());
-        Country germany = countryService.findByCountryName("Germany").orElse(new Country());
-        Country greece = countryService.findByCountryName("Greece").orElse(new Country());
-        Country spain = countryService.findByCountryName("Spain").orElse(new Country());
-        Country france = countryService.findByCountryName("France").orElse(new Country());
-        Country india = countryService.findByCountryName("India").orElse(new Country());
-        Country hungary = countryService.findByCountryName("Hungary").orElse(new Country());
-        Country indonesia = countryService.findByCountryName("Indonesia").orElse(new Country());
-        Country italy = countryService.findByCountryName("Italy").orElse(new Country());
-        Country japan = countryService.findByCountryName("Japan").orElse(new Country());
-        Country poland = countryService.findByCountryName("Poland").orElse(new Country());
-        Country portugal = countryService.findByCountryName("Portugal").orElse(new Country());
-        Country russia = countryService.findByCountryName("Russia").orElse(new Country());
-        Country turkey = countryService.findByCountryName("Turkey").orElse(new Country());
-        Country ukraine = countryService.findByCountryName("Ukraine").orElse(new Country());
-        Country china = countryService.findByCountryName("China").orElse(new Country());
-        Country arabia = countryService.findByCountryName("Saudi Arabia").orElse(new Country());
+        Country england = baseController.getCountryService().findByCountryName("England").orElse(new Country());
+        Country germany = baseController.getCountryService().findByCountryName("Germany").orElse(new Country());
+        Country greece = baseController.getCountryService().findByCountryName("Greece").orElse(new Country());
+        Country spain = baseController.getCountryService().findByCountryName("Spain").orElse(new Country());
+        Country france = baseController.getCountryService().findByCountryName("France").orElse(new Country());
+        Country india = baseController.getCountryService().findByCountryName("India").orElse(new Country());
+        Country hungary = baseController.getCountryService().findByCountryName("Hungary").orElse(new Country());
+        Country indonesia = baseController.getCountryService().findByCountryName("Indonesia").orElse(new Country());
+        Country italy = baseController.getCountryService().findByCountryName("Italy").orElse(new Country());
+        Country japan = baseController.getCountryService().findByCountryName("Japan").orElse(new Country());
+        Country poland = baseController.getCountryService().findByCountryName("Poland").orElse(new Country());
+        Country portugal = baseController.getCountryService().findByCountryName("Portugal").orElse(new Country());
+        Country russia = baseController.getCountryService().findByCountryName("Russia").orElse(new Country());
+        Country turkey = baseController.getCountryService().findByCountryName("Turkey").orElse(new Country());
+        Country ukraine = baseController.getCountryService().findByCountryName("Ukraine").orElse(new Country());
+        Country china = baseController.getCountryService().findByCountryName("China").orElse(new Country());
+        Country arabia = baseController.getCountryService().findByCountryName("Saudi Arabia").orElse(new Country());
         translationObjs.add(new TranslationObj("en", england.getCountryName(), england.getLocalLink(), "english"));
         translationObjs.add(new TranslationObj("ar", "Arabic", arabia.getLocalLink(), "arabic"));
         translationObjs.add(new TranslationObj("de", germany.getCountryName(), germany.getLocalLink(), "german"));

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.racingsoundtracks.deserializers.AuthorToDiscoGSDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,10 +35,13 @@ import java.util.concurrent.TimeUnit;
 public class WebSecurityConfig implements WebMvcConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
-    @Autowired
-    private DatabaseUserDetailsService databaseUserDetailsService;
-    @Autowired
-    private Environment environment;
+    private final DatabaseUserDetailsService databaseUserDetailsService;
+    private final Environment environment;
+
+    public WebSecurityConfig(DatabaseUserDetailsService databaseUserDetailsService, Environment environment) {
+        this.databaseUserDetailsService = databaseUserDetailsService;
+        this.environment = environment;
+    }
 
     @Bean
     public SecurityFilterChain normalSecurityFilterChain(HttpSecurity http) throws Exception {

@@ -9,7 +9,6 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.GameStatus;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Serie;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.services.SerieService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
@@ -17,8 +16,11 @@ import java.io.IOException;
 @JsonComponent
 public class GameDeserializer extends JsonDeserializer<Game> {
 
-    @Autowired
-    SerieService serieService;
+    private final SerieService serieService;
+
+    public GameDeserializer(SerieService serieService) {
+        this.serieService = serieService;
+    }
 
     /**
      * used to deserialize when we do 'readyForUpdate' thing to immediately put values from

@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Service
 public abstract class ChangelogAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(ChangelogAspect.class);
@@ -30,20 +31,23 @@ public abstract class ChangelogAspect {
     @Value("${changelog.id}")
     private String changeLogId;
 
-    @Autowired
-    ChangelogService changelogService;
+    private final ChangelogService changelogService;
+
+    ChangelogAspect(ChangelogService changelogService) {
+        this.changelogService = changelogService;
+    }
 
     private TextChannel channelForChangelog;
     static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-    public TextChannel getChannelForChangelog() throws LoginException, InterruptedException {
+    public TextChannel getChannelForChangelog() throws InterruptedException {
         if (channelForChangelog == null) {
             setupChannelForChangelog(changeLogId);
         }
         return channelForChangelog;
     }
 
-    public void setupChannelForChangelog(String channelId) throws LoginException, InterruptedException {
+    public void setupChannelForChangelog(String channelId) throws InterruptedException {
         JDA jda = WebsiteViewsController.rebuildJda(botSecret);
         channelForChangelog = jda.getTextChannelById(channelId);
     }
@@ -64,7 +68,8 @@ public abstract class ChangelogAspect {
             channelForChangelog.sendMessageEmbeds(embed).queue();
             saveLog(entityType, operationType, text,
                     entityUrl, urlLabel, urlValue, Timestamp.valueOf(localDate));
-        } catch (LoginException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             logger.error("exception in sending message: {}", e.getMessage());
         }
     }

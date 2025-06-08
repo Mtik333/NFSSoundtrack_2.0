@@ -4,7 +4,6 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorAlias;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorSong;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
 import com.nfssoundtrack.racingsoundtracks.repository.AuthorSongRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +12,11 @@ import java.util.Optional;
 @Service
 public class AuthorSongService {
 
-    @Autowired
-    AuthorSongRepository authorSongRepository;
+    private final AuthorSongRepository authorSongRepository;
+
+    public AuthorSongService(AuthorSongRepository authorSongRepository) {
+        this.authorSongRepository = authorSongRepository;
+    }
 
     public List<AuthorSong> findByAuthorAlias(AuthorAlias authorAlias) {
         return authorSongRepository.findByAuthorAlias(authorAlias);

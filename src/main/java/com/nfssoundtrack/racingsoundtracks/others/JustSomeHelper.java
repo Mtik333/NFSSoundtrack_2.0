@@ -9,10 +9,7 @@ import com.nfssoundtrack.racingsoundtracks.services.CorrectionService;
 import com.nfssoundtrack.racingsoundtracks.services.SongSubgroupService;
 import com.nfssoundtrack.racingsoundtracks.services.TodaysSongService;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -86,7 +83,11 @@ public class JustSomeHelper {
         if (todaysSongs.size() == 1) {
             List<SongSubgroup> allSongSubgroups = songSubgroupService.findBySong(song);
             if (allSongSubgroups.size() > 1) {
-                SongSubgroup replacementSongSubgroup = allSongSubgroups.stream().filter(songSubgroup1 -> !songSubgroup1.getId().equals(songSubgroup.getId())).findFirst().get();
+                Optional<SongSubgroup> optionalReplacementSongSubgroup = allSongSubgroups.stream().filter(songSubgroup1 -> !songSubgroup1.getId().equals(songSubgroup.getId())).findFirst();
+                if (optionalReplacementSongSubgroup.isEmpty()){
+                    return;
+                }
+                SongSubgroup replacementSongSubgroup = optionalReplacementSongSubgroup.get();
                 TodaysSong todaysSong = todaysSongs.get(0);
                 todaysSong.setSongSubgroup(replacementSongSubgroup);
                 todaysSongService.save(todaysSong);
@@ -107,7 +108,7 @@ public class JustSomeHelper {
      * @param jsonSerializer type of serializer used to serialize the data
      * @return objectmapper to use further in controllers
      */
-    public static ObjectMapper registerSerializerForObjectMapper(Class<?> classToUse, JsonSerializer jsonSerializer) {
+    public static <T>ObjectMapper registerSerializerForObjectMapper(Class<T> classToUse, JsonSerializer<T> jsonSerializer) {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(classToUse, jsonSerializer);
@@ -122,7 +123,7 @@ public class JustSomeHelper {
      * @param jsonDeserializer type of deserializer used to deserialize the data
      * @return objectmapper to use further in controllers
      */
-    public static ObjectMapper registerDeserializerForObjectMapper(Class<?> classToUse, JsonDeserializer jsonDeserializer) {
+    public static <T>ObjectMapper registerDeserializerForObjectMapper(Class<T> classToUse, JsonDeserializer<T> jsonDeserializer) {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(classToUse, jsonDeserializer);

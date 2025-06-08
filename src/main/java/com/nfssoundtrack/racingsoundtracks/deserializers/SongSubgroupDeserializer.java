@@ -10,7 +10,6 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.services.SongService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
@@ -24,8 +23,11 @@ public class SongSubgroupDeserializer extends JsonDeserializer<SongSubgroup> {
     public static final String INGAME_SRC_ID = "ingameSrcId";
     public static final String REMIX = "remix";
 
-    @Autowired
-    SongService songService;
+    private final SongService songService;
+
+    public SongSubgroupDeserializer(SongService songService) {
+        this.songService = songService;
+    }
 
     /**
      * doing PUT on song-subgroup to save changes to entity immediately

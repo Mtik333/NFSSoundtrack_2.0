@@ -9,7 +9,6 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorCountry;
 import com.nfssoundtrack.racingsoundtracks.services.AuthorAliasService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
@@ -22,8 +21,11 @@ import java.util.List;
 @JsonComponent
 public class ArtistMgmtSerializer extends JsonSerializer<Author> {
 
-    @Autowired
-    AuthorAliasService authorAliasService;
+    private final AuthorAliasService authorAliasService;
+
+    public ArtistMgmtSerializer(AuthorAliasService authorAliasService) {
+        this.authorAliasService = authorAliasService;
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(ArtistMgmtSerializer.class);
 

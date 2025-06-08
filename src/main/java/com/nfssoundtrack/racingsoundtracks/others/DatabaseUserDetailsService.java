@@ -2,7 +2,6 @@ package com.nfssoundtrack.racingsoundtracks.others;
 
 import com.nfssoundtrack.racingsoundtracks.dbmodel.User;
 import com.nfssoundtrack.racingsoundtracks.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,8 +13,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabaseUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public DatabaseUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

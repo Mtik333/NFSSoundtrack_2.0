@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +18,15 @@ import java.util.Optional;
 /**
  * controller used to merge songs and find exact song when creating a new one
  */
-@Controller
+@RestController
 @RequestMapping(path = "/song")
-public class SongController extends BaseControllerWithErrorHandling {
+public class SongController  {
+
+    private final BaseControllerWithErrorHandling baseController;
+
+    public SongController(BaseControllerWithErrorHandling baseController) {
+        this.baseController = baseController;
+    }
 
     /**
      * method used to merge one song with another
@@ -33,8 +38,7 @@ public class SongController extends BaseControllerWithErrorHandling {
      * @throws ResourceNotFoundException
      */
     @PutMapping(value = "/merge", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String mergeSongs(@RequestBody String formData) throws JsonProcessingException, ResourceNotFoundException {
+    public String mergeSongs(@RequestBody String formData) throws JsonProcessingException, ResourceNotFoundException {
         Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
         //so we are supposed to put id of two songs, target song being the one that remains after merge
         String idToMerge = (String) mergeInfo.get("songToMergeId");
@@ -42,17 +46,17 @@ public class SongController extends BaseControllerWithErrorHandling {
         //maybe we want to merge songs but keep the ingame title intact because that's how it is in the game
         Boolean addInGameTitle = (Boolean) mergeInfo.get("pushIngameTitle");
         Song songToMerge =
-                songService.findById(Integer.valueOf(idToMerge)).orElseThrow(
+                baseController.getSongService().findById(Integer.valueOf(idToMerge)).orElseThrow(
                         () -> new ResourceNotFoundException("No song with id " +
                                 "found " + idToMerge));
-        Song targetSong = songService.findById(Integer.valueOf(targetId)).orElseThrow(
+        Song targetSong = baseController.getSongService().findById(Integer.valueOf(targetId)).orElseThrow(
                 () -> new ResourceNotFoundException("No song with id " +
                         "found " + idToMerge));
         String message = "Merging song " + songToMerge.toAnotherChangeLogString()
                 + " into song " + targetSong.toAnotherChangeLogString();
         //aside from the songs found, we need to check the genres of both songs
-        List<SongGenre> songGenresFromMerge = songGenreService.findBySong(songToMerge);
-        List<SongGenre> songGenresFromTarget = songGenreService.findBySong(targetSong);
+        List<SongGenre> songGenresFromMerge = baseController.getSongGenreService().findBySong(songToMerge);
+        List<SongGenre> songGenresFromTarget = baseController.getSongGenreService().findBySong(targetSong);
         List<SongGenre> songGenresToDelete = new ArrayList<>();
         for (SongGenre songGenre : songGenresFromMerge) {
             //we dont want to duplicate genres per song after the merge
@@ -66,9 +70,9 @@ public class SongController extends BaseControllerWithErrorHandling {
                 songGenre.setSong(targetSong);
             }
         }
-        songGenreService.saveAll(songGenresFromMerge);
-        songGenreService.deleteAll(songGenresToDelete);
-        List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(songToMerge);
+        baseController.getSongGenreService().saveAll(songGenresFromMerge);
+        baseController.getSongGenreService().deleteAll(songGenresToDelete);
+        List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(songToMerge);
         //now for each usage of song in a subgroup we will change association to the target song
         //and change the links too, inherit from target
         for (SongSubgroup songSubgroup : songSubgroupList) {
@@ -84,15 +88,15 @@ public class SongController extends BaseControllerWithErrorHandling {
             String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
             //as we merge song in a game, we clear cached info about songs in that game
             //so that when acessing the page, songs list will get updated
-            removeCacheEntry(gameShort);
+            baseController.removeCacheEntry(gameShort);
         }
         //now we are safe to update song-subgroup associatiosn and get rid of song completely
-        songSubgroupService.saveAll(songSubgroupList);
-        List<AuthorSong> authorSongs = authorSongService.findBySong(songToMerge);
+        baseController.getSongSubgroupService().saveAll(songSubgroupList);
+        List<AuthorSong> authorSongs = baseController.getAuthorSongService().findBySong(songToMerge);
         //song can be associated with 1 or more composers so we delete associations too
-        authorSongService.deleteAll(authorSongs);
-        songService.delete(songToMerge);
-        sendMessageToChannel(EntityType.SONG, "update", message,
+        baseController.getAuthorSongService().deleteAll(authorSongs);
+        baseController.getSongService().delete(songToMerge);
+        baseController.sendMessageToChannel(EntityType.SONG, "update", message,
                 EntityUrl.SONG, targetSong.toAnotherChangeLogString(), String.valueOf(targetSong.getId()));
         return new ObjectMapper().writeValueAsString("OK");
     }
@@ -110,8 +114,7 @@ public class SongController extends BaseControllerWithErrorHandling {
      * @throws JsonProcessingException
      */
     @PutMapping(value = "/findExact", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String findSong(@RequestBody String formData) throws JsonProcessingException {
+    public String findSong(@RequestBody String formData) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<?, ?> mergeInfo = new ObjectMapper().readValue(formData, Map.class);
         if (formData.isEmpty()) {
@@ -121,7 +124,7 @@ public class SongController extends BaseControllerWithErrorHandling {
         String title = (String) mergeInfo.get("title");
         //made this dedicated query to look for such song there
         //i dont think there would be 2 identical songs but maybe that could happen?
-        List<Song> matchingSongs = songService.findByOfficialDisplayBandAndOfficialDisplayTitleContains(band, title);
+        List<Song> matchingSongs = baseController.getSongService().findByOfficialDisplayBandAndOfficialDisplayTitleContains(band, title);
         if (!matchingSongs.isEmpty()) {
             return objectMapper.writeValueAsString(matchingSongs.get(0));
         } else {

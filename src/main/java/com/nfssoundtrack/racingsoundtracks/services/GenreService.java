@@ -2,7 +2,6 @@ package com.nfssoundtrack.racingsoundtracks.services;
 
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Genre;
 import com.nfssoundtrack.racingsoundtracks.repository.GenreRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +10,11 @@ import java.util.Optional;
 @Service
 public class GenreService {
 
-    @Autowired
-    GenreRepository genreRepository;
+    private final GenreRepository genreRepository;
+
+    public GenreService(GenreRepository genreRepository) {
+        this.genreRepository = genreRepository;
+    }
 
     public Optional<Genre> findById(int id) {
         return genreRepository.findById(id);

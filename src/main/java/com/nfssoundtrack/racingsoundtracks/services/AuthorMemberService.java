@@ -3,7 +3,6 @@ package com.nfssoundtrack.racingsoundtracks.services;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Author;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorMember;
 import com.nfssoundtrack.racingsoundtracks.repository.AuthorMemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +10,11 @@ import java.util.List;
 @Service
 public class AuthorMemberService {
 
-    @Autowired
-    AuthorMemberRepository authorMemberRepository;
+    private final AuthorMemberRepository authorMemberRepository;
+
+    public AuthorMemberService(AuthorMemberRepository authorMemberRepository) {
+        this.authorMemberRepository = authorMemberRepository;
+    }
 
     public List<AuthorMember> findByMember(Author member) {
         return authorMemberRepository.findByMember(member);

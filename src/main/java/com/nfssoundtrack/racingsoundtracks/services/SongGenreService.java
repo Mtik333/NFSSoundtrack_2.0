@@ -4,7 +4,6 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.Genre;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongGenre;
 import com.nfssoundtrack.racingsoundtracks.repository.SongGenreRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +12,11 @@ import java.util.List;
 @Service
 public class SongGenreService {
 
-    @Autowired
-    SongGenreRepository songGenreRepository;
+    private final SongGenreRepository songGenreRepository;
+
+    public SongGenreService(SongGenreRepository songGenreRepository) {
+        this.songGenreRepository = songGenreRepository;
+    }
 
     public List<SongGenre> findByGenre(Genre genre) {
         return songGenreRepository.findByGenre(genre);

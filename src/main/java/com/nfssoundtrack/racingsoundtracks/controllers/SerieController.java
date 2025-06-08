@@ -10,10 +10,8 @@ import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.serializers.GameSerializer;
 import com.nfssoundtrack.racingsoundtracks.serializers.SerieSerializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
@@ -23,15 +21,20 @@ import java.util.Map;
 /**
  * controller to handle creating / modifying / deleting series
  */
-@Controller
+@RestController
 @RequestMapping(path = "/serie")
-public class SerieController extends BaseControllerWithErrorHandling {
+public class SerieController  {
 
     public static final String SERIES = "series";
-    @Autowired
-    GameSerializer gameSerializer;
-    @Autowired
-    SerieSerializer serieSerializer;
+    private final BaseControllerWithErrorHandling baseController;
+    private final GameSerializer gameSerializer;
+    private final SerieSerializer serieSerializer;
+
+    public SerieController(BaseControllerWithErrorHandling baseController, GameSerializer gameSerializer, SerieSerializer serieSerializer) {
+        this.baseController = baseController;
+        this.gameSerializer = gameSerializer;
+        this.serieSerializer = serieSerializer;
+    }
 
     /**
      * method to render all series from database
@@ -41,10 +44,9 @@ public class SerieController extends BaseControllerWithErrorHandling {
      * @throws JsonProcessingException
      */
     @GetMapping(value = "/readAll")
-    public @ResponseBody
-    String readSeries() throws JsonProcessingException {
+    public String readSeries() throws JsonProcessingException {
         ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Serie.class, serieSerializer);
-        List<Serie> series = serieService.findAllSortedByPositionAsc();
+        List<Serie> series = baseController.getSerieService().findAllSortedByPositionAsc();
         return objectMapper.writeValueAsString(series);
     }
 
@@ -58,11 +60,10 @@ public class SerieController extends BaseControllerWithErrorHandling {
      * @throws JsonProcessingException
      */
     @GetMapping(value = "/read/{serieId}")
-    public @ResponseBody
-    String readGamesFromSerie(@PathVariable("serieId") int serieId)
+    public String readGamesFromSerie(@PathVariable("serieId") int serieId)
             throws ResourceNotFoundException, JsonProcessingException {
         ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Game.class, gameSerializer);
-        Serie serie = serieService.findById(serieId).orElseThrow(
+        Serie serie = baseController.getSerieService().findById(serieId).orElseThrow(
                 () -> new ResourceNotFoundException("No series found with id " + serieId));
         return objectMapper.writeValueAsString(serie.getGames());
     }
@@ -77,24 +78,23 @@ public class SerieController extends BaseControllerWithErrorHandling {
      * @throws ResourceNotFoundException
      */
     @PutMapping(value = "/updatePositions", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String putSeriePositions(@RequestBody String formData) throws JsonProcessingException, ResourceNotFoundException {
+    public String putSeriePositions(@RequestBody String formData) throws JsonProcessingException, ResourceNotFoundException {
         List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
         for (Object obj : objectMapper) {
             LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
             long serieId = Long.parseLong(String.valueOf(linkedHashMap.get("serieId")));
             Long position = Long.parseLong(String.valueOf(linkedHashMap.get("position")));
-            Serie serie = serieService.findById(Math.toIntExact(serieId)).orElseThrow(
+            Serie serie = baseController.getSerieService().findById(Math.toIntExact(serieId)).orElseThrow(
                     () -> new ResourceNotFoundException("no serie with id found " + serieId));
             if (!position.equals(serie.getPosition()) && position % 10 != 0) {
                 String message = "Updating position of game series " + serie.getName() + " to " + position;
-                sendMessageToChannel(EntityType.SERIE, "update", message,
+                baseController.sendMessageToChannel(EntityType.SERIE, "update", message,
                         null, serie.getName(), null);
             }
             serie.setPosition(position);
-            serieService.save(serie);
+            baseController.getSerieService().save(serie);
         }
-        Cache cache = cacheManager.getCache(SERIES);
+        Cache cache = baseController.getCacheManager().getCache(SERIES);
         if (cache != null) {
             cache.clear();
         }
@@ -112,44 +112,43 @@ public class SerieController extends BaseControllerWithErrorHandling {
      * @throws ResourceNotFoundException
      */
     @PutMapping(value = "/updateGames", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String putGamesPositions(@RequestBody String formData) throws JsonProcessingException, ResourceNotFoundException {
+    public String putGamesPositions(@RequestBody String formData) throws JsonProcessingException, ResourceNotFoundException {
         Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
         String serieId = (String) objectMapper.get("serieId");
         String serieName = (String) objectMapper.get("serieName");
         //single object in arrayOfGame consists of game id and position
         List<?> arrayOfGames = (List<?>) objectMapper.get("arrayOfGames");
-        Serie serie = serieService.findById(Integer.parseInt(serieId)).orElseThrow(
+        Serie serie = baseController.getSerieService().findById(Integer.parseInt(serieId)).orElseThrow(
                 () -> new ResourceNotFoundException("no serie with id found " + serieId));
         String message = "Updating game series " + serie.getName();
         //we save the serie name although 99% of situation we will not change it
         serie.setName(serieName);
-        serieService.save(serie);
+        baseController.getSerieService().save(serie);
         for (Object obj : arrayOfGames) {
             LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
             long gameId = Long.parseLong(String.valueOf(linkedHashMap.get("gameId")));
             Long position = Long.parseLong(String.valueOf(linkedHashMap.get("position")));
-            Game game = gameService.findById(Math.toIntExact(gameId)).orElseThrow(
+            Game game = baseController.getGameService().findById(Math.toIntExact(gameId)).orElseThrow(
                     () -> new ResourceNotFoundException("No game with id " +
                             "found " + gameId));
             //repositioning things means we set them all to values divided by 10 so let's avoid spamming
             if (!position.equals(game.getPosition()) && position % 10 != 0) {
                 String localMessage = "Updating position of game " + game.getDisplayTitle()
                         + " in game series " + serie.getName() + " to " + position;
-                sendMessageToChannel(EntityType.GAME, "update", localMessage,
+                baseController.sendMessageToChannel(EntityType.GAME, "update", localMessage,
                         EntityUrl.GAME, game.getDisplayTitle(), game.getGameShort());
             }
             //for each found game we gonna just update game's position in series
             game.setPosition(position);
-            gameService.save(game);
+            baseController.getGameService().save(game);
         }
         //since we updated the positions of games in series, we notify db to re-fetch this info
         //so that info is updated from user perspective too
-        Cache cache = cacheManager.getCache(SERIES);
+        Cache cache = baseController.getCacheManager().getCache(SERIES);
         if (cache != null) {
             cache.clear();
         }
-        sendMessageToChannel(EntityType.SERIE, "update", message,
+        baseController.sendMessageToChannel(EntityType.SERIE, "update", message,
                 null, serie.getName(), null);
         return new ObjectMapper().writeValueAsString("OK");
     }
@@ -163,17 +162,16 @@ public class SerieController extends BaseControllerWithErrorHandling {
      * @throws JsonProcessingException
      */
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String saveNewSerie(@RequestBody String formData) throws JsonProcessingException {
+    public String saveNewSerie(@RequestBody String formData) throws JsonProcessingException {
         String newSerieName = new ObjectMapper().readValue(formData, String.class);
         Serie serie = new Serie(10000L, newSerieName);
         String message = "Creating new game series " + serie.getName();
-        serieService.save(serie);
-        Cache cache = cacheManager.getCache(SERIES);
+        baseController.getSerieService().save(serie);
+        Cache cache = baseController.getCacheManager().getCache(SERIES);
         if (cache != null) {
             cache.clear();
         }
-        sendMessageToChannel(EntityType.SERIE, "create", message,
+        baseController.sendMessageToChannel(EntityType.SERIE, "create", message,
                 null, serie.getName(), null);
         return new ObjectMapper().writeValueAsString("OK");
     }

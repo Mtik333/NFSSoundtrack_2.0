@@ -2,7 +2,6 @@ package com.nfssoundtrack.racingsoundtracks.services;
 
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Country;
 import com.nfssoundtrack.racingsoundtracks.repository.CountryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +10,11 @@ import java.util.Optional;
 @Service
 public class CountryService {
 
-    @Autowired
-    CountryRepository countryRepository;
+    private final CountryRepository countryRepository;
+
+    public CountryService(CountryRepository countryRepository) {
+        this.countryRepository = countryRepository;
+    }
 
     public Optional<Country> findById(int id) {
         return countryRepository.findById(id);

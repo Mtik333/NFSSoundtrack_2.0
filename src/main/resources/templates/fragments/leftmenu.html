@@ -46,7 +46,7 @@
         <!--if menu is pinned to left side, we display same buttons and search input too-->
         <div id="search-games-bar" class="col" style="text-align: right">
             <input class="form-control mt-2 mb-3" id="filter_games_menu" maxlength="15" th:placeholder="#{filterGames}">
-            <button type="button" class="btn text-reset alphabetical-games" data-bs-theme="light"
+            <button id="sort-games-pinned" type="button" class="btn text-reset alphabetical-games" data-bs-theme="light"
                 aria-label="All games">
                 <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor"
                     class="bi bi-sort-alpha-down" viewBox="0 0 16 16" data-toggle="tooltip" th:title="#{allGames}">
@@ -84,7 +84,16 @@
                         <button class="accordion-button collapsed gamegroup-button" type="button"
                             data-bs-toggle="collapse" aria-expanded="true" aria-controls="collapseOne"
                             th:attr="data-bs-target='#collapse-'+${serie.id},aria-controls='collapse-'+${serie.id}"
-                            th:text="${serie.name}">
+                            >
+                            <span class="series-name-container">
+                                <span th:text="${serie.name}"></span>
+                                <th:block th:if="${serie.hasRecentUpdates}">
+                                    <span class="recently-updated-label" th:text="#{UPDATED}"></span>
+                                </th:block>
+                                <th:block th:if="${serie.hasUpcomingGames}">
+                                    <span class="upcoming-content-label" th:text="#{NEW_GAME}"></span>
+                                </th:block>
+                            </span>
                         </button>
                     </h2>
                     <div class="accordion-collapse collapse list-group" th:attr="id='collapse-'+${serie.id}"
@@ -94,6 +103,12 @@
                                 <a href="#" class="list-group-item list-group-item-action game_class"
                                     th:href="'/game/'+${game.gameShort}" th:attr="data-fullTitle=${game.displayTitle}">
                                     <span th:text="${game.gameTitle}"></span>
+                                    <th:block th:if="${game.isRecentlyUpdated}">
+                                        <span class="recently-updated-label" th:text="#{UPDATED}"></span>
+                                    </th:block>
+                                    <th:block th:if="${game.gameStatus.value=='UNRELEASED'}">
+                                        <span class="upcoming-content-label" th:text="#{COMING_SOON}"></span>
+                                    </th:block>
                                     <br>
                                     <th:block th:if="${game.gameStatus.value=='CANCELED'}">
                                         <small th:text="#{canceledGame}"></small>
@@ -123,6 +138,12 @@
                             <a href="#" class="list-group-item list-group-item-action game_class"
                                 th:href="'/game/'+${game.gameShort}" th:attr="data-fullTitle=${game.displayTitle}">
                                 <span th:text="${game.displayTitle}"></span>
+                                <th:block th:if="${game.isRecentlyUpdated}">
+                                    <span class="recently-updated-label" th:text="#{UPDATED}"></span>
+                                </th:block>
+                                <th:block th:if="${game.gameStatus.value=='UNRELEASED'}">
+                                    <span class="upcoming-content-label" th:text="#{COMING_SOON}"></span>
+                                </th:block>
                                 <br>
                                 <th:block th:if="${game.gameStatus.value=='CANCELED'}">
                                     <small th:text="#{canceledGame}"></small>

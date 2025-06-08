@@ -1,9 +1,11 @@
 package com.nfssoundtrack.racingsoundtracks.others;
 
+import java.io.Serializable;
+
 /**
  * used to display these country flags to trigger localization of the website
  */
-public class TranslationObj {
+public class TranslationObj implements Serializable {
 
     private String value;
     private String countryName;

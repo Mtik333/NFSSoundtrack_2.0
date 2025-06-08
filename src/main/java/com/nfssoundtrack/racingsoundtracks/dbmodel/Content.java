@@ -17,13 +17,13 @@ public class Content implements Serializable {
     private Long position;
 
     /**
-     * todo not sure what it is, maybe used during migration?
+     * old remnant of position of game probably
      */
     @Column(name = "pos")
     private Long pos;
 
     /**
-     * todo this is probably not used
+     * this is probably not used
      */
     @Column(name = "visibility")
     private Long visibility;

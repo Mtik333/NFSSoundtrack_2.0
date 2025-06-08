@@ -2,7 +2,6 @@ package com.nfssoundtrack.racingsoundtracks.services;
 
 import com.nfssoundtrack.racingsoundtracks.dbmodel.MainGroup;
 import com.nfssoundtrack.racingsoundtracks.repository.MainGroupRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -10,8 +9,11 @@ import java.util.Optional;
 @Service
 public class MainGroupService {
 
-    @Autowired
-    MainGroupRepository mainGroupRepository;
+    private final MainGroupRepository mainGroupRepository;
+
+    public MainGroupService(MainGroupRepository mainGroupRepository) {
+        this.mainGroupRepository = mainGroupRepository;
+    }
 
     public MainGroup save(MainGroup mainGroup) {
         return mainGroupRepository.save(mainGroup);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +22,15 @@ public class Serie implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "last_updated")
+    private LocalDateTime lastUpdated;
+
+    @Column(name = "is_recently_updated")
+    private Boolean hasRecentUpdates = false;
+
+    @Column(name = "has_upcoming_games")
+    private Boolean hasUpcomingGames = false;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "serie", fetch = FetchType.LAZY)
@@ -57,6 +67,31 @@ public class Serie implements Serializable {
 
     public void setGames(Set<Game> games) {
         this.games = games;
+    }
+
+    // Getters and setters
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public Boolean getHasRecentUpdates() {
+        return hasRecentUpdates;
+    }
+
+    public void setHasRecentUpdates(Boolean hasRecentUpdates) {
+        this.hasRecentUpdates = hasRecentUpdates;
+    }
+
+    public Boolean getHasUpcomingGames() {
+        return hasUpcomingGames;
+    }
+
+    public void setHasUpcomingGames(Boolean hasUpcomingGames) {
+        this.hasUpcomingGames = hasUpcomingGames;
     }
 
     public Serie() {

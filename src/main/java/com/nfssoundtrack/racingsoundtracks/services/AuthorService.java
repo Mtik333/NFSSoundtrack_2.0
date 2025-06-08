@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.http.HttpEntity;
@@ -41,8 +40,8 @@ public class AuthorService {
     public static final String WHAT_EXCEPTION = "what exception? {}";
     public static final String RETRY_IN_2_MINUTES = "Seems there were too many requests to DiscoGS. Please retry in 2 minutes";
 
-    @Autowired
-    AuthorRepository authorRepository;
+    private final AuthorRepository authorRepository;
+    private final Map<Long, DiscoGSObj> discoGSObjMap;
 
     @Value("${discogs.key}")
     private String discogsKey;
@@ -53,11 +52,13 @@ public class AuthorService {
     @Value("${admin.discord.id}")
     private String adminId;
 
-    @Autowired
-    Map<Long, DiscoGSObj> discoGSObjMap;
-
     @Value("${bot.token}")
     private String botSecret;
+
+    public AuthorService(AuthorRepository authorRepository, Map<Long, DiscoGSObj> discoGSObjMap) {
+        this.authorRepository = authorRepository;
+        this.discoGSObjMap = discoGSObjMap;
+    }
 
     private static Instant lastError;
 
@@ -102,7 +103,7 @@ public class AuthorService {
      * @throws InterruptedException
      */
     @CachePut(value = "discoGSMap")
-    public DiscoGSObj fetchInfoFromMap(Author author) throws LoginException, InterruptedException {
+    public DiscoGSObj fetchInfoFromMap(Author author) throws InterruptedException {
         //this map will keep info about authors already fetched from discogs
         Optional<Long> authorIdAlreadyThere = discoGSObjMap.keySet().stream().filter(aLong ->
                 aLong.equals(author.getId())).findFirst();
@@ -149,7 +150,7 @@ public class AuthorService {
      * @throws LoginException
      * @throws InterruptedException
      */
-    private DiscoGSObj handleApiOveruse(DiscoGSObj discoGSObj, Author author) throws LoginException, InterruptedException {
+    private DiscoGSObj handleApiOveruse(DiscoGSObj discoGSObj, Author author) throws InterruptedException {
         //in this case we just return discogs info as we have it already
         if (discoGSObj.getUri() != null) {
             return discoGSObj;
@@ -179,7 +180,7 @@ public class AuthorService {
      * @throws LoginException
      * @throws InterruptedException
      */
-    private DiscoGSObj handleAuthorNotAlreadyThere(Author author) throws LoginException, InterruptedException {
+    private DiscoGSObj handleAuthorNotAlreadyThere(Author author) throws InterruptedException {
         DiscoGSObj discoGSObj;
         //in the earlier days people were clicking on authors causing discogs api to be overloaded
         if (!checkIfCanQueryDiscoGS()) {
@@ -215,7 +216,7 @@ public class AuthorService {
      * @throws LoginException
      * @throws InterruptedException
      */
-    private DiscoGSObj handleAuthorNotThereYet(Author author) throws LoginException, InterruptedException {
+    private DiscoGSObj handleAuthorNotThereYet(Author author) throws InterruptedException {
         DiscoGSObj handledDiscoGSObj;
         //here author was not yet obtained from discogs db so we do our first look-up here
         if (!checkIfCanQueryDiscoGS()) {
@@ -244,7 +245,7 @@ public class AuthorService {
         return handledDiscoGSObj;
     }
 
-    public DiscoGSObj manuallyFetchDiscogsInfo(String authorName, Integer artistDiscogsId) throws LoginException, InterruptedException {
+    public DiscoGSObj manuallyFetchDiscogsInfo(String authorName, Integer artistDiscogsId) throws InterruptedException {
         return obtainArtistLinkAndProfile(authorName, artistDiscogsId);
     }
 
@@ -278,7 +279,7 @@ public class AuthorService {
             RestTemplate restTemplate = new RestTemplate();
             String uri = "https://api.discogs.com/database/search"; // or any other uri
             HttpEntity<String> entity = entityToGet();
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(uri)
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uri)
                     .queryParam("q", URLEncoder.encode(authorName, StandardCharsets.UTF_8))
                     .queryParam("type", "artist")
                     .queryParam("key", discogsKey)
@@ -323,12 +324,12 @@ public class AuthorService {
      * @throws InterruptedException
      * @throws LoginException
      */
-    public DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws InterruptedException, LoginException {
+    public DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws InterruptedException {
         try {
             RestTemplate restTemplate = new RestTemplate();
             String uri2 = "https://api.discogs.com/artists/" + id;
             HttpEntity<String> entity = entityToGet();
-            UriComponentsBuilder builder2 = UriComponentsBuilder.fromHttpUrl(uri2);
+            UriComponentsBuilder builder2 = UriComponentsBuilder.fromUriString(uri2);
             HttpEntity<String> response = restTemplate.exchange(
                     builder2.toUriString(),
                     HttpMethod.GET, entity, String.class);
@@ -390,7 +391,7 @@ public class AuthorService {
      * @throws InterruptedException
      * @throws LoginException
      */
-    private void createArtistJson(Long artistId, DiscoGSObj discoGSObj) throws InterruptedException, LoginException {
+    private void createArtistJson(Long artistId, DiscoGSObj discoGSObj) throws InterruptedException {
         try {
             File folderFile = new File("discogs" + File.separator + artistId);
             if (!folderFile.exists()) {
@@ -426,7 +427,7 @@ public class AuthorService {
         }
     }
 
-    public void updateDiscoGSObj(Long artistId, DiscoGSObj updatedDiscoGSObj) throws LoginException, InterruptedException {
+    public void updateDiscoGSObj(Long artistId, DiscoGSObj updatedDiscoGSObj) throws InterruptedException {
         discoGSObjMap.put(artistId, updatedDiscoGSObj);
         createArtistJson(artistId, updatedDiscoGSObj);
     }

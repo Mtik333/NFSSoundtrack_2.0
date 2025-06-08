@@ -8,9 +8,7 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.EntityUrl;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.serializers.CountrySerializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -18,12 +16,17 @@ import java.util.*;
 /**
  * controller for handling changes to countries
  */
-@Controller
+@RestController
 @RequestMapping(path = "/country")
-public class CountryController extends BaseControllerWithErrorHandling {
+public class CountryController  {
 
-    @Autowired
-    CountrySerializer countrySerializer;
+    private final BaseControllerWithErrorHandling baseController;
+    private final CountrySerializer countrySerializer;
+
+    public CountryController(BaseControllerWithErrorHandling baseController, CountrySerializer countrySerializer) {
+        this.baseController = baseController;
+        this.countrySerializer = countrySerializer;
+    }
 
     /**
      * just to get all countries, used in countryMgmt.js
@@ -33,10 +36,9 @@ public class CountryController extends BaseControllerWithErrorHandling {
      * @throws JsonProcessingException
      */
     @GetMapping(value = "/readAll")
-    public @ResponseBody
-    String readCountries() throws JsonProcessingException {
+    public String readCountries() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        List<Country> countries = countryService.findAll();
+        List<Country> countries = baseController.getCountryService().findAll();
         return objectMapper.writeValueAsString(countries);
     }
 
@@ -50,11 +52,10 @@ public class CountryController extends BaseControllerWithErrorHandling {
      * @throws ResourceNotFoundException
      */
     @GetMapping(value = "/read/{countryId}")
-    public @ResponseBody
-    String readCountry(@PathVariable("countryId") int countryId)
+    public String readCountry(@PathVariable("countryId") int countryId)
             throws JsonProcessingException, ResourceNotFoundException {
         ObjectMapper objectMapper = new ObjectMapper();
-        Country country = countryService.findById(countryId).orElseThrow(
+        Country country = baseController.getCountryService().findById(countryId).orElseThrow(
                 () -> new ResourceNotFoundException("no country found with id " + countryId));
         return objectMapper.writeValueAsString(country);
     }
@@ -70,22 +71,21 @@ public class CountryController extends BaseControllerWithErrorHandling {
      * @throws JsonProcessingException
      */
     @PutMapping(value = "/put/{countryId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String updateCountry(@RequestBody String formData, @PathVariable("countryId") int countryId)
+    public String updateCountry(@RequestBody String formData, @PathVariable("countryId") int countryId)
             throws ResourceNotFoundException, JsonProcessingException {
         LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
         String countryName = String.valueOf(linkedHashMap.get("countryName"));
         String countryLink = String.valueOf(linkedHashMap.get("countryLink"));
         String localLink = String.valueOf(linkedHashMap.get("localLink"));
-        Country country = countryService.findById(countryId).orElseThrow(
+        Country country = baseController.getCountryService().findById(countryId).orElseThrow(
                 () -> new ResourceNotFoundException("no country found with id " + countryId));
         //just updating the entity
         country.setCountryName(countryName);
         country.setCountryLink(countryLink);
         country.setLocalLink(localLink.substring(0, 2).toLowerCase() + ".svg");
         String message = "Updating country " + country.getCountryName();
-        countryService.saveUpdate(country);
-        sendMessageToChannel(EntityType.COUNTRY, "update", message,
+        baseController.getCountryService().saveUpdate(country);
+        baseController.sendMessageToChannel(EntityType.COUNTRY, "update", message,
                 EntityUrl.COUNTRYINFO, country.getCountryName(), String.valueOf(country.getId()));
         return new ObjectMapper().writeValueAsString("OK");
     }
@@ -99,8 +99,7 @@ public class CountryController extends BaseControllerWithErrorHandling {
      * @throws JsonProcessingException
      */
     @PostMapping(value = "/post", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String createCountry(@RequestBody String formData)
+    public String createCountry(@RequestBody String formData)
             throws JsonProcessingException {
         LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
         String countryName = String.valueOf(linkedHashMap.get("countryName"));
@@ -111,8 +110,8 @@ public class CountryController extends BaseControllerWithErrorHandling {
         country.setCountryLink(countryLink);
         country.setLocalLink(localLink.substring(0, 2).toLowerCase() + ".svg");
         String message = "Creating country " + country.getCountryName();
-        countryService.save(country);
-        sendMessageToChannel(EntityType.COUNTRY, "create", message,
+        baseController.getCountryService().save(country);
+        baseController.sendMessageToChannel(EntityType.COUNTRY, "create", message,
                 EntityUrl.COUNTRYINFO, country.getCountryName(), String.valueOf(country.getId()));
         return new ObjectMapper().writeValueAsString("OK");
     }
@@ -126,19 +125,18 @@ public class CountryController extends BaseControllerWithErrorHandling {
      * @throws JsonProcessingException
      */
     @GetMapping(value = "/countryName/{countryNameInput}")
-    public @ResponseBody
-    String readCountries(@PathVariable("countryNameInput") String input) throws JsonProcessingException {
+    public String readCountries(@PathVariable("countryNameInput") String input) throws JsonProcessingException {
         ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Country.class, countrySerializer);
         if (input.length() <= 3) {
             //i dont think we have any 3-letter country but just in case we handle it similarly as in ArtistController
-            Optional<Country> country = countryService.findByCountryName(input);
+            Optional<Country> country = baseController.getCountryService().findByCountryName(input);
             if (country.isEmpty()) {
                 return objectMapper.writeValueAsString(null);
             }
             return objectMapper.writeValueAsString(Collections.singleton(country));
         } else {
             //for longer input we use 'contains' concept
-            List<Country> countryList = countryService.findByCountryNameContains(input);
+            List<Country> countryList = baseController.getCountryService().findByCountryNameContains(input);
             if (countryList.isEmpty()) {
                 return objectMapper.writeValueAsString(null);
             }

@@ -9,7 +9,6 @@ import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.repository.SongSubgroupRepository;
 import com.nfssoundtrack.racingsoundtracks.repository.TodaysSongRepository;
 import net.dv8tion.jda.api.entities.Member;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -25,14 +24,20 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class TodaysSongService {
 
-    @Autowired
-    TodaysSongRepository todaysSongRepository;
+    private final TodaysSongRepository todaysSongRepository;
 
-    @Autowired
-    SongSubgroupRepository songSubgroupRepository;
+    private final SongSubgroupRepository songSubgroupRepository;
 
-    @Autowired
-    CorrectionService correctionService;
+    private final CorrectionService correctionService;
+
+    private final GameService gameService;
+
+    public TodaysSongService(TodaysSongRepository todaysSongRepository, SongSubgroupRepository songSubgroupRepository, CorrectionService correctionService, GameService gameService) {
+        this.todaysSongRepository = todaysSongRepository;
+        this.songSubgroupRepository = songSubgroupRepository;
+        this.correctionService = correctionService;
+        this.gameService = gameService;
+    }
 
     @Value("${bot.token}")
     private String botSecret;
@@ -49,7 +54,7 @@ public class TodaysSongService {
      * @throws InterruptedException
      * @throws LoginException
      */
-    public TodaysSong getTodaysSong() throws ResourceNotFoundException, InterruptedException, LoginException {
+    public TodaysSong getTodaysSong() throws ResourceNotFoundException, InterruptedException {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         LocalDate localDate = LocalDate.now();
         String dateAsString = dtf.format(localDate);
@@ -71,6 +76,8 @@ public class TodaysSongService {
             todaysSong.setSongSubgroup(targetSong);
             todaysSong.setDate(dbDate);
             todaysSong = todaysSongRepository.save(todaysSong);
+            // Refresh recent update flags since it's a new day
+            gameService.refreshRecentFlags();
             notifyAboutCorrections();
             return todaysSong;
         }
@@ -82,7 +89,7 @@ public class TodaysSongService {
      * @throws InterruptedException
      * @throws LoginException
      */
-    private void notifyAboutCorrections() throws InterruptedException, LoginException {
+    private void notifyAboutCorrections() throws InterruptedException {
         List<Correction> corrections = correctionService.findByCorrectionStatus(CorrectionStatus.DONE);
         WebsiteViewsController.rebuildJda(botSecret);
         for (Correction correction : corrections) {

@@ -4,7 +4,6 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.Correction;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.CorrectionStatus;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
 import com.nfssoundtrack.racingsoundtracks.repository.CorrectionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -15,8 +14,11 @@ import java.util.List;
 @Service
 public class CorrectionService {
 
-    @Autowired
-    CorrectionRepository correctionRepository;
+    private final CorrectionRepository correctionRepository;
+
+    public CorrectionService(CorrectionRepository correctionRepository) {
+        this.correctionRepository = correctionRepository;
+    }
 
     public Correction save(Correction correction) {
         return correctionRepository.save(correction);

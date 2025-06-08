@@ -34,7 +34,7 @@ public class Correction {
     private String discordUser;
 
     /**
-     * todo this might be expanded in the future to have some conclusion comments about the correction
+     * this might be expanded in the future to have some conclusion comments about the correction
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "correction_status")

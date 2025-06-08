@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +61,12 @@ public class Game implements Serializable, Comparable<Game> {
 
     @Column(name = "additional_info")
     private String additionalInfo;
+
+    @Column(name = "last_updated")
+    private LocalDateTime lastUpdated;
+
+    @Column(name = "is_recently_updated")
+    private Boolean isRecentlyUpdated = false;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
@@ -197,6 +204,22 @@ public class Game implements Serializable, Comparable<Game> {
         this.additionalInfo = additionalInfo;
     }
 
+    // Getters and setters
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public Boolean getIsRecentlyUpdated() {
+        return isRecentlyUpdated;
+    }
+
+    public void setIsRecentlyUpdated(Boolean isRecentlyUpdated) {
+        this.isRecentlyUpdated = isRecentlyUpdated;
+    }
 
     @Override
     public int compareTo(Game o) {
@@ -233,6 +256,20 @@ public class Game implements Serializable, Comparable<Game> {
     @Override
     public int hashCode() {
         return Objects.hash(id, serie, position, gameTitle, displayTitle, gameShort, prefix);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Game game = (Game) obj;
+        return Objects.equals(id, game.id) &&
+                Objects.equals(serie, game.serie) &&
+                Objects.equals(position, game.position) &&
+                Objects.equals(gameTitle, game.gameTitle) &&
+                Objects.equals(displayTitle, game.displayTitle) &&
+                Objects.equals(gameShort, game.gameShort) &&
+                Objects.equals(prefix, game.prefix);
     }
 
     @Override

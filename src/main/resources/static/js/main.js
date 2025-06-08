@@ -112,6 +112,8 @@ async function doLoadingCrap() {
         $("#offcanvasSpan").prev().css("display", "");
         $("#moreDiv").css("position", "absolute");
         $("#moreCountriesDiv").css("position", "absolute");
+        $("#filter_games_menu_pinned").css("display", "none");
+        $("#sort-games-pinned").css("display", "none");
         $(document).find("header").addClass("sticky-top");
     } else {
         //in case of desktop version putting red text in the very top of the page next to links and logo

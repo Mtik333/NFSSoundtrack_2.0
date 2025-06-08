@@ -20,9 +20,15 @@ import java.util.*;
  */
 @Controller
 @RequestMapping(path = "/search")
-public class SearchController extends BaseControllerWithErrorHandling {
+public class SearchController  {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
+
+    private final BaseControllerWithErrorHandling baseController;
+
+    public SearchController(BaseControllerWithErrorHandling baseController) {
+        this.baseController = baseController;
+    }
 
     @Value("${spring.application.name}")
     String appName;
@@ -49,13 +55,13 @@ public class SearchController extends BaseControllerWithErrorHandling {
             logger.debug("well...");
         } else if (searchData.length() <= 3) {
             //treat as exact input as makes no sense to look for something having 3 or less characters in so many tables
-            Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(query);
+            Optional<AuthorAlias> authorAlias = baseController.getAuthorAliasService().findByAlias(query);
             authorAlias.ifPresent(authorAliases::add);
-            Optional<Genre> genre = genreService.findByGenreName(query);
+            Optional<Genre> genre = baseController.getGenreService().findByGenreName(query);
             genre.ifPresent(genres::add);
-            List<Song> foundSongs = songService.findByOfficialDisplayTitle(query);
+            List<Song> foundSongs = baseController.getSongService().findByOfficialDisplayTitle(query);
             for (Song song : foundSongs) {
-                List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(song);
                 Set<Game> games = new HashSet<>();
                 //we want to show all games (in search results) where this song is actually used
                 for (SongSubgroup songSubgroup : songSubgroupList) {
@@ -65,9 +71,9 @@ public class SearchController extends BaseControllerWithErrorHandling {
             }
             //extremely unlikely to have lyrics with only 3 letters
             //todo check if we should really look for any lyrics here
-            List<Song> foundLyrics = songService.findByLyrics(query);
+            List<Song> foundLyrics = baseController.getSongService().findByLyrics(query);
             for (Song song : foundLyrics) {
-                List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(song);
                 Set<Game> games = new HashSet<>();
                 //in case of lyrics we also collect all games for found song
                 for (SongSubgroup songSubgroup : songSubgroupList) {
@@ -81,15 +87,15 @@ public class SearchController extends BaseControllerWithErrorHandling {
             boolean fullPhraseSearch = query.contains("\"");
             if (fullPhraseSearch) {
                 query = query.replace("\"", "").trim();
-                Optional<AuthorAlias> authorAlias = authorAliasService.findByAlias(query);
+                Optional<AuthorAlias> authorAlias = baseController.getAuthorAliasService().findByAlias(query);
                 if (authorAlias.isPresent()) {
                     authorAliases.add(authorAlias.get());
                 }
-                Optional<Genre> genre = genreService.findByGenreName(query);
+                Optional<Genre> genre = baseController.getGenreService().findByGenreName(query);
                 genre.ifPresent(genres::add);
-                List<Song> foundSongs = songService.findByOfficialDisplayTitle(query);
+                List<Song> foundSongs = baseController.getSongService().findByOfficialDisplayTitle(query);
                 for (Song song : foundSongs) {
-                    List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                    List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(song);
                     Set<Game> games = new HashSet<>();
                     //we want to show all games (in search results) where this song is actually used
                     for (SongSubgroup songSubgroup : songSubgroupList) {
@@ -97,23 +103,23 @@ public class SearchController extends BaseControllerWithErrorHandling {
                     }
                     songTitleList.put(song, games);
                 }
-                List<Song> foundLyrics = songService.findByLyrics(query);
+                List<Song> foundLyrics = baseController.getSongService().findByLyrics(query);
                 for (Song song : foundLyrics) {
-                    List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                    List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(song);
                     Set<Game> games = new HashSet<>();
                     for (SongSubgroup songSubgroup : songSubgroupList) {
                         games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
                     }
                     songLyricsList.put(song, games);
                 }
-                genreService.findByGenreName(query).ifPresent(genreList::add);
+                baseController.getGenreService().findByGenreName(query).ifPresent(genreList::add);
             } else {
                 //otherwise we will be doing the contains-search for input that user provided
-                authorAliases = authorAliasService.findByAliasContains(query);
-                genreList = genreService.findByGenreNameContains(query);
-                List<Song> foundSongs = songService.findByOfficialDisplayTitleContains(query);
+                authorAliases = baseController.getAuthorAliasService().findByAliasContains(query);
+                genreList = baseController.getGenreService().findByGenreNameContains(query);
+                List<Song> foundSongs = baseController.getSongService().findByOfficialDisplayTitleContains(query);
                 for (Song song : foundSongs) {
-                    List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                    List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(song);
                     Set<Game> games = new HashSet<>();
                     //we want to show all games (in search results) where this song is actually used
                     for (SongSubgroup songSubgroup : songSubgroupList) {
@@ -121,9 +127,9 @@ public class SearchController extends BaseControllerWithErrorHandling {
                     }
                     songTitleList.put(song, games);
                 }
-                List<Song> foundLyrics = songService.findByLyricsContains(query);
+                List<Song> foundLyrics = baseController.getSongService().findByLyricsContains(query);
                 for (Song song : foundLyrics) {
-                    List<SongSubgroup> songSubgroupList = songSubgroupService.findBySong(song);
+                    List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(song);
                     Set<Game> games = new HashSet<>();
                     for (SongSubgroup songSubgroup : songSubgroupList) {
                         games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
@@ -132,10 +138,10 @@ public class SearchController extends BaseControllerWithErrorHandling {
                 }
             }
         }
-        model.addAttribute("appName", getLocalizedMessage("searchResultsAt", new String[]{appName}));
-        model.addAttribute(WebsiteViewsController.SERIES, serieService.findAllSortedByPositionAsc());
-        model.addAttribute(WebsiteViewsController.GAMES_ALPHA, gameService.findAllSortedByDisplayTitleAsc());
-        model.addAttribute("todayssong", todaysSongService.getTodaysSong());
+        model.addAttribute("appName", baseController.getLocalizedMessage("searchResultsAt", new String[]{appName}));
+        model.addAttribute(WebsiteViewsController.SERIES, baseController.getSerieService().findAllSortedByPositionAsc());
+        model.addAttribute(WebsiteViewsController.GAMES_ALPHA, baseController.getGameService().findAllSortedByDisplayTitleAsc());
+        model.addAttribute("todayssong", baseController.getTodaysSongService().getTodaysSong());
         model.addAttribute("authorAliases", authorAliases);
         model.addAttribute("songTitleList", songTitleList);
         model.addAttribute("songLyricsList", songLyricsList);

@@ -1194,6 +1194,12 @@ $(document).ready(function () {
         if (typedSrcId.length == 0) {
             return;
         }
+        //if we already have 36 chars, then let's call backend to fetch stuff again
+        //sometimes spotify links get more info from odesli.co than youtube ones
+        if (typedSrcId.length == 36){
+            fetchMusicLinks(typedSrcId);
+            return;
+        }
         var indexOfMark = typedSrcId.indexOf("track/");
         var indexOfSi = typedSrcId.indexOf("?si");
         if (indexOfSi > -1) {
@@ -1561,9 +1567,14 @@ $(document).ready(function () {
         setGenreOnMultipleSongs();
     });
 
-    function fetchMusicLinks() {
+    function fetchMusicLinks(potentialSrcId) {
+        let targetUrl = "linksYt/";
         var srcId;
-        if ($("#officialSrcId").length > 0) {
+        if (potentialSrcId!=undefined){
+            srcId=potentialSrcId;
+            targetUrl="linksSp/";
+        }
+        else if ($("#officialSrcId").length > 0) {
             srcId = $("#officialSrcId").val();
         } else {
             srcId = $("#ingameSrcId").val();
@@ -1575,7 +1586,7 @@ $(document).ready(function () {
         $.ajax({
             async: true,
             type: "GET",
-            url: "/songSubgroup/links/" + srcId,
+            url: "/songSubgroup/"+targetUrl+srcId,
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (links) {

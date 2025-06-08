@@ -3,7 +3,6 @@ package com.nfssoundtrack.racingsoundtracks.services;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.repository.SongSubgroupRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -13,18 +12,17 @@ import java.util.Optional;
 @Service
 public class SongSubgroupService {
 
-    @Autowired
-    AuthorAliasService authorAliasService;
+    private final AuthorAliasService authorAliasService;
 
-    @Autowired
-    AuthorSongService authorSongService;
+    private final AuthorSongService authorSongService;
 
-    @Autowired
-    AuthorService authorService;
+    private final SongSubgroupRepository songSubgroupRepository;
 
-    @Autowired
-    SongSubgroupRepository songSubgroupRepository;
-
+    public SongSubgroupService(AuthorAliasService authorAliasService, AuthorSongService authorSongService, SongSubgroupRepository songSubgroupRepository) {
+        this.authorAliasService = authorAliasService;
+        this.authorSongService = authorSongService;
+        this.songSubgroupRepository = songSubgroupRepository;
+    }
 
     public Optional<SongSubgroup> findById(Integer id) {
         return songSubgroupRepository.findById(id);

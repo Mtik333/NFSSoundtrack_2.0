@@ -4,7 +4,6 @@ import com.nfssoundtrack.racingsoundtracks.controllers.WebsiteViewsController;
 import com.nfssoundtrack.racingsoundtracks.services.GameService;
 import com.nfssoundtrack.racingsoundtracks.services.SerieService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -19,11 +18,13 @@ import java.util.Date;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @Autowired
-    SerieService serieService;
+    private final SerieService serieService;
+    private final GameService gameService;
 
-    @Autowired
-    GameService gameService;
+    public GlobalExceptionHandler(SerieService serieService, GameService gameService) {
+        this.serieService = serieService;
+        this.gameService = gameService;
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorDetails> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {

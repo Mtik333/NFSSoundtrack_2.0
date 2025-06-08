@@ -5,7 +5,6 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongGenre;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.repository.SongRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,14 +13,17 @@ import java.util.Optional;
 @Service
 public class SongService {
 
-    @Autowired
-    SongRepository songRepository;
+    private final SongRepository songRepository;
 
-    @Autowired
-    GenreService genreService;
+    private final GenreService genreService;
 
-    @Autowired
-    SongGenreService songGenreService;
+    private final SongGenreService songGenreService;
+
+    public SongService(SongRepository songRepository, GenreService genreService, SongGenreService songGenreService) {
+        this.songRepository = songRepository;
+        this.genreService = genreService;
+        this.songGenreService = songGenreService;
+    }
 
     public Optional<Song> findById(Integer id) {
         return songRepository.findById(id);
@@ -71,9 +73,11 @@ public class SongService {
      * @param song       song to edit
      * @throws ResourceNotFoundException
      */
-    public void saveNewAssignmentOfExistingGenre(String genreValue, Song song) throws ResourceNotFoundException {
-        Genre genre = genreService.findById(Integer.parseInt(genreValue)).orElseThrow(() -> new ResourceNotFoundException("No genre " +
-                "found with id " + genreValue));
+    public boolean saveNewAssignmentOfExistingGenre(String genreValue, Song song, Genre genre) throws ResourceNotFoundException {
+        if (genre==null){
+            genre = genreService.findById(Integer.parseInt(genreValue)).orElseThrow(() -> new ResourceNotFoundException("No genre " +
+                    "found with id " + genreValue));
+        }
         boolean alreadyAssigned = false;
         for (SongGenre songGenre : song.getSongGenreList()) {
             if (songGenre.getGenre().equals(genre)) {
@@ -85,5 +89,6 @@ public class SongService {
             SongGenre songGenre = new SongGenre(song, genre);
             songGenreService.save(songGenre);
         }
+        return alreadyAssigned;
     }
 }
