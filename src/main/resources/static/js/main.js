@@ -318,41 +318,25 @@ $(document).ready(function () {
                 existingTr.remove();
             }
             if (!sameSongClicked) {
-                //then we create row with video and lyris
+                //then we create row with video and lyrics
                 var videoToUse = $(this).attr("data-tagvideo");
                 var lyricsHtmlElem = $(this).next().next();
-                var lyricsText = lyricsHtmlElem.text();
-                var noLyricsAtAll = false;
-                if (lyricsHtmlElem.attr("data-lyricsState") == "instrumental") {
-                    lyricsText = '<h5 style="word-wrap: break-word;">' + lyricsHtmlElem.attr("data-instrumental") + '</h5>';
-                    noLyricsAtAll = true;
-                } else if (lyricsText == "" || lyricsText == "null") {
-                    lyricsText = '<h5 style="word-wrap: break-word;">' + lyricsHtmlElem.attr("data-noLyrics") + '</h5>';
-                    noLyricsAtAll = true;
-                }
+                var songSubgroupId = lyricsHtmlElem.attr("data-songsubgroup-id");
                 var parentTr = $(this).parent().parent().parent();
-                var newTr = $('<tr id="listen-music">');
-                newTr.attr("data-el_id",parentTr.attr("data-el_id"));
-                newTr.attr("data-group_id",parentTr.attr("data-group_id"));
-                var visibleTh = parentTr.parent().parent().find('th:visible').length;
-                var newTd = $('<td colspan="' + visibleTh + '" id="listen-music-id">');
-                var iframeToPut = $('<iframe id="ytrow" frameborder="0">');
-                var lyricsDiv = $('<div id="lyrics_main">');
-                var clearDiv = $('<div style="clear:both;">');
-                var pElem = $('<p>');
-                if (noLyricsAtAll && 'ontouchstart' in window && isMobileAgent) {
-                    lyricsDiv.width("20%");
-                    iframeToPut.width("76%");
+                
+                // Load lyrics via AJAX if not already loaded
+                if (lyricsHtmlElem.text() === "" && lyricsHtmlElem.attr("data-lyricsState") !== "instrumental") {
+                    // Show video immediately with loading indicator
+                    createVideoRow(videoToUse, '<i style="color: #888;">Loading lyrics...</i>', lyricsHtmlElem, parentTr);
+                    
+                    loadLyrics(songSubgroupId, lyricsHtmlElem, function(lyricsText) {
+                        // Update lyrics in existing row
+                        updateLyricsInRow(lyricsText, lyricsHtmlElem);
+                    });
+                } else {
+                    var lyricsText = lyricsHtmlElem.text();
+                    createVideoRow(videoToUse, lyricsText, lyricsHtmlElem, parentTr);
                 }
-                iframeToPut.attr("src", videoToUse + "?autoplay=1&amp;autohide=0&amp;theme=light&amp;wmode=transparent");
-                iframeToPut.attr("allow", "autoplay");
-                pElem.append(lyricsText);
-                lyricsDiv.append(pElem);
-                newTd.append(iframeToPut);
-                newTd.append(lyricsDiv);
-                newTd.append(clearDiv);
-                newTr.append(newTd);
-                newTr.insertAfter(parentTr);
             } else {
                 let newSrc = $(this).attr("src").replace("znakwodny2", "znakwodny");
                 $(this).attr("src", newSrc);
@@ -361,23 +345,106 @@ $(document).ready(function () {
         } else {
             //otherwise we render modal with video and show lyrics if there are any
             $("#lyricsCollapse").empty();
-            var lyricsTxt = $(this).next().text();
-            //if lyrics value is null or empty, then there's nothing
-            if (lyricsTxt == "null" || lyricsTxt == "") {
-                $("#showLyrics").text("Lyrics not found");
+            var lyricsHtmlElem = $(this).next().next();
+            var songSubgroupId = lyricsHtmlElem.attr("data-songsubgroup-id");
+            var lyricsTxt = lyricsHtmlElem.text();
+            
+            // Load lyrics via AJAX if not already loaded
+            if (lyricsTxt === "" && lyricsHtmlElem.attr("data-lyricsState") !== "instrumental") {
+                // Show loading indicator immediately
+                $("#showLyrics").text("Loading lyrics...");
                 $("#showLyrics").prop("disabled", true);
-                //if lyrics value is 0 then it is instrumental
-            } else if (lyricsTxt == "0.0") {
-                $("#showLyrics").text("This is instrumental, no lyrics");
-                $("#showLyrics").prop("disabled", true);
+                
+                loadLyrics(songSubgroupId, lyricsHtmlElem, function(lyrics) {
+                    handleModalLyrics(lyrics, lyricsHtmlElem);
+                });
             } else {
-                //otherwise just show lyrics
-                $("#lyricsCollapse").append(lyricsTxt);
-                $("#showLyrics").prop("disabled", false);
+                handleModalLyrics(lyricsTxt, lyricsHtmlElem);
             }
         }
 
     });
+
+    /**
+     * function to load lyrics via AJAX
+     */
+    function loadLyrics(songSubgroupId, lyricsElement, callback) {
+        $.ajax({
+            url: "/lyrics/" + songSubgroupId,
+            type: "GET",
+            success: function(lyrics) {
+                lyricsElement.text(lyrics);
+                callback(lyrics);
+            },
+            error: function() {
+                lyricsElement.text(""); // Clear loading state
+                callback(""); // Empty if failed to load
+            }
+        });
+    }
+
+    /**
+     * function to update lyrics in existing video row
+     */
+    function updateLyricsInRow(lyricsText, lyricsHtmlElem) {
+        var noLyricsAtAll = false;
+        if (lyricsHtmlElem.attr("data-lyricsState") == "instrumental") {
+            lyricsText = '<h5 style="word-wrap: break-word;">' + lyricsHtmlElem.attr("data-instrumental") + '</h5>';
+            noLyricsAtAll = true;
+        } else if (lyricsText == "" || lyricsText == "null") {
+            lyricsText = '<h5 style="word-wrap: break-word;">' + lyricsHtmlElem.attr("data-noLyrics") + '</h5>';
+            noLyricsAtAll = true;
+        }
+        
+        // Update the lyrics in the existing row
+        $("#lyrics_main p").html(lyricsText);
+        
+        // Adjust layout for mobile if no lyrics
+        if (noLyricsAtAll && 'ontouchstart' in window && isMobileAgent) {
+            $("#lyrics_main").width("20%");
+            $("#ytrow").width("76%");
+        }
+    }
+
+
+    /**
+     * function to create video row with lyrics
+     */
+    function createVideoRow(videoToUse, lyricsText, lyricsHtmlElem, parentTr) {
+        var noLyricsAtAll = false;
+        if (lyricsHtmlElem.attr("data-lyricsState") == "instrumental") {
+            lyricsText = '<h5 style="word-wrap: break-word;">' + lyricsHtmlElem.attr("data-instrumental") + '</h5>';
+            noLyricsAtAll = true;
+        } else if (lyricsText == "" || lyricsText == "null") {
+            lyricsText = '<h5 style="word-wrap: break-word;">' + lyricsHtmlElem.attr("data-noLyrics") + '</h5>';
+            noLyricsAtAll = true;
+        }
+        
+        var newTr = $('<tr id="listen-music">');
+        newTr.attr("data-el_id", parentTr.attr("data-el_id"));
+        newTr.attr("data-group_id", parentTr.attr("data-group_id"));
+        var visibleTh = parentTr.parent().parent().find('th:visible').length;
+        var newTd = $('<td colspan="' + visibleTh + '" id="listen-music-id">');
+        var iframeToPut = $('<iframe id="ytrow" frameborder="0">');
+        var lyricsDiv = $('<div id="lyrics_main">');
+        var clearDiv = $('<div style="clear:both;">');
+        var pElem = $('<p>');
+        
+        if (noLyricsAtAll && 'ontouchstart' in window && isMobileAgent) {
+            lyricsDiv.width("20%");
+            iframeToPut.width("76%");
+        }
+        
+        iframeToPut.attr("src", videoToUse + "?autoplay=1&amp;autohide=0&amp;theme=light&amp;wmode=transparent");
+        iframeToPut.attr("allow", "autoplay");
+        pElem.append(lyricsText);
+        lyricsDiv.append(pElem);
+        newTd.append(iframeToPut);
+        newTd.append(lyricsDiv);
+        newTd.append(clearDiv);
+        newTr.append(newTd);
+        newTr.insertAfter(parentTr);
+    }
 
     /**
      * method to show 'active' and 'unactive' play button

@@ -25,4 +25,23 @@ $(document).ready(function () {
             $(divContainer).css("overflow-y", "auto");
         }
     });
+
+    /**
+     * function to handle lyrics display in modal
+     */
+    window.handleModalLyrics = function(lyricsTxt, lyricsHtmlElem) {
+        //if lyrics value is null or empty, then there's nothing
+        if (lyricsTxt == "null" || lyricsTxt == "") {
+            $("#showLyrics").text("Lyrics not found");
+            $("#showLyrics").prop("disabled", true);
+            //if lyrics value is 0 then it is instrumental
+        } else if (lyricsHtmlElem.attr("data-lyricsState") == "instrumental") {
+            $("#showLyrics").text("This is instrumental, no lyrics");
+            $("#showLyrics").prop("disabled", true);
+        } else {
+            //otherwise just show lyrics
+            $("#lyricsCollapse").append(lyricsTxt);
+            $("#showLyrics").prop("disabled", false);
+        }
+    };
 });

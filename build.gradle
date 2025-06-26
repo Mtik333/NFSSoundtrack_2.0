@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.0'
 	id 'io.spring.dependency-management' version '1.1.7'
+//	id 'com.github.node-gradle.node' version '7.1.0'
 }
 
 group = 'com.nfssoundtrack'
@@ -40,7 +41,75 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
 
 }
+/*
+// Node.js configuration for minification
+node {
+	version = '22.17.0'
+	npmVersion = '11.4.2'
+	download = true
+}
 
+// Install minification tools
+task installMinifyTools(type: NpmTask) {
+	args = ['install', 'terser', 'clean-css-cli']
+}
+
+// Minify JavaScript files (excluding admin folder)
+task minifyJs(type: Exec, dependsOn: installMinifyTools) {
+	doFirst {
+		// Create output directory if it doesn't exist
+		file('src/main/resources/static/min/js').mkdirs()
+		
+		// Get all JS files except admin folder
+		fileTree('src/main/resources/static/js') {
+			include '*.js'
+			exclude 'admin/**'
+		}.each { jsFile ->
+			def fileName = jsFile.name
+			def outputFile = file("src/main/resources/static/min/js/${fileName}")
+			
+			// Minify each file individually
+			exec {
+				commandLine 'npx', 'terser', jsFile.absolutePath, 
+					'--compress', '--mangle', '--output', outputFile.absolutePath
+			}
+		}
+	}
+	
+	// Dummy command since we're doing the work in doFirst
+	commandLine 'echo', 'JavaScript minification completed'
+}
+
+// Minify CSS files
+task minifyCss(type: Exec, dependsOn: installMinifyTools) {
+	doFirst {
+		// Create output directory if it doesn't exist
+		file('src/main/resources/static/min/css').mkdirs()
+		
+		// Get all CSS files
+		fileTree('src/main/resources/static/css') {
+			include '*.css'
+		}.each { cssFile ->
+			def fileName = cssFile.name
+			def outputFile = file("src/main/resources/static/min/css/${fileName}")
+			
+			// Minify each file individually
+			exec {
+				commandLine 'npx', 'cleancss', cssFile.absolutePath, 
+					'--output', outputFile.absolutePath
+			}
+		}
+	}
+	
+	// Dummy command since we're doing the work in doFirst
+	commandLine 'echo', 'CSS minification completed'
+}
+
+// Run minification before processing resources (can be disabled with -PskipMinify=true)
+if (!project.hasProperty('skipMinify') || project.property('skipMinify') != 'true') {
+    processResources.dependsOn minifyJs, minifyCss
+}
+*/
 tasks.named('test') {
 	useJUnitPlatform()
 }

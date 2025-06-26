@@ -56,9 +56,12 @@
                     <td class="playlist-countries countries">
                         <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
                             <th:block th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
-                                <img class="img-country img-responsive-row-icon" data-toggle="tooltip"
-                                    data-placement="top" th:title="${authorCountry.country.countryName}"
-                                     th:src="@{/images/countryflags/}+${authorCountry.country.localLink}">
+                                <a class="table_link" th:href="'/countryInfo/'+${authorCountry.country.id}">
+                                    <img class="img-country" data-toggle="tooltip"
+                                         data-placement="top" th:title="${authorCountry.country.countryName}"
+                                         style="max-width:40px"
+                                         th:src="@{/images/countryflags/}+${authorCountry.country.localLink}">
+                                </a>
                             </th:block>
                         </th:block>
                     </td>
@@ -128,6 +131,7 @@
                                 </svg>
                             </a>
                             <textarea
+                                    th:attr="data-lyricsState=${songSubgroup.instrumental.value=='YES' ? 'instrumental' : 'noninstrumental'},data-instrumental=#{thisIsInstrumental},data-noLyrics=#{noLyrics},data-songsubgroup-id=${songSubgroup.id}"
                                 th:utext="${songSubgroup.lyrics!=null} ? ${songSubgroup.lyrics} : ${songSubgroup.song.lyrics}"
                                 hidden></textarea>
                             <th:block th:if="${songSubgroup.spotifyId != null}">

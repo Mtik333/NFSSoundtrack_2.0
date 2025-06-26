@@ -99,6 +99,7 @@
                         </svg>
                     </a>
                     <textarea
+                            th:attr="data-lyricsState=${todaysSong.songSubgroup.instrumental.value=='YES' ? 'instrumental' : 'noninstrumental'},data-instrumental=#{thisIsInstrumental},data-noLyrics=#{noLyrics},data-songsubgroup-id=${todaysSong.songSubgroup.id}"
                         th:utext="${todaysSong.songSubgroup.lyrics!=null} ? ${todaysSong.songSubgroup.lyrics} : ${todaysSong.songSubgroup.song.lyrics}"
                         hidden></textarea>
                     <th:block th:if="${todaysSong.songSubgroup.spotifyId != null}">

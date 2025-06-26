@@ -556,6 +556,24 @@ public class WebsiteViewsController  {
     }
 
     /**
+     * endpoint to fetch lyrics for a specific song subgroup
+     * @param songSubgroupId id of the song subgroup
+     * @return lyrics text or empty string if not found
+     * @throws ResourceNotFoundException when song subgroup not found
+     */
+    @GetMapping(value = "/lyrics/{songSubgroupId}")
+    public @ResponseBody String getLyrics(@PathVariable("songSubgroupId") int songSubgroupId) throws ResourceNotFoundException {
+        SongSubgroup songSubgroup = baseController.getSongSubgroupService().findById(songSubgroupId)
+                .orElseThrow(() -> new ResourceNotFoundException("SongSubgroup not found with id " + songSubgroupId));
+        
+        // Priority logic: songSubgroup.lyrics -> song.lyrics
+        String lyrics = songSubgroup.getLyrics() != null ? 
+            songSubgroup.getLyrics() : songSubgroup.getSong().getLyrics();
+        
+        return lyrics != null ? lyrics : "";
+    }
+
+    /**
      * endpoint used for stuff from Toni's Music Library - not relevant to the website
      * he uploads a lot of music and includes original filenames
      * now we can use filename as input to get video title for him as well as description
