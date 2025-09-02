@@ -57,7 +57,7 @@ public class WebsiteViewsController  {
         this.songSerializer = songSerializer;
         this.baseController = baseController;
         this.webClient = WebClient.builder()
-                .baseUrl("https://localhost:445")
+                .baseUrl("https://racingsoundtracks.com:445")
                 .build();
     }
 
@@ -675,30 +675,67 @@ public class WebsiteViewsController  {
      * Handle requests to old.racingsoundtracks.com subdomain by proxying to Apache server on port 445
      */
     @RequestMapping(value = "/**", headers = "host=old.racingsoundtracks.com")
-    public ResponseEntity<String> handleOldSubdomain(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<byte[]> handleOldSubdomain(HttpServletRequest request, HttpServletResponse response) {
         try {
             String requestUri = request.getRequestURI();
             String queryString = request.getQueryString();
             String fullPath = requestUri + (queryString != null ? "?" + queryString : "");
             logger.info("Proxying old subdomain request: {}", fullPath);
-            String responseBody = webClient.get()
+            
+            // Get response as bytes to handle both text and binary content
+            byte[] responseBody = webClient.get()
                     .uri(fullPath)
                     .header("Host", "old.racingsoundtracks.com")
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .bodyToMono(byte[].class)
                     .block();
+            
+            // Determine content type from the request path
+            String contentType = getContentType(requestUri);
+            
+            // Only rewrite HTML content
+            if (contentType.contains("text/html") && responseBody != null) {
+                String htmlContent = new String(responseBody, StandardCharsets.UTF_8);
+                String rewrittenBody = htmlContent
+                        .replace("racingsoundtracks.com:445", "old.racingsoundtracks.com")
+                        .replace("href=\"/", "href=\"https://old.racingsoundtracks.com/")
+                        .replace("src=\"/", "src=\"https://old.racingsoundtracks.com/");
+                responseBody = rewrittenBody.getBytes(StandardCharsets.UTF_8);
+            }
+            
             return ResponseEntity.ok()
-                    .header("Content-Type", "text/html; charset=UTF-8")
+                    .header("Content-Type", contentType)
                     .body(responseBody);
                     
         } catch (WebClientResponseException e) {
             logger.error("Error proxying to Apache server: {}", e.getMessage());
             return ResponseEntity.status(e.getStatusCode())
-                    .body("Error accessing old site: " + e.getMessage());
+                    .body(("Error accessing old site: " + e.getMessage()).getBytes());
         } catch (Exception e) {
             logger.error("Unexpected error proxying request: {}", e.getMessage());
             return ResponseEntity.status(500)
-                    .body("Internal server error while proxying request");
+                    .body("Internal server error while proxying request".getBytes());
+        }
+    }
+
+    /**
+     * Helper method to determine content type based on file extension
+     */
+    private String getContentType(String requestUri) {
+        if (requestUri.endsWith(".css")) {
+            return "text/css";
+        } else if (requestUri.endsWith(".js")) {
+            return "application/javascript";
+        } else if (requestUri.endsWith(".png")) {
+            return "image/png";
+        } else if (requestUri.endsWith(".jpg") || requestUri.endsWith(".jpeg")) {
+            return "image/jpeg";
+        } else if (requestUri.endsWith(".gif")) {
+            return "image/gif";
+        } else if (requestUri.endsWith(".ico")) {
+            return "image/x-icon";
+        } else {
+            return "text/html; charset=UTF-8";
         }
     }
 
