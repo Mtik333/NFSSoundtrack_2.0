@@ -25,6 +25,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -56,8 +57,14 @@ public class WebsiteViewsController  {
     public WebsiteViewsController(SongSerializer songSerializer, BaseControllerWithErrorHandling baseController) {
         this.songSerializer = songSerializer;
         this.baseController = baseController;
+        // Configure WebClient with larger buffer size for big pages
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(5 * 1024 * 1024)) // 5MB
+                .build();
+                
         this.webClient = WebClient.builder()
                 .baseUrl("https://racingsoundtracks.com:445")
+                .exchangeStrategies(strategies)
                 .build();
     }
 
