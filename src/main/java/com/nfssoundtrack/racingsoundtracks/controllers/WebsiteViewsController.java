@@ -19,9 +19,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
@@ -46,10 +51,14 @@ public class WebsiteViewsController  {
 
     private final SongSerializer songSerializer;
     private final BaseControllerWithErrorHandling baseController;
+    private final WebClient webClient;
 
     public WebsiteViewsController(SongSerializer songSerializer, BaseControllerWithErrorHandling baseController) {
         this.songSerializer = songSerializer;
         this.baseController = baseController;
+        this.webClient = WebClient.builder()
+                .baseUrl("https://localhost:445")
+                .build();
     }
 
     @Value("${spring.application.name}")
@@ -660,6 +669,37 @@ public class WebsiteViewsController  {
             jda.awaitReady();
         }
         return jda;
+    }
+
+    /**
+     * Handle requests to old.racingsoundtracks.com subdomain by proxying to Apache server on port 445
+     */
+    @RequestMapping(value = "/**", headers = "host=old.racingsoundtracks.com")
+    public ResponseEntity<String> handleOldSubdomain(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String requestUri = request.getRequestURI();
+            String queryString = request.getQueryString();
+            String fullPath = requestUri + (queryString != null ? "?" + queryString : "");
+            logger.info("Proxying old subdomain request: {}", fullPath);
+            String responseBody = webClient.get()
+                    .uri(fullPath)
+                    .header("Host", "old.racingsoundtracks.com")
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            return ResponseEntity.ok()
+                    .header("Content-Type", "text/html; charset=UTF-8")
+                    .body(responseBody);
+                    
+        } catch (WebClientResponseException e) {
+            logger.error("Error proxying to Apache server: {}", e.getMessage());
+            return ResponseEntity.status(e.getStatusCode())
+                    .body("Error accessing old site: " + e.getMessage());
+        } catch (Exception e) {
+            logger.error("Unexpected error proxying request: {}", e.getMessage());
+            return ResponseEntity.status(500)
+                    .body("Internal server error while proxying request");
+        }
     }
 
     /**
