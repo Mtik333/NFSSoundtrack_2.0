@@ -90,7 +90,12 @@ public class WebsiteViewsController  {
      * @return the main 'endpoint' of the website
      */
     @GetMapping(value = "/")
-    public String mainPage() {
+    public String mainPage(HttpServletRequest request) {
+        if (request != null && request.getServerName().equals("old.racingsoundtracks.com")) {
+            // Let Apache handle old domain requests
+            return "forward:/index.php";
+            // or return some error to let Apache take over
+        }
         return "redirect:/content/home";
     }
 
