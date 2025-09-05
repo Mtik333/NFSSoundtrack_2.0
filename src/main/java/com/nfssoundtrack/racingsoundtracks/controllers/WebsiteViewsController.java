@@ -59,7 +59,7 @@ public class WebsiteViewsController  {
         this.baseController = baseController;
         // Configure WebClient with larger buffer size for big pages
         ExchangeStrategies strategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(5 * 1024 * 1024)) // 5MB
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)) // 10MB
                 .build();
                 
         this.webClient = WebClient.builder()
