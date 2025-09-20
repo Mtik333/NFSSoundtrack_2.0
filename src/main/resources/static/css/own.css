@@ -389,6 +389,12 @@ a.gamegroup.active {
   border-color: rgba(var(--bs-secondary-rgb)) !important;
 }
 
+html[data-bs-theme="dark"] .list-group-item.active {
+  background-color: #1e3a8a !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
 button.subgroup.active {
   border-width: 2px !important;
   border-bottom: 0 !important;

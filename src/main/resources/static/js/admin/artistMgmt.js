@@ -110,6 +110,10 @@ function setupCountryAndAliasFields(foundArtist) {
     divToAppend.append(discoGsDiv);
 }
 
+$(document).on('focusout', '.discoGsStuff', function (e) {
+    discogsToUpdate=true;
+});
+
 $(document).on('click', 'button.delete-alias', function (e) {
     var col = $(this).parent();
     var rowCol = col.parent();
@@ -360,9 +364,9 @@ function generateDiscogsInfoDiv(foundArtist, discoGsDiv) {
             zeroRowDiv.append(fetchUsingDiscogsId);
             discoGsDiv.append(zeroRowDiv);
             var discogsIdInput = $('<input class="form-control" type="text" id="discogsIdInput" value="' + songInfo.discogsId + '">');
-            var discogsUriInput = $('<input class="form-control" type="text" id="discogsUriInput" value="' + songInfo.uri + '">');
-            var discogsTwitterInput = $('<input class="form-control" type="text" id="discogsTwitterInput" value="' + nullToString(songInfo.twitter) + '">');
-            var discogsFacebookInput = $('<input class="form-control" type="text" id="discogsFacebookInput" value="' + nullToString(songInfo.facebook) + '">');
+            var discogsUriInput = $('<input class="form-control discoGsStuff" type="text" id="discogsUriInput" value="' + songInfo.uri + '">');
+            var discogsTwitterInput = $('<input class="form-control discoGsStuff" type="text" id="discogsTwitterInput" value="' + nullToString(songInfo.twitter) + '">');
+            var discogsFacebookInput = $('<input class="form-control discoGsStuff" type="text" id="discogsFacebookInput" value="' + nullToString(songInfo.facebook) + '">');
             firstRowColDiv1.append(discogsIdInput);
             firstRowColDiv1.append('<label for="discogsIdInput">DiscoGS ID</label>');
             firstRowColDiv2.append(discogsUriInput);
@@ -381,10 +385,10 @@ function generateDiscogsInfoDiv(foundArtist, discoGsDiv) {
             var secondRowColDiv2 = $('<div class="col">');
             var secondRowColDiv3 = $('<div class="col">');
             var secondRowColDiv4 = $('<div class="col">');
-            var discogsInstagramInput = $('<input class="form-control" type="text" id="discogsInstagramInput" value="' + nullToString(songInfo.instagram) + '">');
-            var discogsSoundcloudInput = $('<input class="form-control" type="text" id="discogsSoundcloudInput" value="' + nullToString(songInfo.soundcloud) + '">');
-            var discogsWikipediaInput = $('<input class="form-control" type="text" id="discogsWikipediaInput" value="' + nullToString(songInfo.wikipedia) + '">');
-            var discogsMyspaceInput = $('<input class="form-control" type="text" id="discogsMyspaceInput" value="' + nullToString(songInfo.myspace) + '">');
+            var discogsInstagramInput = $('<input class="form-control discoGsStuff" type="text" id="discogsInstagramInput" value="' + nullToString(songInfo.instagram) + '">');
+            var discogsSoundcloudInput = $('<input class="form-control discoGsStuff" type="text" id="discogsSoundcloudInput" value="' + nullToString(songInfo.soundcloud) + '">');
+            var discogsWikipediaInput = $('<input class="form-control discoGsStuff" type="text" id="discogsWikipediaInput" value="' + nullToString(songInfo.wikipedia) + '">');
+            var discogsMyspaceInput = $('<input class="form-control discoGsStuff" type="text" id="discogsMyspaceInput" value="' + nullToString(songInfo.myspace) + '">');
             secondRowColDiv1.append(discogsInstagramInput);
             secondRowColDiv1.append('<label for="discogsInstagramInput">Instagram link</label>');
             secondRowColDiv2.append(discogsSoundcloudInput);
