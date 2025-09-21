@@ -132,17 +132,25 @@ public class DiscoGSObj {
 
     public void setLinks(List<String> urls) {
         for (String localUrl : urls) {
-            if (localUrl.contains("facebook")) {
+            boolean missingHttp = !localUrl.contains("http");
+            String targetUrl;
+            if (missingHttp){
+                targetUrl = "https://"+localUrl;
+            } else {
+                targetUrl = localUrl;
+            }
+            targetUrl = targetUrl.substring(targetUrl.indexOf("http"));
+            if (targetUrl.contains("facebook")) {
                 this.setFacebook(localUrl);
-            } else if (localUrl.contains("twitter")) {
+            } else if (targetUrl.contains("twitter")) {
                 this.setTwitter(localUrl);
-            } else if (localUrl.contains("instagram")) {
+            } else if (targetUrl.contains("instagram")) {
                 this.setInstagram(localUrl);
-            } else if (localUrl.contains("soundcloud")) {
+            } else if (targetUrl.contains("soundcloud")) {
                 this.setSoundcloud(localUrl);
-            } else if (localUrl.contains("myspace")) {
+            } else if (targetUrl.contains("myspace")) {
                 this.setMyspace(localUrl);
-            } else if (localUrl.contains("wikipedia")) {
+            } else if (targetUrl.contains("wikipedia")) {
                 this.setWikipedia(localUrl);
             }
         }
