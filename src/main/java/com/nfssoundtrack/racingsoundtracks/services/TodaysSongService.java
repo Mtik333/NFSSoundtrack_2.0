@@ -90,20 +90,58 @@ public class TodaysSongService {
      * @throws LoginException
      */
     private void notifyAboutCorrections() throws InterruptedException {
-        List<Correction> corrections = correctionService.findByCorrectionStatus(CorrectionStatus.DONE);
+        List<Correction> doneCorrections = correctionService.findByCorrectionStatus(CorrectionStatus.DONE);
         WebsiteViewsController.rebuildJda(botSecret);
-        for (Correction correction : corrections) {
-            //if user was mentioned in correction, we'll contact him but also mark correction as modified anyway
-            if (!correction.getDiscordUser().isEmpty()) {
-                List<Member> foundUsers = WebsiteViewsController.getJda().getGuilds().get(0)
-                        .retrieveMembersByPrefix(correction.getDiscordUser(), 1).get();
-                if (!foundUsers.isEmpty()) {
-                    foundUsers.get(0).getUser().openPrivateChannel().queue(privateChannel -> privateChannel
-                            .sendMessage("Your correction with ID " + correction.getId()
-                                    + " was processed. Please check at " + correction.getPageUrl()).queue());
-                }
+        for (Correction correction : doneCorrections) {
+            if (correction.getDiscordUser().isEmpty()) {
+                continue;
             }
+            //if user was mentioned in correction, we'll contact him but also mark correction as modified anyway
+            List<Member> foundUsers = WebsiteViewsController.getJda().getGuilds().get(0)
+                    .retrieveMembersByPrefix(correction.getDiscordUser(), 1).get();
+            if (foundUsers.isEmpty()) {
+                continue;
+            }
+            foundUsers.get(0).getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                    .sendMessage("Your correction with ID " + correction.getId()
+                            + " was processed. Please check at " + correction.getPageUrl()).queue());
             correction.setCorrectionStatus(CorrectionStatus.NOTIFIED);
+            correctionService.save(correction);
+        }
+        List<Correction> rejectedCorrections = correctionService.findByCorrectionStatus(CorrectionStatus.REJECTED);
+        for (Correction correction : rejectedCorrections) {
+            if (correction.getDiscordUser().isEmpty()) {
+                continue;
+            }
+            //if user was mentioned in correction, we'll contact him but also mark correction as modified anyway
+            List<Member> foundUsers = WebsiteViewsController.getJda().getGuilds().get(0)
+                    .retrieveMembersByPrefix(correction.getDiscordUser(), 1).get();
+            if (foundUsers.isEmpty()) {
+                continue;
+            }
+            foundUsers.get(0).getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                    .sendMessage("Your correction with ID " + correction.getId()
+                            + " was rejected. Reason is: " + correction.getAdminComment()).queue());
+            correction.setCorrectionStatus(CorrectionStatus.REJECTED_NOTIFIED);
+            correctionService.save(correction);
+        }
+        List<Correction> clarifyCorrections = correctionService.findByCorrectionStatus(CorrectionStatus.CLARIFY);
+        for (Correction correction : clarifyCorrections) {
+            if (correction.getDiscordUser().isEmpty()) {
+                continue;
+            }
+            //if user was mentioned in correction, we'll contact him but also mark correction as modified anyway
+            List<Member> foundUsers = WebsiteViewsController.getJda().getGuilds().get(0)
+                    .retrieveMembersByPrefix(correction.getDiscordUser(), 1).get();
+            if (foundUsers.isEmpty()) {
+                continue;
+            }
+            foundUsers.get(0).getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                    .sendMessage("Your correction with ID " + correction.getId()
+                            + " requires clarification. Admin is asking: " + correction.getAdminComment()
+                    + "\nPlease write to me via Discord by finding user with this ID: 356215521420771329" +
+                            " or send me an e-mail to mtik333@gmail.com").queue());
+            correction.setCorrectionStatus(CorrectionStatus.CLARIFY_WAITING);
             correctionService.save(correction);
         }
     }

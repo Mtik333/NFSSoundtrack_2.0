@@ -4,7 +4,11 @@ public enum CorrectionStatus {
 
     PENDING("PENDING"),
     DONE("DONE"),
-    NOTIFIED("NOTIFIED");
+    NOTIFIED("NOTIFIED"),
+    REJECTED("REJECTED"),
+    REJECTED_NOTIFIED("REJECTED_NOTIFIED"),
+    CLARIFY("CLARIFY"),
+    CLARIFY_WAITING("CLARIFY_WAITING");
 
     public String value() {
         return value;

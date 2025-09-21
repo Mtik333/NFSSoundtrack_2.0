@@ -40,6 +40,9 @@ public class Correction {
     @Column(name = "correction_status")
     private CorrectionStatus correctionStatus;
 
+    @Column(name = "admin_comment")
+    private String adminComment;
+
     public Long getId() {
         return id;
     }
@@ -94,6 +97,14 @@ public class Correction {
 
     public void setCorrectionStatus(CorrectionStatus correctionStatus) {
         this.correctionStatus = correctionStatus;
+    }
+
+    public String getAdminComment() {
+        return adminComment;
+    }
+
+    public void setAdminComment(String adminComment) {
+        this.adminComment = adminComment;
     }
 
     public Correction() {

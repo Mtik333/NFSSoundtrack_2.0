@@ -141,17 +141,17 @@ public class DiscoGSObj {
             }
             targetUrl = targetUrl.substring(targetUrl.indexOf("http"));
             if (targetUrl.contains("facebook")) {
-                this.setFacebook(localUrl);
+                this.setFacebook(targetUrl);
             } else if (targetUrl.contains("twitter")) {
-                this.setTwitter(localUrl);
+                this.setTwitter(targetUrl);
             } else if (targetUrl.contains("instagram")) {
-                this.setInstagram(localUrl);
+                this.setInstagram(targetUrl);
             } else if (targetUrl.contains("soundcloud")) {
-                this.setSoundcloud(localUrl);
+                this.setSoundcloud(targetUrl);
             } else if (targetUrl.contains("myspace")) {
-                this.setMyspace(localUrl);
+                this.setMyspace(targetUrl);
             } else if (targetUrl.contains("wikipedia")) {
-                this.setWikipedia(localUrl);
+                this.setWikipedia(targetUrl);
             }
         }
     }
