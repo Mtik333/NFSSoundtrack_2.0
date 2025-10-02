@@ -746,7 +746,7 @@ public class SongSubgroupController  {
             int beginPositionITunes = valueToCheck.indexOf("https://geo.music.apple.com");
             if (beginPositionITunes > -1) {
                 int endPosition = valueToCheck.indexOf("0026mt=1");
-                String iTunesLink = valueToCheck.substring(beginPositionITunes, endPosition - 2);
+                String iTunesLink = valueToCheck.substring(beginPositionITunes, endPosition - 2) + "&at=11lJZP";
                 songSubgroup.setItunesLink(iTunesLink);
             }
             int beginPositionTidal = valueToCheck.indexOf("https://listen.tidal.com");
