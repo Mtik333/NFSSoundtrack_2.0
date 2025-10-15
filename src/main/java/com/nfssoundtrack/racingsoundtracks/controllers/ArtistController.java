@@ -414,10 +414,22 @@ public class ArtistController {
                 discoGSObj.setSocialLink(twitter, facebook, instagram, soundcloud, myspace, wikipedia);
                 String localMessage = "Updating DiscoGS info for author " + author.getName();
                 //as during edit we maybe updated the author, we want to update the index too
-                baseController.getAuthorService().updateDiscoGSObj(Long.valueOf(authorId), discoGSObj);
+                baseController.getAuthorService().updateDiscoGSObj(Long.valueOf(authorId), discoGSObj,
+                        false);
                 baseController.sendMessageToChannel(EntityType.AUTHOR, "update", localMessage,
                         EntityUrl.AUTHOR, author.getName(), String.valueOf(author.getId()));
             }
+        } else {
+            //if we came across author who's not existing in discogs
+            //we will update all the existing discogs files to add missing info on it
+            //i do it only because i want to match some missing artists with the discogs identifiers
+            //and i dont want to go through artists that i know do not exist in discogs
+            //TODO disable once you go through all the letters and digits
+            DiscoGSObj discoGSObj = new DiscoGSObj();
+            discoGSObj.setNotInDiscogs(true);
+            discoGSObj.setDiscogsId(0);
+            baseController.getAuthorService().updateDiscoGSObj(author.getId(),discoGSObj,true);
+            updateAllDiscoGS(author.getName().substring(0,1));
         }
         //it might be that there was a typo in author official name, so if we want to fix all the songs associated
         //with such author, we will go through all songs and correct this value there
@@ -492,5 +504,22 @@ public class ArtistController {
         //once we save the author, these fetched values will be saved to index too
         DiscoGSObj discoGSObj = baseController.getAuthorService().manuallyFetchDiscogsInfo(artistName, discogsId);
         return objectMapper.writeValueAsString(discoGSObj);
+    }
+
+    @PostMapping(value = "/updateAllDiscoGs/{letter}")
+    public String updateAllDiscoGS(@PathVariable("letter") String letter)
+            throws InterruptedException, JsonProcessingException {
+        List<Author> authors = baseController.getAuthorService().findByNameStartingWith(letter);
+        for (Author author : authors){
+            DiscoGSObj discoGSObj = discoGSObjMap.get(author.getId());
+            if (discoGSObj==null){
+                continue;
+            }
+            if (Boolean.TRUE.equals(author.getSkipDiscogs())){
+                discoGSObj.setDiscogsId(0);
+            }
+            baseController.getAuthorService().updateDiscoGSObj(author.getId(), discoGSObj, author.getSkipDiscogs());
+        }
+        return new ObjectMapper().writeValueAsString("OK");
     }
 }

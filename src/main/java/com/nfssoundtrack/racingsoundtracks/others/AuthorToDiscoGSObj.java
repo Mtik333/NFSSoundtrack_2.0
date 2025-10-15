@@ -7,6 +7,7 @@ package com.nfssoundtrack.racingsoundtracks.others;
 public class AuthorToDiscoGSObj {
 
     private long artistId;
+    private boolean ignoredByDiscogs;
     private DiscoGSObj discoGSObj;
 
     public long getArtistId() {
@@ -23,6 +24,14 @@ public class AuthorToDiscoGSObj {
 
     public void setDiscoGSObj(DiscoGSObj discoGSObj) {
         this.discoGSObj = discoGSObj;
+    }
+
+    public boolean isIgnoredByDiscogs() {
+        return ignoredByDiscogs;
+    }
+
+    public void setIgnoredByDiscogs(boolean ignoredByDiscogs) {
+        this.ignoredByDiscogs = ignoredByDiscogs;
     }
 
     public AuthorToDiscoGSObj(long artistId, DiscoGSObj discoGSObj) {

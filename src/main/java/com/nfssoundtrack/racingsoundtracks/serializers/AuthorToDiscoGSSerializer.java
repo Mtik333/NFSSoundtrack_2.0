@@ -16,6 +16,7 @@ public class AuthorToDiscoGSSerializer extends JsonSerializer<AuthorToDiscoGSObj
     public void serialize(AuthorToDiscoGSObj authorToDiscoGSObj, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeNumberField("artistId", authorToDiscoGSObj.getArtistId());
+        jsonGenerator.writeBooleanField("ignoredByDiscogs", authorToDiscoGSObj.isIgnoredByDiscogs());
         jsonGenerator.writeFieldName("discogs");
         jsonGenerator.writeStartObject();
         jsonGenerator.writeBooleanField("notInDiscogs", authorToDiscoGSObj.getDiscoGSObj().isNotInDiscogs());

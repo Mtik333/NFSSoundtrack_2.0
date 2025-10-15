@@ -78,6 +78,10 @@ public class AuthorService {
         return authorRepository.findByNameContains(name);
     }
 
+    public List<Author> findByNameStartingWith(String name) {
+        return authorRepository.findByNameStartingWith(name);
+    }
+
     public void delete(Author author) {
         authorRepository.delete(author);
     }
@@ -166,7 +170,7 @@ public class AuthorService {
                     "- you might reach out to admin so he can double check");
             updateLastError(Instant.now());
         } else {
-            updateDiscoGSObj(author.getId(), discoGSObj);
+            updateDiscoGSObj(author.getId(), discoGSObj, author.getSkipDiscogs());
         }
         return discoGSObj;
     }
@@ -196,14 +200,14 @@ public class AuthorService {
                 discoGSObj = new DiscoGSObj(false, artistDiscogsId, null, RETRY_IN_2_MINUTES);
                 updateLastError(Instant.now());
             } else {
-                updateDiscoGSObj(author.getId(), discoGSObj);
+                updateDiscoGSObj(author.getId(), discoGSObj, author.getSkipDiscogs());
             }
         } else {
             //otherwise, means author is not in the discogs database
             //we store this info in map and json too
             discoGSObj = new DiscoGSObj(true, 0, null,
                     author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
-            updateDiscoGSObj(author.getId(), discoGSObj);
+            updateDiscoGSObj(author.getId(), discoGSObj, author.getSkipDiscogs());
         }
         return discoGSObj;
     }
@@ -234,13 +238,13 @@ public class AuthorService {
                         "- you might reach out to admin so he can double check");
                 updateLastError(Instant.now());
             }
-            updateDiscoGSObj(author.getId(), handledDiscoGSObj);
+            updateDiscoGSObj(author.getId(), handledDiscoGSObj, author.getSkipDiscogs());
         } else {
             //otherwise, well cannot find author by his name
             //so admin will probably have to look up manually
             handledDiscoGSObj = new DiscoGSObj(true, 0, null,
                     author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
-            updateDiscoGSObj(author.getId(), handledDiscoGSObj);
+            updateDiscoGSObj(author.getId(), handledDiscoGSObj, author.getSkipDiscogs());
         }
         return handledDiscoGSObj;
     }
@@ -391,7 +395,8 @@ public class AuthorService {
      * @throws InterruptedException
      * @throws LoginException
      */
-    private void createArtistJson(Long artistId, DiscoGSObj discoGSObj) throws InterruptedException {
+    private void createArtistJson(Long artistId, DiscoGSObj discoGSObj,
+                                  Boolean ignoredForDiscoGs) throws InterruptedException {
         try {
             File folderFile = new File("discogs" + File.separator + artistId);
             if (!folderFile.exists()) {
@@ -409,6 +414,11 @@ public class AuthorService {
                     simpleModule.addSerializer(AuthorToDiscoGSObj.class, new AuthorToDiscoGSSerializer());
                     objectMapper.registerModule(simpleModule);
                     AuthorToDiscoGSObj authorToDiscoGSObj = new AuthorToDiscoGSObj(artistId, discoGSObj);
+                    if (ignoredForDiscoGs==null){
+                        authorToDiscoGSObj.setIgnoredByDiscogs(Boolean.FALSE);
+                    } else {
+                        authorToDiscoGSObj.setIgnoredByDiscogs(ignoredForDiscoGs);
+                    }
                     String valueAsString = objectMapper.writeValueAsString(authorToDiscoGSObj);
                     randomDiscoGsFile.write(valueAsString.getBytes(StandardCharsets.UTF_8));
                 }
@@ -427,9 +437,9 @@ public class AuthorService {
         }
     }
 
-    public void updateDiscoGSObj(Long artistId, DiscoGSObj updatedDiscoGSObj) throws InterruptedException {
+    public void updateDiscoGSObj(Long artistId, DiscoGSObj updatedDiscoGSObj, Boolean ignoredByDiscoGs) throws InterruptedException {
         discoGSObjMap.put(artistId, updatedDiscoGSObj);
-        createArtistJson(artistId, updatedDiscoGSObj);
+        createArtistJson(artistId, updatedDiscoGSObj, ignoredByDiscoGs);
     }
 
     private static void updateLastError(Instant instant) {

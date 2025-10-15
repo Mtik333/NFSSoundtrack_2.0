@@ -62,7 +62,7 @@ public class SubgroupController  {
                 + " in game " + subgroup.getMainGroup().getGame().getDisplayTitle();
         //so we get the subgroup
         List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
-        Map<String, String[]> songsToAssign = new HashMap<>();
+        Map<String, List<String[]>> songsToAssign = new HashMap<>();
         List<String> songsToDetach = new ArrayList<>();
         for (Object obj : objectMapper) {
             LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) obj;
@@ -73,7 +73,12 @@ public class SubgroupController  {
             String state = String.valueOf(linkedHashMap.get("state"));
             //filling map of songs to add / delete to subgroup
             if (state.equals("ADD")) {
-                songsToAssign.put(songId, new String[]{songSubgroupId, position});
+                List<String[]> arrayOfSongSubgroups = songsToAssign.get(songId);
+                if (arrayOfSongSubgroups==null){
+                    arrayOfSongSubgroups = new ArrayList<>();
+                }
+                arrayOfSongSubgroups.add(new String[]{songSubgroupId, position});
+                songsToAssign.put(songId, arrayOfSongSubgroups);
             } else if (state.equals("DELETE")) {
                 songsToDetach.add(songId);
             }
@@ -118,47 +123,49 @@ public class SubgroupController  {
         }
         //we will put position of new song in subgroup based on how many songs we are trying to remove / add
         int positionPrefix = 10 * songsToDetach.size();
-        for (Map.Entry<String, String[]> song : songsToAssign.entrySet()) {
+        for (Map.Entry<String, List<String[]>> song : songsToAssign.entrySet()) {
             Song song1 = baseController.getSongService().findById(Integer.valueOf(song.getKey()))
                     .orElseThrow(() -> new ResourceNotFoundException("No song with id found " + song));
             //using logic to create new songsubgroup based on details of existing songsubgroup
-            String songSubgroupId = song.getValue()[0];
-            int position = Integer.parseInt(song.getValue()[1]) + positionPrefix;
-            //our getvalue is basically song-subgroup of song we associate with this subgroup
-            if (songSubgroupId != null) {
-                SongSubgroup optionalSongSubgroup = baseController.getSongSubgroupService().findById(Integer.valueOf(songSubgroupId))
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "No songSubgroupId with id found " + songSubgroupId));
-                SongSubgroup songSubgroup = new SongSubgroup(optionalSongSubgroup);
-                songSubgroup.setPosition((long) position);
-                songSubgroup.setSubgroup(subgroup);
-                songSubgroup.setSong(song1);
-                String localMessage = "Adding song " + song1.toAnotherChangeLogString()
-                        + " to subgroup " + subgroup.getSubgroupName()
-                        + " in group " + subgroup.getMainGroup().getGroupName()
-                        + " in game " + subgroup.getMainGroup().getGame().getDisplayTitle();
-                baseController.getSongSubgroupService().save(songSubgroup);
-                baseController.sendMessageToChannel(EntityType.SONG_SUBGROUP, "create", localMessage,
-                        EntityUrl.SONG, song1.toAnotherChangeLogString(), String.valueOf(song1.getId()));
-            } else {
-                //i feel like this is not used at all
-                List<SongSubgroup> existingSubgroups = baseController.getSongSubgroupService().findBySong(song1);
-                SongSubgroup originalSongSubgroup = existingSubgroups.stream().filter(songSubgroup1 ->
-                                songSubgroup1.getSubgroup().getMainGroup().getGame().equals(subgroup.getMainGroup().getGame()))
-                        .findFirst().orElseThrow(
-                                () -> new ResourceNotFoundException(
-                                        "THere should be original subgroup here but not found"));
-                SongSubgroup songSubgroup = new SongSubgroup(originalSongSubgroup);
-                songSubgroup.setPosition((long) position);
-                songSubgroup.setSubgroup(subgroup);
-                songSubgroup.setSong(song1);
-                String localMessage = "[temp] Adding song " + song1.toAnotherChangeLogString()
-                        + " to subgroup " + subgroup.getSubgroupName()
-                        + " in group " + subgroup.getMainGroup().getGroupName()
-                        + " in game " + subgroup.getMainGroup().getGame().getDisplayTitle();
-                baseController.getSongSubgroupService().save(songSubgroup);
-                baseController.sendMessageToChannel(EntityType.SONG_SUBGROUP, "create", localMessage,
-                        EntityUrl.SONG, song1.toAnotherChangeLogString(), String.valueOf(song1.getId()));
+            for (String[] array : song.getValue()){
+                String songSubgroupId = array[0];
+                int position = Integer.parseInt(array[1]) + positionPrefix;
+                //our getvalue is basically song-subgroup of song we associate with this subgroup
+                if (songSubgroupId != null) {
+                    SongSubgroup optionalSongSubgroup = baseController.getSongSubgroupService().findById(Integer.valueOf(songSubgroupId))
+                            .orElseThrow(() -> new ResourceNotFoundException(
+                                    "No songSubgroupId with id found " + songSubgroupId));
+                    SongSubgroup songSubgroup = new SongSubgroup(optionalSongSubgroup);
+                    songSubgroup.setPosition((long) position);
+                    songSubgroup.setSubgroup(subgroup);
+                    songSubgroup.setSong(song1);
+                    String localMessage = "Adding song " + song1.toAnotherChangeLogString()
+                            + " to subgroup " + subgroup.getSubgroupName()
+                            + " in group " + subgroup.getMainGroup().getGroupName()
+                            + " in game " + subgroup.getMainGroup().getGame().getDisplayTitle();
+                    baseController.getSongSubgroupService().save(songSubgroup);
+                    baseController.sendMessageToChannel(EntityType.SONG_SUBGROUP, "create", localMessage,
+                            EntityUrl.SONG, song1.toAnotherChangeLogString(), String.valueOf(song1.getId()));
+                } else {
+                    //i feel like this is not used at all
+                    List<SongSubgroup> existingSubgroups = baseController.getSongSubgroupService().findBySong(song1);
+                    SongSubgroup originalSongSubgroup = existingSubgroups.stream().filter(songSubgroup1 ->
+                                    songSubgroup1.getSubgroup().getMainGroup().getGame().equals(subgroup.getMainGroup().getGame()))
+                            .findFirst().orElseThrow(
+                                    () -> new ResourceNotFoundException(
+                                            "THere should be original subgroup here but not found"));
+                    SongSubgroup songSubgroup = new SongSubgroup(originalSongSubgroup);
+                    songSubgroup.setPosition((long) position);
+                    songSubgroup.setSubgroup(subgroup);
+                    songSubgroup.setSong(song1);
+                    String localMessage = "[temp] Adding song " + song1.toAnotherChangeLogString()
+                            + " to subgroup " + subgroup.getSubgroupName()
+                            + " in group " + subgroup.getMainGroup().getGroupName()
+                            + " in game " + subgroup.getMainGroup().getGame().getDisplayTitle();
+                    baseController.getSongSubgroupService().save(songSubgroup);
+                    baseController.sendMessageToChannel(EntityType.SONG_SUBGROUP, "create", localMessage,
+                            EntityUrl.SONG, song1.toAnotherChangeLogString(), String.valueOf(song1.getId()));
+                }
             }
         }
         //again cleaning the cache of game when updating subgroup

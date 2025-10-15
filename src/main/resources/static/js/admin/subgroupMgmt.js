@@ -161,7 +161,7 @@ $(document).ready(function () {
         });
         for (let i = 0; i < subgroupSongs.length; i++) {
             var songId = subgroupSongs[i].song.id;
-            var songToMark = $("#subgroups-table").find('tr[data-songId="' + songId + '"]').first();
+            var songToMark = $("#subgroups-table").find('tr[data-songSubgroupId="' + subgroupSongs[i].id + '"]').first();
             songToMark.attr("data-songSubgroupId", subgroupSongs[i].id);
             var inputToMark = songToMark.find("input");
             $(inputToMark[0]).prop('checked', true);

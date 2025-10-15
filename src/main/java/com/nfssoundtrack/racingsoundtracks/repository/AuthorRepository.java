@@ -13,4 +13,6 @@ public interface AuthorRepository extends JpaRepository<Author, Integer> {
     List<Author> findAllByName(String name);
 
     List<Author> findByNameContains(String name);
+
+    List<Author> findByNameStartingWith(String name);
 }
