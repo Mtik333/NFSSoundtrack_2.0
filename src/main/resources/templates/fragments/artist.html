@@ -15,29 +15,29 @@
     <th:block th:if="${discoGSObj.uri}">
         <br>
         <b th:utext="#{moreInfo}"></b>
-        <a target="_blank" class="a-external-music-link" th:href="${discoGSObj.uri}">
+        <a target="_blank" class="a-external-music-link-author" th:href="${discoGSObj.uri}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/discogs_big.webp}">
         </a>
-        <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.wikipedia}"
+        <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.wikipedia}"
             th:href="${discoGSObj.wikipedia}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/wikipedia_big.webp}">
         </a>
-        <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.facebook}"
+        <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.facebook}"
             th:href="${discoGSObj.facebook}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/facebook_big.webp}">
         </a>
-        <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.twitter}" th:href="${discoGSObj.twitter}">
+        <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.twitter}" th:href="${discoGSObj.twitter}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/twitter_big.webp}">
         </a>
-        <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.instagram}"
+        <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.instagram}"
             th:href="${discoGSObj.instagram}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/instagram_big.webp}">
         </a>
-        <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.soundcloud}"
+        <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.soundcloud}"
             th:href="${discoGSObj.soundcloud}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/soundcloud_big.webp}">
         </a>
-        <a target="_blank" class="a-external-music-link" th:if="${discoGSObj.myspace}" th:href="${discoGSObj.myspace}">
+        <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.myspace}" th:href="${discoGSObj.myspace}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/myspace_big.webp}">
         </a>
     </th:block>
