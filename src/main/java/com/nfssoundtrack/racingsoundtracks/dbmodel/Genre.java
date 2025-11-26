@@ -15,6 +15,9 @@ public class Genre implements Serializable {
     @Column(name = "genre_name")
     private String genreName;
 
+    @Column(name = "genre_description")
+    private String genreDescription;
+
     public Long getId() {
         return id;
     }
@@ -31,11 +34,20 @@ public class Genre implements Serializable {
         this.genreName = genreName;
     }
 
+    public String getGenreDescription() {
+        return genreDescription;
+    }
+
+    public void setGenreDescription(String genreDescription) {
+        this.genreDescription = genreDescription;
+    }
+
     @Override
     public String toString() {
         return "Genre{" +
                 "id=" + id +
                 ", genreName='" + genreName + '\'' +
+                ", genreDescription='" + genreDescription + '\'' +
                 '}';
     }
 

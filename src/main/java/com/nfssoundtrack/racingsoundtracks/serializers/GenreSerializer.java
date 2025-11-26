@@ -21,6 +21,7 @@ public class GenreSerializer extends JsonSerializer<Genre> {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeNumberField("value", genre.getId());
         jsonGenerator.writeStringField("label", genre.getGenreName());
+        jsonGenerator.writeStringField("desc", genre.getGenreDescription());
         jsonGenerator.writeEndObject();
     }
 }

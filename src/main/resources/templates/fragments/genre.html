@@ -1,4 +1,5 @@
 <h2 th:text="#{songsWithGenre}+' '+${genre?.genreName}"></h2>
+<h5 th:text="${genre?.genreDescription}"></h5>
 <th:block th:if="${#lists.size(songSubgroupList)>=50 and readFull!=null}">
     <h5 th:text="#{listOfSongsOver50}"></h5>
     <a class="table_link" th:href="@{/genre/readfull/{genreid}(genreid=${genre.id})}" th:text="#{seeFullGenreList}"></a>

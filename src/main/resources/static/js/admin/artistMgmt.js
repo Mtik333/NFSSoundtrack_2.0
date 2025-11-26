@@ -46,7 +46,7 @@ function setupAutocompleteManageArtist(mySelect, mySelectHidden, valueToSet) {
             $.ajax({
                 async: false,
                 type: "GET",
-                url: "/author/authorNameMgmt/" + $(mySelect).val(),
+                url: "/author/authorNameMgmt/" + encodeURIComponent($(mySelect).val().replace("/","__")),
                 success: function (ooo) {
                     foundArtist = JSON.parse(ooo);
                     if (foundArtist) {

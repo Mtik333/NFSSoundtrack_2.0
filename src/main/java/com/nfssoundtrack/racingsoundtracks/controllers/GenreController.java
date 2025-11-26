@@ -2,17 +2,17 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Country;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.EntityType;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.EntityUrl;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Genre;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
+import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.serializers.GenreSerializer;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * i screwed up and there are some endpoint with similar start in main controller class
@@ -68,4 +68,31 @@ public class GenreController {
         }
     }
 
+    /**
+     * method to update country based on its identifier
+     * used in countryMgmt.js when you click on 'save' button in 'manage countries'
+     *
+     * @param formData  consists just of country name and link (hardly possible but country can change name isn't it?)
+     * @param countryId id of country in db
+     * @return OK if successful
+     * @throws ResourceNotFoundException
+     * @throws JsonProcessingException
+     */
+    @PutMapping(value = "/put/{genreId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public String updateGenre(@RequestBody String formData, @PathVariable("genreId") int countryId)
+            throws ResourceNotFoundException, JsonProcessingException {
+        LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
+        String genreName = String.valueOf(linkedHashMap.get("genreName"));
+        String genreDescription = String.valueOf(linkedHashMap.get("description"));
+        Genre genre = baseController.getGenreService().findById(countryId).orElseThrow(
+                () -> new ResourceNotFoundException("no country found with id " + countryId));
+        //just updating the entity
+        genre.setGenreName(genreName);
+        genre.setGenreDescription(genreDescription);
+        String message = "Updating genre " + genre.getGenreName();
+        baseController.getGenreService().save(genre);
+        baseController.sendMessageToChannel(EntityType.GENRE, "update", message,
+                EntityUrl.GENRE, genre.getGenreName(), String.valueOf(genre.getId()));
+        return new ObjectMapper().writeValueAsString("OK");
+    }
 }

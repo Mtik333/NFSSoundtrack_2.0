@@ -117,6 +117,9 @@ public class ArtistController {
             throws JsonProcessingException {
         ObjectMapper objectMapper = JustSomeHelper.registerSerializerForObjectMapper(Author.class,
                 artistMgmtSerializer);
+        if (input.contains("__")){
+            input = input.replace("__","/");
+        }
         if (input == null || input.isEmpty()) {
             return objectMapper.writeValueAsString(null);
         }

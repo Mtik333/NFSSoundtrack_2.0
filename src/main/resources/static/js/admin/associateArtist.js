@@ -71,7 +71,7 @@ function setupAutocompleteMergeArtist(mySelect, mySelectHidden, valueToSet) {
             $.ajax({
                 async: false,
                 type: "GET",
-                url: "/author/authorNameMgmt/" + $(mySelect).val(),
+                url: "/author/authorNameMgmt/" + encodeURIComponent($(mySelect).val().replace("/","__")),
                 success: function (ooo) {
                     var foundArtist = JSON.parse(ooo);
                     if (foundArtist) {
