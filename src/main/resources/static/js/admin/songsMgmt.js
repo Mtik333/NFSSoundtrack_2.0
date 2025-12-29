@@ -1031,6 +1031,8 @@ $(document).ready(function () {
     function generateSpotifyAndLyrics(ingameDisplayDiv, songSubgroup) {
         ingameDisplayDiv.append("<h4>Spotify and others / lyrics</h4>");
         ingameDisplayDiv.append('<button id="fetch-spotify-links" class="btn btn-info">Fetch all possible links</button>');
+        ingameDisplayDiv.append('<span> </span>');
+        ingameDisplayDiv.append('<button id="fetch-lyrics" class="btn btn-info">Fetch lyrics</button>');
         var itunesInput = $('<input type="text" class="form-control" id="itunesInput"/>');
         var spotifyInput = $('<input type="text" class="form-control" id="spotifyInput"/>');
         var soundcloudInput = $('<input type="text" class="form-control" id="soundcloudInput"/>');
@@ -1551,6 +1553,10 @@ $(document).ready(function () {
         fetchMusicLinks();
     });
 
+    $(document).on('click', '#fetch-lyrics', function (e) {
+        fetchLyrics();
+    });
+
     $(document).on('click', '#copy-links', function (e) {
         copyMusicLinks();
     });
@@ -1567,6 +1573,23 @@ $(document).ready(function () {
         setGenreOnMultipleSongs();
     });
 
+    function fetchLyrics(){
+        let songId = currentSongSubgroup.song.id;
+        $("#fetch-lyrics").after("<span id='request-status'>Fetching lyrics...</span>")
+        $.ajax({
+            async: true,
+            type: "GET",
+            url: "/song/lyrics/"+songId,
+            success: function (lyrics) {
+                $("#lyrics").text(lyrics);
+                $("#request-status").text("OK");
+            },
+            error: function (ooo) {
+                alert("error fetching lyrics, check the logs");
+            },
+        });        
+    }
+
     function fetchMusicLinks(potentialSrcId) {
         let targetUrl = "linksYt/";
         var srcId;
@@ -1582,7 +1605,7 @@ $(document).ready(function () {
         if (srcId.length == 0) {
             return;
         }
-        $("#fetch-spotify-links").after("<span id='request-status'>Fetching...</span>")
+        $("#fetch-spotify-links").after("<span id='request-status'>Fetching links...</span>")
         $.ajax({
             async: true,
             type: "GET",

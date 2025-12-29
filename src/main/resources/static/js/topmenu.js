@@ -19,16 +19,42 @@ $(document).ready(function () {
 
     $(document).on("click", "#save-preferences", function () {
         /*putting all stuff to the localstorage and reloading page as someone might have decided to change language*/
-        localStorage.setItem("expandable-width", $("#expandable-width").val());
-        localStorage.setItem("scrolling-stuff", $("#scrolling-stuff").prop("checked"));
-        localStorage.setItem("static-leftmenu", $("#static-leftmenu").prop("checked"));
-        localStorage.setItem("icons-size", $("#icons-size").val());
-        localStorage.setItem("content-width", $("#content-width").val());
-        localStorage.setItem("video-rendering-stuff", $("#video-rendering-stuff").prop("checked"));
-        localStorage.setItem("hide-icons", JSON.stringify($("#hide-icons").val()));
-        localStorage.setItem("hide-flags", $("#hide-flags").prop("checked"));
-        localStorage.setItem("all-games", $("#all-games").prop("checked"));
+        let localStorageInfo = new Object();
+        localStorageInfo.expandableWidth = $("#expandable-width").val();
+        localStorageInfo.scrollingStuff = $("#scrolling-stuff").prop("checked");
+        localStorageInfo.staticLeftMenu = $("#static-leftmenu").prop("checked");
+        localStorageInfo.iconsSize = $("#icons-size").val();
+        localStorageInfo.contentWidth = $("#content-width").val();
+        localStorageInfo.videoRenderingStuff = $("#video-rendering-stuff").prop("checked");
+        localStorageInfo.hideIcons = JSON.stringify($("#hide-icons").val());
+        localStorageInfo.hideFlags = $("#hide-flags").prop("checked");
+        localStorageInfo.allGames = $("#all-games").prop("checked");
+        localStorageInfo.composersFlagsOnly = $("#composers-flags-only").prop("checked");
+        localStorageInfo.lang = $("#lang-select").val();
+        localStorage.setItem("expandable-width", localStorageInfo.expandableWidth);
+        localStorage.setItem("scrolling-stuff", localStorageInfo.scrollingStuff);
+        localStorage.setItem("static-leftmenu", localStorageInfo.staticLeftMenu);
+        localStorage.setItem("icons-size", localStorageInfo.iconsSize);
+        localStorage.setItem("content-width", localStorageInfo.contentWidth);
+        localStorage.setItem("video-rendering-stuff", localStorageInfo.videoRenderingStuff);
+        localStorage.setItem("hide-icons", localStorageInfo.hideIcons);
+        localStorage.setItem("hide-flags", localStorageInfo.hideFlags);
+        localStorage.setItem("all-games", localStorageInfo.allGames);
+        localStorage.setItem("composers-flags-only", localStorageInfo.composersFlagsOnly);
         localStorage.setItem("lang", $("#lang-select").val());
+        $.ajax({
+            url: "/preferences",
+            type: "POST",
+            data: JSON.stringify(localStorageInfo),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function(lyrics) {
+                console.log("saved preferences to session");
+            },
+            error: function() {
+                console.log("something wrong in session");
+            }
+        });
         var langAlreadyThere = window.location.toString().indexOf("?lang") > -1;
         if (langAlreadyThere) {
             window.location.search = "?lang=" + $("#lang-select").val();
@@ -77,6 +103,10 @@ $(document).ready(function () {
         var allGames = localStorage.getItem("all-games");
         if (allGames != undefined) {
             $("#all-games").prop("checked", JSON.parse(allGames));
+        }
+        var composersFlagsOnly = localStorage.getItem("composers-flags-only");
+        if (composersFlagsOnly != undefined) {
+            $("#composers-flags-only").prop("checked", JSON.parse(composersFlagsOnly));
         }
     });
 

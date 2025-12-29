@@ -356,7 +356,7 @@ public class AuthorService {
             List<String> urls = (List<String>) something.get("urls");
             //urls is actually a list of various social media links
             if (urls != null && !urls.isEmpty()) {
-                discoGSObj.setLinks(urls);
+                discoGSObj.setLinks(urls, authorName);
             }
             return discoGSObj;
         } catch (Exception exp) {

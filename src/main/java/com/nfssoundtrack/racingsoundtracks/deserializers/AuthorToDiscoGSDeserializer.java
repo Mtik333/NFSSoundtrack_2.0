@@ -20,7 +20,7 @@ public class AuthorToDiscoGSDeserializer extends JsonDeserializer<AuthorToDiscoG
      * @param jsonParser             no idea what it is
      * @param deserializationContext similarly
      * @return object that consists of author id in database and all the info from discogs
-     * @throws IOException
+     * @throws IOException input output exception
      */
     @Override
     public AuthorToDiscoGSObj deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
@@ -35,9 +35,13 @@ public class AuthorToDiscoGSDeserializer extends JsonDeserializer<AuthorToDiscoG
         String soundcloud = JustSomeHelper.returnProperValueToDb(node.get(DISCOGS).get("soundcloud").asText());
         String myspace = JustSomeHelper.returnProperValueToDb(node.get(DISCOGS).get("myspace").asText());
         String wikipedia = JustSomeHelper.returnProperValueToDb(node.get(DISCOGS).get("wikipedia").asText());
+        String bandcamp = JustSomeHelper.returnProperValueToDb(node.get(DISCOGS).path("bandcamp").asText());
+        String website = JustSomeHelper.returnProperValueToDb(node.get(DISCOGS).path("website").asText());
+        String linktree = JustSomeHelper.returnProperValueToDb(node.get(DISCOGS).path("linktree").asText());
         boolean notInDiscogs = node.get(DISCOGS).get("notInDiscogs").asBoolean();
         DiscoGSObj discoGSObj = new DiscoGSObj(notInDiscogs, discogsId, uri, profile);
-        discoGSObj.setSocialLink(twitter, facebook, instagram, soundcloud, myspace, wikipedia);
+        discoGSObj.setSocialLink(twitter, facebook, instagram, soundcloud, myspace, wikipedia,
+                bandcamp, website, linktree);
         return new AuthorToDiscoGSObj(artistId, discoGSObj);
     }
 }

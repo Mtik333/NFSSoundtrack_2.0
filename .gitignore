@@ -44,3 +44,8 @@ out/
 logs
 discogs
 garbage
+/src/main/resorces/application-docker.properties
+/src/main/resources/static/min/
+/flatout2_files/
+/claude_src/
+/node_modules/

@@ -412,9 +412,13 @@ public class ArtistController {
                 String wikipedia = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("wikipedia"));
                 String myspace = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("myspace"));
                 String profile = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("profile"));
+                String bandcamp = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("bandcamp"));
+                String website = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("website"));
+                String linktree = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("linktree"));
                 String id = (String) formDataMap.get("id");
                 DiscoGSObj discoGSObj = new DiscoGSObj(false, Integer.parseInt(id), uri, profile);
-                discoGSObj.setSocialLink(twitter, facebook, instagram, soundcloud, myspace, wikipedia);
+                discoGSObj.setSocialLink(twitter, facebook, instagram, soundcloud, myspace, wikipedia,
+                        bandcamp,website,linktree);
                 String localMessage = "Updating DiscoGS info for author " + author.getName();
                 //as during edit we maybe updated the author, we want to update the index too
                 baseController.getAuthorService().updateDiscoGSObj(Long.valueOf(authorId), discoGSObj,

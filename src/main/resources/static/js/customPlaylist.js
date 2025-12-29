@@ -11,6 +11,8 @@ $(document).ready(function () {
 		$("col.song-instrumental").css("display", "none");
 		$("#mobileAddToPlaylist").css("display", "none");
 		$("#mobileRemoveFromPlaylist").css("display", "");
+	} else {
+        $("th.contextButton").remove();
 	}
 
 	function TableComparer(index) {

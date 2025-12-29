@@ -616,8 +616,10 @@ $(document).ready(function () {
             $("table.playlist_table").find("tr:visible:not(.subgroup-separator):not(.visually-hidden)").each(function () {
                 var bandText = $(this).find("td.band").html();
                 var titleText = $(this).find("td.songtitle").html();
-                bandText = $.trim(bandText).replaceAll("\n", "").replaceAll("<span>", "").replaceAll("</span>", "").replaceAll("> ", ">");
-                titleText = $.trim(titleText).replaceAll("\n", "").replaceAll("<span>", "").replaceAll("</span>", "").replaceAll("> ", ">");
+                bandText = $.trim(bandText).replaceAll("\n", "")
+                    .replaceAll("> ", ">").replaceAll(" <a", "<a");
+                titleText = $.trim(titleText).replaceAll("\n", "")
+                    .replaceAll("> ", ">").replaceAll(" <a", "<a");
                 var youtubePlayIcon = $(this).find("img.play_icon");
                 if (youtubePlayIcon.length > 0) {
                     var youtubeLink = youtubePlayIcon.attr("data-tagvideo")

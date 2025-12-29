@@ -2,6 +2,7 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +44,8 @@ public class SearchController  {
      * @return index.html with several response parameters to the frontend
      */
     @GetMapping(value = "/basic")
-    public String searchStuff(Model model, @RequestParam("searchData") String searchData) throws LoginException, ResourceNotFoundException, InterruptedException {
+    public String searchStuff(Model model, @RequestParam("searchData") String searchData, HttpSession session)
+            throws LoginException, ResourceNotFoundException, InterruptedException {
         List<AuthorAlias> authorAliases = new ArrayList<>();
         List<Genre> genres = new ArrayList<>();
         Map<Song, Set<Game>> songTitleList = new HashMap<>();
@@ -149,6 +151,11 @@ public class SearchController  {
         model.addAttribute("search", true);
         model.addAttribute("searchPhrase", searchData);
         model.addAttribute("translations", WebsiteViewsController.translationObjs);
+        Enumeration<String> attributes = session.getAttributeNames();
+        while (attributes.hasMoreElements()){
+            String attribute = attributes.nextElement();
+            model.addAttribute(attribute, session.getAttribute(attribute));
+        }
         return "index";
     }
 }

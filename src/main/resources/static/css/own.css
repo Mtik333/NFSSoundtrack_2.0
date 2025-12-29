@@ -185,6 +185,14 @@ td.playlist_row>a.table_link {
   background-color: transparent;
   text-decoration: none;
   color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1));
+  padding-left: 0;
+  padding-right: 0;
+}
+
+td.playlist_row>span {
+  padding-left: 0;
+  padding-right: 0;
+  background-color: transparent;
 }
 
 html[data-bs-theme="dark"] body #playlist_progress tr.current {
@@ -926,6 +934,10 @@ html[data-bs-theme="dark"] .upcoming-content-label {
   }
 
   td.songtitle {
+    word-wrap: break-word;
+  }
+
+  td.playlist_row {
     word-wrap: break-word;
   }
 

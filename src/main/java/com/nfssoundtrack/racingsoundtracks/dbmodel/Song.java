@@ -236,6 +236,11 @@ public class Song implements Serializable {
         return officialDisplayBand + " - " + officialDisplayTitle;
     }
 
+    //TODO use it in some cases for lyrics?
+    public String getTitleWithoutFeat(){
+        return officialDisplayTitle.substring(officialDisplayTitle.indexOf("feat."), officialDisplayTitle.lastIndexOf(")"));
+    }
+
     public String toChangeLogString() {
         return officialDisplayBand + " - " + officialDisplayTitle + ", srcId: " + srcId + ", (id: " + id + ")";
     }

@@ -7,6 +7,7 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.*;
 import com.nfssoundtrack.racingsoundtracks.serializers.SongSerializer;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpSession;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -104,8 +105,8 @@ public class WebsiteViewsController  {
      * @return endpoint of admin panel
      */
     @GetMapping(value = "/manage/manage")
-    public String manage(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
-        addCommonAttributes(model, "genericAt", new String[]{"Manage"});
+    public String manage(Model model, HttpSession httpSession) throws LoginException, ResourceNotFoundException, InterruptedException {
+        addCommonAttributes(model, "genericAt", new String[]{"Manage"}, httpSession);
         return "manage";
     }
 
@@ -114,8 +115,8 @@ public class WebsiteViewsController  {
      * @return endpoint of login
      */
     @GetMapping(value = "/login")
-    public String login(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
-        addCommonAttributes(model, "genericAt", new String[]{"Login"});
+    public String login(Model model, HttpSession httpSession) throws LoginException, ResourceNotFoundException, InterruptedException {
+        addCommonAttributes(model, "genericAt", new String[]{"Login"}, httpSession);
         model.addAttribute("login", true);
         return "login";
     }
@@ -126,8 +127,9 @@ public class WebsiteViewsController  {
      * @return html for content_short entry
      */
     @GetMapping(value = "/content/{value}")
-    public String topMenuEntry(Model model, @PathVariable("value") String value) throws ResourceNotFoundException, LoginException, InterruptedException {
-        addCommonAttributes(model, "genericAt", new String[]{value});
+    public String topMenuEntry(Model model, @PathVariable("value") String value, HttpSession httpSession)
+            throws ResourceNotFoundException, LoginException, InterruptedException {
+        addCommonAttributes(model, "genericAt", new String[]{value}, httpSession);
         model.addAttribute("htmlToInject",
                 baseController.getContentService().findByContentShort(value).getContentData());
         boolean isHome = value.contains("home");
@@ -143,11 +145,12 @@ public class WebsiteViewsController  {
      * @return whole display of game's soundtrack
      */
     @GetMapping(value = "/game/{gameshort}")
-    public String game(Model model, @PathVariable("gameshort") String gameshort/*, HttpSession httpSession*/) throws LoginException, ResourceNotFoundException, InterruptedException {
+    public String game(Model model, @PathVariable("gameshort") String gameshort, HttpSession httpSession)
+            throws LoginException, ResourceNotFoundException, InterruptedException {
         Game game = baseController.getGameService().findByGameShort(gameshort);
         model.addAttribute("endpoint", "/game/" + gameshort);
         model.addAttribute("game", game);
-        addCommonAttributes(model, "gameSoundtrackAt", new String[]{game.getDisplayTitle()});
+        addCommonAttributes(model, "gameSoundtrackAt", new String[]{game.getDisplayTitle()}, httpSession);
         //for few games there's custom theme to make website background a bit more interesting
         Optional<CustomTheme> customTheme = baseController.getCustomThemeService().findByGame(game);
         customTheme.ifPresent(theme -> model.addAttribute("customTheme", theme));
@@ -163,7 +166,7 @@ public class WebsiteViewsController  {
      * @throws JsonProcessingException   exception due to objectmapper
      */
     @PostMapping(value = "/custom/playlist")
-    public String getCustomPlaylist(Model model, @RequestBody String customPlaylist)
+    public String getCustomPlaylist(Model model, @RequestBody String customPlaylist, HttpSession httpSession)
             throws ResourceNotFoundException, JsonProcessingException, LoginException, InterruptedException {
         List<SongSubgroup> songSubgroupList = new ArrayList<>();
         if (customPlaylist == null || customPlaylist.isEmpty()) {
@@ -181,7 +184,7 @@ public class WebsiteViewsController  {
                         "id " + songSubgroupId)));
             }
         }
-        addCommonAttributes(model, "customPlaylistAt", null);
+        addCommonAttributes(model, "customPlaylistAt", null, httpSession);
         model.addAttribute("customPlaylist", songSubgroupList);
         return MIN_INDEX;
     }
@@ -214,13 +217,14 @@ public class WebsiteViewsController  {
      * @throws ResourceNotFoundException exception when song is not found
      */
     @GetMapping(value = "/song/{songId}")
-    public String provideSongInfo(Model model, @PathVariable("songId") String songId) throws ResourceNotFoundException, LoginException, InterruptedException {
+    public String provideSongInfo(Model model, @PathVariable("songId") String songId, HttpSession httpSession)
+            throws ResourceNotFoundException, LoginException, InterruptedException {
         Song song = baseController.getSongService().findById(Integer.valueOf(songId)).orElseThrow(
                 () -> new ResourceNotFoundException("No song found with id " + songId));
         model.addAttribute("songToCheck", song);
         model.addAttribute("songUsages", baseController.getSongSubgroupService().findBySong(song));
         addCommonAttributes(model, "genericAt", new String[]{song.getOfficialDisplayBand()
-                + " - " + song.getOfficialDisplayTitle()});
+                + " - " + song.getOfficialDisplayTitle()}, httpSession);
         return MIN_INDEX;
     }
 
@@ -232,7 +236,7 @@ public class WebsiteViewsController  {
      * @throws JsonProcessingException   exception due to objectmapper
      */
     @GetMapping(value = "/author/{authorId}")
-    public String readAuthor(Model model, @PathVariable("authorId") int authorId)
+    public String readAuthor(Model model, @PathVariable("authorId") int authorId, HttpSession httpSession)
             throws ResourceNotFoundException, JsonProcessingException, LoginException, InterruptedException {
         Author author =
                 baseController.getAuthorService().findById(authorId).orElseThrow(
@@ -301,7 +305,7 @@ public class WebsiteViewsController  {
             model.addAttribute("memberOfAsComposer", memberOfAsComposer);
         }
         model.addAttribute("artistsBeingMembersOfAuthor", artistsBeingMembersOfAuthor);
-        addCommonAttributes(model, "genericAt", new String[]{author.getName()});
+        addCommonAttributes(model, "genericAt", new String[]{author.getName()}, httpSession);
         return MIN_INDEX;
     }
 
@@ -312,7 +316,8 @@ public class WebsiteViewsController  {
      * @throws ResourceNotFoundException when genre with this id not found
      */
     @GetMapping(value = "/genre/{genreId}")
-    public String readGenreInfo(Model model, @PathVariable("genreId") int genreId) throws ResourceNotFoundException, LoginException, InterruptedException {
+    public String readGenreInfo(Model model, @PathVariable("genreId") int genreId, HttpSession httpSession)
+            throws ResourceNotFoundException, LoginException, InterruptedException {
         Genre genre =
                 baseController.getGenreService().findById(genreId).orElseThrow(
                         () -> new ResourceNotFoundException("No genre found with id " + genreId));
@@ -323,7 +328,7 @@ public class WebsiteViewsController  {
         model.addAttribute("songSubgroupList", songSubgroupList);
         model.addAttribute("genre", genre);
         model.addAttribute("readFull", true);
-        addCommonAttributes(model, "genericAt", new String[]{genre.getGenreName()});
+        addCommonAttributes(model, "genericAt", new String[]{genre.getGenreName()}, httpSession);
         return MIN_INDEX;
     }
 
@@ -334,7 +339,7 @@ public class WebsiteViewsController  {
      * @throws ResourceNotFoundException when genre with this id not found
      */
     @GetMapping(value = "/genre/readfull/{genreId}")
-    public String readGenreInfoFull(Model model, @PathVariable("genreId") int genreId)
+    public String readGenreInfoFull(Model model, @PathVariable("genreId") int genreId, HttpSession httpSession)
             throws ResourceNotFoundException, LoginException, InterruptedException {
         Genre genre =
                 baseController.getGenreService().findById(genreId).orElseThrow(
@@ -348,7 +353,7 @@ public class WebsiteViewsController  {
         List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySongInSortedByIdAsc(songs);
         model.addAttribute("songSubgroupList", songSubgroupList);
         model.addAttribute("genre", genre);
-        addCommonAttributes(model, "fullGenreListAt", new String[]{genre.getGenreName()});
+        addCommonAttributes(model, "fullGenreListAt", new String[]{genre.getGenreName()},httpSession);
         return MIN_INDEX;
     }
 
@@ -357,11 +362,11 @@ public class WebsiteViewsController  {
      * @return table with todays songs randomly picked in last 30 days
      */
     @GetMapping(value = "/songhistory")
-    public String getTodaysSongHistory(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+    public String getTodaysSongHistory(Model model, HttpSession httpSession) throws LoginException, ResourceNotFoundException, InterruptedException {
         List<TodaysSong> todays30Songs = baseController.getTodaysSongService().findAllFromLast30Days();
         model.addAttribute("todays30Songs", todays30Songs);
         model.addAttribute("readFull", true);
-        addCommonAttributes(model, "archiveOfSongsAt", null);
+        addCommonAttributes(model, "archiveOfSongsAt", null, httpSession);
         return MIN_INDEX;
     }
 
@@ -373,15 +378,15 @@ public class WebsiteViewsController  {
      * @throws InterruptedException
      */
     @GetMapping(value = "/songhistory/readfull")
-    public String getTodaysSongHistoryFull(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+    public String getTodaysSongHistoryFull(Model model, HttpSession httpSession) throws LoginException, ResourceNotFoundException, InterruptedException {
         List<TodaysSong> todays30Songs = baseController.getTodaysSongService().findAll();
         model.addAttribute("todays30Songs", todays30Songs);
-        addCommonAttributes(model, "archiveOfSongsAt", null);
+        addCommonAttributes(model, "archiveOfSongsAt", null, httpSession);
         return MIN_INDEX;
     }
 
     @GetMapping(value = "/countryInfo/{countryId}")
-    public String getArtistsFromCountry(Model model, @PathVariable("countryId") int countryId)
+    public String getArtistsFromCountry(Model model, @PathVariable("countryId") int countryId, HttpSession httpSession)
             throws ResourceNotFoundException, LoginException, InterruptedException {
         Country country =
                 baseController.getCountryService().findById(countryId).orElseThrow(
@@ -420,33 +425,33 @@ public class WebsiteViewsController  {
         model.addAttribute("countryAuthors", rowsToDisplay);
         model.addAttribute("selectedCountry", country);
         model.addAttribute("allCountries", allCountries);
-        addCommonAttributes(model, "countryAuthorsAt", new String[]{country.getCountryName()});
+        addCommonAttributes(model, "countryAuthorsAt", new String[]{country.getCountryName()}, httpSession);
         return MIN_INDEX;
     }
 
     @GetMapping(value = "/corrections")
-    public String getAllCorrections(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+    public String getAllCorrections(Model model, HttpSession httpSession) throws LoginException, ResourceNotFoundException, InterruptedException {
         List<Correction> corrections = baseController.getCorrectionService().findAll();
         model.addAttribute("corrections", corrections);
-        addCommonAttributes(model, "genericAt", new String[]{"Corrections"});
+        addCommonAttributes(model, "genericAt", new String[]{"Corrections"}, httpSession);
         return MIN_INDEX;
     }
 
     @GetMapping(value = "/changelog")
-    public String getLatestChangelogs(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+    public String getLatestChangelogs(Model model, HttpSession httpSession) throws LoginException, ResourceNotFoundException, InterruptedException {
         Page<Changelog> changelogsPage = baseController.getChangelogService().findAll(50);
         List<Changelog> changelogs = changelogsPage.stream().toList();
         model.addAttribute("changelogs", changelogs);
         model.addAttribute("readFull", true);
-        addCommonAttributes(model, "genericAt", new String[]{"Changelog"});
+        addCommonAttributes(model, "genericAt", new String[]{"Changelog"}, httpSession);
         return MIN_INDEX;
     }
 
     @GetMapping(value = "/changelog/readfull")
-    public String getAllChangelogs(Model model) throws LoginException, ResourceNotFoundException, InterruptedException {
+    public String getAllChangelogs(Model model, HttpSession httpSession) throws LoginException, ResourceNotFoundException, InterruptedException {
         List<Changelog> changelogs = baseController.getChangelogService().findAll();
         model.addAttribute("changelogs", changelogs);
-        addCommonAttributes(model, "genericAt", new String[]{"Changelog"});
+        addCommonAttributes(model, "genericAt", new String[]{"Changelog"}, httpSession);
         return MIN_INDEX;
     }
     /**
@@ -456,13 +461,19 @@ public class WebsiteViewsController  {
      * @param appNameKey key from message.properties to be translated
      * @param params     params to provide to the message translation
      */
-    private void addCommonAttributes(Model model, String appNameKey, String[] params) throws LoginException, ResourceNotFoundException, InterruptedException {
+    private void addCommonAttributes(Model model, String appNameKey, String[] params, HttpSession session)
+            throws LoginException, ResourceNotFoundException, InterruptedException {
         //name of the app, rather unrelevant
         model.addAttribute(APP_NAME, baseController.getLocalizedMessage(appNameKey, params));
         model.addAttribute(SERIES, baseController.getSerieService().findAllSortedByPositionAsc());
         model.addAttribute(GAMES_ALPHA, baseController.getGameService().findAllSortedByDisplayTitleAsc());
         model.addAttribute("translations", translationObjs);
         model.addAttribute("todayssong", baseController.getTodaysSongService().getTodaysSong());
+        Enumeration<String> attributes = session.getAttributeNames();
+        while (attributes.hasMoreElements()){
+            String attribute = attributes.nextElement();
+            model.addAttribute(attribute, session.getAttribute(attribute));
+        }
     }
 
     /**
@@ -586,14 +597,22 @@ public class WebsiteViewsController  {
     public @ResponseBody String getLyrics(@PathVariable("songSubgroupId") int songSubgroupId) throws ResourceNotFoundException {
         SongSubgroup songSubgroup = baseController.getSongSubgroupService().findById(songSubgroupId)
                 .orElseThrow(() -> new ResourceNotFoundException("SongSubgroup not found with id " + songSubgroupId));
-        
         // Priority logic: songSubgroup.lyrics -> song.lyrics
         String lyrics = songSubgroup.getLyrics() != null ? 
             songSubgroup.getLyrics() : songSubgroup.getSong().getLyrics();
-        
         return lyrics != null ? lyrics : "";
     }
 
+    @PostMapping(value = "/preferences")
+    public @ResponseBody String savePreferences(@RequestBody String formData, HttpSession session)
+            throws ResourceNotFoundException, JsonProcessingException {
+        LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
+        for (Map.Entry<?,?> obj : linkedHashMap.entrySet()){
+            Object value = obj.getValue();
+            session.setAttribute(obj.getKey().toString(), value);
+        }
+        return "";
+    }
     /**
      * endpoint used for stuff from Toni's Music Library - not relevant to the website
      * he uploads a lot of music and includes original filenames

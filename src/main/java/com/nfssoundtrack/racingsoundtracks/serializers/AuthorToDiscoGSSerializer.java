@@ -29,6 +29,9 @@ public class AuthorToDiscoGSSerializer extends JsonSerializer<AuthorToDiscoGSObj
         jsonGenerator.writeStringField("soundcloud", authorToDiscoGSObj.getDiscoGSObj().getSoundcloud());
         jsonGenerator.writeStringField("wikipedia", authorToDiscoGSObj.getDiscoGSObj().getWikipedia());
         jsonGenerator.writeStringField("myspace", authorToDiscoGSObj.getDiscoGSObj().getMyspace());
+        jsonGenerator.writeStringField("bandcamp", authorToDiscoGSObj.getDiscoGSObj().getBandcamp());
+        jsonGenerator.writeStringField("website", authorToDiscoGSObj.getDiscoGSObj().getWebsite());
+        jsonGenerator.writeStringField("linktree", authorToDiscoGSObj.getDiscoGSObj().getLinktree());
         jsonGenerator.writeEndObject();
         jsonGenerator.writeEndObject();
     }

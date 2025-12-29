@@ -202,6 +202,9 @@ $(document).on('click', '#save-artist', function (e) {
         artistToSave.wikipedia = $("#discogsWikipediaInput").val();
         artistToSave.myspace = $("#discogsMyspaceInput").val();
         artistToSave.profile = $("#discogsProfile").text();
+        artistToSave.bandcamp = $("#discogsBandcampInput").val();
+        artistToSave.website = $("#discogsWebsiteInput").val();
+        artistToSave.linktree = $("#discogsLinktreeInput").val();
         artistToSave.id = $("#discogsIdInput").val();
     }
     artistToSave.changeOfficialArtist = $("#changeOfficialArtist").prop("checked");
@@ -403,6 +406,25 @@ function generateDiscogsInfoDiv(foundArtist, discoGsDiv) {
             secondRowDiv.append(secondRowColDiv4);
             discoGsDiv.append(secondRowDiv);
             var thirdRowDiv = $('<div class="row p-1">');
+            var thirdRowColDiv1 = $('<div class="col">');
+            var thirdRowColDiv2 = $('<div class="col">');
+            var thirdRowColDiv3 = $('<div class="col">');
+            var thirdRowColDiv4 = $('<div class="col">');
+            var discogsBandcampInput = $('<input class="form-control discoGsStuff" type="text" id="discogsBandcampInput" value="' + nullToString(songInfo.bandcamp) + '">');
+            var discogsWebsiteInput = $('<input class="form-control discoGsStuff" type="text" id="discogsWebsiteInput" value="' + nullToString(songInfo.website) + '">');            
+            var discogsLinktreeInput = $('<input class="form-control discoGsStuff" type="text" id="discogsLinktreeInput" value="' + nullToString(songInfo.linktree) + '">');            
+            thirdRowColDiv1.append(discogsBandcampInput);
+            thirdRowColDiv1.append('<label for="discogsBandcampInput">Bandcamp link</label>');
+            thirdRowColDiv2.append(discogsWebsiteInput);
+            thirdRowColDiv2.append('<label for="discogsWebsiteInput">Author website</label>');
+            thirdRowColDiv3.append(discogsLinktreeInput);
+            thirdRowColDiv3.append('<label for="discogsLinktreeInput">Linktree link</label>');
+            thirdRowDiv.append(thirdRowColDiv1);
+            thirdRowDiv.append(thirdRowColDiv2);
+            thirdRowDiv.append(thirdRowColDiv3);
+            thirdRowDiv.append(thirdRowColDiv4);
+            discoGsDiv.append(thirdRowDiv);
+            var thirdRowDiv = $('<div class="row p-1">');
             var discogsProfile = $('<textarea class="form-control" id="discogsProfile"></textarea/>');
             discogsProfile.text(songInfo.profile);
             thirdRowDiv.append(discogsProfile);
@@ -437,6 +459,9 @@ $(document).on('click', '#fetch-from-discogs', function (e) {
             $("#discogsWikipediaInput").val(songInfo.wikipedia);
             $("#discogsMyspaceInput").val(songInfo.myspace);
             $("#discogsProfile").text(songInfo.profile);
+            $("#discogsBandcampInput").val(songInfo.bandcamp);
+            $("#discogsWebsiteInput").val(songInfo.website);
+            $("#discogsLinktreeInput").val(songInfo.linktree);
         }
     });
 

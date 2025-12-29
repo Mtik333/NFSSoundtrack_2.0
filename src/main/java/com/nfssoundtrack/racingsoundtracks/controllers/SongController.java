@@ -4,16 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
+import com.nfssoundtrack.racingsoundtracks.others.lyrics.Lyrics;
+import com.nfssoundtrack.racingsoundtracks.others.lyrics.LyricsClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 /**
  * controller used to merge songs and find exact song when creating a new one
@@ -131,4 +133,50 @@ public class SongController  {
             return objectMapper.writeValueAsString(null);
         }
     }
+
+    @GetMapping(value = "/lyrics/{songId}")
+    public String fetchLyrics(@PathVariable("songId") int songId) throws ResourceNotFoundException, ExecutionException, InterruptedException {
+        Song song = baseController.getSongService().findById(songId)
+                .orElseThrow(() -> new ResourceNotFoundException("No song " + "found with id " + songId));
+        String songInfo = song.toAnotherChangeLogString();
+        String encodedSongInfo = URLEncoder.encode(songInfo, StandardCharsets.UTF_8);
+        String lrcLibUrl = "https://lrclib.net/api/get?";
+        String lrcLibSongInfo = "artist_name="+song.getOfficialDisplayBand()
+                +"&track_name="+song.getOfficialDisplayTitle();
+        String lrcLibSearch = lrcLibUrl+lrcLibSongInfo;
+        LyricsClient client;
+        Lyrics lyrics;
+        //we keep trying by various services
+        client = new LyricsClient();
+        lyrics = client.getLrcLibLyrics(encodedSongInfo,lrcLibSearch).get();
+        if (lyrics!=null){
+            String content = lyrics.getContent();
+            content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
+            return content;
+        }
+//        client = new LyricsClient("Spotify");
+//        lyrics = client.getLyricsNoSearch(encodedSongInfo,
+//                "https://open.spotify.com/track/"+song.getSpotifyId().substring(14), "Spotify").get();
+//        if (lyrics!=null){
+//            String content = lyrics.getContent();
+//            content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
+//            return content;
+//        }
+        client = new LyricsClient();
+        lyrics = client.getLyrics(encodedSongInfo).get();
+        if (lyrics!=null){
+            String content = lyrics.getContent();
+            content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
+            return content;
+        }
+        client = new LyricsClient("Genius");
+        lyrics = client.getLyrics(encodedSongInfo).get();
+        if (lyrics!=null){
+            String content = lyrics.getContent();
+            content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
+            return content;
+        }
+        return "";
+    }
+
 }

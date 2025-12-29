@@ -14,17 +14,15 @@ public class DiscoGSObj {
     private Integer discogsId;
     private String uri;
     private String profile;
-
     private String twitter;
-
     private String facebook;
-
     private String instagram;
     private String soundcloud;
-
     private String myspace;
-
     private String wikipedia;
+    private String bandcamp;
+    private String website;
+    private String linktree;
 
     public DiscoGSObj() {
     }
@@ -41,13 +39,17 @@ public class DiscoGSObj {
         this.profile = profile;
     }
 
-    public void setSocialLink(String twitter, String facebook, String instagram, String soundcloud, String myspace, String wikipedia) {
+    public void setSocialLink(String twitter, String facebook, String instagram, String soundcloud,
+                              String myspace, String wikipedia, String bandcamp, String website, String linktree) {
         this.twitter = twitter;
         this.facebook = facebook;
         this.instagram = instagram;
         this.soundcloud = soundcloud;
         this.myspace = myspace;
         this.wikipedia = wikipedia;
+        this.bandcamp = bandcamp;
+        this.website = website;
+        this.linktree = linktree;
     }
 
     public String getUri() {
@@ -114,6 +116,30 @@ public class DiscoGSObj {
         this.wikipedia = wikipedia;
     }
 
+    public String getLinktree() {
+        return linktree;
+    }
+
+    public void setLinktree(String linktree) {
+        this.linktree = linktree;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String getBandcamp() {
+        return bandcamp;
+    }
+
+    public void setBandcamp(String bandcamp) {
+        this.bandcamp = bandcamp;
+    }
+
     public boolean isNotInDiscogs() {
         return notInDiscogs;
     }
@@ -130,7 +156,7 @@ public class DiscoGSObj {
         this.discogsId = artistId;
     }
 
-    public void setLinks(List<String> urls) {
+    public void setLinks(List<String> urls, String authorName) {
         for (String localUrl : urls) {
             boolean missingHttp = !localUrl.contains("http");
             String targetUrl;
@@ -152,6 +178,18 @@ public class DiscoGSObj {
                 this.setMyspace(targetUrl);
             } else if (targetUrl.contains("wikipedia")) {
                 this.setWikipedia(targetUrl);
+            } else if (targetUrl.contains("bandcamp")){
+                this.setBandcamp(targetUrl);
+            } else if (targetUrl.contains("linktr")){
+                this.setLinktree(targetUrl);
+            } else if (this.getWebsite()==null) {
+                String[] elems = authorName.toLowerCase().split(" ");
+                for (String elem : elems){
+                    if (targetUrl.contains(elem)){
+                        this.setWebsite(targetUrl);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -169,6 +207,9 @@ public class DiscoGSObj {
                 ", soundcloud='" + soundcloud + '\'' +
                 ", myspace='" + myspace + '\'' +
                 ", wikipedia='" + wikipedia + '\'' +
+                ", bandcamp='" + bandcamp + '\'' +
+                ", linktree='" + linktree + '\'' +
+                ", website='" + website + '\'' +
                 '}';
     }
 }

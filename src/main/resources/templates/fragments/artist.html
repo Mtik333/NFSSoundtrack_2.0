@@ -15,6 +15,10 @@
     <th:block th:if="${discoGSObj.uri}">
         <br>
         <b th:utext="#{moreInfo}"></b>
+        <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.website}"
+           th:href="${discoGSObj.website}">
+            <img class="img-responsive-author-info" th:src="@{/images/fullres/website_big.webp}">
+        </a>
         <a target="_blank" class="a-external-music-link-author" th:href="${discoGSObj.uri}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/discogs_big.webp}">
         </a>
@@ -39,6 +43,12 @@
         </a>
         <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.myspace}" th:href="${discoGSObj.myspace}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/myspace_big.webp}">
+        </a>
+        <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.bandcamp}" th:href="${discoGSObj.bandcamp}">
+            <img class="img-responsive-author-info" th:src="@{/images/fullres/bandcamp_big.webp}">
+        </a>
+        <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.linktree}" th:href="${discoGSObj.linktree}">
+            <img class="img-responsive-author-info" th:src="@{/images/fullres/linktree_big.webp}">
         </a>
     </th:block>
 </div>
@@ -160,7 +170,7 @@
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
                             data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.webp}">
                     </td>
-                    <td colspan="6">
+                    <td colspan="5">
                         <th:block
                             th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
@@ -192,6 +202,67 @@
                                 th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
+                    </td>
+                    <td>
+                        <div class="play_icondiv" style="display: flex;">
+                            <th:block th:if="${songToSongSubgroupMap.key.srcId != null}">
+                                <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
+                                     data-bs-target="#videoModal"
+                                     th:attr="data-tagVideo='https://www.youtube.com/embed/'+${songToSongSubgroupMap.key.srcId}"
+                                     th:src="@{/images/znakwodny.webp}">
+                                <a class="table_link externalYT" target="_blank"
+                                   th:href="'https://www.youtube.com/watch?v='+${songToSongSubgroupMap.key.srcId}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                         class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                        <path fill-rule="evenodd"
+                                              d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                                    </svg>
+                                </a>
+                            </th:block>
+                            <textarea
+                                    th:attr="data-lyricsState='noninstrumental',data-instrumental=#{thisIsInstrumental},data-noLyrics=#{noLyrics}"
+                                    th:utext="${songToSongSubgroupMap.key.lyrics}"
+                                    hidden></textarea>
+                            <th:block th:if="${songToSongSubgroupMap.key.spotifyId != null}">
+                                <a class="a-external-music-link spotify-link" th:href="${songToSongSubgroupMap.key.spotifyId}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
+                                </a>
+                                <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
+                                     th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip"
+                                     data-placement="top" th:title="#{playSample}">
+                                <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
+                                     th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip"
+                                     data-placement="top" th:title="#{pauseSample}" style="display: none;">
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.deezerId != null}">
+                                <a class="a-external-music-link deezer-link" th:href="${songToSongSubgroupMap.key.deezerId}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.itunesLink != null}">
+                                <a class="a-external-music-link itunes-link" th:href="${songToSongSubgroupMap.key.itunesLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.tidalLink != null}">
+                                <a class="a-external-music-link tidal-link" th:href="${songToSongSubgroupMap.key.tidalLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.soundcloudLink != null}">
+                                <a class="a-external-music-link soundcloud-link"
+                                   th:href="${songToSongSubgroupMap.key.soundcloudLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
+                                </a>
+                            </th:block>
+                        </div>
                     </td>
                 </tr>
                 <tr class="all composer" th:each="songSubgroup : ${songToSongSubgroupMap.value}"
@@ -306,7 +377,7 @@
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
                             data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.webp}">
                     </td>
-                    <td colspan="6">
+                    <td colspan="5">
                         <th:block
                             th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
@@ -338,6 +409,67 @@
                                 th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
+                    </td>
+                    <td>
+                        <div class="play_icondiv" style="display: flex;">
+                            <th:block th:if="${songToSongSubgroupMap.key.srcId != null}">
+                                <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
+                                     data-bs-target="#videoModal"
+                                     th:attr="data-tagVideo='https://www.youtube.com/embed/'+${songToSongSubgroupMap.key.srcId}"
+                                     th:src="@{/images/znakwodny.webp}">
+                                <a class="table_link externalYT" target="_blank"
+                                   th:href="'https://www.youtube.com/watch?v='+${songToSongSubgroupMap.key.srcId}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                         class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                        <path fill-rule="evenodd"
+                                              d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                                    </svg>
+                                </a>
+                            </th:block>
+                            <textarea
+                                    th:attr="data-lyricsState='noninstrumental',data-instrumental=#{thisIsInstrumental},data-noLyrics=#{noLyrics}"
+                                    th:utext="${songToSongSubgroupMap.key.lyrics}"
+                                    hidden></textarea>
+                            <th:block th:if="${songToSongSubgroupMap.key.spotifyId != null}">
+                                <a class="a-external-music-link spotify-link" th:href="${songToSongSubgroupMap.key.spotifyId}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
+                                </a>
+                                <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
+                                     th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip"
+                                     data-placement="top" th:title="#{playSample}">
+                                <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
+                                     th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip"
+                                     data-placement="top" th:title="#{pauseSample}" style="display: none;">
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.deezerId != null}">
+                                <a class="a-external-music-link deezer-link" th:href="${songToSongSubgroupMap.key.deezerId}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.itunesLink != null}">
+                                <a class="a-external-music-link itunes-link" th:href="${songToSongSubgroupMap.key.itunesLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.tidalLink != null}">
+                                <a class="a-external-music-link tidal-link" th:href="${songToSongSubgroupMap.key.tidalLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.soundcloudLink != null}">
+                                <a class="a-external-music-link soundcloud-link"
+                                   th:href="${songToSongSubgroupMap.key.soundcloudLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
+                                </a>
+                            </th:block>
+                        </div>
                     </td>
                 </tr>
                 <tr class="all subcomposer" th:each="songSubgroup : ${songToSongSubgroupMap.value}"
@@ -438,7 +570,7 @@
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
                             data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.webp}">
                     </td>
-                    <td colspan="6">
+                    <td colspan="5">
                         <th:block
                             th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
@@ -470,6 +602,67 @@
                                 th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
+                    </td>
+                    <td>
+                        <div class="play_icondiv" style="display: flex;">
+                            <th:block th:if="${songToSongSubgroupMap.key.srcId != null}">
+                                <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
+                                     data-bs-target="#videoModal"
+                                     th:attr="data-tagVideo='https://www.youtube.com/embed/'+${songToSongSubgroupMap.key.srcId}"
+                                     th:src="@{/images/znakwodny.webp}">
+                                <a class="table_link externalYT" target="_blank"
+                                   th:href="'https://www.youtube.com/watch?v='+${songToSongSubgroupMap.key.srcId}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                         class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                        <path fill-rule="evenodd"
+                                              d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                                    </svg>
+                                </a>
+                            </th:block>
+                            <textarea
+                                    th:attr="data-lyricsState='noninstrumental',data-instrumental=#{thisIsInstrumental},data-noLyrics=#{noLyrics}"
+                                    th:utext="${songToSongSubgroupMap.key.lyrics}"
+                                    hidden></textarea>
+                            <th:block th:if="${songToSongSubgroupMap.key.spotifyId != null}">
+                                <a class="a-external-music-link spotify-link" th:href="${songToSongSubgroupMap.key.spotifyId}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
+                                </a>
+                                <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
+                                     th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip"
+                                     data-placement="top" th:title="#{playSample}">
+                                <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
+                                     th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip"
+                                     data-placement="top" th:title="#{pauseSample}" style="display: none;">
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.deezerId != null}">
+                                <a class="a-external-music-link deezer-link" th:href="${songToSongSubgroupMap.key.deezerId}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.itunesLink != null}">
+                                <a class="a-external-music-link itunes-link" th:href="${songToSongSubgroupMap.key.itunesLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.tidalLink != null}">
+                                <a class="a-external-music-link tidal-link" th:href="${songToSongSubgroupMap.key.tidalLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.soundcloudLink != null}">
+                                <a class="a-external-music-link soundcloud-link"
+                                   th:href="${songToSongSubgroupMap.key.soundcloudLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
+                                </a>
+                            </th:block>
+                        </div>
                     </td>
                 </tr>
                 <tr class="all remix" th:each="songSubgroup : ${songToSongSubgroupMap.value}"
@@ -570,7 +763,7 @@
                         <img class="img-responsive-row-icon info-about-song pointable" data-toggle="tooltip"
                             data-placement="right" th:title="#{showInfo}" th:src="@{/images/fullres/info_big.webp}">
                     </td>
-                    <td colspan="6">
+                    <td colspan="5">
                         <th:block
                             th:each="authorSong,iter : ${songToSongSubgroupMap.key.authorSongList.?[role.value=='COMPOSER']}">
                             <a class="table_link" th:href="'/author/'+${authorSong.authorAlias.author.id}"
@@ -602,6 +795,67 @@
                                 th:href="'/genre/'+${songGenre.genre.id}"></a><span th:remove="tag"
                                 th:text="${!iter.last ? ', ' : ''}"></span>
                         </th:block>
+                    </td>
+                    <td>
+                        <div class="play_icondiv" style="display: flex;">
+                            <th:block th:if="${songToSongSubgroupMap.key.srcId != null}">
+                                <img class="play_icon img-responsive-row-icon pointable" data-bs-toggle="modal"
+                                     data-bs-target="#videoModal"
+                                     th:attr="data-tagVideo='https://www.youtube.com/embed/'+${songToSongSubgroupMap.key.srcId}"
+                                     th:src="@{/images/znakwodny.webp}">
+                                <a class="table_link externalYT" target="_blank"
+                                   th:href="'https://www.youtube.com/watch?v='+${songToSongSubgroupMap.key.srcId}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                         class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                                        <path fill-rule="evenodd"
+                                              d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                                    </svg>
+                                </a>
+                            </th:block>
+                            <textarea
+                                    th:attr="data-lyricsState='noninstrumental',data-instrumental=#{thisIsInstrumental},data-noLyrics=#{noLyrics}"
+                                    th:utext="${songToSongSubgroupMap.key.lyrics}"
+                                    hidden></textarea>
+                            <th:block th:if="${songToSongSubgroupMap.key.spotifyId != null}">
+                                <a class="a-external-music-link spotify-link" th:href="${songToSongSubgroupMap.key.spotifyId}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/spotify_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSpotify}">
+                                </a>
+                                <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
+                                     th:src="@{/images/fullres/play_with30.webp}" data-toggle="tooltip"
+                                     data-placement="top" th:title="#{playSample}">
+                                <img class="img-responsive-row-icon 30-player pointable a-external-music-link"
+                                     th:src="@{/images/fullres/pause_with30.webp}" data-toggle="tooltip"
+                                     data-placement="top" th:title="#{pauseSample}" style="display: none;">
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.deezerId != null}">
+                                <a class="a-external-music-link deezer-link" th:href="${songToSongSubgroupMap.key.deezerId}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/deezer_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInDeezer}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.itunesLink != null}">
+                                <a class="a-external-music-link itunes-link" th:href="${songToSongSubgroupMap.key.itunesLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/itunes_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInAppleMusic}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.tidalLink != null}">
+                                <a class="a-external-music-link tidal-link" th:href="${songToSongSubgroupMap.key.tidalLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/tidal_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInTidal}">
+                                </a>
+                            </th:block>
+                            <th:block th:if="${songToSongSubgroupMap.key.soundcloudLink != null}">
+                                <a class="a-external-music-link soundcloud-link"
+                                   th:href="${songToSongSubgroupMap.key.soundcloudLink}">
+                                    <img class="img-responsive-row-icon" th:src="@{/images/fullres/soundcloud_big.webp}"
+                                         data-toggle="tooltip" data-placement="top" th:title="#{openInSoundCloud}">
+                                </a>
+                            </th:block>
+                        </div>
                     </td>
                 </tr>
                 <tr class="all feat" th:each="songSubgroup : ${songToSongSubgroupMap.value}"
