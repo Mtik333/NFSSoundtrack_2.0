@@ -148,10 +148,10 @@ public class SongController  {
         Lyrics lyrics;
         //we keep trying by various services
         client = new LyricsClient();
-        lyrics = client.getLrcLibLyrics(encodedSongInfo,lrcLibSearch).get();
+        lyrics = client.getLrcLibLyrics(encodedSongInfo,lrcLibSearch);
         if (lyrics!=null){
             String content = lyrics.getContent();
-            content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
+            //content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br><br>");
             return content;
         }
 //        client = new LyricsClient("Spotify");
@@ -163,14 +163,14 @@ public class SongController  {
 //            return content;
 //        }
         client = new LyricsClient();
-        lyrics = client.getLyrics(encodedSongInfo).get();
+        lyrics = client.getLyrics(encodedSongInfo);
         if (lyrics!=null){
             String content = lyrics.getContent();
             content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
             return content;
         }
         client = new LyricsClient("Genius");
-        lyrics = client.getLyrics(encodedSongInfo).get();
+        lyrics = client.getLyrics(encodedSongInfo);
         if (lyrics!=null){
             String content = lyrics.getContent();
             content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");

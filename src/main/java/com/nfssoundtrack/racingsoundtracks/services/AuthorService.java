@@ -112,11 +112,11 @@ public class AuthorService {
         Optional<Long> authorIdAlreadyThere = discoGSObjMap.keySet().stream().filter(aLong ->
                 aLong.equals(author.getId())).findFirst();
         //if we want to ignore discogs for this author, we just return 'bland value'
-        if (Boolean.TRUE.equals(author.getSkipDiscogs())) {
-            discoGSObjMap.remove(author.getId());
-            return new DiscoGSObj(true, 0, null,
-                    author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
-        }
+//        if (Boolean.TRUE.equals(author.getSkipDiscogs())) {
+//            discoGSObjMap.remove(author.getId());
+//            return new DiscoGSObj(true, 0, null,
+//                    author.getName() + NOT_FOUND_IN_DISCO_GS_DATABASE);
+//        }
         DiscoGSObj discoGSObj;
         if (authorIdAlreadyThere.isPresent()) {
             //otherwise, if author is already in map, we check how discogs looks like

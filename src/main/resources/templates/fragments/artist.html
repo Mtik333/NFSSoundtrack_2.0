@@ -12,14 +12,13 @@
     <span th:utext="${discoGSObj.profile}"></span>
 </div>
 <div id="socialLinks">
-    <th:block th:if="${discoGSObj.uri}">
         <br>
         <b th:utext="#{moreInfo}"></b>
         <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.website}"
            th:href="${discoGSObj.website}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/website_big.webp}">
         </a>
-        <a target="_blank" class="a-external-music-link-author" th:href="${discoGSObj.uri}">
+        <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.uri}" th:href="${discoGSObj.uri}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/discogs_big.webp}">
         </a>
         <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.wikipedia}"
@@ -50,7 +49,6 @@
         <a target="_blank" class="a-external-music-link-author" th:if="${discoGSObj.linktree}" th:href="${discoGSObj.linktree}">
             <img class="img-responsive-author-info" th:src="@{/images/fullres/linktree_big.webp}">
         </a>
-    </th:block>
 </div>
 <h5 th:text="#{allAliases}"></h5>
 <th:block th:each="singleAlias,iter : ${allAliases}">

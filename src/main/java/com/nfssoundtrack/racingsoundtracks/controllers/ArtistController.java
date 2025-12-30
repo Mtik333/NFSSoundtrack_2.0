@@ -401,22 +401,23 @@ public class ArtistController {
             }
         }
         //if we do care about DiscoGS, all links will be updated in "DiscoGS" index stored locally on the server
+        DiscoGSObj discoGSObj;
+        String twitter = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("twitter"));
+        String facebook = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("facebook"));
+        String instagram = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("instagram"));
+        String soundcloud = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("soundcloud"));
+        String wikipedia = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("wikipedia"));
+        String myspace = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("myspace"));
+        String profile = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("profile"));
+        String bandcamp = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("bandcamp"));
+        String website = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("website"));
+        String linktree = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("linktree"));
         if (Boolean.FALSE.equals(author.getSkipDiscogs())) {
             Boolean updateDiscogs = (Boolean) formDataMap.get("discogsToUpdate");
             if (Boolean.TRUE.equals(updateDiscogs)) {
                 String uri = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("uri"));
-                String twitter = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("twitter"));
-                String facebook = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("facebook"));
-                String instagram = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("instagram"));
-                String soundcloud = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("soundcloud"));
-                String wikipedia = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("wikipedia"));
-                String myspace = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("myspace"));
-                String profile = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("profile"));
-                String bandcamp = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("bandcamp"));
-                String website = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("website"));
-                String linktree = JustSomeHelper.returnProperValueToDb((String) formDataMap.get("linktree"));
                 String id = (String) formDataMap.get("id");
-                DiscoGSObj discoGSObj = new DiscoGSObj(false, Integer.parseInt(id), uri, profile);
+                discoGSObj = new DiscoGSObj(false, Integer.parseInt(id), uri, profile);
                 discoGSObj.setSocialLink(twitter, facebook, instagram, soundcloud, myspace, wikipedia,
                         bandcamp,website,linktree);
                 String localMessage = "Updating DiscoGS info for author " + author.getName();
@@ -432,11 +433,14 @@ public class ArtistController {
             //i do it only because i want to match some missing artists with the discogs identifiers
             //and i dont want to go through artists that i know do not exist in discogs
             //TODO disable once you go through all the letters and digits
-            DiscoGSObj discoGSObj = new DiscoGSObj();
+            discoGSObj = new DiscoGSObj();
+            discoGSObj.setProfile(profile);
+            discoGSObj.setSocialLink(twitter, facebook, instagram, soundcloud, myspace, wikipedia,
+                    bandcamp,website,linktree);
             discoGSObj.setNotInDiscogs(true);
             discoGSObj.setDiscogsId(0);
             baseController.getAuthorService().updateDiscoGSObj(author.getId(),discoGSObj,true);
-            updateAllDiscoGS(author.getName().substring(0,1));
+            //updateAllDiscoGS(author.getName().substring(0,1));
         }
         //it might be that there was a typo in author official name, so if we want to fix all the songs associated
         //with such author, we will go through all songs and correct this value there

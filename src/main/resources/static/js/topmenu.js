@@ -158,9 +158,9 @@ $(document).ready(function () {
     $(document).on('click', '#dynamic_bg', function (e) {
         e.preventDefault();
         if (localStorage.hasOwnProperty("dynamic-bg")) {
-            currentBg = (Number(localStorage.getItem("dynamic-bg-index")) + 1) % 5;
+            currentBg = (Number(localStorage.getItem("dynamic-bg-index")) + 1) % 6;
         } else {
-            currentBg = (currentBg + 1) % 5
+            currentBg = (currentBg + 1) % 6;
         }
         if (currentBg == 0) {
             localStorage.removeItem("dynamic-bg");
