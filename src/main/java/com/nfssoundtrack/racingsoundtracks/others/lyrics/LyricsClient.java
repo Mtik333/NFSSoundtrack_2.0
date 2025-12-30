@@ -1,8 +1,10 @@
 package com.nfssoundtrack.racingsoundtracks.others.lyrics;
 
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -12,8 +14,18 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Safelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -30,9 +42,9 @@ public class LyricsClient {
     private final HashMap<String, Lyrics> cache = new HashMap<>();
     private final OutputSettings noPrettyPrint = new OutputSettings().prettyPrint(false);
     private final Safelist newlineSafelist = Safelist.none().addTags("br", "p");
-    private final Executor executor;
     private final String defaultSource, userAgent;
     private final int timeout;
+    private static final Logger LOGGER = LoggerFactory.getLogger(LyricsClient.class);
 
     /**
      * Constructs a new {@link LyricsClient} using all defaults
@@ -73,7 +85,6 @@ public class LyricsClient {
         this.defaultSource = defaultSource == null ? config.getString("lyrics.default") : defaultSource;
         this.userAgent = config.getString("lyrics.user-agent");
         this.timeout = config.getInt("lyrics.timeout");
-        this.executor = executor == null ? Executors.newCachedThreadPool() : executor;
     }
 
     /**
@@ -88,15 +99,30 @@ public class LyricsClient {
         return getLyrics(search, defaultSource);
     }
 
-    public Lyrics getLrcLibLyrics(String search, String searchUrl) {
+    public Lyrics getLrcLibLyrics(String search, Song song, String searchUrl) {
         String cacheKey = "LrcLib" + "||" + search;
         if (cache.containsKey(cacheKey)) {
             return cache.get(cacheKey);
         }
         try {
-            Connection connection = Jsoup.connect(searchUrl).userAgent(userAgent).timeout(timeout);
-            String body = connection.ignoreContentType(true).execute().body();
-            JSONObject json = new JSONObject(body);
+            RestTemplate restTemplate = new RestTemplate();
+            String lrcLibUrl = "https://lrclib.net/api/search";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            headers.add("user-agent", "RacingSoundtracks v1.0 (https://racingsoundtracks.com)");
+            HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(lrcLibUrl)
+                    .queryParam("track_name", URLEncoder.encode(song.getOfficialDisplayTitle(), StandardCharsets.UTF_8))
+                    .queryParam("artist_name", URLEncoder.encode(song.getOfficialDisplayBand(), StandardCharsets.UTF_8));
+            HttpEntity<String> response1 = restTemplate.exchange(
+                    builder.toUriString(),
+                    HttpMethod.GET, entity, String.class);
+            String body1 = response1.getBody();
+            JSONArray listOfFoundEntries = new JSONArray(body1);
+            if (listOfFoundEntries.isEmpty()) {
+                return null;
+            }
+            JSONObject json = listOfFoundEntries.getJSONObject(0);
             String title = json.getString("trackName");
             String artist = json.getString("artistName");
             String songLyrics = json.getString("plainLyrics");
@@ -104,8 +130,8 @@ public class LyricsClient {
                     songLyrics, searchUrl, "LrcLib");
             cache.put(cacheKey, lyrics);
             return lyrics;
-        } catch (IOException | NullPointerException | JSONException ex) {
-            System.out.println(ex.getMessage());
+        } catch (NullPointerException | JSONException ex) {
+            LOGGER.error(ex.getMessage());
             return null;
         }
     }
@@ -165,34 +191,10 @@ public class LyricsClient {
             cache.put(cacheKey, lyrics);
             return lyrics;
         } catch (ConfigException ex) {
-            System.out.println(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             throw new IllegalArgumentException(String.format("Source '%s' does not exist or is not configured correctly", source));
         } catch (Exception ignored) {
-            System.out.println(ignored.getMessage());
-            return null;
-        }
-    }
-
-    public Lyrics getLyricsNoSearch(String search, String url, String source) {
-        String cacheKey = source + "||" + search;
-        if (cache.containsKey(cacheKey)) {
-            return cache.get(cacheKey);
-        }
-        try {
-            String titleSelector = config.getString("lyrics." + source + ".parse.title");
-            String authorSelector = config.getString("lyrics." + source + ".parse.author");
-            String contentSelector = config.getString("lyrics." + source + ".parse.content");
-            Document doc = Jsoup.connect(url).userAgent(userAgent).timeout(timeout).get();
-            Lyrics lyrics = new Lyrics(doc.selectFirst(titleSelector).ownText(),
-                    doc.selectFirst(authorSelector).ownText(),
-                    cleanWithNewlines(doc.selectFirst(contentSelector)),
-                    url,
-                    source);
-            cache.put(cacheKey, lyrics);
-            return lyrics;
-        } catch (ConfigException ex) {
-            throw new IllegalArgumentException(String.format("Source '%s' does not exist or is not configured correctly", source));
-        } catch (Exception ignored) {
+            LOGGER.error(ignored.getMessage());
             return null;
         }
     }

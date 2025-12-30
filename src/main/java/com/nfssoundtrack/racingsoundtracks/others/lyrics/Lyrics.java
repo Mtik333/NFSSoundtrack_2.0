@@ -8,6 +8,10 @@ package com.nfssoundtrack.racingsoundtracks.others.lyrics;
 public class Lyrics
 {
     private final String title, author, content, url, source;
+    //these fields below are going to be useful in the future once i make something to submit lyrics to LrcLib
+    private String albumName;
+    private int duration;
+    private String escapedContent;
 
     protected Lyrics(String title, String author, String content, String url, String source)
     {
@@ -66,5 +70,29 @@ public class Lyrics
     public String getSource()
     {
         return source;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public String getAlbumName() {
+        return albumName;
+    }
+
+    public void setAlbumName(String albumName) {
+        this.albumName = albumName;
+    }
+
+    public String getEscapedContent() {
+        return escapedContent;
+    }
+
+    public void setEscapedContent(String escapedContent) {
+        this.escapedContent = escapedContent;
     }
 }

@@ -6,6 +6,8 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.others.lyrics.Lyrics;
 import com.nfssoundtrack.racingsoundtracks.others.lyrics.LyricsClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 /**
  * controller used to merge songs and find exact song when creating a new one
@@ -25,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 public class SongController  {
 
     private final BaseControllerWithErrorHandling baseController;
+    private static final Logger logger = LoggerFactory.getLogger(SongController.class);
 
     public SongController(BaseControllerWithErrorHandling baseController) {
         this.baseController = baseController;
@@ -135,50 +137,33 @@ public class SongController  {
     }
 
     @GetMapping(value = "/lyrics/{songId}")
-    public String fetchLyrics(@PathVariable("songId") int songId) throws ResourceNotFoundException, ExecutionException, InterruptedException {
+    public String fetchLyrics(@PathVariable("songId") int songId) throws ResourceNotFoundException {
         Song song = baseController.getSongService().findById(songId)
                 .orElseThrow(() -> new ResourceNotFoundException("No song " + "found with id " + songId));
         String songInfo = song.toAnotherChangeLogString();
         String encodedSongInfo = URLEncoder.encode(songInfo, StandardCharsets.UTF_8);
-        String lrcLibUrl = "https://lrclib.net/api/get?";
+        String lrcLibUrl = "https://lrclib.net/api/search?";
         String lrcLibSongInfo = "artist_name="+song.getOfficialDisplayBand()
                 +"&track_name="+song.getOfficialDisplayTitle();
         String lrcLibSearch = lrcLibUrl+lrcLibSongInfo;
         LyricsClient client;
         Lyrics lyrics;
-        //we keep trying by various services
+        //we keep trying by either LrcLib or Az-Lyrics services - Genius does not work from my server
         client = new LyricsClient();
-        lyrics = client.getLrcLibLyrics(encodedSongInfo,lrcLibSearch);
-        System.out.println("lyrics lrclib: " + lyrics);
+        lyrics = client.getLrcLibLyrics(encodedSongInfo, song,lrcLibSearch);
         if (lyrics!=null){
             String content = lyrics.getContent();
-            //content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br><br>");
+            content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br><br>");
             return content;
         }
-//        client = new LyricsClient("Spotify");
-//        lyrics = client.getLyricsNoSearch(encodedSongInfo,
-//                "https://open.spotify.com/track/"+song.getSpotifyId().substring(14), "Spotify").get();
-//        if (lyrics!=null){
-//            String content = lyrics.getContent();
-//            content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
-//            return content;
-//        }
         client = new LyricsClient();
         lyrics = client.getLyrics(encodedSongInfo);
-        System.out.println("lyrics az: " + lyrics);
         if (lyrics!=null){
             String content = lyrics.getContent();
             content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
             return content;
         }
-        client = new LyricsClient("Genius");
-        lyrics = client.getLyrics(encodedSongInfo);
-        System.out.println("lyrics genius: " + lyrics);
-        if (lyrics!=null){
-            String content = lyrics.getContent();
-            content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
-            return content;
-        }
+        logger.info("end of fetch-lyrics method");
         return "";
     }
 
