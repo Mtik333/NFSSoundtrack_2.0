@@ -149,6 +149,7 @@ public class SongController  {
         //we keep trying by various services
         client = new LyricsClient();
         lyrics = client.getLrcLibLyrics(encodedSongInfo,lrcLibSearch);
+        System.out.println("lyrics lrclib: " + lyrics);
         if (lyrics!=null){
             String content = lyrics.getContent();
             //content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br><br>");
@@ -164,6 +165,7 @@ public class SongController  {
 //        }
         client = new LyricsClient();
         lyrics = client.getLyrics(encodedSongInfo);
+        System.out.println("lyrics az: " + lyrics);
         if (lyrics!=null){
             String content = lyrics.getContent();
             content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
@@ -171,6 +173,7 @@ public class SongController  {
         }
         client = new LyricsClient("Genius");
         lyrics = client.getLyrics(encodedSongInfo);
+        System.out.println("lyrics genius: " + lyrics);
         if (lyrics!=null){
             String content = lyrics.getContent();
             content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");

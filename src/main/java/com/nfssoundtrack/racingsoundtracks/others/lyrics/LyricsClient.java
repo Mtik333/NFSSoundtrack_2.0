@@ -105,6 +105,7 @@ public class LyricsClient {
             cache.put(cacheKey, lyrics);
             return lyrics;
         } catch (IOException | NullPointerException | JSONException ex) {
+            System.out.println(ex.getMessage());
             return null;
         }
     }
@@ -164,8 +165,10 @@ public class LyricsClient {
             cache.put(cacheKey, lyrics);
             return lyrics;
         } catch (ConfigException ex) {
+            System.out.println(ex.getMessage());
             throw new IllegalArgumentException(String.format("Source '%s' does not exist or is not configured correctly", source));
         } catch (Exception ignored) {
+            System.out.println(ignored.getMessage());
             return null;
         }
     }
