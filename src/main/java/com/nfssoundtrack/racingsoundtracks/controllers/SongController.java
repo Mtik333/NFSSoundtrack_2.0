@@ -164,7 +164,7 @@ public class SongController  {
             return content;
         }
         logger.info("end of fetch-lyrics method");
-        return "";
+        return null;
     }
 
 }

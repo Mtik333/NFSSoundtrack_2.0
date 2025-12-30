@@ -143,4 +143,23 @@ public class JustSomeHelper {
         Map<Object, Boolean> seen = new ConcurrentHashMap<>();
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
+
+    public static String removeVariousSpecialCharactersFromString(String entry){
+        return entry.replace("'","")
+                .replace("!","")
+                .replace("#","")
+                .replace("$","S")
+                .replace("&","and")
+                .replace("(","")
+                .replace(")","")
+                .replace("-","")
+                .replace("+","")
+                .replace("=","")
+                .replace(":","")
+                .replace(",","")
+                .replace(".","")
+                .replace("/","")
+                .replace("?","")
+                .replace("\"","");
+    }
 }

@@ -1,6 +1,7 @@
 package com.nfssoundtrack.racingsoundtracks.others.lyrics;
 
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
+import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
@@ -112,20 +113,26 @@ public class LyricsClient {
             headers.add("user-agent", "RacingSoundtracks v1.0 (https://racingsoundtracks.com)");
             HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(lrcLibUrl)
-                    .queryParam("track_name", URLEncoder.encode(song.getOfficialDisplayTitle(), StandardCharsets.UTF_8))
-                    .queryParam("artist_name", URLEncoder.encode(song.getOfficialDisplayBand(), StandardCharsets.UTF_8));
-            HttpEntity<String> response1 = restTemplate.exchange(
-                    builder.toUriString(),
-                    HttpMethod.GET, entity, String.class);
-            String body1 = response1.getBody();
-            JSONArray listOfFoundEntries = new JSONArray(body1);
+                    .queryParam("track_name", URLEncoder.encode(
+                            JustSomeHelper.removeVariousSpecialCharactersFromString(song.getOfficialDisplayTitle()),
+                            StandardCharsets.UTF_8))
+                    .queryParam("artist_name", URLEncoder.encode(
+                            JustSomeHelper.removeVariousSpecialCharactersFromString(song.getOfficialDisplayBand()),
+                            StandardCharsets.UTF_8));
+            HttpEntity<String> stringHttpEntity = restTemplate.exchange(
+                    builder.toUriString(), HttpMethod.GET, entity, String.class);
+            String body = stringHttpEntity.getBody();
+            JSONArray listOfFoundEntries = new JSONArray(body);
             if (listOfFoundEntries.isEmpty()) {
                 return null;
             }
             JSONObject json = listOfFoundEntries.getJSONObject(0);
             String title = json.getString("trackName");
             String artist = json.getString("artistName");
-            String songLyrics = json.getString("plainLyrics");
+            String songLyrics = json.optString("plainLyrics");
+            if (songLyrics.isEmpty()){
+                songLyrics = "Instrumental";
+            }
             Lyrics lyrics = new Lyrics(title, artist,
                     songLyrics, searchUrl, "LrcLib");
             cache.put(cacheKey, lyrics);

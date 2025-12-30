@@ -1581,8 +1581,14 @@ $(document).ready(function () {
             type: "GET",
             url: "/song/lyrics/"+songId,
             success: function (lyrics) {
-                $("#lyrics").text(lyrics);
-                $("#request-status").text("OK");
+                if (lyrics==""){
+                    $("#request-status").text("Not found");
+                } else if (lyrics == "Instrumental"){
+                    $("#request-status").text("Instrumental");
+                } else {
+                    $("#lyrics").text(lyrics);
+                    $("#request-status").text("OK");
+                }
             },
             error: function (ooo) {
                 alert("error fetching lyrics, check the logs");
