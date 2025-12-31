@@ -13,7 +13,7 @@ public class Lyrics
     private int duration;
     private String escapedContent;
 
-    protected Lyrics(String title, String author, String content, String url, String source)
+    public Lyrics(String title, String author, String content, String url, String source)
     {
         this.title = title;
         this.author = author;

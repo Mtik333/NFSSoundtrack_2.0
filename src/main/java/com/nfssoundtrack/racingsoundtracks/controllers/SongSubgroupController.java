@@ -8,6 +8,7 @@ import com.nfssoundtrack.racingsoundtracks.deserializers.SongDeserializer;
 import com.nfssoundtrack.racingsoundtracks.deserializers.SongSubgroupDeserializer;
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
+import com.nfssoundtrack.racingsoundtracks.others.lyrics.Lyrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -661,6 +662,35 @@ public class SongSubgroupController  {
             //we clear all the notes from each song in a subgroup
             songSubgroup.setInfo(null);
             baseController.getSongSubgroupService().save(songSubgroup);
+        }
+        String gameShort = subgroup.getMainGroup().getGame().getGameShort();
+        //it's worth also unloading game cache
+        baseController.removeCacheEntry(gameShort);
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
+    @GetMapping(value = "/getLyrics/{subgroupId}")
+    public String getLyricsForSongs(@PathVariable("subgroupId") int subgroupId)
+            throws IOException, ResourceNotFoundException {
+        Subgroup subgroup = baseController.getSubgroupService().findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No " +
+                "subgroup found with id " + subgroupId));
+        //fetching all songs from subgroup
+        List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
+        for (SongSubgroup songSubgroup : songSubgroupList) {
+            Song song = songSubgroup.getSong();
+            logger.error("getting lyrics for: {}", song.toAnotherChangeLogString());
+            if (song.getLyrics()!=null){
+                logger.error("lyrics already there");
+                continue;
+            }
+            Lyrics lyrics = JustSomeHelper.getLrcLibLyrics(song);
+            if (lyrics==null){
+                logger.error("no lyrics found");
+                continue;
+            }
+            song.setLyrics(lyrics.getContent());
+            //we clear all the notes from each song in a subgroup
+            baseController.getSongService().save(song);
         }
         String gameShort = subgroup.getMainGroup().getGame().getGameShort();
         //it's worth also unloading game cache

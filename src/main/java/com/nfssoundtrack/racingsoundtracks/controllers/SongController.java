@@ -3,16 +3,14 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
+import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.others.lyrics.Lyrics;
-import com.nfssoundtrack.racingsoundtracks.others.lyrics.LyricsClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -140,27 +138,10 @@ public class SongController  {
     public String fetchLyrics(@PathVariable("songId") int songId) throws ResourceNotFoundException {
         Song song = baseController.getSongService().findById(songId)
                 .orElseThrow(() -> new ResourceNotFoundException("No song " + "found with id " + songId));
-        String songInfo = song.toAnotherChangeLogString();
-        String encodedSongInfo = URLEncoder.encode(songInfo, StandardCharsets.UTF_8);
-        String lrcLibUrl = "https://lrclib.net/api/search?";
-        String lrcLibSongInfo = "artist_name="+song.getOfficialDisplayBand()
-                +"&track_name="+song.getOfficialDisplayTitle();
-        String lrcLibSearch = lrcLibUrl+lrcLibSongInfo;
-        LyricsClient client;
-        Lyrics lyrics;
-        //we keep trying by either LrcLib or Az-Lyrics services - Genius does not work from my server
-        client = new LyricsClient();
-        lyrics = client.getLrcLibLyrics(encodedSongInfo, song,lrcLibSearch);
+        Lyrics lyrics = JustSomeHelper.getLrcLibLyrics(song);
         if (lyrics!=null){
             String content = lyrics.getContent();
             content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br><br>");
-            return content;
-        }
-        client = new LyricsClient();
-        lyrics = client.getLyrics(encodedSongInfo);
-        if (lyrics!=null){
-            String content = lyrics.getContent();
-            content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br>");
             return content;
         }
         logger.info("end of fetch-lyrics method");

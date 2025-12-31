@@ -5,14 +5,28 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
+import com.nfssoundtrack.racingsoundtracks.others.lyrics.Lyrics;
 import com.nfssoundtrack.racingsoundtracks.services.CorrectionService;
 import com.nfssoundtrack.racingsoundtracks.services.SongSubgroupService;
 import com.nfssoundtrack.racingsoundtracks.services.TodaysSongService;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static java.util.Map.entry;
 
 public class JustSomeHelper {
 
@@ -144,22 +158,89 @@ public class JustSomeHelper {
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
-    public static String removeVariousSpecialCharactersFromString(String entry){
-        return entry.replace("'","")
-                .replace("!","")
-                .replace("#","")
-                .replace("$","S")
-                .replace("&","and")
-                .replace("(","")
-                .replace(")","")
-                .replace("-","")
-                .replace("+","")
-                .replace("=","")
-                .replace(":","")
-                .replace(",","")
-                .replace(".","")
-                .replace("/","")
-                .replace("?","")
-                .replace("\"","");
+    public static Map<String,String> getInvalidCharsForTitle(){
+        return Map.ofEntries(
+                entry("'",""),
+                entry("!",""),
+                entry("#",""),
+                entry("$","S"),
+                entry("&","and"),
+                entry("(",""),
+                entry(")",""),
+                entry("-",""),
+                entry("+",""),
+                entry("=",""),
+                entry(":",""),
+                entry(",",""),
+                entry(".",""),
+                entry("/",""),
+                entry("?",""),
+                entry("\"","")
+        );
+    }
+
+    public static Map<String,String> getInvalidCharsForBand(){
+        return Map.ofEntries(
+                entry("'",""),
+                entry("!",""),
+                entry("#",""),
+                entry("$","S"),
+                entry("&","and"),
+                entry("(",""),
+                entry(")",""),
+                entry("+",""),
+                entry("=",""),
+                entry(":",""),
+                entry(",",""),
+                entry(".",""),
+                entry("/",""),
+                entry("?",""),
+                entry("\"","")
+        );
+    }
+
+    public static String removeVariousSpecialCharactersFromString(String entry, Map<String,String> chars){
+        for (Map.Entry<String,String> singleChar : chars.entrySet()){
+            entry = entry.replace(singleChar.getKey(),singleChar.getValue());
+        }
+        return entry;
+    }
+
+    public static Lyrics getLrcLibLyrics(Song song) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String lrcLibUrl = "https://lrclib.net/api/search";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            headers.add("user-agent", "RacingSoundtracks v1.0 (https://racingsoundtracks.com)");
+            HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(lrcLibUrl)
+                    .queryParam("track_name", URLEncoder.encode(
+                            JustSomeHelper.removeVariousSpecialCharactersFromString(
+                                    song.getOfficialDisplayTitle(),JustSomeHelper.getInvalidCharsForTitle()),
+                            StandardCharsets.UTF_8))
+                    .queryParam("artist_name", URLEncoder.encode(
+                            JustSomeHelper.removeVariousSpecialCharactersFromString(
+                                    song.getOfficialDisplayBand(),JustSomeHelper.getInvalidCharsForBand()),
+                            StandardCharsets.UTF_8));
+            HttpEntity<String> stringHttpEntity = restTemplate.exchange(
+                    builder.toUriString(), HttpMethod.GET, entity, String.class);
+            String body = stringHttpEntity.getBody();
+            JSONArray listOfFoundEntries = new JSONArray(body);
+            if (listOfFoundEntries.isEmpty()) {
+                return null;
+            }
+            JSONObject json = listOfFoundEntries.getJSONObject(0);
+            String title = json.getString("trackName");
+            String artist = json.getString("artistName");
+            String songLyrics = json.optString("plainLyrics");
+            String songUrl = json.optString("url");
+            if (songLyrics.isEmpty()){
+                songLyrics = "Instrumental";
+            }
+            return new Lyrics(title, artist, songLyrics, songUrl, "LrcLib");
+        } catch (NullPointerException | JSONException ex) {
+            return null;
+        }
     }
 }
