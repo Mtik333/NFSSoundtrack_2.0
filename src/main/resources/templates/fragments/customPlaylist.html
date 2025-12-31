@@ -57,21 +57,25 @@
                         <th:block th:each="authorSong : ${songSubgroup.song.authorSongList}">
                             <th:block th:if="${(composersFlagsOnly==null || #bools.isTrue(composersFlagsOnly)) && authorSong.role.value=='COMPOSER'}"
                                       th:each="authorCountry : ${authorSong.authorAlias.author.authorCountries}">
-                                <a class="table_link" th:href="'/countryInfo/'+${authorCountry.country.id}">
-                                    <img class="img-country" data-toggle="tooltip"
-                                         data-placement="top" th:title="${authorCountry.country.countryName}"
-                                         style="max-width:40px"
-                                         th:src="@{/images/countryflags/}+${authorCountry.country.localLink}">
-                                </a>
+                                <th:block th:if="${authorCountry.country.localLink!=null}">
+                                    <a class="table_link" th:href="'/countryInfo/'+${authorCountry.country.id}">
+                                        <img class="img-country" data-toggle="tooltip"
+                                             data-placement="top" th:title="${authorCountry.country.countryName}"
+                                             style="max-width:40px"
+                                             th:src="@{/images/countryflags/}+${authorCountry.country.localLink}">
+                                    </a>
+                                </th:block>
                             </th:block>
                             <th:block th:if="${composersFlagsOnly!=null && !#bools.isTrue(composersFlagsOnly)}">
                                 <th:block th:each="authorCountry2 : ${authorSong.authorAlias.author.authorCountries}">
-                                    <a class="table_link" th:href="'/countryInfo/'+${authorCountry2.country.id}">
-                                        <img class="img-country" data-toggle="tooltip"
-                                             data-placement="top" th:title="${authorCountry2.country.countryName}"
-                                             style="max-width:40px"
-                                             th:src="@{/images/countryflags/}+${authorCountry2.country.localLink}">
-                                    </a>
+                                    <th:block th:if="${authorCountry2.country.localLink!=null}">
+                                        <a class="table_link" th:href="'/countryInfo/'+${authorCountry2.country.id}">
+                                            <img class="img-country" data-toggle="tooltip"
+                                                 data-placement="top" th:title="${authorCountry2.country.countryName}"
+                                                 style="max-width:40px"
+                                                 th:src="@{/images/countryflags/}+${authorCountry2.country.localLink}">
+                                        </a>
+                                    </th:block>
                                 </th:block>
                             </th:block>
                         </th:block>
