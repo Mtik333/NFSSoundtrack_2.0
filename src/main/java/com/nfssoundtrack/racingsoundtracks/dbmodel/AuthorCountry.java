@@ -19,7 +19,7 @@ public class AuthorCountry implements Serializable {
     private Author author;
 
     @JsonBackReference
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "country_id")
     private Country country;
 
