@@ -1703,7 +1703,7 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (links) {
-                getSingleSubgroupFromGame(0);
+                alert("lyrics fetching finished");
                 $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
                     $(successAlertHtml).slideUp(500, function () {
                         $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();

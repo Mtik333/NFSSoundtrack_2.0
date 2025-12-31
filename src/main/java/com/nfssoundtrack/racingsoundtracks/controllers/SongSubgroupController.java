@@ -688,7 +688,7 @@ public class SongSubgroupController  {
                 logger.error("no lyrics found");
                 continue;
             }
-            song.setLyrics(lyrics.getContent());
+            song.setLyrics(lyrics.getContent().replace("\n","<br>"));
             //we clear all the notes from each song in a subgroup
             baseController.getSongService().save(song);
         }

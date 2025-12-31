@@ -141,7 +141,7 @@ public class SongController  {
         Lyrics lyrics = JustSomeHelper.getLrcLibLyrics(song);
         if (lyrics!=null){
             String content = lyrics.getContent();
-            content = content.replace("\n\n\n","<br><br>").replace("\n\n","<br><br>");
+            content = content.replace("\n","<br>");
             return content;
         }
         logger.info("end of fetch-lyrics method");
