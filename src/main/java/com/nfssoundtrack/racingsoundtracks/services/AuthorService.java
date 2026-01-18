@@ -128,14 +128,17 @@ public class AuthorService {
                 if (!discoGSObj.isNotInDiscogs()) {
                     if (discoGSObj.getDiscogsId() == null) {
                         //i think i was notifying here the admin to manually put author info via admim panel
-                        RestAction<Member> memberRestAction = WebsiteViewsController.getJda().getGuilds().get(0).retrieveMemberById(adminId);
-                        DiscoGSObj finalDiscoGSObj = discoGSObj;
-                        memberRestAction.queue(member -> member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
-                                .sendMessage("discoGSObj " + finalDiscoGSObj).queue()));
+//                        RestAction<Member> memberRestAction = WebsiteViewsController.getJda().getGuilds().get(0).retrieveMemberById(adminId);
+//                        DiscoGSObj finalDiscoGSObj = discoGSObj;
+//                        memberRestAction.queue(member -> member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+//                                .sendMessage("discoGSObj " + finalDiscoGSObj).queue()));
                         discoGSObjMap.remove(author.getId());
                     } else {
                         discoGSObj = handleApiOveruse(discoGSObj, author);
                     }
+                } else {
+                    discoGSObj.setWebsite(null);
+                    discoGSObj.setBandcamp(null);
                 }
             }
         } else {
@@ -155,8 +158,14 @@ public class AuthorService {
      * @throws InterruptedException
      */
     private DiscoGSObj handleApiOveruse(DiscoGSObj discoGSObj, Author author) throws InterruptedException {
+        //covering the case where we are missing website / bandcamp info so we have to re-try fetching it
+        if (discoGSObj.getUri()!=null && discoGSObj.getWebsite()!=null && discoGSObj.getWebsite().isEmpty()){
+            discoGSObj = obtainArtistLinkAndProfile(author.getName(), discoGSObj.getDiscogsId());
+            updateDiscoGSObj(author.getId(), discoGSObj, author.getSkipDiscogs());
+            return discoGSObj;
+        }
         //in this case we just return discogs info as we have it already
-        if (discoGSObj.getUri() != null) {
+        else if (discoGSObj.getUri() != null) {
             return discoGSObj;
         }
         if (!checkIfCanQueryDiscoGS()) {

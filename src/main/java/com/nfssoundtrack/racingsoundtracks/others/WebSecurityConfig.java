@@ -3,6 +3,7 @@ package com.nfssoundtrack.racingsoundtracks.others;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.nfssoundtrack.racingsoundtracks.deserializers.AuthorToDiscoGSDeserializer;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -125,6 +126,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 if (artistDir.isDirectory()) {
                     try {
                         File discoGsFile = new File(artistDir.getPath() + File.separator + "discogs.json");
+                        JSONObject jsonObject = new JSONObject(discoGsFile);
+                        boolean websiteChecked = jsonObject.has("website") && jsonObject.has("bandcamp");
                         AuthorToDiscoGSObj obj = mapper.readValue(discoGsFile, AuthorToDiscoGSObj.class);
                         String profile = obj.getDiscoGSObj().getProfile();
                         if (profile != null && !profile.isEmpty()) {
@@ -132,6 +135,10 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                     .replace("[b]", "<b>").replace("[/b]", "</b>")
                                     .replace("[u]", "<u>").replace("[/u]", "</u>")
                                     .replace("[i]", "<i>").replace("[/i]", "</i>"));
+                        }
+                        if (!websiteChecked){
+                            obj.getDiscoGSObj().setWebsite("");
+                            obj.getDiscoGSObj().setBandcamp("");
                         }
                         discogsMap.put(obj.getArtistId(), obj.getDiscoGSObj());
                     } catch (NumberFormatException e1) {
