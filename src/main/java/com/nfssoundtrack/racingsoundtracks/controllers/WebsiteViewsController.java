@@ -179,9 +179,12 @@ public class WebsiteViewsController  {
                     TypeFactory.defaultInstance().constructCollectionType(List.class, String.class));
             //as array consits of song-subgroup id, we are looking for it in database
             for (String songSubgroupId : finalList) {
-                songSubgroupList.add(baseController.getSongSubgroupService().findById(Integer.valueOf(
-                        songSubgroupId)).orElseThrow(() -> new ResourceNotFoundException("No songsubgroup found with " +
-                        "id " + songSubgroupId)));
+                Optional<SongSubgroup> foundSong = baseController.getSongSubgroupService().findById(Integer.valueOf(songSubgroupId));
+                if (foundSong.isPresent()){
+                    songSubgroupList.add(foundSong.get());
+                } else {
+                    logger.warn("No songsubgroup found with id " + songSubgroupId);
+                }
             }
         }
         addCommonAttributes(model, "customPlaylistAt", null, httpSession);
