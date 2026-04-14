@@ -9,6 +9,7 @@ import com.nfssoundtrack.racingsoundtracks.deserializers.SongSubgroupDeserialize
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.others.lyrics.Lyrics;
+import com.nfssoundtrack.racingsoundtracks.services.YouTubeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -28,7 +29,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/songSubgroup")
-public class SongSubgroupController  {
+public class SongSubgroupController {
 
     private static final Logger logger = LoggerFactory.getLogger(SongSubgroupController.class);
 
@@ -54,7 +55,7 @@ public class SongSubgroupController  {
      */
     @PutMapping(value = "/positions/{subgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public String putSubgroupPositions(@PathVariable("subgroupId") int subgroupId,
-                                @RequestBody String formData) throws JsonProcessingException, ResourceNotFoundException {
+                                       @RequestBody String formData) throws JsonProcessingException, ResourceNotFoundException {
         List<?> objectMapper = new ObjectMapper().readValue(formData, List.class);
         SongSubgroup firstSongSubgroup = null;
         for (Object obj : objectMapper) {
@@ -362,7 +363,7 @@ public class SongSubgroupController  {
      */
     @PutMapping(value = "/putGlobally/{songSubgroupId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public String putGlobally(@PathVariable("songSubgroupId") int songSubgroupId,
-                       @RequestBody String formData) throws JsonProcessingException {
+                              @RequestBody String formData) throws JsonProcessingException {
         try {
             SongSubgroup songSubgroup = baseController.getSongSubgroupService().findById(songSubgroupId).orElseThrow(() -> new ResourceNotFoundException(
                     "No song subgroup with id found " + songSubgroupId));
@@ -412,12 +413,12 @@ public class SongSubgroupController  {
                     Genre genre = baseController.getGenreService().findById(Integer.parseInt(genreValue)).orElseThrow(() -> new ResourceNotFoundException("No genre " +
                             "found with id " + genreValue));
                     //case when we just associate existing in database genre with this song for the first time
-                    boolean alreadyAssigned=baseController.getSongService().saveNewAssignmentOfExistingGenre(genreValue, songSubgroup.getSong(), genre);
-                    if (!alreadyAssigned){
+                    boolean alreadyAssigned = baseController.getSongService().saveNewAssignmentOfExistingGenre(genreValue, songSubgroup.getSong(), genre);
+                    if (!alreadyAssigned) {
                         String localMessage = "Linking genre " + genre.getGenreName()
-                            + " to the song " + songSubgroup.getSong().toAnotherChangeLogString();
+                                + " to the song " + songSubgroup.getSong().toAnotherChangeLogString();
                         baseController.sendMessageToChannel(EntityType.GENRE, "create", localMessage,
-                            EntityUrl.GENRE, genre.getGenreName(), String.valueOf(genre.getId()));
+                                EntityUrl.GENRE, genre.getGenreName(), String.valueOf(genre.getId()));
                     }
                 }
             }
@@ -581,12 +582,12 @@ public class SongSubgroupController  {
                 } else {
                     Genre genre = baseController.getGenreService().findById(Integer.parseInt(genreValue)).orElseThrow(() -> new ResourceNotFoundException("No genre " +
                             "found with id " + genreValue));
-                    boolean alreadyAssigned=baseController.getSongService().saveNewAssignmentOfExistingGenre(genreValue, songSubgroup.getSong(), genre);
-                    if (!alreadyAssigned){
+                    boolean alreadyAssigned = baseController.getSongService().saveNewAssignmentOfExistingGenre(genreValue, songSubgroup.getSong(), genre);
+                    if (!alreadyAssigned) {
                         String localMessage = "Linking existing genre " + genre.getGenreName()
-                            + " to song " + song.toAnotherChangeLogString();
+                                + " to song " + song.toAnotherChangeLogString();
                         baseController.sendMessageToChannel(EntityType.SONG_GENRE, "create", localMessage,
-                            EntityUrl.SONG, songSubgroup.getSong().toAnotherChangeLogString(), String.valueOf(songSubgroup.getSong().getId()));
+                                EntityUrl.SONG, songSubgroup.getSong().toAnotherChangeLogString(), String.valueOf(songSubgroup.getSong().getId()));
                     }
                 }
             }
@@ -651,6 +652,64 @@ public class SongSubgroupController  {
         return new ObjectMapper().writeValueAsString("OK");
     }
 
+    @PostMapping(value = "/createSongViaYTLink/{subgroupId}")
+    public String createSongInSubgroupViaYTLink(@RequestBody String formData,
+                                                @PathVariable("subgroupId") int subgroupId)
+            throws Exception {
+        Subgroup subgroup = baseController.getSubgroupService().findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No song " +
+                "subgroup found with id " + subgroupId));
+        LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
+        String link = String.valueOf(linkedHashMap.get("id"));
+        Game game = subgroup.getMainGroup().getGame();
+        String tempAuthor = "Somebodygame_id"+game.getId();
+        YouTubeService youTubeService = new YouTubeService();
+        String botSecret = baseController.getAuthorService().getBotSecret();
+        String adminId = baseController.getAuthorService().getAdminId();
+        Set<Song> songsToProcess;
+        if (link.contains("/playlist")){
+            link = link.replace("https://www.youtube.com/playlist?list=","");
+            songsToProcess = youTubeService.createSongsFromYTPlaylist(link,tempAuthor,botSecret,adminId);
+        } else if (link.contains("watch?") && link.contains("&list")){
+            link = link.replace("https://www.youtube.com/watch?v=","")
+                    .substring(0,link.indexOf("&"));
+            Song song = youTubeService.createSongFromYTLink(link, tempAuthor, botSecret, adminId);
+            songsToProcess = Collections.singleton(song);
+        } else {
+            link = link.replace("https://www.youtube.com/watch?v=","");
+            Song song = youTubeService.createSongFromYTLink(link, tempAuthor, botSecret, adminId);
+            songsToProcess = Collections.singleton(song);
+        }
+        if (songsToProcess==null){
+            throw new Exception("???");
+        }
+        String authorName = songsToProcess.stream().toList().get(0).getOfficialDisplayBand();
+        Optional<Author> authorExists = baseController.getAuthorService().findByName(authorName);
+        Author authorToUse = null;
+        AuthorAlias composerAlias = null;
+        if (authorExists.isEmpty()){
+            Author newAuthor = new Author();
+            newAuthor.setName(authorName);
+            authorToUse = baseController.getAuthorService().save(newAuthor);
+            composerAlias = new AuthorAlias(authorToUse, authorName);
+            composerAlias = baseController.getAuthorAliasService().save(composerAlias);
+        } else {
+            authorToUse = authorExists.get();
+            composerAlias = baseController.getAuthorAliasService().findByAuthor(authorToUse).get(0);
+        }
+        for (Song song : songsToProcess){
+            song = baseController.getSongService().save(song);
+            AuthorSong authorSong = new AuthorSong(composerAlias, song, Role.COMPOSER);
+            baseController.getAuthorSongService().save(authorSong);
+            SongSubgroup songSubgroup = new SongSubgroup(song.getSrcId(), song.getOfficialDisplayBand(),
+                    song.getOfficialDisplayTitle(), 10000L, null, null, null);
+            songSubgroup.setSong(song);
+            songSubgroup.setSubgroup(subgroup);
+            songSubgroup.setInstrumental(Instrumental.NO);
+            baseController.getSongSubgroupService().save(songSubgroup);
+        }
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
     @GetMapping(value = "/removeNotes/{subgroupId}")
     public String removeNotesFromSongs(@PathVariable("subgroupId") int subgroupId)
             throws IOException, ResourceNotFoundException {
@@ -679,16 +738,16 @@ public class SongSubgroupController  {
         for (SongSubgroup songSubgroup : songSubgroupList) {
             Song song = songSubgroup.getSong();
             logger.error("getting lyrics for: {}", song.toAnotherChangeLogString());
-            if (song.getLyrics()!=null){
+            if (song.getLyrics() != null) {
                 logger.error("lyrics already there");
                 continue;
             }
             Lyrics lyrics = JustSomeHelper.getLrcLibLyrics(song);
-            if (lyrics==null){
+            if (lyrics == null) {
                 logger.error("no lyrics found");
                 continue;
             }
-            song.setLyrics(lyrics.getContent().replace("\n","<br>"));
+            song.setLyrics(lyrics.getContent().replace("\n", "<br>"));
             //we clear all the notes from each song in a subgroup
             baseController.getSongService().save(song);
         }
@@ -712,7 +771,7 @@ public class SongSubgroupController  {
             if (song.getSrcId() != null) {
                 setLinksFromOdesliCoUsingYt(song.getSrcId(), songSubgroup, true);
             }
-            if (song.getSpotifyId()!=null){
+            if (song.getSpotifyId() != null) {
                 setLinksFromOdesliCoUsingSpotify(song.getSpotifyId(), songSubgroup, true);
             }
             song.setLinks(songSubgroup);
@@ -727,7 +786,7 @@ public class SongSubgroupController  {
 
     @PutMapping(value = "/setMultiSongGenre/{subgroupId}")
     public String setGenresOnMultipleSongs(@RequestBody String formData,
-                                    @PathVariable("subgroupId") int subgroupId)
+                                           @PathVariable("subgroupId") int subgroupId)
             throws IOException, ResourceNotFoundException {
         Subgroup subgroup = baseController.getSubgroupService().findById(subgroupId).orElseThrow(() -> new ResourceNotFoundException("No song " +
                 "subgroup found with id " + subgroupId));
@@ -752,11 +811,11 @@ public class SongSubgroupController  {
         return new ObjectMapper().writeValueAsString("OK");
     }
 
-    private void setLinksFromOdesliCoUsingYt(String youtubeId, SongSubgroup songSubgroup, boolean setSong){
-        setLinksFromOdesliCo(youtubeId,"https://www.youtube.com/watch?v=",songSubgroup,setSong);
+    private void setLinksFromOdesliCoUsingYt(String youtubeId, SongSubgroup songSubgroup, boolean setSong) {
+        setLinksFromOdesliCo(youtubeId, "https://www.youtube.com/watch?v=", songSubgroup, setSong);
     }
 
-    private void setLinksFromOdesliCoUsingSpotify(String spotifyId, SongSubgroup songSubgroup, boolean setSong){
+    private void setLinksFromOdesliCoUsingSpotify(String spotifyId, SongSubgroup songSubgroup, boolean setSong) {
         setLinksFromOdesliCo(spotifyId, "", songSubgroup, setSong);
     }
 

@@ -49,3 +49,4 @@ garbage
 /flatout2_files/
 /claude_src/
 /node_modules/
+/src/main/resources/client_secret.json

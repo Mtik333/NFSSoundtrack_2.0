@@ -52,12 +52,16 @@ $(document).ready(function () {
                     var newSongButton = $('<button data-gameId=' + gameId + ' id="new-song" class="new-group btn btn-success">New song</button>');
                     var copySongLinksButton = $('<button data-subgroupId=' + currentSubgroup + ' id="copy-links" class="btn btn-primary">Copy music links to subgroup</button>');
                     var obtainLinksButton = $('<button data-subgroupId=' + currentSubgroup + ' id="obtain-links" class="btn btn-primary">Get music links from Odesli.co</button>');
+                    var createSongFromYouTubeLink = $('<button data-subgroupId=' + currentSubgroup + ' id="create-song-via-yt" class="btn btn-primary">Create song from YT link</button>');
+                    var ytInput = $('<input class="form-control" id="ytInput"/>');
                     var removeNotesButton = $('<button data-subgroupId=' + currentSubgroup + ' id="remove-notes" class="btn btn-primary">Remove notes from all songs</button>');
                     var getLyricsButton = $('<button data-subgroupId=' + currentSubgroup + ' id="get-lyrics" class="btn btn-primary">Get lyrics for all songs</button>');
                     var addGenreButton = $('<button data-subgroupId=' + currentSubgroup + ' id="obtain-genres" class="btn btn-primary">Add genre to all songs in subgroup</button>');
                     newGroupSpan.append(newSongButton);
                     newGroupSpan.append(copySongLinksButton);
                     newGroupSpan.append(obtainLinksButton);
+                    newGroupSpan.append(createSongFromYouTubeLink);
+                    newGroupSpan.append(ytInput);
                     newGroupSpan.append(removeNotesButton);
                     newGroupSpan.append(getLyricsButton);
                     newGroupSpan.append(addGenreButton);
@@ -470,6 +474,7 @@ $(document).ready(function () {
         $("#obtain-links").attr("data-subgroupid", currentSubgroupId);
         $("#remove-notes").attr("data-subgroupid", currentSubgroupId);
         $("#get-lyrics").attr("data-subgroupid", currentSubgroupId);
+        $("#create-song-via-yt").attr("data-subgroupid", currentSubgroupId);
     });
 
     function generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv,
@@ -1580,6 +1585,10 @@ $(document).ready(function () {
         setGenreOnMultipleSongs();
     });
 
+    $(document).on('click', '#create-song-via-yt', function (e) {
+        createSongViaYTLink();
+    });
+
     function fetchLyrics(){
         let songId = currentSongSubgroup.song.id;
         $("#fetch-lyrics").after("<span id='request-status'>Fetching lyrics...</span>")
@@ -1647,6 +1656,32 @@ $(document).ready(function () {
                 alert("error fetching music links, check the logs");
             },
         });
+    }
+
+    function createSongViaYTLink(){
+        let subgroupToPropagate = Number($("#create-song-via-yt").attr("data-subgroupid"));
+        let link = new Object();
+        link.id = $("#ytInput").val();
+        $.ajax({
+            async: false,
+            type: "POST",
+            data: JSON.stringify(link),
+            url: "/songSubgroup/createSongViaYTLink/" + subgroupToPropagate,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (links) {
+                getSingleSubgroupFromGame(0);
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500, function () {
+                        $("#selectSubgroup").find("a[data-subgroupid='" + currentSubgroup + "']").click();
+                    });
+                });
+            },
+            error: function (ooo) {
+                alert("error creating song from YT link, check the logs");
+            },
+        });
+
     }
 
     function copyMusicLinks() {

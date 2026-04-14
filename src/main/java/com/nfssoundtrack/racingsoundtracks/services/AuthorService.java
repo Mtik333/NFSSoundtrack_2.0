@@ -455,4 +455,11 @@ public class AuthorService {
         lastError = instant;
     }
 
+    public String getAdminId() {
+        return adminId;
+    }
+
+    public String getBotSecret() {
+        return botSecret;
+    }
 }

@@ -81,6 +81,9 @@ public class WebsiteViewsController  {
     @Value("${changelog.id}")
     private String changeLogId;
 
+    @Value("${admin.discord.id}")
+    private String adminId;
+
     static JDA jda;
 
     public static JDA getJda() {
@@ -813,4 +816,5 @@ public class WebsiteViewsController  {
         translationObjs.add(new TranslationObj("uk", ukraine.getCountryName(), ukraine.getLocalLink(), "ukrainian"));
         translationObjs.add(new TranslationObj("zh", china.getCountryName(), china.getLocalLink(), "chinese"));
     }
+
 }
