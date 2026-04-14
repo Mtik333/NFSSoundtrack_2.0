@@ -3,9 +3,11 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.*;
 import com.nfssoundtrack.racingsoundtracks.serializers.SongSerializer;
+import com.nfssoundtrack.racingsoundtracks.services.YouTubeService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpSession;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -32,6 +34,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -617,6 +620,18 @@ public class WebsiteViewsController  {
             Object value = obj.getValue();
             session.setAttribute(obj.getKey().toString(), value);
         }
+        return "";
+    }
+
+    @GetMapping(value = "/googleCallback")
+    public @ResponseBody String getGoogleCallback(HttpServletRequest request)
+            throws ResourceNotFoundException, IOException {
+        String code = request.getParameter("code");
+        GoogleTokenResponse tokenResponse = YouTubeService.flow
+                .newTokenRequest(code)
+                .setRedirectUri("https://racingsoundtracks.com/googleCallback")
+                .execute();
+        YouTubeService.credential = YouTubeService.flow.createAndStoreCredential(tokenResponse, null);
         return "";
     }
     /**

@@ -50,3 +50,4 @@ garbage
 /claude_src/
 /node_modules/
 /src/main/resources/client_secret.json
+/src/main/resources/client_secret2.json

@@ -1,7 +1,6 @@
 package com.nfssoundtrack.racingsoundtracks.services;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -9,8 +8,10 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.*;
+import com.nfssoundtrack.racingsoundtracks.controllers.WebsiteViewsController;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
-import com.nfssoundtrack.racingsoundtracks.others.LocalAuthorizationCodeInstalledApp;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -34,29 +35,39 @@ public class YouTubeService {
     @Value("${bot.token}")
     private String botSecret;
 
-    private static final String CLIENT_SECRETS = "/client_secret.json";
+    private static final String CLIENT_SECRETS = "/client_secret2.json";
     private static final Collection<String> SCOPES =
             Arrays.asList("https://www.googleapis.com/auth/youtube.force-ssl");
     private static final String APPLICATION_NAME = "ijustwantyoutubeapi";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static Credential credential;
+    public static Credential credential;
+    public static GoogleAuthorizationCodeFlow flow;
 
     public Credential authorize(final NetHttpTransport httpTransport,
-                                String botSecret, String adminId) throws IOException {
+                                String botSecret, String adminId) throws IOException, InterruptedException {
         // Load client secrets.
         InputStream in = YouTubeService.class.getResourceAsStream(CLIENT_SECRETS);
         GoogleClientSecrets clientSecrets =
                 GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
         // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow =
-                new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, SCOPES)
+        flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, SCOPES)
+                        .setAccessType("offline")
+                        .setApprovalPrompt("force")
                         .build();
-        Credential credential = new LocalAuthorizationCodeInstalledApp(flow, new LocalServerReceiver(),adminId,botSecret)
-                .authorize("user");
+        String url = flow.newAuthorizationUrl().setRedirectUri("https://racingsoundtracks.com/googleCallback").build();
+        WebsiteViewsController.rebuildJda(botSecret);
+        RestAction<Member> memberRestAction = WebsiteViewsController.getJda().getGuilds().get(0).retrieveMemberById(adminId);
+        memberRestAction.queue(member -> {
+            member.getUser().openPrivateChannel().queue(privateChannel -> privateChannel
+                    .sendMessage("Please open the following address in your browser:" + url).queue());
+        });
+        while (credential==null){
+
+        }
         return credential;
     }
 
-    public YouTube getService(String botSecret, String adminId) throws GeneralSecurityException, IOException {
+    public YouTube getService(String botSecret, String adminId) throws GeneralSecurityException, IOException, InterruptedException {
         final NetHttpTransport httpTransport = new NetHttpTransport();
         if (credential==null){
             credential = authorize(httpTransport, botSecret, adminId);
