@@ -32,6 +32,10 @@ public class SongSubgroupService {
         return songSubgroupRepository.findBySong(song);
     }
 
+    public List<SongSubgroup> findBySubgroupMainGroupGame(Game game) {
+        return songSubgroupRepository.findBySubgroupMainGroupGame(game);
+    }
+
     public List<SongSubgroup> findByFilenameStartsWith(String filename) {
         return songSubgroupRepository.findByFilenameStartsWith(filename);
     }

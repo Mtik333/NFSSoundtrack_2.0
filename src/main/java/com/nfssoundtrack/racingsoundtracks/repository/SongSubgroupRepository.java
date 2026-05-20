@@ -1,5 +1,6 @@
 package com.nfssoundtrack.racingsoundtracks.repository;
 
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
 import org.springframework.data.domain.Sort;
@@ -12,6 +13,8 @@ public interface SongSubgroupRepository extends JpaRepository<SongSubgroup, Inte
     List<SongSubgroup> findBySong(Song song);
 
     List<SongSubgroup> findByFilenameStartsWith(String filename);
+
+    List<SongSubgroup> findBySubgroupMainGroupGame(Game game);
 
     List<SongSubgroup> findBySongIn(List<Song> songs, Sort sort);
 

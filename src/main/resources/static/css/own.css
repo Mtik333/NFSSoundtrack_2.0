@@ -560,6 +560,16 @@ html[data-bs-theme="dark"] .upcoming-content-label {
     box-shadow: 0 0.125rem 0.375rem rgba(162, 155, 254, 0.4);
 }
 
+html[data-bs-theme="dark"] tr.table-success {
+  --bs-table-bg: #1a3a25;
+  --bs-table-striped-bg: #1a3a25;
+  --bs-table-hover-bg: #1e4429;
+  --bs-table-color: #fff;
+  --bs-table-striped-color: #fff;
+  --bs-table-hover-color: #fff;
+}
+
+
 @media screen and (max-width: 600px) {
 
     .recently-updated-label,

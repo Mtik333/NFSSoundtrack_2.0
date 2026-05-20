@@ -1,6 +1,7 @@
 package com.nfssoundtrack.racingsoundtracks.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
@@ -9,6 +10,8 @@ import com.nfssoundtrack.racingsoundtracks.others.*;
 import com.nfssoundtrack.racingsoundtracks.serializers.SongSerializer;
 import com.nfssoundtrack.racingsoundtracks.services.YouTubeService;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -20,31 +23,41 @@ import org.apache.commons.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * main controller with all the basic endpoint for non-authenticated users
  */
 @Controller
-public class WebsiteViewsController  {
+public class WebsiteViewsController {
 
     private static final Logger logger = LoggerFactory.getLogger(WebsiteViewsController.class);
     public static final String APP_NAME = "appName";
@@ -65,7 +78,7 @@ public class WebsiteViewsController  {
         ExchangeStrategies strategies = ExchangeStrategies.builder()
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)) // 10MB
                 .build();
-                
+
         this.webClient = WebClient.builder()
                 .baseUrl("https://racingsoundtracks.com:445")
                 .exchangeStrategies(strategies)
@@ -86,6 +99,21 @@ public class WebsiteViewsController  {
 
     @Value("${admin.discord.id}")
     private String adminId;
+
+    @Value("${seektune.binary}")
+    private String seekTuneBinary;
+
+    @Value("${seektune.workdir}")
+    private String seekTuneWorkDir;
+
+    @Value("${seektune.url}")
+    private String seekTuneUrl;
+
+    @Value("${seektune.apikey}")
+    private String seekTuneApiKey;
+
+    @Value("${spring.datasource.url}")
+    private String dataSourceUrl;
 
     static JDA jda;
 
@@ -186,7 +214,7 @@ public class WebsiteViewsController  {
             //as array consits of song-subgroup id, we are looking for it in database
             for (String songSubgroupId : finalList) {
                 Optional<SongSubgroup> foundSong = baseController.getSongSubgroupService().findById(Integer.valueOf(songSubgroupId));
-                if (foundSong.isPresent()){
+                if (foundSong.isPresent()) {
                     songSubgroupList.add(foundSong.get());
                 } else {
                     logger.warn("No songsubgroup found with id " + songSubgroupId);
@@ -362,7 +390,7 @@ public class WebsiteViewsController  {
         List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySongInSortedByIdAsc(songs);
         model.addAttribute("songSubgroupList", songSubgroupList);
         model.addAttribute("genre", genre);
-        addCommonAttributes(model, "fullGenreListAt", new String[]{genre.getGenreName()},httpSession);
+        addCommonAttributes(model, "fullGenreListAt", new String[]{genre.getGenreName()}, httpSession);
         return MIN_INDEX;
     }
 
@@ -463,6 +491,7 @@ public class WebsiteViewsController  {
         addCommonAttributes(model, "genericAt", new String[]{"Changelog"}, httpSession);
         return MIN_INDEX;
     }
+
     /**
      * some attributes provided to model repeat with each invocation so let's group it in a single place
      *
@@ -479,7 +508,7 @@ public class WebsiteViewsController  {
         model.addAttribute("translations", translationObjs);
         model.addAttribute("todayssong", baseController.getTodaysSongService().getTodaysSong());
         Enumeration<String> attributes = session.getAttributeNames();
-        while (attributes.hasMoreElements()){
+        while (attributes.hasMoreElements()) {
             String attribute = attributes.nextElement();
             model.addAttribute(attribute, session.getAttribute(attribute));
         }
@@ -598,6 +627,7 @@ public class WebsiteViewsController  {
 
     /**
      * endpoint to fetch lyrics for a specific song subgroup
+     *
      * @param songSubgroupId id of the song subgroup
      * @return lyrics text or empty string if not found
      * @throws ResourceNotFoundException when song subgroup not found
@@ -607,8 +637,8 @@ public class WebsiteViewsController  {
         SongSubgroup songSubgroup = baseController.getSongSubgroupService().findById(songSubgroupId)
                 .orElseThrow(() -> new ResourceNotFoundException("SongSubgroup not found with id " + songSubgroupId));
         // Priority logic: songSubgroup.lyrics -> song.lyrics
-        String lyrics = songSubgroup.getLyrics() != null ? 
-            songSubgroup.getLyrics() : songSubgroup.getSong().getLyrics();
+        String lyrics = songSubgroup.getLyrics() != null ?
+                songSubgroup.getLyrics() : songSubgroup.getSong().getLyrics();
         return lyrics != null ? lyrics : "";
     }
 
@@ -616,7 +646,7 @@ public class WebsiteViewsController  {
     public @ResponseBody String savePreferences(@RequestBody String formData, HttpSession session)
             throws ResourceNotFoundException, JsonProcessingException {
         LinkedHashMap<?, ?> linkedHashMap = (LinkedHashMap<?, ?>) new ObjectMapper().readValue(formData, Map.class);
-        for (Map.Entry<?,?> obj : linkedHashMap.entrySet()){
+        for (Map.Entry<?, ?> obj : linkedHashMap.entrySet()) {
             Object value = obj.getValue();
             session.setAttribute(obj.getKey().toString(), value);
         }
@@ -634,6 +664,7 @@ public class WebsiteViewsController  {
         YouTubeService.credential = YouTubeService.flow.createAndStoreCredential(tokenResponse, null);
         return "";
     }
+
     /**
      * endpoint used for stuff from Toni's Music Library - not relevant to the website
      * he uploads a lot of music and includes original filenames
@@ -708,6 +739,132 @@ public class WebsiteViewsController  {
         return resultingText.toString();
     }
 
+    @PostMapping(value = "/recognize", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String recognizeSong(
+            @RequestParam("audio") MultipartFile audio,
+            @RequestParam(value = "gameShort", required = false) String gameShort,
+            Model model,
+            HttpSession session) throws Exception {
+        String songIds=null;
+        if (gameShort != null && !gameShort.isBlank()) {
+            Game game = baseController.getGameService().findByGameShort(gameShort);
+            if (game != null) {
+                List<SongSubgroup> subgroups = baseController
+                        .getSongSubgroupService().findBySubgroupMainGroupGame(game);
+                songIds = subgroups.stream()
+                        .map(ss -> String.valueOf(ss.getSong().getId()))
+                        .distinct()
+                        .collect(Collectors.joining(","));
+            }
+        }
+
+        String stdout;
+        if (dataSourceUrl.contains("localhost")){
+            Path tempFile = Files.createTempFile(
+                    "recognize_", "_" + audio.getOriginalFilename()
+            );
+            Path songsFile = Files.createTempFile("songs_", ".csv");
+            try {
+                audio.transferTo(tempFile);
+                ProcessBuilder pb;
+                if (songIds!=null && !songIds.isEmpty()){
+                    songIds = songIds.replace(",","\n");
+                    Files.writeString(songsFile,songIds);
+                    pb = new ProcessBuilder(
+                            seekTuneBinary, "recognize",
+                            "-songs", songsFile.toString(), tempFile.toString()
+                    );
+                } else {
+                    pb = new ProcessBuilder(
+                            seekTuneBinary, "recognize", tempFile.toString()
+                    );
+                }
+                pb.directory(new File(seekTuneWorkDir));
+                pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+                Process process = pb.start();
+
+                stdout = new String(
+                        process.getInputStream().readAllBytes()
+                );
+                boolean finished = process.waitFor(60, TimeUnit.SECONDS);
+                if (!finished) {
+                    process.destroy();
+                    throw new RuntimeException("seek-tune timed out");
+                }
+            } finally {
+                Files.deleteIfExists(tempFile);
+                Files.deleteIfExists(songsFile);
+            }
+        } else {
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("audio", new ByteArrayResource(audio.getBytes()) {
+                @Override
+                public String getFilename() {
+                    return audio.getOriginalFilename();
+                }
+            });
+            if (songIds!=null && !songIds.isEmpty()) {
+                body.add("songIds", songIds);
+            }
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            headers.set("X-API-Key", seekTuneApiKey);
+
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    seekTuneUrl + "/recognize",
+                    request,
+                    String.class
+            );
+            stdout = response.getBody();
+        }
+
+        List<RawMatch> rawMatches = new ObjectMapper().readValue(
+                stdout, new TypeReference<>() {
+                }
+        );
+        LinkedHashMap<Song, Set<Game>> recognitionSongList =
+                new LinkedHashMap<>();
+        Map<Long, Long> recognitionTimestampMap = new HashMap<>();
+        Map<Long, Double> recognitionScoreMap = new HashMap<>();
+
+        for (RawMatch raw : rawMatches) {
+            Optional<Song> songOpt = baseController.getSongService()
+                    .findById((int) raw.songId);
+            if (songOpt.isEmpty()) continue;
+
+            Song song = songOpt.get();
+            List<SongSubgroup> subgroups = baseController
+                    .getSongSubgroupService().findBySong(song);
+            Set<Game> games = new HashSet<>();
+            for (SongSubgroup ss : subgroups) {
+                games.add(ss.getSubgroup().getMainGroup().getGame());
+            }
+            recognitionSongList.put(song, games);
+            recognitionScoreMap.put(song.getId(), raw.score);
+            recognitionTimestampMap.put(song.getId(), raw.timestampMs / 1000);
+        }
+
+        model.addAttribute("recognitionSongList", recognitionSongList);
+        model.addAttribute("recognitionScoreMap", recognitionScoreMap);
+        model.addAttribute("recognitionResults", true);
+        model.addAttribute("recognitionTimestampMap", recognitionTimestampMap);
+        addCommonAttributes(
+                model, "genericAt", new String[]{"Recognition"}, session
+        );
+        return MIN_INDEX;
+
+    }
+
+    private static class RawMatch {
+        public long songId;
+        public double score;
+        public float confidence;
+        public long timestampMs;
+    }
+
     /**
      * just rebuilding the JDA to be able to send / receive messages via bot
      *
@@ -733,7 +890,7 @@ public class WebsiteViewsController  {
             String queryString = request.getQueryString();
             String fullPath = requestUri + (queryString != null ? "?" + queryString : "");
             logger.info("Proxying old subdomain request: {}", fullPath);
-            
+
             // Get response as bytes to handle both text and binary content
             byte[] responseBody = webClient.get()
                     .uri(fullPath)
@@ -741,10 +898,10 @@ public class WebsiteViewsController  {
                     .retrieve()
                     .bodyToMono(byte[].class)
                     .block();
-            
+
             // Determine content type from the request path
             String contentType = getContentType(requestUri);
-            
+
             // Only rewrite HTML content
             if (contentType.contains("text/html") && responseBody != null) {
                 String htmlContent = new String(responseBody, StandardCharsets.UTF_8);
@@ -754,11 +911,11 @@ public class WebsiteViewsController  {
                         .replace("src=\"/", "src=\"https://old.racingsoundtracks.com/");
                 responseBody = rewrittenBody.getBytes(StandardCharsets.UTF_8);
             }
-            
+
             return ResponseEntity.ok()
                     .header("Content-Type", contentType)
                     .body(responseBody);
-                    
+
         } catch (WebClientResponseException e) {
             logger.error("Error proxying to Apache server: {}", e.getMessage());
             return ResponseEntity.status(e.getStatusCode())

@@ -166,6 +166,7 @@
                 <div th:if="${todays30Songs}" th:insert="~{fragments/todayssong.html}"></div>
                 <div th:if="${countryAuthors}" th:insert="~{fragments/countryAuthors.html}"></div>
                 <div th:if="${corrections}" th:insert="~{fragments/corrections.html}"></div>
+                <div th:if="${recognitionResults}" th:insert="~{fragments/recognition.html}"></div>
                 <div th:if="${changelogs}" th:insert="~{fragments/changelog.html}"></div>
             </div>
             <th:block th:insert="~{fragments/changeLanguageModal.html}"></th:block>

@@ -53,6 +53,19 @@
                         th:attr="data-tooltip=#{customPlaylistTooltip}" th:text="#{customPlaylist}"></button>
                 </form>
             </li>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                 class="bi bi-mic-fill pointable top-svg" viewBox="0 0 16 16"
+                 data-bs-toggle="modal" data-bs-target="#recognitionModal"
+                 data-toggle="tooltip" title="Recognize song">
+                <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0z"/>
+                <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0
+   1 3 8V7a.5.5 0 0 1 .5-.5"/>
+            </svg>
+            <li class="btn nav-item nfs-top-item d-inline-block p-1">
+                <a class="nav-link d-inline p-1" data-bs-toggle="modal"
+                   data-bs-target="#recognitionModal">Recognize</a>
+            </li>
+
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
                 <a class="nav-link d-inline p-1" id="reportGeneralProblem" th:text="#{problem}"></a>
             </li>
@@ -120,6 +133,104 @@
     $("#flexSwitchCheckDefault").prop("checked", localStorage.getItem("dark-mode") == "true");
     changeStuffForDynamicTheme();
 </script>
+<div class="modal fade" id="recognitionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" th:text="#{recognitionModalTitle}"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="recognitionForm" method="post" th:action="@{/recognize}"
+                      enctype="multipart/form-data">
+
+                    <ul class="nav nav-tabs mb-3" id="recognitionTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-bs-toggle="tab"
+                                    data-bs-target="#uploadTab" type="button"
+                                    th:text="#{recognitionUploadTab}"></button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="tab"
+                                    data-bs-target="#recordTab" type="button"
+                                    th:text="#{recognitionRecordTab}"></button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="uploadTab" role="tabpanel">
+                            <div class="mb-3">
+                                <label for="audioFile" class="form-label"
+                                       th:text="#{recognitionUploadLabel}"></label>
+                                <input class="form-control" type="file"
+                                       id="audioFile" name="audio" accept="audio/*">
+                            </div>
+                            <div id="recognizeSpinner" class="text-center my-2" style="display:none;">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden" th:text="#{recognizingShort}"></span>
+                                </div>
+                                <div class="mt-1 small" th:text="#{recognizingWait}"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="recognizeBtn"
+                                    th:attr="data-recognizing=#{recognizingShort}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-mic-fill me-1" viewBox="0 0 16 16">
+                                    <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0z"/>
+                                    <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5
+  4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                                <span th:text="#{recognizeBtn}"></span>
+                            </button>
+                        </div>
+
+                        <div class="tab-pane fade" id="recordTab" role="tabpanel">
+                            <div id="recordBtns" class="d-flex gap-2 mb-3">
+                                <button id="recordMicBtn" class="btn btn-outline-primary" type="button">
+                                    🎤 <span th:text="#{recognitionMicBtn}"></span>
+                                </button>
+                                <button id="recordSysBtn" class="btn btn-outline-secondary" type="button">
+                                    🔊 <span th:text="#{recognitionSysAudioBtn}"></span>
+                                </button>
+                            </div>
+                            <div id="recordingStatus" style="display:none;" class="mb-3">
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <span class="badge bg-danger">● REC</span>
+                                    <span id="recordTimer" class="fw-bold">0:00</span>
+                                    <span class="text-muted small" th:text="#{recognitionMaxTime}"></span>
+                                </div>
+                                <div class="progress mb-2" style="height:6px;">
+                                    <div id="recordProgress" class="progress-bar bg-danger"
+                                         role="progressbar" style="width:0%"></div>
+                                </div>
+                                <button id="stopRecordBtn" class="btn btn-danger btn-sm" type="button"
+                                        th:text="#{recognitionStopBtn}"></button>
+                            </div>
+                            <div id="recordSpinner" class="text-center my-2" style="display:none;">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden" th:text="#{recognizingShort}"></span>
+                                </div>
+                                <div class="mt-1 small" th:text="#{recognizingWait}"></div>
+                            </div>
+                            <div id="recordMsg" class="small text-muted mt-2"></div>
+                            <div id="sysAudioHint" class="small text-muted mt-1" style="display:none;"
+                                 th:text="#{recognitionSysAudioHint}"></div>
+                        </div>
+                    </div>
+
+                    <div id="gameFilterDiv" class="form-check mt-3 pt-2 border-top" style="display:none;">
+                        <input class="form-check-input" type="checkbox"
+                               id="limitToGame" name="gameShort" value="">
+                        <label class="form-check-label" for="limitToGame"
+                               th:text="#{recognitionGameFilter}"></label>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="modal fade" id="preferencesModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">

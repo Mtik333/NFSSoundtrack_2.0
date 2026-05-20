@@ -434,8 +434,9 @@ $(document).ready(function () {
             lyricsDiv.width("20%");
             iframeToPut.width("76%");
         }
-        
-        iframeToPut.attr("src", videoToUse + "?autoplay=1&amp;autohide=0&amp;theme=light&amp;wmode=transparent");
+
+        var videoSeparator = videoToUse.indexOf("?") !== -1 ? "&amp;" : "?";
+        iframeToPut.attr("src", videoToUse + videoSeparator + "autoplay=1&amp;autohide=0&amp;theme=light&amp;wmode=transparent");
         iframeToPut.attr("allow", "autoplay");
         pElem.append(lyricsText);
         lyricsDiv.append(pElem);
@@ -490,7 +491,9 @@ $(document).ready(function () {
         var myImgSource = e.relatedTarget;
         //we set play image back to the normal one and push video id to the variable
         $(myImgSource).attr("src", $(myImgSource).attr("src").replace("znakwodny2", "znakwodny"));
-        baseVideoSrc = $(myImgSource).attr("data-tagVideo") + "?autoplay=1&amp;modestbranding=1&amp;showinfo=0";
+        var tagVideo = $(myImgSource).attr("data-tagVideo");
+        var videoSeparator = tagVideo.indexOf("?") !== -1 ? "&amp;" : "?";
+        baseVideoSrc = tagVideo + videoSeparator + "autoplay=1&amp;modestbranding=1&amp;showinfo=0";
         //then we do the same stuff with lyrics situation
         $("#lyricsCollapse").empty();
         var lyricsTxt = $(myImgSource).next().text();

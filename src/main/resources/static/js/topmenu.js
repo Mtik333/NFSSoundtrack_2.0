@@ -1,6 +1,12 @@
 var currentBg = 0;
 $(document).ready(function () {
     changeStuffForDynamicTheme();
+    var gameMatch = window.location.pathname.match(/\/game\/([^\/]+)/);
+    if (gameMatch) {
+        $('#limitToGame').val(gameMatch[1]);
+        $('#gameFilterDiv').show();
+    }
+
     $('#hide-icons').multiselect({
         includeSelectAllOption: true,
         templates: {
@@ -193,4 +199,132 @@ $(document).ready(function () {
             window.location = window.location + "?lang=" + langValue;
         }
     });
+
+    $(document).on('submit', '#recognitionForm', function () {
+        $('#recognizeSpinner').show();
+        $('#recognizeBtn').prop('disabled', true).text($('#recognizeBtn').data('recognizing'));
+    });
+
+    // --- audio recording for recognition modal ---
+
+    var mediaRecorder = null;
+    var recordChunks = [];
+    var recordTimerInterval = null;
+    var recordElapsed = 0;
+    var MAX_RECORD_SECONDS = 15;
+
+    function recordPad(n) { return String(n).padStart(2, '0'); }
+
+    function recordUpdateTimer() {
+        recordElapsed++;
+        var m = Math.floor(recordElapsed / 60);
+        var s = recordElapsed % 60;
+        $('#recordTimer').text(m + ':' + recordPad(s));
+        $('#recordProgress').css('width', Math.min(100, (recordElapsed / MAX_RECORD_SECONDS) * 100) + '%');
+        if (recordElapsed >= MAX_RECORD_SECONDS) {
+            stopRecording();
+        }
+    }
+
+    function startRecording(stream) {
+        recordChunks = [];
+        mediaRecorder = new MediaRecorder(stream, { audioBitsPerSecond: 256000 });
+        mediaRecorder.ondataavailable = function (e) {
+            if (e.data.size > 0) recordChunks.push(e.data);
+        };
+        mediaRecorder.onstop = function () {
+            stream.getTracks().forEach(function (t) { t.stop(); });
+            var blob = new Blob(recordChunks, { type: mediaRecorder.mimeType });
+            submitRecording(blob, mediaRecorder.mimeType);
+        };
+        mediaRecorder.start();
+        recordElapsed = 0;
+        $('#recordTimer').text('0:00');
+        $('#recordProgress').css('width', '0%');
+        $('#recordBtns').hide();
+        $('#recordingStatus').show();
+        $('#recordMsg').text('');
+        recordTimerInterval = setInterval(recordUpdateTimer, 1000);
+    }
+
+    function stopRecording() {
+        clearInterval(recordTimerInterval);
+        $('#recordingStatus').hide();
+        $('#recordSpinner').show();
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+        }
+    }
+
+    function resetRecordUI() {
+        $('#recordBtns').show();
+        $('#recordingStatus').hide();
+        $('#recordSpinner').hide();
+        $('#sysAudioHint').hide();
+        recordElapsed = 0;
+    }
+
+    function submitRecording(blob, mimeType) {
+        var ext = mimeType.indexOf('ogg') !== -1 ? 'ogg'
+            : mimeType.indexOf('mp4') !== -1 ? 'mp4' : 'webm';
+        try {
+            var dt = new DataTransfer();
+            dt.items.add(new File([blob], 'recording.' + ext, { type: mimeType }));
+            $('#audioFile')[0].files = dt.files;
+            $('#recognizeSpinner').show();
+            $('#recognitionForm')[0].submit();
+        } catch (e) {
+            resetRecordUI();
+            $('#recordMsg').text('Failed to submit recording: ' + e.message);
+        }
+    }
+
+    $(document).on('click', '#recordMicBtn', function () {
+        $('#recordMsg').text('');
+        $('#sysAudioHint').hide();
+        navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false,
+                channelCount: 2,
+                sampleRate: 48000
+            }
+        })
+            .then(function (stream) { startRecording(stream); })
+            .catch(function (e) {
+                $('#recordMsg').text('Microphone access denied: ' + e.message);
+            });
+    });
+
+    $(document).on('click', '#recordSysBtn', function () {
+        $('#recordMsg').text('');
+        $('#sysAudioHint').show();
+        navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
+            .then(function (stream) {
+                stream.getVideoTracks().forEach(function (t) { t.stop(); });
+                if (stream.getAudioTracks().length === 0) {
+                    resetRecordUI();
+                    $('#recordMsg').text('No audio captured. Please check "Share audio" in the browser dialog.');
+                    return;
+                }
+                startRecording(stream);
+            })
+            .catch(function (e) {
+                resetRecordUI();
+                $('#recordMsg').text('Could not capture system audio: ' + e.message);
+            });
+    });
+
+    $(document).on('click', '#stopRecordBtn', stopRecording);
+
+    $('#recognitionModal').on('hidden.bs.modal', function () {
+        clearInterval(recordTimerInterval);
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+        }
+        resetRecordUI();
+        $('#recordMsg').text('');
+    });
+
 });
