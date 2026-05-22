@@ -884,6 +884,46 @@ html[data-bs-theme="dark"] tr.table-success {
     display: none;
   }
 
+  #recognitionTopTable col.recognition-rank {
+    width: 8%;
+  }
+
+  #recognitionTopTable col.search-info_button {
+    display: none;
+  }
+
+  #recognitionTopTable col.search-actions {
+    width: 10%;
+  }
+
+  #recognitionTopTable th.info_button {
+    display: none;
+  }
+
+  #recognitionTopTable td.info_button {
+    display: none;
+  }
+
+  #recognitionOtherTable col.recognition-rank {
+    width: 8%;
+  }
+
+  #recognitionOtherTable col.search-info_button {
+    display: none;
+  }
+
+  #recognitionOtherTable col.search-actions {
+    width: 10%;
+  }
+
+  #recognitionOtherTable th.info_button {
+    display: none;
+  }
+
+  #recognitionOtherTable td.info_button {
+    display: none;
+  }
+
   .game_content_th {
     text-align: center;
   }

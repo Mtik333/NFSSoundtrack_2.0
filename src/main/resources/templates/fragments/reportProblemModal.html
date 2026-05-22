@@ -29,6 +29,7 @@
                             <option value="DISPLAY_ISSUES" th:text="#{wrongDisplay}"></option>
                             <option value="OTHER_PROBLEM" th:text="#{wrongOther}"></option>
                             <option value="WRONG_ARTIST_INFO" th:text="#{wrongArtistInfo}"></option>
+                            <option value="WRONG_RECOGNITION" th:text="#{wrongRecognition}"></option>
                         </optgroup>
                     </select>
                 </div>
@@ -47,6 +48,10 @@
                 </div>
                 <div class="col">
                     <input class="form-control w-50" type="text" id="discord-username">
+                </div>
+                <div id="recognitionAudioDiv" class="col mt-2" style="display:none;">
+                    <label for="correction-audio" th:text="#{recognitionReportAudioLabel}"></label>
+                    <input class="form-control mt-1" type="file" id="correction-audio" accept="audio/*">
                 </div>
                 <div class="col" style="text-align: center;">
                     <button type="button" class="btn btn-success m-2" id="submit-correction"

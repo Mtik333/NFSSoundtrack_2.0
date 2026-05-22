@@ -45,6 +45,14 @@
                 <li class="btn nav-item nfs-top-item d-inline-block p-1">
                     <a class="nav-link d-inline p-1" th:href="@{/logout}" href="#">Sign out</a>
                 </li>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-mic-fill pointable top-svg" viewBox="0 0 16 16"
+                     data-bs-toggle="modal" data-bs-target="#recognitionModal"
+                     data-toggle="tooltip" th:title="#{identifySongTooltip}">
+                    <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0z"/>
+                    <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0
+   1 3 8V7a.5.5 0 0 1 .5-.5"/>
+                </svg>
             </th:block>
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
                 <form th:action="@{/custom/playlist}" method="post" class="d-inline p-1">
@@ -53,19 +61,6 @@
                         th:attr="data-tooltip=#{customPlaylistTooltip}" th:text="#{customPlaylist}"></button>
                 </form>
             </li>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                 class="bi bi-mic-fill pointable top-svg" viewBox="0 0 16 16"
-                 data-bs-toggle="modal" data-bs-target="#recognitionModal"
-                 data-toggle="tooltip" title="Recognize song">
-                <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0z"/>
-                <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0
-   1 3 8V7a.5.5 0 0 1 .5-.5"/>
-            </svg>
-            <li class="btn nav-item nfs-top-item d-inline-block p-1">
-                <a class="nav-link d-inline p-1" data-bs-toggle="modal"
-                   data-bs-target="#recognitionModal">Recognize</a>
-            </li>
-
             <li class="btn nav-item nfs-top-item d-inline-block p-1">
                 <a class="nav-link d-inline p-1" id="reportGeneralProblem" th:text="#{problem}"></a>
             </li>
@@ -133,7 +128,8 @@
     $("#flexSwitchCheckDefault").prop("checked", localStorage.getItem("dark-mode") == "true");
     changeStuffForDynamicTheme();
 </script>
-<div class="modal fade" id="recognitionModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="recognitionModal" tabindex="-1" aria-hidden="true"
+     th:attr="data-mic-denied=#{recognitionMicDenied},data-no-audio=#{recognitionNoAudio},data-sys-denied=#{recognitionSysDenied},data-submit-failed=#{recognitionSubmitFailed}">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

@@ -115,6 +115,8 @@ public class WebsiteViewsController {
     @Value("${spring.datasource.url}")
     private String dataSourceUrl;
 
+    @Value("${recognition.reports.dir}")
+    private String recognitionReportsDir;
     static JDA jda;
 
     public static JDA getJda() {
@@ -523,20 +525,20 @@ public class WebsiteViewsController {
      * @throws JsonProcessingException
      * @throws InterruptedException
      */
-    @PostMapping(value = "/correction", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String submitCorrection(@RequestBody String formData)
+    @PostMapping(value = "/correction", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public @ResponseBody String submitCorrection(
+            @RequestParam(value = "affectedSongsubgroup", required = false, defaultValue = "-1") String songSubgroupIdStr,
+            @RequestParam(value = "sourceUrl",       required = false, defaultValue = "") String pageUrl,
+            @RequestParam("problemType")             String problemType,
+            @RequestParam(value = "rightValue",      required = false, defaultValue = "") String correctValue,
+            @RequestParam(value = "discordUsername", required = false, defaultValue = "") String discordUserName,
+            @RequestParam(value = "audio",           required = false) MultipartFile audio)
             throws JsonProcessingException, InterruptedException {
-        Map<?, ?> objectMapper = new ObjectMapper().readValue(formData, Map.class);
-        //can be that issue is reported to specific row in game's soundtrack
-        int songSubgroupId = (int) objectMapper.get("affectedSongsubgroup");
-        String pageUrl = (String) objectMapper.get("sourceUrl");
-        String problemType = (String) objectMapper.get("problemType");
-        String correctValue = (String) objectMapper.get("rightValue");
-        String discordUserName = (String) objectMapper.get("discordUsername");
+
         try {
             Optional<SongSubgroup> songSubgroup;
             Correction correction;
+            int songSubgroupId = Integer.parseInt(songSubgroupIdStr);
             //so depending on that we will create the correction and store in database
             if (songSubgroupId != -1) {
                 songSubgroup = baseController.getSongSubgroupService().findById(songSubgroupId);
@@ -551,6 +553,20 @@ public class WebsiteViewsController {
             }
             correction.setCorrectionStatus(CorrectionStatus.PENDING);
             correction = baseController.getCorrectionService().save(correction);
+            // save audio file if attached
+            byte[] audioBytes = null;
+            String savedFilename = null;
+            if (audio != null && !audio.isEmpty()) {
+                String orig = audio.getOriginalFilename() != null ? audio.getOriginalFilename() : "recording";
+                String ext  = orig.contains(".") ? orig.substring(orig.lastIndexOf('.')) : "";
+                savedFilename = "correction_" + correction.getId() + ext;
+                Path savePath = Path.of(recognitionReportsDir).resolve(savedFilename);
+                Files.createDirectories(savePath.getParent());
+                audio.transferTo(savePath);
+                audioBytes = Files.readAllBytes(savePath);
+                correction.setAudioFilename(savedFilename);
+                baseController.getCorrectionService().save(correction);
+            }
             //if user was provided, we will send the message to discord server so admin can check this correction
             rebuildJda(botSecret);
             List<Member> foundUsers;
@@ -581,8 +597,15 @@ public class WebsiteViewsController {
             eb.setFooter("Correction ID: " + correction.getId());
             MessageEmbed embed = eb.build();
             if (textChannel != null && textChannel.canTalk()) {
-                textChannel.sendMessageEmbeds(embed).queue();
+                if (audioBytes != null) {
+                    textChannel.sendMessageEmbeds(embed)
+                            .addFiles(net.dv8tion.jda.api.utils.FileUpload.fromData(audioBytes, savedFilename))
+                            .queue();
+                } else {
+                    textChannel.sendMessageEmbeds(embed).queue();
+                }
             }
+
             //if user was there and found in Discord list, message would be sent to thank for the correction
             if (!foundUsers.isEmpty()) {
                 foundUsers.get(0).getUser().openPrivateChannel().queue(privateChannel -> privateChannel
@@ -592,6 +615,8 @@ public class WebsiteViewsController {
             }
         } catch (ResourceNotFoundException | InterruptedException e) {
             throw new InterruptedException(e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return new ObjectMapper().writeValueAsString("OK");
     }

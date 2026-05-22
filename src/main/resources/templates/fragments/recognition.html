@@ -1,5 +1,9 @@
 <h2 th:text="#{recognitionResultsHeading}"></h2>
-<p class="text-muted small" th:text="#{recognitionWrongResult(#{problem})}"></p>
+<p class="text-muted small">
+    <a href="#" id="reportWrongRecognition"
+       data-bs-toggle="modal" data-bs-target="#reportProblemModal"
+       th:text="#{recognitionReportWrongResult}"></a>
+</p>
 
 <h4 th:text="#{recognitionBestMatch}"></h4>
 <table id="recognitionTopTable"
@@ -380,6 +384,11 @@
 <script>
     $(document).ready(function () {
         $('#recognitionTopTable .play_icon').first().trigger('click');
+        $(document).on("click", "#reportWrongRecognition", function () {
+            $("#affected-songsubgroup").val(-1);
+            $("#source-url").val(window.location.href);
+            $("#problem-type").val("WRONG_RECOGNITION").trigger("change");
+        });
     });
 </script>
 

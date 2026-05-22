@@ -275,7 +275,7 @@ $(document).ready(function () {
             $('#recognitionForm')[0].submit();
         } catch (e) {
             resetRecordUI();
-            $('#recordMsg').text('Failed to submit recording: ' + e.message);
+            $('#recordMsg').text($('#recognitionModal').data('submitFailed') + e.message);
         }
     }
 
@@ -293,7 +293,7 @@ $(document).ready(function () {
         })
             .then(function (stream) { startRecording(stream); })
             .catch(function (e) {
-                $('#recordMsg').text('Microphone access denied: ' + e.message);
+                $('#recordMsg').text($('#recognitionModal').data('micDenied') + e.message);
             });
     });
 
@@ -305,14 +305,14 @@ $(document).ready(function () {
                 stream.getVideoTracks().forEach(function (t) { t.stop(); });
                 if (stream.getAudioTracks().length === 0) {
                     resetRecordUI();
-                    $('#recordMsg').text('No audio captured. Please check "Share audio" in the browser dialog.');
+                    $('#recordMsg').text($('#recognitionModal').data('noAudio'));
                     return;
                 }
                 startRecording(stream);
             })
             .catch(function (e) {
                 resetRecordUI();
-                $('#recordMsg').text('Could not capture system audio: ' + e.message);
+                $('#recordMsg').text($('#recognitionModal').data('sysDenied') + e.message);
             });
     });
 

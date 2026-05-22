@@ -43,6 +43,9 @@ public class Correction {
     @Column(name = "admin_comment")
     private String adminComment;
 
+    @Column(name = "audio_filename")
+    private String audioFilename;
+
     public Long getId() {
         return id;
     }
@@ -106,6 +109,10 @@ public class Correction {
     public void setAdminComment(String adminComment) {
         this.adminComment = adminComment;
     }
+
+    public String getAudioFilename() { return audioFilename; }
+
+    public void setAudioFilename(String audioFilename) { this.audioFilename = audioFilename; }
 
     public Correction() {
     }
