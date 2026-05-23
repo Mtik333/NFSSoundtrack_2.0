@@ -56,6 +56,7 @@ $(document).ready(function () {
                     var ytInput = $('<input class="form-control" id="ytInput"/>');
                     var removeNotesButton = $('<button data-subgroupId=' + currentSubgroup + ' id="remove-notes" class="btn btn-primary">Remove notes from all songs</button>');
                     var getLyricsButton = $('<button data-subgroupId=' + currentSubgroup + ' id="get-lyrics" class="btn btn-primary">Get lyrics for all songs</button>');
+                    var fingerprintAllButton = $('<button data-subgroupId=' + currentSubgroup + ' id="fingerprint-all" class="btn btn-primary">Fingerprint all songs</button>');
                     var addGenreButton = $('<button data-subgroupId=' + currentSubgroup + ' id="obtain-genres" class="btn btn-primary">Add genre to all songs in subgroup</button>');
                     newGroupSpan.append(newSongButton);
                     newGroupSpan.append(copySongLinksButton);
@@ -64,6 +65,7 @@ $(document).ready(function () {
                     newGroupSpan.append(ytInput);
                     newGroupSpan.append(removeNotesButton);
                     newGroupSpan.append(getLyricsButton);
+                    newGroupSpan.append(fingerprintAllButton);
                     newGroupSpan.append(addGenreButton);
                     newGroupSpan.append('<select id="selectGenre" class="form-select w-auto"></select>');
                     //todo make a button to copy song links from global entry to subgroup entries
@@ -311,6 +313,7 @@ $(document).ready(function () {
                 saveCol.append('<button id="cancel-song-globally" type="submit" class="btn btn-primary">Cancel</button>');
                 saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagate"><label class="form-check-label pl-2 pt-2" for="propagate">Propagate links to in-game entry?</label>');
                 saveCol.append('<input type="checkbox" class="form-check-input m-3" id="propagateAll"><label class="form-check-label pl-2 pt-2" for="propagateAll">Propagate links to all in-game entries?</label>');
+                saveCol.append('<input type="checkbox" class="form-check-input m-3" id="forceReFingerprint"><label class="form-check-label pl-2 pt-2" for="forceReFingerprint">Force re-fingerprint?</label>');
                 globallySaveOrCancelDiv.append(saveCol);
                 var officialDisplayDiv = $('<div class="form-group officialDisplay" id="officialDisplay">');
                 generateOfficialDisplayDiv(officialDisplayDiv, songSubgroup);
@@ -474,7 +477,9 @@ $(document).ready(function () {
         $("#obtain-links").attr("data-subgroupid", currentSubgroupId);
         $("#remove-notes").attr("data-subgroupid", currentSubgroupId);
         $("#get-lyrics").attr("data-subgroupid", currentSubgroupId);
+        $("#fingerprint-all").attr("data-subgroupid", currentSubgroupId);
         $("#create-song-via-yt").attr("data-subgroupid", currentSubgroupId);
+        $("#obtain-genres").attr("data-subgroupid", currentSubgroupId);
     });
 
     function generateAuthorDiv(mainComposerDiv, officialArtistName, artistDiv, aliasDiv,
@@ -1360,6 +1365,7 @@ $(document).ready(function () {
         songGloballyToSave.featNextToComposer = $("#featNextToComposer").prop("checked");
         songGloballyToSave.propagate = $("#propagate").prop("checked");
         songGloballyToSave.propagateAll = $("#propagateAll").prop("checked");
+        songGloballyToSave.forceReFingerprint = $("#forceReFingerprint").prop("checked");
         var genres = $("#genreDisplay").find("input.genre-select");
         for (let i = 0; i < genres.length; i++) {
             var genreInput = genres[i];
@@ -1581,6 +1587,10 @@ $(document).ready(function () {
         getLyricsForSongs();
     });
 
+    $(document).on('click', '#fingerprint-all', function (e) {
+        fingerprintAllSongs();
+    });
+
     $(document).on('click', '#obtain-genres', function (e) {
         setGenreOnMultipleSongs();
     });
@@ -1747,6 +1757,24 @@ $(document).ready(function () {
             },
             error: function (ooo) {
                 alert("error getting lyrics, check the logs");
+            },
+        });
+    }
+
+    function fingerprintAllSongs() {
+        var subgroupToPropagate = Number($("#fingerprint-all").attr("data-subgroupid"));
+        alert("Fingerprinting will run in the background, this may take a while");
+        $.ajax({
+            async: true,
+            type: "GET",
+            url: "/songSubgroup/fingerprintAll/" + subgroupToPropagate,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (result) {
+                alert("Fingerprinting finished");
+            },
+            error: function (ooo) {
+                alert("Error during fingerprinting, check the logs");
             },
         });
     }

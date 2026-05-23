@@ -140,6 +140,21 @@
                 <form id="recognitionForm" method="post" th:action="@{/recognize}"
                       enctype="multipart/form-data">
 
+                    <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded"
+                         style="background-color:rgba(220,53,69,0.08);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
+                             viewBox="0 0 16 16" fill="currentColor"
+                             class="text-danger flex-shrink-0">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/>
+                            <path d="M9 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                            <path d="M5 2.5 L6.5 5.5 L4.5 8.5 L6.5 10.5 L5.5 13.5"
+                                  fill="none" stroke="currentColor" stroke-width="1.2"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <p class="mb-0 text-danger" th:text="#{recognitionDisclaimer}"></p>
+                    </div>
+
                     <ul class="nav nav-tabs mb-3" id="recognitionTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" data-bs-toggle="tab"

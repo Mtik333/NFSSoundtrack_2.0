@@ -12,8 +12,12 @@ import com.nfssoundtrack.racingsoundtracks.others.lyrics.Lyrics;
 import com.nfssoundtrack.racingsoundtracks.services.YouTubeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,6 +25,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.Arrays;
 
 /**
  * controller used for probably most complicated stuff on the website
@@ -35,6 +40,12 @@ public class SongSubgroupController {
 
     private final SongSubgroupDeserializer songSubgroupDeserializer;
     private final SongDeserializer songDeserializer;
+    @Value("${seektune.binary}")
+    private String seekTuneBinary;
+
+    @Value("${seektune.workdir}")
+    private String seekTuneWorkDir;
+
     private final BaseControllerWithErrorHandling baseController;
 
     public SongSubgroupController(SongSubgroupDeserializer songSubgroupDeserializer, SongDeserializer songDeserializer, BaseControllerWithErrorHandling baseController) {
@@ -371,6 +382,7 @@ public class SongSubgroupController {
                     + " for all games";
             //so this time we are going to go for main song as we're going to modify it
             Song relatedSong = songSubgroup.getSong();
+            String oldSrcId = relatedSong.getSrcId();
             ObjectMapper objectMapper = JustSomeHelper.registerDeserializerForObjectMapper(Song.class, songDeserializer);
             relatedSong = objectMapper.readerForUpdating(relatedSong).readValue(formData, Song.class);
             Map<String, String> localObjectMapper = new ObjectMapper().readValue(formData,
@@ -427,6 +439,35 @@ public class SongSubgroupController {
             baseController.sendMessageToChannel(EntityType.SONG, "update", message,
                     EntityUrl.SONG, relatedSong.toAnotherChangeLogString(), String.valueOf(relatedSong.getId()));
             baseController.getSongService().save(relatedSong);
+
+            String newSrcId = relatedSong.getSrcId();
+            boolean forceReFingerprint = Boolean.parseBoolean(localObjectMapper.get("forceReFingerprint"));
+            boolean srcIdChanged = newSrcId != null && !newSrcId.isBlank() && !newSrcId.equals(oldSrcId);
+            if (srcIdChanged || forceReFingerprint) {
+                final long finalSongId = relatedSong.getId();
+                final String finalSrcId = newSrcId != null && !newSrcId.isBlank() ? newSrcId : oldSrcId;
+                if (finalSrcId != null && !finalSrcId.isBlank()) {
+                    List<String> command = new ArrayList<>(Arrays.asList(seekTuneBinary, "fingerprint",
+                            "-songId", String.valueOf(finalSongId),
+                            "-ytId", finalSrcId,
+                            "-force"));
+                    if (forceReFingerprint) {
+                        command.add("-replace");
+                    }
+                    new Thread(() -> {
+                        try {
+                            new ProcessBuilder(command)
+                                    .directory(new java.io.File(seekTuneWorkDir))
+                                    .inheritIO()
+                                    .start()
+                                    .waitFor();
+                        } catch (Exception e) {
+                            logger.error("Failed to re-fingerprint song {}: {}", finalSongId, e.getMessage());
+                        }
+                    }).start();
+                }
+            }
+
             //so for editing song globally, we always come from a subgroup entry so we also update related links
             //for both global song entry and this single local subgroup entry too
             if (Boolean.parseBoolean(localObjectMapper.get("propagate"))) {
@@ -592,6 +633,24 @@ public class SongSubgroupController {
                 }
             }
             baseController.getSongSubgroupService().save(songSubgroup);
+
+            if (song.getSrcId() != null && !song.getSrcId().isBlank()) {
+                final long finalSongId = song.getId();
+                final String finalSrcId = song.getSrcId();
+                new Thread(() -> {
+                    try {
+                        new ProcessBuilder(seekTuneBinary, "fingerprint",
+                                "-songId", String.valueOf(finalSongId),
+                                "-ytId", finalSrcId)
+                                .directory(new java.io.File(seekTuneWorkDir))
+                                .inheritIO()
+                                .start()
+                                .waitFor();
+                    } catch (Exception e) {
+                        logger.error("Failed to fingerprint song {}: {}", finalSongId, e.getMessage());
+                    }
+                }).start();
+            }
         }
         //again new song means we have to clean game cache
         String gameShort = songSubgroup.getSubgroup().getMainGroup().getGame().getGameShort();
@@ -754,6 +813,50 @@ public class SongSubgroupController {
         String gameShort = subgroup.getMainGroup().getGame().getGameShort();
         //it's worth also unloading game cache
         baseController.removeCacheEntry(gameShort);
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
+    @GetMapping(value = "/fingerprintAll/{subgroupId}")
+    public String fingerprintAllSongs(@PathVariable("subgroupId") int subgroupId)
+            throws IOException, ResourceNotFoundException {
+        Subgroup subgroup = baseController.getSubgroupService().findById(subgroupId)
+                .orElseThrow(() -> new ResourceNotFoundException("No subgroup found with id " + subgroupId));
+        List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
+        List<Long> errorSongIds = new ArrayList<>();
+        for (SongSubgroup songSubgroup : songSubgroupList) {
+            Song song = songSubgroup.getSong();
+            if (song.getSrcId() == null || song.getSrcId().isBlank()) {
+                logger.error("fingerprintAll: skipping song {} - no srcId", song.getId());
+                continue;
+            }
+            logger.error("fingerprintAll: processing song {}", song.toAnotherChangeLogString());
+            try {
+                int exitCode = new ProcessBuilder(seekTuneBinary, "fingerprint",
+                        "-songId", String.valueOf(song.getId()),
+                        "-ytId", song.getSrcId())
+                        .directory(new java.io.File(seekTuneWorkDir))
+                        .inheritIO()
+                        .start()
+                        .waitFor();
+                if (exitCode != 0) {
+                    logger.error("fingerprintAll: failed for song {} with exit code {}", song.getId(), exitCode);
+                    errorSongIds.add(song.getId());
+                }
+            } catch (Exception e) {
+                logger.error("fingerprintAll: exception for song {}: {}", song.getId(), e.getMessage());
+                errorSongIds.add(song.getId());
+            }
+        }
+        if (!errorSongIds.isEmpty()) {
+            String gameId = String.valueOf(subgroup.getMainGroup().getGame().getId());
+            String groupId = String.valueOf(subgroup.getMainGroup().getId());
+            String errorFileName = "fingerprinting_error_" + gameId + "_" + groupId + "_" + subgroupId;
+            try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.File(seekTuneWorkDir, errorFileName))) {
+                for (Long id : errorSongIds) {
+                    pw.println(id);
+                }
+            }
+        }
         return new ObjectMapper().writeValueAsString("OK");
     }
 

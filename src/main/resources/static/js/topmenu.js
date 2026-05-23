@@ -284,7 +284,7 @@ $(document).ready(function () {
         $('#sysAudioHint').hide();
         navigator.mediaDevices.getUserMedia({
             audio: {
-                echoCancellation: false,
+                echoCancellation: true,
                 noiseSuppression: false,
                 autoGainControl: false,
                 channelCount: 2,
