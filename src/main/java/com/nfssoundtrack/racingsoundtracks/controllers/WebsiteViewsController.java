@@ -784,7 +784,7 @@ public class WebsiteViewsController {
         }
 
         String stdout;
-        if (dataSourceUrl.contains("localhost")){
+        if (dataSourceUrl.contains("jdbc")){
             Path tempFile = Files.createTempFile(
                     "recognize_", "_" + audio.getOriginalFilename()
             );
