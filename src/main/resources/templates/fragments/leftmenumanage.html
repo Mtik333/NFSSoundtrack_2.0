@@ -33,6 +33,8 @@
                                th:attr="data-gameId=${game.id}">Manage distinct songs</a>
                             <a class="manage edit-game dropdown-item" href="#" th:attr="data-gameId=${game.id}">Edit
                                 game</a>
+                            <a class="manage manage-game-platforms dropdown-item" href="#"
+                                th:attr="data-gameId=${game.id},data-gameTitle=${game.displayTitle}">Manage platforms</a>
                         </div>
                     </div>
                 </li>

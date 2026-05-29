@@ -315,6 +315,18 @@ $(document).ready(function () {
         secondRowDiv.append(youtubeColDiv);
         secondRowDiv.append(soundcloudColDiv);
         newGameDiv.append(secondRowDiv);
+        var thirdRowDiv = $('<div class="row">');
+        var releaseYearColDiv = $('<div class="col">');
+        var rawgUrlColDiv = $('<div class="col">');
+        var releaseYearInput = $('<input class="form-control" id="releaseYearInput" type="text">');
+        var rawgUrlInput = $('<input class="form-control" id="rawgUrlInput" type="text">');
+        releaseYearColDiv.append('<label for="releaseYearInput">Release year</label>');
+        releaseYearColDiv.append(releaseYearInput);
+        rawgUrlColDiv.append('<label for="rawgUrlInput">Rawg.io URL</label>');
+        rawgUrlColDiv.append(rawgUrlInput);
+        thirdRowDiv.append(releaseYearColDiv);
+        thirdRowDiv.append(rawgUrlColDiv);
+        newGameDiv.append(thirdRowDiv);
         var additionalInfoRowDiv = $('<div class="row">');
         var additionalInfoColDiv = $('<div class="col">');
         var additionalInfoInput = $('<textarea class="form-control" id="additionalInfoInput">');
@@ -345,6 +357,8 @@ $(document).ready(function () {
         formData.youtubeId = $("#youtubePlaylistInput").val();
         formData.soundcloudId = $("#soundcloudPlaylistInput").val();
         formData.additionalInfo = $("#additionalInfoInput").val();
+        formData.releaseYear = $("#releaseYearInput").val();
+        formData.rawgUrl = $("#rawgUrlInput").val();
         $.ajax({
             async: false,
             type: "POST",

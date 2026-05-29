@@ -68,6 +68,12 @@ public class Game implements Serializable, Comparable<Game> {
     @Column(name = "is_recently_updated")
     private Boolean isRecentlyUpdated = false;
 
+    @Column(name = "release_year")
+    private String releaseYear;
+
+    @Column(name = "rawg_url")
+    private String rawgUrl;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     @OrderBy("position ASC")
@@ -204,7 +210,6 @@ public class Game implements Serializable, Comparable<Game> {
         this.additionalInfo = additionalInfo;
     }
 
-    // Getters and setters
     public LocalDateTime getLastUpdated() {
         return lastUpdated;
     }
@@ -219,6 +224,22 @@ public class Game implements Serializable, Comparable<Game> {
 
     public void setIsRecentlyUpdated(Boolean isRecentlyUpdated) {
         this.isRecentlyUpdated = isRecentlyUpdated;
+    }
+
+    public String getReleaseYear() {
+        return releaseYear;
+    }
+
+    public void setReleaseYear(String releaseYear) {
+        this.releaseYear = releaseYear;
+    }
+
+    public String getRawgUrl() {
+        return rawgUrl;
+    }
+
+    public void setRawgUrl(String rawgUrl) {
+        this.rawgUrl = rawgUrl;
     }
 
     @Override

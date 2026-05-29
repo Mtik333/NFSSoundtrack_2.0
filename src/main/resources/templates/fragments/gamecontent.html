@@ -76,6 +76,32 @@
                     th:href="${#strings.replace(game.disqusLink,'nfssoundtrack.com','old.racingsoundtracks.com')}"></a>
             </div>
         </th:block>
+        <div id="extraLinksGroup" style="display: flex; align-items: center">
+            <th:block th:if="${game.rawgUrl!=null}">
+                <div class="pointable" id="rawgIoLink">
+                    <a th:href="${game.rawgUrl}">
+                        <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
+                         th:title="#{openRawg}" th:src="@{/images/fullres/rawg_big.webp}">
+                    </a>
+                </div>
+            </th:block>
+            <th:block th:each="gamePlatform : ${gamePlatforms}" th:if="${gamePlatform.retroachievementsUrl!=null}">
+                <div class="pointable retroachievementLinks">
+                    <a th:href="${gamePlatform.retroachievementsUrl}" target="_blank">
+                        <th:block th:if="${#bools.isTrue(gamePlatform.hasSet)}">
+                            <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
+                                 th:title="${gamePlatform.game.displayTitle}+#{achievementsSetYes}+${gamePlatform.platform.platform}"
+                                 th:src="@{/images/fullres/retroachievements_set.webp}">
+                        </th:block>
+                        <th:block th:if="${!#bools.isTrue(gamePlatform.hasSet)}">
+                            <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
+                                 th:title="${gamePlatform.game.displayTitle}+#{achievementsSetNo}+${gamePlatform.platform.platform}"
+                                 th:src="@{/images/fullres/retroachievements_noset.webp}">
+                        </th:block>
+                    </a>
+                </div>
+            </th:block>
+        </div>
         <th:block th:if="${customTheme!=null}">
             <div class="pointable" id="dynamicBackground" data-toggle="tooltip" data-placement="top"
                 th:title="#{dynamicBackground}">
@@ -86,6 +112,9 @@
                 </svg>
             </div>
         </th:block>
+    </div>
+    <div id="playlistsDiv2" class="form-group pb-2 pt-1"
+         style="display: none; align-items: center; justify-content: center">
     </div>
     <div class="form-group">
         <span>

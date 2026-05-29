@@ -32,24 +32,24 @@ async function doLoadingCrap() {
     if (localStorage.getItem("static-leftmenu") == "false") {
         $("#unpin-menu").css("display", "none");
         $("#unpin-menu").parent().css("display", "");
-        $("#unpin-menu").prev().css("display", "none");
-        $("#unpin-menu").prev().prev().css("display", "none");
-        $("#filter_games_menu").css("display", "none");
         $("#filter_games_menu_pinned").css("display", "");
+        // hide entire search-games-bar so its buttons don't bleed into the offcanvas body
+        $("#search-games-bar").css("display", "none");
         var contentDiv = $("#offcanvas").next().next();
         if (contentWidth != null) {
             contentDiv.addClass("col-sm-" + contentWidth);
             contentDiv.removeClass("col");
         }
-        //probably need to make this less convoluted as code is quite repetitive
+        //restore header button states for offcanvas mode (year-games is always visible)
         if (localStorage.getItem("all-games") == "true") {
             $("#all-games-div").css("overflow-y", "");
             $("#all-games-div").css("max-height", "");
-            $("#pin-menu").prev().css("display", "");
-            $("#pin-menu").prev().prev().css("display", "none");
+            $("#pin-menu").prev().prev().css("display", "");          // grouped-games → show
+            $("#pin-menu").prev().prev().prev().css("display", "none"); // alpha-games → hide
         } else {
-            $("#pin-menu").prev().css("display", "none");
-            $("#pin-menu").prev().prev().css("display", "");
+            // series view or year view: alpha visible, grouped hidden
+            $("#pin-menu").prev().prev().css("display", "none");       // grouped-games → hide
+            $("#pin-menu").prev().prev().prev().css("display", "");    // alpha-games → show
         }
         $("#leftMenuTodaySong").css("display", "none");
     } else if (!isMobileAgent) {
@@ -62,26 +62,23 @@ async function doLoadingCrap() {
         $("#filter_games_menu_pinned").css("display", "none");
         $("#unpin-menu").css("display", "");
         $("#unpin-menu").parent().css("display", "flex");
-        $("#pin-menu").prev().css("display", "none");
-        $("#pin-menu").prev().prev().css("display", "none");
+        // show search-games-bar for pinned mode and reset its button states using unpin-menu as anchor
+        $("#search-games-bar").css("display", "");
         var contentDiv = $("#offcanvas").next().next();
         if (contentWidth != null) {
             contentDiv.addClass("col");
             contentDiv.removeClass("col-sm-" + contentWidth);
         }
         $("#leftMenuTodaySong").css("display", "");
-        //if we shouw all games, need to introduce the scrollbar to that group display as we dont want game menu to be shown entirely with 1000 or so games
+        //restore pinned-area button states (year-games is always visible)
         if (localStorage.getItem("all-games") == "true") {
             $("#all-games-div").css("overflow-y", "scroll");
-            //unpin menu button is placed after buttons to trigger alphabetical and normal order
-            $("#unpin-menu").prev().css("display", "");
-            $("#unpin-menu").prev().prev().css("display", "none");
-            //we are in case of non-game page like main one
+            $("#unpin-menu").prev().prev().css("display", "");          // grouped-games → show
+            $("#unpin-menu").prev().prev().prev().css("display", "none"); // alpha-games → hide
             if ($("div.centerKeeper").length == 3) {
                 $("#all-games-div").css("max-height",
                     ($("div.centerKeeper").first().height() - $("#search-games-bar").height() - $("#allgames-heading").height()) + "px");
             } else {
-                //otherwise we want to make menu not too big and not too small depending on how many songs are in the game
                 var minVw = 36;
                 var maxVw = 144;
                 var tenPercentOfWholePageHeight = Math.floor((($("header").height() + $("div.real-page-content").height()) / window.innerHeight * 100) / 20);
@@ -93,9 +90,14 @@ async function doLoadingCrap() {
                     $("#all-games-div").css("max-height", $("div.parentTabs").height() + "px");
                 }
             }
+        } else if (localStorage.getItem("year-games") == "true") {
+            $("#year-games-div").css("overflow-y", "scroll");
+            $("#unpin-menu").prev().prev().css("display", "");          // grouped-games → show
+            $("#unpin-menu").prev().prev().prev().css("display", "");   // alpha-games → show (year view keeps alpha visible)
         } else {
-            $("#unpin-menu").prev().css("display", "none");
-            $("#unpin-menu").prev().prev().css("display", "");
+            // series view: hide grouped, show alpha (year always visible)
+            $("#unpin-menu").prev().prev().css("display", "none");       // grouped-games → hide
+            $("#unpin-menu").prev().prev().prev().css("display", "");    // alpha-games → show
         }
     }
     if ('ontouchstart' in window && isMobileAgent) {
@@ -115,6 +117,10 @@ async function doLoadingCrap() {
         $("#filter_games_menu_pinned").css("display", "none");
         $("#sort-games-pinned").css("display", "none");
         $(document).find("header").addClass("sticky-top");
+        if ($("#extraLinksGroup").length) {
+            $("#extraLinksGroup").appendTo("#playlistsDiv2");
+            $("#playlistsDiv2").css("display", "flex");
+        }
     } else {
         //in case of desktop version putting red text in the very top of the page next to links and logo
         $("#warnUser").css("position", "absolute");
@@ -181,9 +187,12 @@ async function doLoadingCrap() {
         $("#offcanvas").removeClass("w-50");
         $("#offcanvas").addClass("w-" + newWidth);
     }
-    //if we display all games together, we show such group and hide all normal groups
-    var allGames = localStorage.getItem("all-games");
-    if (allGames == "true") {
+    //restore menu view and content — button states are handled by doLoadingCrap per mode
+    if (localStorage.getItem("year-games") == "true") {
+        buildYearGroups();
+        $("#year-games-group").attr("hidden", false);
+        $(".single-serie").attr("hidden", true);
+    } else if (localStorage.getItem("all-games") == "true") {
         $("#all-games-group").attr("hidden", false);
         $(".single-serie").attr("hidden", true);
     }
@@ -241,6 +250,41 @@ async function doLoadingCrap() {
             }
         });
     }
+}
+
+// Build year-grouped game list from existing series links (runs once, lazy)
+function buildYearGroups() {
+    var container = $("#year-games-div");
+    if (container.children().length > 0) return;
+
+    var gamesByYear = {};
+    var currentPath = window.location.pathname;
+    $(".single-serie .game_class").each(function () {
+        var year = $(this).attr("data-year");
+        if (!year || year === "null") year = "?";
+        if (!gamesByYear[year]) gamesByYear[year] = [];
+        var clone = $(this).clone();
+        if ($(this).attr("href") === currentPath) {
+            clone.addClass("active");
+        }
+        gamesByYear[year].push({ title: $(this).attr("data-fullTitle") || "", el: clone });
+    });
+
+    var years = Object.keys(gamesByYear).sort(function (a, b) {
+        if (a === "?") return 1;
+        if (b === "?") return -1;
+        return parseInt(b) - parseInt(a);
+    });
+
+    years.forEach(function (year) {
+        var label = $('<div class="px-3 py-1 fw-bold small border-top year-group-label"></div>').text(year);
+        container.append(label);
+        var ul = $('<ul class="btn-toggle-nav list-unstyled fw-normal mb-0 small serie_class"></ul>');
+        gamesByYear[year]
+            .sort(function (a, b) { return a.title.localeCompare(b.title); })
+            .forEach(function (g) { ul.append($('<li></li>').append(g.el)); });
+        container.append(ul);
+    });
 }
 
 //here we scroll all-games group to the game that we are in right now
@@ -1143,7 +1187,9 @@ $(document).ready(function () {
                     scrollTop: $($("a.active")[1]).offset().top + $($("a.active")[1]).height() * -5 + $("#search-games-bar").height() * -2
                 }, 0)
         } else {
+            $("#unpin-menu").prev().css("display", "");
             $("#unpin-menu").prev().prev().css("display", "");
+            $("#unpin-menu").prev().prev().prev().css("display", "");
         }
     });
 
@@ -1158,6 +1204,7 @@ $(document).ready(function () {
         //just see what happens in case of clicking to pin menu, it's basically other way around
         $("#unpin-menu").prev().css("display", "none");
         $("#unpin-menu").prev().prev().css("display", "none");
+        $("#unpin-menu").prev().prev().prev().css("display", "none");
         $("#filter_games_menu_pinned").css("display", "");
         $("#filter_games_menu").css("display", "none");
         localStorage.setItem("static-leftmenu", false);
@@ -1171,32 +1218,38 @@ $(document).ready(function () {
         if (localStorage.getItem("all-games") == "true") {
             $("#all-games-div").css("overflow-y", "");
             $("#all-games-div").css("max-height", "");
-            $("#pin-menu").prev().css("display", "");
-            $("#pin-menu").prev().prev().css("display", "none");
+            $("#pin-menu").prev().prev().css("display", "");
+            $("#pin-menu").prev().prev().prev().css("display", "");
             $($("a.active")[1]).parent().parent().parent().parent().parent().parent()
                 .animate({
                     scrollTop: $($("a.active")[1]).offset().top + $($("a.active")[1]).height() * -3 + $("div.offcanvas-header").height() * -1
                 }, 0)
         } else {
-            $("#pin-menu").prev().css("display", "none");
-            $("#pin-menu").prev().prev().css("display", "");
+            $("#pin-menu").prev().prev().css("display", "none");
+            $("#pin-menu").prev().prev().prev().css("display", "");
         }
     });
 
     //when we decide to group games normally, we hide this big group and show the other button, to display games alphabetically
-    //again since these buttons appear twice in the canvas, we use this to show the right one
+    //again since these buttons appear twice in the canvas, we use $(this).prev() to only reveal the adjacent button
     $("button.grouped-games").on("click", function (e) {
         localStorage.setItem("all-games", false);
-        $(this).prev().css("display", "");
+        localStorage.setItem("year-games", false);
         $("button.grouped-games").css("display", "none");
+        $(this).prev().css("display", "");  // show only the adjacent alpha button (not the one from the other group)
+        // year-games: never hidden
         $("#all-games-group").attr("hidden", true);
+        $("#year-games-group").attr("hidden", true);
         $(".single-serie").attr("hidden", false);
     });
 
     $("button.alphabetical-games").on("click", function (e) {
         localStorage.setItem("all-games", true);
+        localStorage.setItem("year-games", false);
         $("button.alphabetical-games").css("display", "none");
-        $(this).next().css("display", "");
+        // year-games: never hidden
+        $(this).next().css("display", "");  // show only the adjacent grouped button (not the one from the other group)
+        $("#year-games-group").attr("hidden", true);
         $("#all-games-group").attr("hidden", false);
         $(".single-serie").attr("hidden", true);
         if (localStorage.getItem("static-leftmenu") == "true") {
@@ -1212,6 +1265,35 @@ $(document).ready(function () {
                     $("#all-games-div").css("max-height", "144vw");
                 } else if (tenPercentOfWholePageHeight < minVw) {
                     $("#all-games-div").css("max-height", $("div.parentTabs").height() + "px");
+                }
+            }
+        }
+    });
+
+    $("button.year-games").on("click", function (e) {
+        localStorage.setItem("all-games", false);
+        localStorage.setItem("year-games", true);
+        // year-games: never hidden (don't hide self)
+        //$("button.alphabetical-games").css("display", "");
+        $(this).prev().prev().css("display", "");
+        $(this).prev().css("display", "");  // show only the adjacent grouped button (not the one from the other group)
+        $("#all-games-group").attr("hidden", true);
+        $("#year-games-group").attr("hidden", false);
+        $(".single-serie").attr("hidden", true);
+        buildYearGroups();
+        if (localStorage.getItem("static-leftmenu") == "true") {
+            if ($("div.centerKeeper").length == 3) {
+                $("#year-games-div").css("max-height", ($("div.centerKeeper").first().height() - $("#search-games-bar").height() - $("#yeargames-heading").height()) + "px");
+            } else {
+                var minVw = 36;
+                var maxVw = 144;
+                var tenPercentOfWholePageHeight = Math.floor((($("header").height() + $("div.real-page-content").height()) / window.innerHeight * 100) / 20);
+                if (tenPercentOfWholePageHeight <= maxVw && tenPercentOfWholePageHeight >= minVw) {
+                    $("#year-games-div").css("max-height", tenPercentOfWholePageHeight + "vw");
+                } else if (tenPercentOfWholePageHeight > maxVw) {
+                    $("#year-games-div").css("max-height", "144vw");
+                } else if (tenPercentOfWholePageHeight < minVw) {
+                    $("#year-games-div").css("max-height", $("div.parentTabs").height() + "px");
                 }
             }
         }

@@ -967,6 +967,10 @@ html[data-bs-theme="dark"] tr.table-success {
     text-align: center;
   }
 
+  #extraLinksGroup {
+    text-align: center;
+  }
+
   #ytrow {
     width: 48%;
     height: 40vw;
@@ -1054,6 +1058,11 @@ html[data-bs-theme="dark"] tr.table-success {
   }
 
   svg.bi-sort-alpha-down {
+    width: 7vw;
+    height: 7vw;
+  }
+
+  svg.bi-sort-year-down {
     width: 7vw;
     height: 7vw;
   }

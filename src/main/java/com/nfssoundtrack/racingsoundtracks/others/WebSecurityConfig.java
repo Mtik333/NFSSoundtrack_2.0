@@ -54,7 +54,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         //these endpoints we don't want to expose to non-admin user
                         //or so called not-authenticated user
                         .requestMatchers("/manage/manage", "/manage/manage#", "/serie/**", "/country/**",
-                                "/maingroup/**", "/songSubgroup/**", "/subgroup/**", "/gamedb/**")
+                                "/maingroup/**", "/songSubgroup/**", "/subgroup/**", "/gamedb/**",
+                                "/gameplatform/**")
                         .hasAuthority("ADMIN"))
                 .authorizeHttpRequests(requests -> requests
                         //those can be seen by everones

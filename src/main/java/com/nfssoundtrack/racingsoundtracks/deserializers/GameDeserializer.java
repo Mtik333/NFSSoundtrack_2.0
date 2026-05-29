@@ -47,6 +47,8 @@ public class GameDeserializer extends JsonDeserializer<Game> {
         intoValue.setYoutubeId(JustSomeHelper.returnProperValueToDb(node.get("youtubeId").asText()));
         intoValue.setSoundcloudId(JustSomeHelper.returnProperValueToDb(node.get("soundcloudId").asText()));
         intoValue.setAdditionalInfo(JustSomeHelper.returnProperValueToDb(node.get("additionalInfo").asText()));
+        intoValue.setReleaseYear(JustSomeHelper.returnProperValueToDb(node.get("releaseYear").asText()));
+        intoValue.setRawgUrl(JustSomeHelper.returnProperValueToDb(node.get("rawgUrl").asText()));
         return intoValue;
     }
 
@@ -72,11 +74,15 @@ public class GameDeserializer extends JsonDeserializer<Game> {
         String youtubeId = JustSomeHelper.returnProperValueToDb(node.get("youtubeId").asText());
         String soundcloudId = JustSomeHelper.returnProperValueToDb(node.get("soundcloudId").asText());
         String additionalInfo = JustSomeHelper.returnProperValueToDb(node.get("additionalInfo").asText());
+        String releaseYear = JustSomeHelper.returnProperValueToDb(node.get("releaseYear").asText());
+        String rawgUrl = JustSomeHelper.returnProperValueToDb(node.get("rawgUrl").asText());
         int serieId = node.get("serieId").asInt();
         Serie currentSerie = serieService.findById(serieId).orElseThrow(() -> new IOException("No " +
                 "serie with id found " + serieId));
         Game game = new Game(1000L, gameTitle, displayTitle, gameShort, gamePrefix, gameStatus, additionalInfo);
         game.setAudioLinks(spotifyId, deezerId, tidalId, youtubeId, soundcloudId);
+        game.setReleaseYear(releaseYear);
+        game.setRawgUrl(rawgUrl);
         game.setSerie(currentSerie);
         return game;
     }

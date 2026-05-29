@@ -128,8 +128,33 @@ $(document).ready(function () {
         }, delay);
     });
 
+    function funcToShowOnlyFilteredGamesYearGroup(searchValue) {
+        var allA = $("#year-games-div").find("a");
+        for (let i = 0; i < allA.length; i++) {
+            var gameDisplayTitle = $(allA[i]).attr("data-fullTitle");
+            if (gameDisplayTitle && gameDisplayTitle.toLowerCase().indexOf(searchValue) > -1) {
+                $(allA[i]).parent().show();
+            } else {
+                $(allA[i]).parent().hide();
+            }
+        }
+        // hide year labels that have no visible games under them
+        $("#year-games-div .year-group-label").each(function () {
+            var label = $(this);
+            var nextUl = label.next("ul");
+            if (nextUl.find("li:visible").length === 0) {
+                label.hide();
+            } else {
+                label.show();
+            }
+        });
+    }
+
     function filterGames(info) {
         //to avoid issues when one-group is active, new method was introduced to handle this case
+        if (localStorage.getItem("year-games") == "true") {
+            return filterYearGamesGroup(info);
+        }
         if (localStorage.getItem("all-games") == "true") {
             return filterAllGamesGroup(info);
         }
@@ -193,6 +218,18 @@ $(document).ready(function () {
                     buttonToClick.click();
                 }
             }
+        }
+    }
+
+    function filterYearGamesGroup(info) {
+        var searchValue = info.val().toLowerCase();
+        if (searchValue.length > 3) {
+            setTimeout(function () {
+                funcToShowOnlyFilteredGamesYearGroup(searchValue);
+            }, 400);
+        } else {
+            $("#year-games-div").find("a").parent().show();
+            $("#year-games-div .year-group-label").show();
         }
     }
 

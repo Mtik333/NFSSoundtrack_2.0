@@ -8,6 +8,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.*;
 import com.nfssoundtrack.racingsoundtracks.serializers.SongSerializer;
+import com.nfssoundtrack.racingsoundtracks.services.GamePlatformService;
 import com.nfssoundtrack.racingsoundtracks.services.YouTubeService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.apache.commons.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
@@ -70,6 +72,8 @@ public class WebsiteViewsController {
     private final SongSerializer songSerializer;
     private final BaseControllerWithErrorHandling baseController;
     private final WebClient webClient;
+    @Autowired
+    private GamePlatformService gamePlatformService;
 
     public WebsiteViewsController(SongSerializer songSerializer, BaseControllerWithErrorHandling baseController) {
         this.songSerializer = songSerializer;
@@ -191,6 +195,7 @@ public class WebsiteViewsController {
         Optional<CustomTheme> customTheme = baseController.getCustomThemeService().findByGame(game);
         customTheme.ifPresent(theme -> model.addAttribute("customTheme", theme));
         model.addAttribute("songSubgroups", baseController.getSongSubgroupService().hasGameAnySongs(game));
+        model.addAttribute("gamePlatforms", gamePlatformService.findByGame(game));
         return MIN_INDEX;
     }
 
