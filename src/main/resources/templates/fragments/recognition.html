@@ -39,7 +39,7 @@
         th:attr="data-song_id=${song.key.id}">
         <td>
             <strong>1</strong><br>
-            <small th:text="${recognitionScoreMap[song.key.id].intValue()}"></small>
+            <small th:text="'C:' + ${recognitionConfidenceMap[song.key.id]} + '% S:' + ${recognitionScoreMap[song.key.id]} + '%'"></small>
         </td>
         <td class="contextButton" style="display:none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw"
@@ -225,7 +225,7 @@
             th:attr="data-song_id=${song.key.id}">
             <td>
                 <strong th:text="${iter.index + 1}"></strong><br>
-                <small th:text="${recognitionScoreMap[song.key.id].intValue()}"></small>
+                <small th:text="'C:' + ${recognitionConfidenceMap[song.key.id]} + '% S:' + ${recognitionScoreMap[song.key.id]} + '%'"></small>
             </td>
             <td class="contextButton" style="display:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw"

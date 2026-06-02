@@ -858,7 +858,8 @@ public class WebsiteViewsController {
         LinkedHashMap<Song, Set<Game>> recognitionSongList =
                 new LinkedHashMap<>();
         Map<Long, Long> recognitionTimestampMap = new HashMap<>();
-        Map<Long, Double> recognitionScoreMap = new HashMap<>();
+        Map<Long, Integer> recognitionScoreMap = new HashMap<>();
+        Map<Long, Integer> recognitionConfidenceMap = new HashMap<>();
 
         for (RawMatch raw : rawMatches) {
             Optional<Song> songOpt = baseController.getSongService()
@@ -873,12 +874,14 @@ public class WebsiteViewsController {
                 games.add(ss.getSubgroup().getMainGroup().getGame());
             }
             recognitionSongList.put(song, games);
-            recognitionScoreMap.put(song.getId(), raw.score);
+            recognitionScoreMap.put(song.getId(), (int) Math.round(raw.score * 100));
+            recognitionConfidenceMap.put(song.getId(), (int) Math.round(raw.confidence * 100));
             recognitionTimestampMap.put(song.getId(), raw.timestampMs / 1000);
         }
 
         model.addAttribute("recognitionSongList", recognitionSongList);
         model.addAttribute("recognitionScoreMap", recognitionScoreMap);
+        model.addAttribute("recognitionConfidenceMap", recognitionConfidenceMap);
         model.addAttribute("recognitionResults", true);
         model.addAttribute("recognitionTimestampMap", recognitionTimestampMap);
         addCommonAttributes(

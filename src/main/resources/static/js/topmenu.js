@@ -237,7 +237,7 @@ $(document).ready(function () {
             var blob = new Blob(recordChunks, { type: mediaRecorder.mimeType });
             submitRecording(blob, mediaRecorder.mimeType);
         };
-        mediaRecorder.start();
+        mediaRecorder.start(100);
         recordElapsed = 0;
         $('#recordTimer').text('0:00');
         $('#recordProgress').css('width', '0%');
@@ -284,11 +284,11 @@ $(document).ready(function () {
         $('#sysAudioHint').hide();
         navigator.mediaDevices.getUserMedia({
             audio: {
-                echoCancellation: true,
+                echoCancellation: false,
                 noiseSuppression: false,
                 autoGainControl: false,
-                channelCount: 2,
-                sampleRate: 48000
+                channelCount: 1,
+                sampleRate: 44100
             }
         })
             .then(function (stream) { startRecording(stream); })
@@ -300,7 +300,7 @@ $(document).ready(function () {
     $(document).on('click', '#recordSysBtn', function () {
         $('#recordMsg').text('');
         $('#sysAudioHint').show();
-        navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
+        navigator.mediaDevices.getDisplayMedia({ video: false, audio: true })
             .then(function (stream) {
                 stream.getVideoTracks().forEach(function (t) { t.stop(); });
                 if (stream.getAudioTracks().length === 0) {
