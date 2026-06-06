@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.Arrays;
 
@@ -46,12 +49,32 @@ public class SongSubgroupController {
     @Value("${seektune.workdir}")
     private String seekTuneWorkDir;
 
+    @Value("${seektune.mode}")
+    private String seekTuneMode;
+
+    @Value("${seektune.pendingfile}")
+    private String seekTunePendingFile;
+
+    private static final Object pendingCsvLock = new Object();
+
     private final BaseControllerWithErrorHandling baseController;
 
     public SongSubgroupController(SongSubgroupDeserializer songSubgroupDeserializer, SongDeserializer songDeserializer, BaseControllerWithErrorHandling baseController) {
         this.songSubgroupDeserializer = songSubgroupDeserializer;
         this.songDeserializer = songDeserializer;
         this.baseController = baseController;
+    }
+
+    private void appendToPendingCsv(long songId, String ytId) {
+        synchronized (pendingCsvLock) {
+            try {
+                String line = songId + "," + ytId + System.lineSeparator();
+                Files.write(Paths.get(seekTunePendingFile), line.getBytes(),
+                        StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            } catch (Exception e) {
+                logger.error("Failed to append to pending fingerprints CSV: song {}", songId, e);
+            }
+        }
     }
 
     /**
@@ -447,24 +470,28 @@ public class SongSubgroupController {
                 final long finalSongId = relatedSong.getId();
                 final String finalSrcId = newSrcId != null && !newSrcId.isBlank() ? newSrcId : oldSrcId;
                 if (finalSrcId != null && !finalSrcId.isBlank()) {
-                    List<String> command = new ArrayList<>(Arrays.asList(seekTuneBinary, "fingerprint",
-                            "-songId", String.valueOf(finalSongId),
-                            "-ytId", finalSrcId,
-                            "-force"));
-                    if (forceReFingerprint) {
-                        command.add("-replace");
-                    }
-                    new Thread(() -> {
-                        try {
-                            new ProcessBuilder(command)
-                                    .directory(new java.io.File(seekTuneWorkDir))
-                                    .inheritIO()
-                                    .start()
-                                    .waitFor();
-                        } catch (Exception e) {
-                            logger.error("Failed to re-fingerprint song {}: {}", finalSongId, e.getMessage());
+                    if ("csv".equals(seekTuneMode)) {
+                        appendToPendingCsv(finalSongId, finalSrcId);
+                    } else {
+                        List<String> command = new ArrayList<>(Arrays.asList(seekTuneBinary, "fingerprint",
+                                "-songId", String.valueOf(finalSongId),
+                                "-ytId", finalSrcId,
+                                "-force"));
+                        if (forceReFingerprint) {
+                            command.add("-replace");
                         }
-                    }).start();
+                        new Thread(() -> {
+                            try {
+                                new ProcessBuilder(command)
+                                        .directory(new java.io.File(seekTuneWorkDir))
+                                        .inheritIO()
+                                        .start()
+                                        .waitFor();
+                            } catch (Exception e) {
+                                logger.error("Failed to re-fingerprint song {}: {}", finalSongId, e.getMessage());
+                            }
+                        }).start();
+                    }
                 }
             }
 
@@ -637,19 +664,23 @@ public class SongSubgroupController {
             if (song.getSrcId() != null && !song.getSrcId().isBlank()) {
                 final long finalSongId = song.getId();
                 final String finalSrcId = song.getSrcId();
-                new Thread(() -> {
-                    try {
-                        new ProcessBuilder(seekTuneBinary, "fingerprint",
-                                "-songId", String.valueOf(finalSongId),
-                                "-ytId", finalSrcId)
-                                .directory(new java.io.File(seekTuneWorkDir))
-                                .inheritIO()
-                                .start()
-                                .waitFor();
-                    } catch (Exception e) {
-                        logger.error("Failed to fingerprint song {}: {}", finalSongId, e.getMessage());
-                    }
-                }).start();
+                if ("csv".equals(seekTuneMode)) {
+                    appendToPendingCsv(finalSongId, finalSrcId);
+                } else {
+                    new Thread(() -> {
+                        try {
+                            new ProcessBuilder(seekTuneBinary, "fingerprint",
+                                    "-songId", String.valueOf(finalSongId),
+                                    "-ytId", finalSrcId)
+                                    .directory(new java.io.File(seekTuneWorkDir))
+                                    .inheritIO()
+                                    .start()
+                                    .waitFor();
+                        } catch (Exception e) {
+                            logger.error("Failed to fingerprint song {}: {}", finalSongId, e.getMessage());
+                        }
+                    }).start();
+                }
             }
         }
         //again new song means we have to clean game cache
@@ -822,6 +853,14 @@ public class SongSubgroupController {
         Subgroup subgroup = baseController.getSubgroupService().findById(subgroupId)
                 .orElseThrow(() -> new ResourceNotFoundException("No subgroup found with id " + subgroupId));
         List<SongSubgroup> songSubgroupList = subgroup.getSongSubgroupList();
+        if ("csv".equals(seekTuneMode)) {
+            for (SongSubgroup songSubgroup : songSubgroupList) {
+                Song song = songSubgroup.getSong();
+                if (song.getSrcId() == null || song.getSrcId().isBlank()) continue;
+                appendToPendingCsv(song.getId(), song.getSrcId());
+            }
+            return new ObjectMapper().writeValueAsString("OK");
+        }
         List<Long> errorSongIds = new ArrayList<>();
         for (SongSubgroup songSubgroup : songSubgroupList) {
             Song song = songSubgroup.getSong();

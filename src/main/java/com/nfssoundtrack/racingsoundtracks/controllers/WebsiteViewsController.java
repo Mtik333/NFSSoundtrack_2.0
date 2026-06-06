@@ -52,6 +52,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -769,13 +770,14 @@ public class WebsiteViewsController {
         return resultingText.toString();
     }
 
+    private final ConcurrentHashMap<String, RecognitionJob> recognitionJobs = new ConcurrentHashMap<>();
+
     @PostMapping(value = "/recognize", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String recognizeSong(
+    @ResponseBody
+    public Map<String, String> startRecognize(
             @RequestParam("audio") MultipartFile audio,
-            @RequestParam(value = "gameShort", required = false) String gameShort,
-            Model model,
-            HttpSession session) throws Exception {
-        String songIds=null;
+            @RequestParam(value = "gameShort", required = false) String gameShort) throws Exception {
+        String songIds = null;
         if (gameShort != null && !gameShort.isBlank()) {
             Game game = baseController.getGameService().findByGameShort(gameShort);
             if (game != null) {
@@ -788,87 +790,64 @@ public class WebsiteViewsController {
             }
         }
 
-        String stdout;
-        if (dataSourceUrl.contains("jdbc")){
-            Path tempFile = Files.createTempFile(
-                    "recognize_", "_" + audio.getOriginalFilename()
-            );
-            Path songsFile = Files.createTempFile("songs_", ".csv");
+        String jobId = UUID.randomUUID().toString();
+        RecognitionJob job = new RecognitionJob();
+        recognitionJobs.put(jobId, job);
+
+        byte[] audioBytes = audio.getBytes();
+        String originalFilename = audio.getOriginalFilename();
+        final String finalSongIds = songIds;
+
+        Thread t = new Thread(() -> {
             try {
-                audio.transferTo(tempFile);
-                ProcessBuilder pb;
-                if (songIds!=null && !songIds.isEmpty()){
-                    songIds = songIds.replace(",","\n");
-                    Files.writeString(songsFile,songIds);
-                    pb = new ProcessBuilder(
-                            seekTuneBinary, "recognize",
-                            "-songs", songsFile.toString(), tempFile.toString()
-                    );
-                } else {
-                    pb = new ProcessBuilder(
-                            seekTuneBinary, "recognize", tempFile.toString()
-                    );
-                }
-                pb.directory(new File(seekTuneWorkDir));
-                pb.redirectError(ProcessBuilder.Redirect.DISCARD);
-                Process process = pb.start();
-
-                stdout = new String(
-                        process.getInputStream().readAllBytes()
-                );
-                boolean finished = process.waitFor(60, TimeUnit.SECONDS);
-                if (!finished) {
-                    process.destroy();
-                    throw new RuntimeException("seek-tune timed out");
-                }
-            } finally {
-                Files.deleteIfExists(tempFile);
-                Files.deleteIfExists(songsFile);
+                job.matches = doRecognize(audioBytes, originalFilename, finalSongIds);
+                job.status = RecognitionJob.Status.DONE;
+            } catch (Exception e) {
+                logger.error("Recognition job failed", e);
+                job.error = e.getMessage();
+                job.status = RecognitionJob.Status.ERROR;
             }
-        } else {
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("audio", new ByteArrayResource(audio.getBytes()) {
-                @Override
-                public String getFilename() {
-                    return audio.getOriginalFilename();
-                }
-            });
-            if (songIds!=null && !songIds.isEmpty()) {
-                body.add("songIds", songIds);
-            }
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-            headers.set("X-API-Key", seekTuneApiKey);
+        });
+        t.setDaemon(true);
+        t.start();
 
-            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+        return Map.of("jobId", jobId);
+    }
 
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.postForEntity(
-                    seekTuneUrl + "/recognize",
-                    request,
-                    String.class
-            );
-            stdout = response.getBody();
+    @GetMapping(value = "/recognize/status/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, String> recognizeStatus(@PathVariable String jobId) {
+        RecognitionJob job = recognitionJobs.get(jobId);
+        if (job == null) {
+            return Map.of("status", "NOT_FOUND");
+        }
+        if (job.status == RecognitionJob.Status.ERROR) {
+            return Map.of("status", "ERROR", "error", job.error != null ? job.error : "Unknown error");
+        }
+        return Map.of("status", job.status.name());
+    }
+
+    @GetMapping("/recognize/result/{jobId}")
+    public String recognizeResult(
+            @PathVariable String jobId,
+            Model model,
+            HttpSession session) throws Exception {
+        RecognitionJob job = recognitionJobs.remove(jobId);
+        if (job == null || job.status != RecognitionJob.Status.DONE) {
+            addCommonAttributes(model, "genericAt", new String[]{"Recognition"}, session);
+            return MIN_INDEX;
         }
 
-        List<RawMatch> rawMatches = new ObjectMapper().readValue(
-                stdout, new TypeReference<>() {
-                }
-        );
-        LinkedHashMap<Song, Set<Game>> recognitionSongList =
-                new LinkedHashMap<>();
+        LinkedHashMap<Song, Set<Game>> recognitionSongList = new LinkedHashMap<>();
         Map<Long, Long> recognitionTimestampMap = new HashMap<>();
         Map<Long, Integer> recognitionScoreMap = new HashMap<>();
         Map<Long, Integer> recognitionConfidenceMap = new HashMap<>();
 
-        for (RawMatch raw : rawMatches) {
-            Optional<Song> songOpt = baseController.getSongService()
-                    .findById((int) raw.songId);
+        for (RawMatch raw : job.matches) {
+            Optional<Song> songOpt = baseController.getSongService().findById((int) raw.songId);
             if (songOpt.isEmpty()) continue;
-
             Song song = songOpt.get();
-            List<SongSubgroup> subgroups = baseController
-                    .getSongSubgroupService().findBySong(song);
+            List<SongSubgroup> subgroups = baseController.getSongSubgroupService().findBySong(song);
             Set<Game> games = new HashSet<>();
             for (SongSubgroup ss : subgroups) {
                 games.add(ss.getSubgroup().getMainGroup().getGame());
@@ -884,11 +863,58 @@ public class WebsiteViewsController {
         model.addAttribute("recognitionConfidenceMap", recognitionConfidenceMap);
         model.addAttribute("recognitionResults", true);
         model.addAttribute("recognitionTimestampMap", recognitionTimestampMap);
-        addCommonAttributes(
-                model, "genericAt", new String[]{"Recognition"}, session
-        );
+        addCommonAttributes(model, "genericAt", new String[]{"Recognition"}, session);
         return MIN_INDEX;
+    }
 
+    private List<RawMatch> doRecognize(byte[] audioBytes, String originalFilename, String songIds) throws Exception {
+        String stdout;
+        if (dataSourceUrl.contains("jdbc")) {
+            Path tempFile = Files.createTempFile("recognize_", "_" + originalFilename);
+            Path songsFile = Files.createTempFile("songs_", ".csv");
+            try {
+                Files.write(tempFile, audioBytes);
+                ProcessBuilder pb;
+                if (songIds != null && !songIds.isEmpty()) {
+                    Files.writeString(songsFile, songIds.replace(",", "\n"));
+                    pb = new ProcessBuilder(seekTuneBinary, "recognize",
+                            "-songs", songsFile.toString(), tempFile.toString());
+                } else {
+                    pb = new ProcessBuilder(seekTuneBinary, "recognize", tempFile.toString());
+                }
+                pb.directory(new File(seekTuneWorkDir));
+                pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+                Process process = pb.start();
+                stdout = new String(process.getInputStream().readAllBytes());
+                boolean finished = process.waitFor(60, TimeUnit.SECONDS);
+                if (!finished) {
+                    process.destroy();
+                    throw new RuntimeException("seek-tune timed out");
+                }
+            } finally {
+                Files.deleteIfExists(tempFile);
+                Files.deleteIfExists(songsFile);
+            }
+        } else {
+            final String fname = originalFilename;
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("audio", new ByteArrayResource(audioBytes) {
+                @Override
+                public String getFilename() { return fname; }
+            });
+            if (songIds != null && !songIds.isEmpty()) {
+                body.add("songIds", songIds);
+            }
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            headers.set("X-API-Key", seekTuneApiKey);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    seekTuneUrl + "/recognize", request, String.class);
+            stdout = response.getBody();
+        }
+        return new ObjectMapper().readValue(stdout, new TypeReference<>() {});
     }
 
     private static class RawMatch {
@@ -896,6 +922,13 @@ public class WebsiteViewsController {
         public double score;
         public float confidence;
         public long timestampMs;
+    }
+
+    private static class RecognitionJob {
+        enum Status { PENDING, DONE, ERROR }
+        volatile Status status = Status.PENDING;
+        volatile List<RawMatch> matches;
+        volatile String error;
     }
 
     /**

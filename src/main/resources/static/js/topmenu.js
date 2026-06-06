@@ -200,10 +200,47 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('submit', '#recognitionForm', function () {
-        $('#recognizeSpinner').show();
-        $('#recognizeBtn').prop('disabled', true).text($('#recognizeBtn').data('recognizing'));
+    $(document).on('submit', '#recognitionForm', function (e) {
+        e.preventDefault();
+        submitRecognitionForm(new FormData(this));
     });
+
+    function submitRecognitionForm(fd) {
+        $('#recognizeSpinner').show();
+        $('#recordSpinner').show();
+        $('#recognizeBtn').prop('disabled', true);
+
+        fetch('/recognize', { method: 'POST', body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (!data.jobId) { showRecognitionError('Unexpected response'); return; }
+                pollRecognitionJob(data.jobId);
+            })
+            .catch(function (e) { showRecognitionError(e.message); });
+    }
+
+    function pollRecognitionJob(jobId) {
+        fetch('/recognize/status/' + jobId)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.status === 'DONE') {
+                    window.location.href = '/recognize/result/' + jobId;
+                } else if (data.status === 'ERROR' || data.status === 'NOT_FOUND') {
+                    showRecognitionError(data.error || 'Recognition failed');
+                } else {
+                    setTimeout(function () { pollRecognitionJob(jobId); }, 5000);
+                }
+            })
+            .catch(function (e) { showRecognitionError(e.message); });
+    }
+
+    function showRecognitionError(msg) {
+        $('#recognizeSpinner').hide();
+        $('#recordSpinner').hide();
+        $('#recognizeBtn').prop('disabled', false);
+        resetRecordUI();
+        $('#recordMsg').text($('#recognitionModal').data('submitFailed') + ': ' + msg);
+    }
 
     // --- audio recording for recognition modal ---
 
@@ -268,11 +305,9 @@ $(document).ready(function () {
         var ext = mimeType.indexOf('ogg') !== -1 ? 'ogg'
             : mimeType.indexOf('mp4') !== -1 ? 'mp4' : 'webm';
         try {
-            var dt = new DataTransfer();
-            dt.items.add(new File([blob], 'recording.' + ext, { type: mimeType }));
-            $('#audioFile')[0].files = dt.files;
-            $('#recognizeSpinner').show();
-            $('#recognitionForm')[0].submit();
+            var fd = new FormData($('#recognitionForm')[0]);
+            fd.set('audio', new File([blob], 'recording.' + ext, { type: mimeType }));
+            submitRecognitionForm(fd);
         } catch (e) {
             resetRecordUI();
             $('#recordMsg').text($('#recognitionModal').data('submitFailed') + e.message);
