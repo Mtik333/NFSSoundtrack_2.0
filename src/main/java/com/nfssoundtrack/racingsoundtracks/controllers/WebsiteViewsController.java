@@ -9,6 +9,7 @@ import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.*;
 import com.nfssoundtrack.racingsoundtracks.serializers.SongSerializer;
 import com.nfssoundtrack.racingsoundtracks.services.GamePlatformService;
+import com.nfssoundtrack.racingsoundtracks.services.GamePlaylistService;
 import com.nfssoundtrack.racingsoundtracks.services.YouTubeService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,6 +76,8 @@ public class WebsiteViewsController {
     private final WebClient webClient;
     @Autowired
     private GamePlatformService gamePlatformService;
+    @Autowired
+    private GamePlaylistService gamePlaylistService;
 
     public WebsiteViewsController(SongSerializer songSerializer, BaseControllerWithErrorHandling baseController) {
         this.songSerializer = songSerializer;
@@ -197,6 +200,7 @@ public class WebsiteViewsController {
         customTheme.ifPresent(theme -> model.addAttribute("customTheme", theme));
         model.addAttribute("songSubgroups", baseController.getSongSubgroupService().hasGameAnySongs(game));
         model.addAttribute("gamePlatforms", gamePlatformService.findByGame(game));
+        model.addAttribute("gamePlaylists", gamePlaylistService.findByGame(game));
         return MIN_INDEX;
     }
 

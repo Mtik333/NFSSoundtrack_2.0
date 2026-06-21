@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `subgroup` (
   `subgroup_name` tinytext NOT NULL,
   `group_id` smallint(5) unsigned NOT NULL,
   `position` smallint(5) unsigned NOT NULL,
+  `subgroup_type` enum('BETA','TRAILERS') DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_subgroup_maingroup` (`group_id`),
   CONSTRAINT `FK_subgroup_maingroup` FOREIGN KEY (`group_id`) REFERENCES `maingroup` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION

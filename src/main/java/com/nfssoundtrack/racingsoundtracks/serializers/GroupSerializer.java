@@ -30,6 +30,7 @@ public class GroupSerializer extends JsonSerializer<MainGroup> {
             jsonGenerator.writeObjectField("id", subgroup.getId());
             jsonGenerator.writeObjectField("subgroupName", subgroup.getSubgroupName());
             jsonGenerator.writeObjectField("position", subgroup.getPosition());
+            jsonGenerator.writeObjectField("subgroupType", subgroup.getSubgroupType() != null ? subgroup.getSubgroupType().name() : null);
             jsonGenerator.writeEndObject();
         }
         jsonGenerator.writeEndArray();

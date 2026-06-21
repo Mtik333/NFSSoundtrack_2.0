@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.security.auth.login.LoginException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * controller used for handling search done by users
@@ -48,7 +49,7 @@ public class SearchController  {
             throws LoginException, ResourceNotFoundException, InterruptedException {
         List<AuthorAlias> authorAliases = new ArrayList<>();
         List<Genre> genres = new ArrayList<>();
-        Map<Song, Set<Game>> songTitleList = new HashMap<>();
+        Map<Song, Map<Game, String>> songTitleList = new HashMap<>();
         Map<Song, Set<Game>> songLyricsList = new HashMap<>();
         List<Genre> genreList = new ArrayList<>();
         String query = searchData.trim();
@@ -64,12 +65,7 @@ public class SearchController  {
             List<Song> foundSongs = baseController.getSongService().findByOfficialDisplayTitle(query);
             for (Song song : foundSongs) {
                 List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(song);
-                Set<Game> games = new HashSet<>();
-                //we want to show all games (in search results) where this song is actually used
-                for (SongSubgroup songSubgroup : songSubgroupList) {
-                    games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
-                }
-                songTitleList.put(song, games);
+                songTitleList.put(song, buildGameMap(songSubgroupList));
             }
             //extremely unlikely to have lyrics with only 3 letters
             //todo check if we should really look for any lyrics here
@@ -98,12 +94,7 @@ public class SearchController  {
                 List<Song> foundSongs = baseController.getSongService().findByOfficialDisplayTitle(query);
                 for (Song song : foundSongs) {
                     List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(song);
-                    Set<Game> games = new HashSet<>();
-                    //we want to show all games (in search results) where this song is actually used
-                    for (SongSubgroup songSubgroup : songSubgroupList) {
-                        games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
-                    }
-                    songTitleList.put(song, games);
+                    songTitleList.put(song, buildGameMap(songSubgroupList));
                 }
                 List<Song> foundLyrics = baseController.getSongService().findByLyrics(query);
                 for (Song song : foundLyrics) {
@@ -122,12 +113,7 @@ public class SearchController  {
                 List<Song> foundSongs = baseController.getSongService().findByOfficialDisplayTitleContains(query);
                 for (Song song : foundSongs) {
                     List<SongSubgroup> songSubgroupList = baseController.getSongSubgroupService().findBySong(song);
-                    Set<Game> games = new HashSet<>();
-                    //we want to show all games (in search results) where this song is actually used
-                    for (SongSubgroup songSubgroup : songSubgroupList) {
-                        games.add(songSubgroup.getSubgroup().getMainGroup().getGame());
-                    }
-                    songTitleList.put(song, games);
+                    songTitleList.put(song, buildGameMap(songSubgroupList));
                 }
                 List<Song> foundLyrics = baseController.getSongService().findByLyricsContains(query);
                 for (Song song : foundLyrics) {
@@ -157,5 +143,27 @@ public class SearchController  {
             model.addAttribute(attribute, session.getAttribute(attribute));
         }
         return "index";
+    }
+
+    private Map<Game, String> buildGameMap(List<SongSubgroup> songSubgroupList) {
+        Map<Game, List<SongSubgroup>> byGame = new LinkedHashMap<>();
+        for (SongSubgroup ss : songSubgroupList) {
+            Game game = ss.getSubgroup().getMainGroup().getGame();
+            byGame.computeIfAbsent(game, k -> new ArrayList<>()).add(ss);
+        }
+        Map<Game, String> gameMap = new LinkedHashMap<>();
+        for (Map.Entry<Game, List<SongSubgroup>> entry : byGame.entrySet()) {
+            boolean allNonFinal = entry.getValue().stream()
+                    .allMatch(ss -> ss.getSubgroup().getSubgroupType() != null);
+            String label = null;
+            if (allNonFinal) {
+                label = entry.getValue().stream()
+                        .map(ss -> ss.getSubgroup().getSubgroupType().getDisplayLabel())
+                        .distinct()
+                        .collect(Collectors.joining(" / "));
+            }
+            gameMap.put(entry.getKey(), label);
+        }
+        return gameMap;
     }
 }

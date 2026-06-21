@@ -210,4 +210,15 @@ public class SubgroupController  {
         return new ObjectMapper().writeValueAsString("OK");
     }
 
+    @PatchMapping(value = "/setType/{subgroupId}")
+    public String setSubgroupType(@PathVariable("subgroupId") int subgroupId,
+                                  @RequestParam(value = "type", required = false) String type)
+            throws ResourceNotFoundException, JsonProcessingException {
+        Subgroup subgroup = baseController.getSubgroupService().findById(subgroupId)
+                .orElseThrow(() -> new ResourceNotFoundException("No subgroup with id found " + subgroupId));
+        subgroup.setSubgroupType(type != null && !type.isBlank() ? SubgroupType.valueOf(type) : null);
+        baseController.getSubgroupService().save(subgroup);
+        return new ObjectMapper().writeValueAsString("OK");
+    }
+
 }

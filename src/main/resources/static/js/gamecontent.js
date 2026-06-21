@@ -1,76 +1,144 @@
 $(document).ready(function () {
 
-    /**
-     * method to show spotify modal
-     */
-    $('#youtubeModal').on('show.bs.modal', function (e) {
-        $("#youtubePlaylist").attr('src', "https://www.youtube.com/embed/videoseries?list=" + $("#youtubeLink").attr('data-tagVideo'));
+    var youtubeIndex = 0, spotifyIndex = 0, tidalIndex = 0, deezerIndex = 0, soundcloudIndex = 0;
+
+    function readPlaylists(containerId) {
+        var result = [];
+        $('#' + containerId + ' .playlist-entry').each(function () {
+            result.push({url: $(this).attr('data-url'), label: $(this).attr('data-label') || ''});
+        });
+        return result;
+    }
+
+    function applyNav(prefix, index, playlists) {
+        var total = playlists.length;
+        var label = playlists[index].label;
+        var navLabel = label + (total > 1 ? ' (' + (index + 1) + '/' + total + ')' : '');
+        $('#' + prefix + '-nav-label').text(navLabel);
+        $('#' + prefix + '-nav').css('display', 'flex');
+        if (total > 1) {
+            $('#' + prefix + '-prev').css('display', 'block').prop('disabled', index === 0);
+            $('#' + prefix + '-next').css('display', 'block').prop('disabled', index === total - 1);
+        }
+    }
+
+    $('#youtubeModal').on('show.bs.modal', function () {
+        var playlists = readPlaylists('youtube-playlists');
+        if (playlists.length > 0) {
+            youtubeIndex = 0;
+            $("#youtubePlaylist").attr('src', "https://www.youtube.com/embed/videoseries?list=" + playlists[0].url);
+            applyNav('youtube', 0, playlists);
+        } else {
+            $("#youtubePlaylist").attr('src', "https://www.youtube.com/embed/videoseries?list=" + $("#youtubeLink").attr('data-tagVideo'));
+        }
+    });
+    $('#youtubeModal').on('hide.bs.modal', function () { $("#youtubePlaylist").attr('src', ''); });
+    $(document).on('click', '#youtube-prev', function () {
+        var playlists = readPlaylists('youtube-playlists');
+        if (youtubeIndex > 0) { youtubeIndex--; $("#youtubePlaylist").attr('src', "https://www.youtube.com/embed/videoseries?list=" + playlists[youtubeIndex].url); applyNav('youtube', youtubeIndex, playlists); }
+    });
+    $(document).on('click', '#youtube-next', function () {
+        var playlists = readPlaylists('youtube-playlists');
+        if (youtubeIndex < playlists.length - 1) { youtubeIndex++; $("#youtubePlaylist").attr('src', "https://www.youtube.com/embed/videoseries?list=" + playlists[youtubeIndex].url); applyNav('youtube', youtubeIndex, playlists); }
     });
 
-    /**
-     * method to unload spotify iframe when modal closed
-     */
-    $('#spotifyModal').on('hide.bs.modal', function (e) {
-        $("#youtubePlaylist").attr('src', '');
+    $('#spotifyModal').on('show.bs.modal', function () {
+        var playlists = readPlaylists('spotify-playlists');
+        if (playlists.length > 0) {
+            spotifyIndex = 0;
+            $("#spotifyVideo").attr('src', "https://open.spotify.com/embed/playlist/" + playlists[0].url);
+            $("#spotify-ext").attr('href', "spotify:playlist:" + playlists[0].url);
+            applyNav('spotify', 0, playlists);
+        } else {
+            var id = $("#spotifyLink").attr('data-tagVideo');
+            $("#spotifyVideo").attr('src', "https://open.spotify.com/embed/playlist/" + id);
+            $("#spotify-ext").attr('href', "spotify:playlist:" + id);
+        }
+    });
+    $('#spotifyModal').on('hide.bs.modal', function () { $("#spotifyVideo").attr('src', ''); });
+    $(document).on('click', '#spotify-prev', function () {
+        var playlists = readPlaylists('spotify-playlists');
+        if (spotifyIndex > 0) { spotifyIndex--; $("#spotifyVideo").attr('src', "https://open.spotify.com/embed/playlist/" + playlists[spotifyIndex].url); $("#spotify-ext").attr('href', "spotify:playlist:" + playlists[spotifyIndex].url); applyNav('spotify', spotifyIndex, playlists); }
+    });
+    $(document).on('click', '#spotify-next', function () {
+        var playlists = readPlaylists('spotify-playlists');
+        if (spotifyIndex < playlists.length - 1) { spotifyIndex++; $("#spotifyVideo").attr('src', "https://open.spotify.com/embed/playlist/" + playlists[spotifyIndex].url); $("#spotify-ext").attr('href', "spotify:playlist:" + playlists[spotifyIndex].url); applyNav('spotify', spotifyIndex, playlists); }
     });
 
-    /**
-     * method to show spotify modal
-     */
-    $('#spotifyModal').on('show.bs.modal', function (e) {
-        $("#spotifyVideo").attr('src', "https://open.spotify.com/embed/playlist/" + $("#spotifyLink").attr('data-tagVideo'));
-        $("#spotify-ext").attr('href', "spotify:playlist:" + $("#spotifyLink").attr('data-tagVideo'));
+    $('#soundcloudModal').on('show.bs.modal', function () {
+        var playlists = readPlaylists('soundcloud-playlists');
+        if (playlists.length > 0) {
+            soundcloudIndex = 0;
+            $("#soundcloudVideo").attr('src', "https://w.soundcloud.com/player/?url=https%253A//api.soundcloud.com/playlists/" + playlists[0].url + "&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true");
+            applyNav('soundcloud', 0, playlists);
+        } else {
+            $("#soundcloudVideo").attr('src', "https://w.soundcloud.com/player/?url=https%253A//api.soundcloud.com/playlists/" + $("#soundcloudLink").attr('data-tagVideo') + "&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true");
+        }
+    });
+    $('#soundcloudModal').on('hide.bs.modal', function () { $("#soundcloudVideo").attr('src', ''); });
+    $(document).on('click', '#soundcloud-prev', function () {
+        var playlists = readPlaylists('soundcloud-playlists');
+        if (soundcloudIndex > 0) { soundcloudIndex--; $("#soundcloudVideo").attr('src', "https://w.soundcloud.com/player/?url=https%253A//api.soundcloud.com/playlists/" + playlists[soundcloudIndex].url + "&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"); applyNav('soundcloud', soundcloudIndex, playlists); }
+    });
+    $(document).on('click', '#soundcloud-next', function () {
+        var playlists = readPlaylists('soundcloud-playlists');
+        if (soundcloudIndex < playlists.length - 1) { soundcloudIndex++; $("#soundcloudVideo").attr('src', "https://w.soundcloud.com/player/?url=https%253A//api.soundcloud.com/playlists/" + playlists[soundcloudIndex].url + "&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"); applyNav('soundcloud', soundcloudIndex, playlists); }
     });
 
-    /**
-     * method to unload spotify iframe when modal closed
-     */
-    $('#spotifyModal').on('hide.bs.modal', function (e) {
-        $("#spotifyVideo").attr('src', '');
+    $('#tidalModal').on('show.bs.modal', function () {
+        var playlists = readPlaylists('tidal-playlists');
+        if (playlists.length > 0) {
+            tidalIndex = 0;
+            $("#tidalVideo").attr('src', "https://embed.tidal.com/playlists/" + playlists[0].url);
+            $("#tidal-ext").attr('href', "https://listen.tidal.com/playlist/" + playlists[0].url);
+            applyNav('tidal', 0, playlists);
+        } else {
+            var id = $("#tidalLink").attr('data-tagVideo');
+            $("#tidalVideo").attr('src', "https://embed.tidal.com/playlists/" + id);
+            $("#tidal-ext").attr('href', "https://listen.tidal.com/playlist/" + id);
+        }
+    });
+    $('#tidalModal').on('hide.bs.modal', function () { $("#tidalVideo").attr('src', ''); });
+    $(document).on('click', '#tidal-prev', function () {
+        var playlists = readPlaylists('tidal-playlists');
+        if (tidalIndex > 0) { tidalIndex--; $("#tidalVideo").attr('src', "https://embed.tidal.com/playlists/" + playlists[tidalIndex].url); $("#tidal-ext").attr('href', "https://listen.tidal.com/playlist/" + playlists[tidalIndex].url); applyNav('tidal', tidalIndex, playlists); }
+    });
+    $(document).on('click', '#tidal-next', function () {
+        var playlists = readPlaylists('tidal-playlists');
+        if (tidalIndex < playlists.length - 1) { tidalIndex++; $("#tidalVideo").attr('src', "https://embed.tidal.com/playlists/" + playlists[tidalIndex].url); $("#tidal-ext").attr('href', "https://listen.tidal.com/playlist/" + playlists[tidalIndex].url); applyNav('tidal', tidalIndex, playlists); }
     });
 
-    /**
-     * method to show soundcloud modal
-     */
-    $('#soundcloudModal').on('show.bs.modal', function (e) {
-        $("#soundcloudVideo").attr('src', "https://w.soundcloud.com/player/?url=https%253A//api.soundcloud.com/playlists/" + $("#soundcloudLink").attr('data-tagVideo') + "&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true");
+    $('#deezerModal').on('show.bs.modal', function () {
+        var playlists = readPlaylists('deezer-playlists');
+        if (playlists.length > 0) {
+            deezerIndex = 0;
+            $("#deezerVideo").attr('src', "https://widget.deezer.com/widget/auto/playlist/" + playlists[0].url);
+            $("#deezer-ext").attr('href', "deezer://www.deezer.com/playlist/" + playlists[0].url);
+            applyNav('deezer', 0, playlists);
+        } else {
+            var id = $("#deezerLink").attr('data-tagVideo');
+            $("#deezerVideo").attr('src', "https://widget.deezer.com/widget/auto/playlist/" + id);
+            $("#deezer-ext").attr('href', "deezer://www.deezer.com/playlist/" + id);
+        }
+    });
+    $('#deezerModal').on('hide.bs.modal', function () { $("#deezerVideo").attr('src', ''); });
+    $(document).on('click', '#deezer-prev', function () {
+        var playlists = readPlaylists('deezer-playlists');
+        if (deezerIndex > 0) { deezerIndex--; $("#deezerVideo").attr('src', "https://widget.deezer.com/widget/auto/playlist/" + playlists[deezerIndex].url); $("#deezer-ext").attr('href', "deezer://www.deezer.com/playlist/" + playlists[deezerIndex].url); applyNav('deezer', deezerIndex, playlists); }
+    });
+    $(document).on('click', '#deezer-next', function () {
+        var playlists = readPlaylists('deezer-playlists');
+        if (deezerIndex < playlists.length - 1) { deezerIndex++; $("#deezerVideo").attr('src', "https://widget.deezer.com/widget/auto/playlist/" + playlists[deezerIndex].url); $("#deezer-ext").attr('href', "deezer://www.deezer.com/playlist/" + playlists[deezerIndex].url); applyNav('deezer', deezerIndex, playlists); }
     });
 
-    /**
-     * method to unload soundcloud iframe when modal closed
-     */
-    $('#soundcloudModal').on('hide.bs.modal', function (e) {
-        $("#soundcloudVideo").attr('src', '');
-    });
-
-    /**
-     * method to show tidal modal
-     */
-    $('#tidalModal').on('show.bs.modal', function (e) {
-        $("#tidalVideo").attr('src', "https://embed.tidal.com/playlists/" + $("#tidalLink").attr('data-tagVideo'));
-        $("#tidal-ext").attr('href', "https://listen.tidal.com/playlist/" + $("#tidalLink").attr('data-tagVideo'));
-    });
-
-    /**
-     * method to unload tidal iframe when modal closed
-     */
-    $('#tidalModal').on('hide.bs.modal', function (e) {
-        $("#tidalVideo").attr('src', '');
-    });
-
-    /**
-     * method to show deezer modal
-     */
-    $('#deezerModal').on('show.bs.modal', function (e) {
-        $("#deezerVideo").attr('src', "https://widget.deezer.com/widget/auto/playlist/" + $("#deezerLink").attr('data-tagVideo'));
-        $("#deezer-ext").attr('href', "deezer://www.deezer.com/playlist/" + $("#deezerLink").attr('data-tagVideo'));
-    });
-
-    /**
-     * method to unload deezer iframe when modal closed
-     */
-    $('#deezerModal').on('hide.bs.modal', function (e) {
-        $("#deezerVideo").attr('src', '');
+    $(document).on('keydown', function (e) {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        var openModal = $('#youtubeModal.show, #spotifyModal.show, #soundcloudModal.show, #tidalModal.show, #deezerModal.show');
+        if (openModal.length === 0) return;
+        e.preventDefault();
+        var prefix = openModal.attr('id').replace('Modal', '');
+        if (e.key === 'ArrowLeft') $('#' + prefix + '-prev').trigger('click');
+        else $('#' + prefix + '-next').trigger('click');
     });
 
     /**

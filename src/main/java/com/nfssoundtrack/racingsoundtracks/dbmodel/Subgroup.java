@@ -23,6 +23,10 @@ public class Subgroup implements Serializable {
     @Column(name = "position")
     private Integer position;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subgroup_type")
+    private SubgroupType subgroupType;
+
     @JsonBackReference
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
@@ -65,6 +69,14 @@ public class Subgroup implements Serializable {
         this.position = position;
     }
 
+    public SubgroupType getSubgroupType() {
+        return subgroupType;
+    }
+
+    public void setSubgroupType(SubgroupType subgroupType) {
+        this.subgroupType = subgroupType;
+    }
+
     public List<SongSubgroup> getSongSubgroupList() {
         return songSubgroupList;
     }
@@ -93,6 +105,7 @@ public class Subgroup implements Serializable {
                 ", subgroupName='" + subgroupName + '\'' +
                 ", position=" + position +
                 ", mainGroup=" + mainGroup +
+                ", subgroupType=" + subgroupType +
                 '}';
     }
 

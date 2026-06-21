@@ -45,7 +45,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr th:each="song, iter1 : ${songTitleList}" th:attr="data-song_id=${song.key.id}">
+        <tr th:each="song, iter1 : ${songTitleList.entrySet()}" th:attr="data-song_id=${song.key.id}">
             <td class="contextButton" style="display:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor"
                     class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
@@ -89,8 +89,8 @@
                 </th:block>
             </td>
             <td>
-                <th:block th:each="game,iter : ${song.value}">
-                    <a class="table_link" th:href="'/game/'+${game.gameShort}" th:text="${game.displayTitle} "></a><span
+                <th:block th:each="gameEntry,iter : ${song.value}">
+                    <a class="table_link" th:href="'/game/'+${gameEntry.key.gameShort}" th:text="${gameEntry.key.displayTitle}"></a><span th:if="${gameEntry.value != null}" th:text="' (' + ${gameEntry.value} + ')'"></span><span
                         th:text="${!iter.last ? ', ' : ''}"></span>
                 </th:block>
             </td>

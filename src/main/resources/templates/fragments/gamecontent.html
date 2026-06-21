@@ -25,41 +25,71 @@
         <span id="playlist_init" class="nfs-top-item p-2 d-inline-block pointable" data-bs-toggle="modal"
             data-bs-target="#playlistModeModal" th:text="#{launchPlaylist}"></span>
         <div style="display: flex; align-items: center">
-            <th:block th:if="${game.youtubeId!=null && game.youtubeId!=''}">
-                <div class="pointable" data-bs-target="#youtubeModal" data-bs-toggle="modal" id="youtubeLink"
-                    th:attr="data-tagVideo=${game.youtubeId}">
-                    <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
-                        data-placement="top" th:title="#{launchYoutube}" th:src="@{/images/fullres/youtube_big.webp}">
-                </div>
+            <th:block th:with="ytPlaylists=${gamePlaylists.?[platform.name() == 'YOUTUBE']}">
+                <th:block th:if="${(game.youtubeId!=null && game.youtubeId!='') or !#lists.isEmpty(ytPlaylists)}">
+                    <div class="pointable" data-bs-target="#youtubeModal" data-bs-toggle="modal" id="youtubeLink"
+                        th:attr="data-tagVideo=${game.youtubeId}">
+                        <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
+                            data-placement="top" th:title="#{launchYoutube}" th:src="@{/images/fullres/youtube_big.webp}">
+                    </div>
+                    <div id="youtube-playlists" style="display:none">
+                        <div th:each="pl : ${ytPlaylists}" class="playlist-entry"
+                            th:attr="data-url=${pl.playlistUrl},data-label=${pl.label}"></div>
+                    </div>
+                </th:block>
             </th:block>
-            <th:block th:if="${game.spotifyId!=null && game.spotifyId!=''}">
-                <div class="pointable" data-bs-target="#spotifyModal" data-bs-toggle="modal" id="spotifyLink"
-                    th:attr="data-tagVideo=${game.spotifyId}">
-                    <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
-                        data-placement="top" th:title="#{launchSpotify}" th:src="@{/images/fullres/spotify_big.webp}">
-                </div>
+            <th:block th:with="spotifyPlaylists=${gamePlaylists.?[platform.name() == 'SPOTIFY']}">
+                <th:block th:if="${(game.spotifyId!=null && game.spotifyId!='') or !#lists.isEmpty(spotifyPlaylists)}">
+                    <div class="pointable" data-bs-target="#spotifyModal" data-bs-toggle="modal" id="spotifyLink"
+                        th:attr="data-tagVideo=${game.spotifyId}">
+                        <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
+                            data-placement="top" th:title="#{launchSpotify}" th:src="@{/images/fullres/spotify_big.webp}">
+                    </div>
+                    <div id="spotify-playlists" style="display:none">
+                        <div th:each="pl : ${spotifyPlaylists}" class="playlist-entry"
+                            th:attr="data-url=${pl.playlistUrl},data-label=${pl.label}"></div>
+                    </div>
+                </th:block>
             </th:block>
-            <th:block th:if="${game.tidalId!=null && game.tidalId!=''}">
-                <div class="pointable" data-bs-target="#tidalModal" data-bs-toggle="modal" id="tidalLink"
-                    th:attr="data-tagVideo=${game.tidalId}">
-                    <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
-                        data-placement="top" th:title="#{launchTidal}" th:src="@{/images/fullres/tidal_big.webp}">
-                </div>
+            <th:block th:with="tidalPlaylists=${gamePlaylists.?[platform.name() == 'TIDAL']}">
+                <th:block th:if="${(game.tidalId!=null && game.tidalId!='') or !#lists.isEmpty(tidalPlaylists)}">
+                    <div class="pointable" data-bs-target="#tidalModal" data-bs-toggle="modal" id="tidalLink"
+                        th:attr="data-tagVideo=${game.tidalId}">
+                        <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
+                            data-placement="top" th:title="#{launchTidal}" th:src="@{/images/fullres/tidal_big.webp}">
+                    </div>
+                    <div id="tidal-playlists" style="display:none">
+                        <div th:each="pl : ${tidalPlaylists}" class="playlist-entry"
+                            th:attr="data-url=${pl.playlistUrl},data-label=${pl.label}"></div>
+                    </div>
+                </th:block>
             </th:block>
-            <th:block th:if="${game.deezerId!=null && game.deezerId!=''}">
-                <div class="pointable" data-bs-target="#deezerModal" data-bs-toggle="modal" id="deezerLink"
-                    th:attr="data-tagVideo=${game.deezerId}">
-                    <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
-                        data-placement="top" th:title="#{launchDeezer}" th:src="@{/images/fullres/deezer_big.webp}">
-                </div>
+            <th:block th:with="deezerPlaylists=${gamePlaylists.?[platform.name() == 'DEEZER']}">
+                <th:block th:if="${(game.deezerId!=null && game.deezerId!='') or !#lists.isEmpty(deezerPlaylists)}">
+                    <div class="pointable" data-bs-target="#deezerModal" data-bs-toggle="modal" id="deezerLink"
+                        th:attr="data-tagVideo=${game.deezerId}">
+                        <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
+                            data-placement="top" th:title="#{launchDeezer}" th:src="@{/images/fullres/deezer_big.webp}">
+                    </div>
+                    <div id="deezer-playlists" style="display:none">
+                        <div th:each="pl : ${deezerPlaylists}" class="playlist-entry"
+                            th:attr="data-url=${pl.playlistUrl},data-label=${pl.label}"></div>
+                    </div>
+                </th:block>
             </th:block>
-            <th:block th:if="${game.soundcloudId!=null && game.soundcloudId!=''}">
-                <div class="pointable" data-bs-target="#soundcloudModal" data-bs-toggle="modal" id="soundcloudLink"
-                    th:attr="data-tagVideo=${game.soundcloudId}">
-                    <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
-                        data-placement="top" th:title="#{launchSoundcloud}"
-                        th:src="@{/images/fullres/soundcloud_big.webp}">
-                </div>
+            <th:block th:with="soundcloudPlaylists=${gamePlaylists.?[platform.name() == 'SOUNDCLOUD']}">
+                <th:block th:if="${(game.soundcloudId!=null && game.soundcloudId!='') or !#lists.isEmpty(soundcloudPlaylists)}">
+                    <div class="pointable" data-bs-target="#soundcloudModal" data-bs-toggle="modal" id="soundcloudLink"
+                        th:attr="data-tagVideo=${game.soundcloudId}">
+                        <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip"
+                            data-placement="top" th:title="#{launchSoundcloud}"
+                            th:src="@{/images/fullres/soundcloud_big.webp}">
+                    </div>
+                    <div id="soundcloud-playlists" style="display:none">
+                        <div th:each="pl : ${soundcloudPlaylists}" class="playlist-entry"
+                            th:attr="data-url=${pl.playlistUrl},data-label=${pl.label}"></div>
+                    </div>
+                </th:block>
             </th:block>
         </div>
         <div class="pointable" data-bs-target="#disqusModal" data-bs-toggle="modal" id="newDisqusLink">
@@ -389,11 +419,20 @@
     <div class="modal fade" id="youtubeModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
+                <button type="button" class="playlist-chevron playlist-chevron-prev" id="youtube-prev">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/></svg>
+                </button>
+                <button type="button" class="playlist-chevron playlist-chevron-next" id="youtube-next">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </button>
                 <div class="modal-header">
+                    <div id="youtube-nav" class="me-auto" style="display:none !important">
+                        <span id="youtube-nav-label" class="small"></span>
+                    </div>
                     <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body playlist-modal-body">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="ratio ratio-16x9">
@@ -411,12 +450,21 @@
     <div class="modal fade" id="spotifyModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
+                <button type="button" class="playlist-chevron playlist-chevron-prev" id="spotify-prev">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/></svg>
+                </button>
+                <button type="button" class="playlist-chevron playlist-chevron-next" id="spotify-next">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </button>
                 <div class="modal-header">
                     <a href="" id="spotify-ext" class="btn btn-outline-info" th:text="#{launchInSpotify}"></a>
+                    <div id="spotify-nav" class="mx-auto" style="display:none !important">
+                        <span id="spotify-nav-label" class="small"></span>
+                    </div>
                     <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body playlist-modal-body">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="ratio ratio-16x9">
@@ -434,11 +482,20 @@
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
+                <button type="button" class="playlist-chevron playlist-chevron-prev" id="soundcloud-prev">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/></svg>
+                </button>
+                <button type="button" class="playlist-chevron playlist-chevron-next" id="soundcloud-next">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </button>
                 <div class="modal-header">
+                    <div id="soundcloud-nav" class="me-auto" style="display:none !important">
+                        <span id="soundcloud-nav-label" class="small"></span>
+                    </div>
                     <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body playlist-modal-body">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="ratio ratio-16x9">
@@ -455,13 +512,22 @@
     <div class="modal fade" id="tidalModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
+                <button type="button" class="playlist-chevron playlist-chevron-prev" id="tidal-prev">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/></svg>
+                </button>
+                <button type="button" class="playlist-chevron playlist-chevron-next" id="tidal-next">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </button>
                 <div class="modal-header">
                     <a href="" id="tidal-ext" target="_blank" class="btn btn-outline-info"
                         th:text="#{launchInTidal}"></a>
+                    <div id="tidal-nav" class="mx-auto" style="display:none !important">
+                        <span id="tidal-nav-label" class="small"></span>
+                    </div>
                     <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body playlist-modal-body">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="ratio ratio-16x9">
@@ -478,12 +544,21 @@
     <div class="modal fade" id="deezerModal" role="dialog" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
+                <button type="button" class="playlist-chevron playlist-chevron-prev" id="deezer-prev">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/></svg>
+                </button>
+                <button type="button" class="playlist-chevron playlist-chevron-next" id="deezer-next">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
+                </button>
                 <div class="modal-header">
                     <a href="" id="deezer-ext" class="btn btn-outline-info" th:text="#{launchInDeezer}"></a>
+                    <div id="deezer-nav" class="mx-auto" style="display:none !important">
+                        <span id="deezer-nav-label" class="small"></span>
+                    </div>
                     <button type="button" class="btn-close" data-bs-theme="light" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body playlist-modal-body">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="ratio ratio-16x9">

@@ -1,5 +1,76 @@
 var gameToEdit;
 
+var PLAYLIST_PLATFORMS = [
+    {value: "SPOTIFY",     label: "Spotify"},
+    {value: "DEEZER",      label: "Deezer"},
+    {value: "TIDAL",       label: "Tidal"},
+    {value: "YOUTUBE",     label: "YouTube"},
+    {value: "SOUNDCLOUD",  label: "SoundCloud"},
+    {value: "APPLE_MUSIC", label: "Apple Music"}
+];
+
+function extractPlaylistId(platform, value) {
+    value = value.trim();
+    if (!value.includes('://')) return value; // already an ID, not a full URL
+    var match;
+    switch (platform) {
+        case 'SPOTIFY':
+            // https://open.spotify.com/playlist/0z8pXoTXnRZ8oTiDSeTF9S?si=xxx
+            match = value.match(/playlist\/([A-Za-z0-9]+)/);
+            return match ? match[1] : value;
+        case 'YOUTUBE':
+            // https://www.youtube.com/playlist?list=PLxxxxxx
+            match = value.match(/[?&]list=([^&]+)/);
+            return match ? match[1] : value;
+        case 'DEEZER':
+            // https://www.deezer.com/en/playlist/1234567890
+            match = value.match(/playlist\/(\d+)/);
+            return match ? match[1] : value;
+        case 'TIDAL':
+            // https://listen.tidal.com/playlist/uuid-here
+            match = value.match(/playlist\/([a-f0-9-]{36})/i);
+            return match ? match[1] : value;
+        case 'APPLE_MUSIC':
+            // https://music.apple.com/us/playlist/name/pl.xxxxxxxx
+            match = value.match(/(pl\.[A-Za-z0-9]+)/);
+            return match ? match[1] : value;
+        default:
+            // SOUNDCLOUD: embed uses numeric API IDs not present in public URLs — leave as-is
+            return value;
+    }
+}
+
+function buildPlatformSelect(selectedValue) {
+    var sel = $('<select class="form-select d-inline-block w-auto playlist-platform-select">');
+    PLAYLIST_PLATFORMS.forEach(function (p) {
+        var opt = $('<option>').val(p.value).text(p.label);
+        if (p.value === selectedValue) opt.prop('selected', true);
+        sel.append(opt);
+    });
+    return sel;
+}
+
+function buildPlaylistRow(playlist) {
+    var row = $('<div class="row g-2 align-items-center mb-1 playlist-entry-row">')
+        .attr('data-playlist-id', playlist ? playlist.id : '');
+    row.append($('<div class="col-auto">').append(buildPlatformSelect(playlist ? playlist.platform : 'SPOTIFY')));
+    row.append($('<div class="col-3">').append(
+        $('<input class="form-control playlist-label-input" placeholder="Label (optional)">')
+            .val(playlist ? playlist.label : '')
+    ));
+    row.append($('<div class="col">').append(
+        $('<input class="form-control playlist-url-input" placeholder="Playlist ID or URL">')
+            .val(playlist ? playlist.playlistUrl : '')
+    ));
+    if (playlist) {
+        row.append($('<div class="col-auto">').append('<button type="button" class="btn btn-primary save-playlist-btn">Save</button>'));
+        row.append($('<div class="col-auto">').append('<button type="button" class="btn btn-danger delete-playlist-btn">X</button>'));
+    } else {
+        row.append($('<div class="col-auto">').append('<button type="button" class="btn btn-success add-playlist-btn">+</button>'));
+    }
+    return row;
+}
+
 $(document).ready(function () {
     $(document).on('click', "a.edit-game", function (e) {
         var gameId = $(this).attr("data-gameid");
@@ -92,6 +163,22 @@ $(document).ready(function () {
                 additionalInfoColDiv.append(additionalInfoInput);
                 additionalInfoRowDiv.append(additionalInfoColDiv);
                 newGameDiv.append(additionalInfoRowDiv);
+
+                var playlistsSection = $('<div class="mt-3">');
+                playlistsSection.append('<h5>Playlists</h5>');
+                $.ajax({
+                    async: false,
+                    type: "GET",
+                    url: "/gamePlaylist/byGame/" + Number(gameId),
+                    success: function (data) {
+                        JSON.parse(data).forEach(function (pl) {
+                            playlistsSection.append(buildPlaylistRow(pl));
+                        });
+                    }
+                });
+                playlistsSection.append(buildPlaylistRow(null));
+                newGameDiv.append(playlistsSection);
+
                 divToAppend.append('<button id="saveEditGame" type="submit" class="btn btn-primary">Save changes</button>');
                 divToAppend.append(newGameDiv);
 
@@ -156,6 +243,77 @@ $(document).ready(function () {
         var typedSrcId = $(this).val();
         var indexOfMark = typedSrcId.indexOf("list=");
         $(this).val(typedSrcId.substring(indexOfMark + 5, indexOfMark + 39));
+    });
+
+    $(document).on('focusout', '.playlist-url-input', function () {
+        var row = $(this).closest('.playlist-entry-row');
+        var platform = row.find('.playlist-platform-select').val();
+        $(this).val(extractPlaylistId(platform, $(this).val()));
+    });
+
+    $(document).on('click', '.save-playlist-btn', function () {
+        var row = $(this).closest('.playlist-entry-row');
+        var id = row.attr('data-playlist-id');
+        var body = {
+            platform: row.find('.playlist-platform-select').val(),
+            playlistUrl: row.find('.playlist-url-input').val(),
+            label: row.find('.playlist-label-input').val()
+        };
+        $.ajax({
+            async: false, type: "PUT",
+            url: "/gamePlaylist/update/" + id,
+            data: JSON.stringify(body),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(successAlertHtml).slideUp(500); });
+            },
+            error: function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(failureAlertHtml).slideUp(500); });
+            }
+        });
+    });
+
+    $(document).on('click', '.delete-playlist-btn', function () {
+        if (!confirm("Delete this playlist?")) return;
+        var row = $(this).closest('.playlist-entry-row');
+        var id = row.attr('data-playlist-id');
+        $.ajax({
+            async: false, type: "DELETE",
+            url: "/gamePlaylist/delete/" + id,
+            success: function () { row.remove(); },
+            error: function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(failureAlertHtml).slideUp(500); });
+            }
+        });
+    });
+
+    $(document).on('click', '.add-playlist-btn', function () {
+        var row = $(this).closest('.playlist-entry-row');
+        var url = row.find('.playlist-url-input').val();
+        if (!url) return;
+        var body = {
+            platform: row.find('.playlist-platform-select').val(),
+            playlistUrl: url,
+            label: row.find('.playlist-label-input').val()
+        };
+        $.ajax({
+            async: false, type: "POST",
+            url: "/gamePlaylist/save/" + Number(gameToEdit.id),
+            data: JSON.stringify(body),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (resp) {
+                var saved = {id: resp.id, platform: body.platform, playlistUrl: body.playlistUrl, label: body.label};
+                row.before(buildPlaylistRow(saved));
+                row.find('.playlist-label-input, .playlist-url-input').val('');
+                row.find('.playlist-platform-select').val('SPOTIFY');
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(successAlertHtml).slideUp(500); });
+            },
+            error: function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(failureAlertHtml).slideUp(500); });
+            }
+        });
     });
 });
 

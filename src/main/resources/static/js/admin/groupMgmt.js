@@ -120,7 +120,15 @@ $(document).ready(function () {
             }
             inputRowDiv.append(subgroupInput);
             divWithCols.append(inputRowDiv);
-            divWithCols.append('<div class="col-sm"><input type="text" class="group-position" value="' + groupToEdit.subgroups[i].position + '"><button id="add-subgroup" type="submit" data-subgroupPosition="' + groupToEdit.subgroups[i].position + '" class="btn btn-success">+</button><button type="button" id="delete-subgroup" data-subGroupId="' + groupToEdit.subgroups[i].id + '" class="btn btn-danger">X</button></div>');
+            var currentType = groupToEdit.subgroups[i].subgroupType || "";
+            var typeSelect = '<select class="form-select form-select-sm d-inline-block w-auto ms-1 subgroup-type-select" data-subGroupId="' + groupToEdit.subgroups[i].id + '"' + (subgroupInput.val().localeCompare("All") == 0 ? ' disabled' : '') + '>'
+                + '<option value="">—</option>'
+                + '<option value="TRAILERS"' + (currentType === "TRAILERS" ? ' selected' : '') + '>Trailers only</option>'
+                + '<option value="BETA"' + (currentType === "BETA" ? ' selected' : '') + '>Beta soundtrack</option>'
+                + '<option value="UNUSED"' + (currentType === "UNUSED" ? ' selected' : '') + '>Found in game files but not used</option>'
+                + '<option value="ALBUM"' + (currentType === "ALBUM" ? ' selected' : '') + '>Included in music album</option>'
+                + '</select>';
+            divWithCols.append('<div class="col-sm"><input type="text" class="group-position" value="' + groupToEdit.subgroups[i].position + '"><button id="add-subgroup" type="submit" data-subgroupPosition="' + groupToEdit.subgroups[i].position + '" class="btn btn-success">+</button><button type="button" id="delete-subgroup" data-subGroupId="' + groupToEdit.subgroups[i].id + '" class="btn btn-danger">X</button>' + typeSelect + '</div>');
             formAppend.append(divWithCols);
         }
         formAppend.append('<div class="form-group">');
@@ -243,6 +251,26 @@ $(document).ready(function () {
             $($(this).find("input")).val((index + 1) * 10);
         });
         sortTable();
+    });
+
+    $(document).on('change', '.subgroup-type-select', function () {
+        var subgroupId = $(this).attr('data-subGroupId');
+        var selectedType = $(this).val();
+        $.ajax({
+            async: false,
+            type: "PATCH",
+            url: "/subgroup/setType/" + subgroupId + (selectedType ? "?type=" + selectedType : ""),
+            success: function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(successAlertHtml).slideUp(500);
+                });
+            },
+            error: function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () {
+                    $(failureAlertHtml).slideUp(500);
+                });
+            },
+        });
     });
 
     $(document).on('focusout', '.groupPosition', sortTable);
