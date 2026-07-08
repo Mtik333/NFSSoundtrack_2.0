@@ -504,6 +504,13 @@ public class WebsiteViewsController {
         return MIN_INDEX;
     }
 
+    @GetMapping(value = "/connections")
+    public String bandConnections(Model model, HttpSession httpSession) throws LoginException, ResourceNotFoundException, InterruptedException {
+        model.addAttribute("bandConnections", true);
+        addCommonAttributes(model, "genericAt", new String[]{"Artist connections"}, httpSession);
+        return MIN_INDEX;
+    }
+
     /**
      * some attributes provided to model repeat with each invocation so let's group it in a single place
      *

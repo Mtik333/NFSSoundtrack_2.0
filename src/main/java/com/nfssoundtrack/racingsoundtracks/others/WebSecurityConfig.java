@@ -55,7 +55,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         //or so called not-authenticated user
                         .requestMatchers("/manage/manage", "/manage/manage#", "/serie/**", "/country/**",
                                 "/maingroup/**", "/songSubgroup/**", "/subgroup/**", "/gamedb/**",
-                                "/gameplatform/**")
+                                "/gameplatform/**", "/api/bands/admin/**")
                         .hasAuthority("ADMIN"))
                 .authorizeHttpRequests(requests -> requests
                         //those can be seen by everones

@@ -9,6 +9,8 @@
     <button id="merge-songs" type="submit" class="btn btn-primary mt-2">Merge songs</button>
     <button id="merge-duplicate-artist" type="submit" class="btn btn-primary mt-2">Merge duplicate artists</button>
     <button id="associate-artists" type="submit" class="btn btn-primary mt-2">Add artist as member of other artist (band)</button>
+    <button id="rebuild-band-graph" type="button" class="btn btn-warning mt-2">Rebuild band connection graph</button>
+    <span id="rebuild-band-graph-status" class="ms-1 small"></span>
     <ul class="nav-item list-group-item ps-0" th:each="serie: ${series}">
         <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
             th:attr="data-bs-target='#id'+${serie.id}" aria-expanded="false">
