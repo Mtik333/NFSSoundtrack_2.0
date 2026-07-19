@@ -183,6 +183,14 @@ public class WebsiteViewsController {
         return MIN_INDEX;
     }
 
+    @GetMapping(value = "/radio")
+    public String radio(Model model, HttpSession httpSession)
+            throws LoginException, ResourceNotFoundException, InterruptedException {
+        model.addAttribute("radio", true);
+        addCommonAttributes(model, "radioTitle", null, httpSession);
+        return MIN_INDEX;
+    }
+
     /**
      * @param model     view model
      * @param gameshort short name from 'game' table

@@ -3,9 +3,11 @@ package com.nfssoundtrack.racingsoundtracks.services;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.repository.SongSubgroupRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,6 +64,45 @@ public class SongSubgroupService {
 
     public SongSubgroup save(SongSubgroup songSubgroup) {
         return songSubgroupRepository.save(songSubgroup);
+    }
+
+    public Optional<SongSubgroup> findRandom(Collection<Long> excludeIds) {
+        return songSubgroupRepository.findRandom(excludeIds);
+    }
+
+    public Optional<SongSubgroup> findRandomFromSeries(Collection<Long> excludeIds, Collection<Long> serieIds) {
+        return songSubgroupRepository.findRandomFromSeries(excludeIds, serieIds);
+    }
+
+    public Optional<SongSubgroup> findRandomFromGames(Collection<Long> excludeIds, Collection<Long> gameIds) {
+        return songSubgroupRepository.findRandomFromGames(excludeIds, gameIds);
+    }
+
+    public Optional<SongSubgroup> findRandomFromGenres(Collection<Long> excludeIds, Collection<Long> genreIds) {
+        return songSubgroupRepository.findRandomFromGenres(excludeIds, genreIds);
+    }
+
+    public Optional<SongSubgroup> findRandomFromGamesAndGenres(Collection<Long> excludeIds, Collection<Long> gameIds, Collection<Long> genreIds) {
+        return songSubgroupRepository.findRandomFromGamesAndGenres(excludeIds, gameIds, genreIds);
+    }
+
+    public Optional<SongSubgroup> findRandomFromSeriesAndGenres(Collection<Long> excludeIds, Collection<Long> serieIds, Collection<Long> genreIds) {
+        return songSubgroupRepository.findRandomFromSeriesAndGenres(excludeIds, serieIds, genreIds);
+    }
+
+    public long countAll() { return songSubgroupRepository.countAll(); }
+    public long countFromGames(Collection<Long> gameIds) { return songSubgroupRepository.countFromGames(gameIds); }
+    public long countFromSeries(Collection<Long> serieIds) { return songSubgroupRepository.countFromSeries(serieIds); }
+    public long countFromGenres(Collection<Long> genreIds) { return songSubgroupRepository.countFromGenres(genreIds); }
+    public long countFromGamesAndGenres(Collection<Long> gameIds, Collection<Long> genreIds) { return songSubgroupRepository.countFromGamesAndGenres(gameIds, genreIds); }
+    public long countFromSeriesAndGenres(Collection<Long> serieIds, Collection<Long> genreIds) { return songSubgroupRepository.countFromSeriesAndGenres(serieIds, genreIds); }
+
+    public List<SongSubgroup> searchByBandAndTitle(String band, String title) {
+        return songSubgroupRepository.searchByBandAndTitle(band, title, PageRequest.of(0, 15));
+    }
+
+    public List<SongSubgroup> searchByTitle(String title) {
+        return songSubgroupRepository.searchByTitle(title, PageRequest.of(0, 15));
     }
 
     /**
