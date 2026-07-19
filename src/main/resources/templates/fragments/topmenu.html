@@ -396,6 +396,18 @@
                         </div>
                     </div>
                 </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label for="streaming-overlay-url" th:text="#{streamingOverlayUrl}"></label>
+                        <div><small class="text-muted" th:text="#{streamingOverlayUrlHint}"></small></div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" id="streaming-overlay-url" readonly>
+                            <button class="btn btn-outline-secondary btn-sm" id="copy-overlay-url" type="button" th:text="#{copy}"></button>
+                        </div>
+                    </div>
+                </div>
                 <div class="row p-3">
                     <button type="button" class="btn btn-success" id="save-preferences" data-bs-dismiss="modal"
                         aria-label="Save preferences" th:text="#{savePreferences}"></button>

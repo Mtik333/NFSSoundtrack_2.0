@@ -69,7 +69,24 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on("click", "#copy-overlay-url", function () {
+        var url = $("#streaming-overlay-url").val();
+        if (url) {
+            navigator.clipboard.writeText(url).catch(function() {
+                $("#streaming-overlay-url").select();
+                document.execCommand("copy");
+            });
+        }
+    });
+
     $(document).on("click", "#openPreferences", function () {
+        var streamingToken = localStorage.getItem("streaming-token");
+        if (!streamingToken) {
+            streamingToken = crypto.randomUUID();
+            localStorage.setItem("streaming-token", streamingToken);
+        }
+        $("#streaming-overlay-url").val(window.location.origin + "/streaming/overlay/" + streamingToken);
+
         var scrolling = localStorage.getItem("scrolling-stuff");
         if (scrolling != undefined) {
             $("#scrolling-stuff").prop("checked", JSON.parse(scrolling));

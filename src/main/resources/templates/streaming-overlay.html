@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Now Playing</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: transparent;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        #overlay {
+            display: inline-block;
+            background: rgba(5, 5, 5, 0.93);
+            padding: 12px 18px;
+            border-radius: 5px;
+            color: #ffffff;
+            width: 620px;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        #overlay.hidden { display: none; }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td {
+            border: none;
+            padding: 0;
+            vertical-align: middle;
+        }
+
+        td.emoji {
+            width: 36px;
+            text-align: center;
+        }
+
+        #artist    { font-size: 22px; line-height: 1.5; }
+        #title-row { font-size: 28px; font-weight: 600; line-height: 1.4; }
+        #paren-row { font-size: 28px; font-weight: 600; line-height: 1.4; }
+        #game           { font-size: 16px; line-height: 1.5; color: rgba(255, 255, 255, 0.8); }
+        #subgroup-row   { font-size: 16px; line-height: 1.5; color: rgba(255, 255, 255, 0.8); }
+    </style>
+</head>
+<body>
+    <div id="overlay" class="hidden">
+        <table>
+            <tr id="artist">
+                <td class="emoji">🎤</td>
+                <td id="artist-text"></td>
+            </tr>
+            <tr id="title-row">
+                <td class="emoji">✏️</td>
+                <td id="title-text"></td>
+            </tr>
+            <tr id="paren-row" style="display:none;">
+                <td class="emoji"></td>
+                <td id="paren-text"></td>
+            </tr>
+            <tr id="game">
+                <td class="emoji">🎮</td>
+                <td id="game-text"></td>
+            </tr>
+            <tr id="subgroup-row" style="display:none;">
+                <td class="emoji">❗</td>
+                <td id="subgroup-text"></td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        var token = window.location.pathname.split('/').pop();
+
+        function truncateToLines(text, font, maxWidth, maxLines) {
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            ctx.font = font;
+            var words = text.split(' ');
+            var line = '';
+            var committed = '';
+            var linesUsed = 0;
+            for (var i = 0; i < words.length; i++) {
+                var test = line ? line + ' ' + words[i] : words[i];
+                if (ctx.measureText(test).width > maxWidth) {
+                    linesUsed++;
+                    if (linesUsed >= maxLines) {
+                        // truncate current line to last word that fits with '...'
+                        while (line && ctx.measureText(line + '...').width > maxWidth) {
+                            line = line.substring(0, line.lastIndexOf(' '));
+                        }
+                        var full = committed ? committed + ' ' + line : line;
+                        return { text: full.trim() + '...', truncated: true };
+                    }
+                    committed = committed ? committed + ' ' + line : line;
+                    line = words[i];
+                } else {
+                    line = test;
+                }
+            }
+            return { text: text, truncated: false };
+        }
+
+        function setTitle(text) {
+            var parenIdx = text.indexOf('(');
+            var mainTitle = parenIdx >0 ? text.substring(0, parenIdx).trim() : text;
+            var parenPart = parenIdx >0 ? text.substring(parenIdx) : null;
+
+            var font = 'bold 28px system-ui, -apple-system, sans-serif';
+            var result = truncateToLines(mainTitle, font, 548, 2);
+
+            document.getElementById('title-text').textContent = result.text;
+
+            if (!result.truncated && parenPart) {
+                document.getElementById('paren-text').textContent = parenPart;
+                document.getElementById('paren-row').style.display = 'table-row';
+            } else {
+                document.getElementById('paren-row').style.display = 'none';
+            }
+        }
+
+        function applyData(data) {
+            if (data.artist || data.title) {
+                document.getElementById('artist-text').textContent = data.artist || '';
+                setTitle(data.title || '');
+                document.getElementById('game-text').textContent = data.game || '';
+                var subgroupRow = document.getElementById('subgroup-row');
+                if (data.subgroupType) {
+                    document.getElementById('subgroup-text').textContent = data.subgroupType;
+                    subgroupRow.style.display = 'table-row';
+                } else {
+                    subgroupRow.style.display = 'none';
+                }
+                document.getElementById('overlay').classList.remove('hidden');
+            } else {
+                document.getElementById('overlay').classList.add('hidden');
+            }
+        }
+
+        function connect() {
+            var es = new EventSource('/streaming/events/' + token);
+            es.onmessage = function(e) {
+                applyData(JSON.parse(e.data));
+            };
+            es.onerror = function() {
+                es.close();
+                setTimeout(connect, 5000);
+            };
+        }
+
+        connect();
+    </script>
+</body>
+</html>

@@ -120,12 +120,12 @@
                     <a th:href="${gamePlatform.retroachievementsUrl}" target="_blank">
                         <th:block th:if="${#bools.isTrue(gamePlatform.hasSet)}">
                             <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
-                                 th:title="${gamePlatform.game.displayTitle}+#{achievementsSetYes}+${gamePlatform.platform.platform}"
+                                 th:title="${gamePlatform.game.displayTitle}+' '+#{achievementsSetYes}+${gamePlatform.platform.platform}"
                                  th:src="@{/images/fullres/retroachievements_set.webp}">
                         </th:block>
                         <th:block th:if="${!#bools.isTrue(gamePlatform.hasSet)}">
                             <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
-                                 th:title="${gamePlatform.game.displayTitle}+#{achievementsSetNo}+${gamePlatform.platform.platform}"
+                                 th:title="${gamePlatform.game.displayTitle}+' '+#{achievementsSetNo}+${gamePlatform.platform.platform}"
                                  th:src="@{/images/fullres/retroachievements_noset.webp}">
                         </th:block>
                     </a>
@@ -203,7 +203,7 @@
                                     th:text="${gamegroup.groupName} + ' - ' + ${subgroup.subgroupName}"></td>
                             </tr>
                             <tr th:each="songSubgroup : ${subgroup.songSubgroupList}"
-                                th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id}">
+                                th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-group_id=${gamegroup.id},data-song_id=${songSubgroup.song.id},data-songSubgroup-id=${songSubgroup.id},data-subgroup-type=${songSubgroup.subgroup.subgroupType != null ? songSubgroup.subgroup.subgroupType.displayLabel : ''}">
                                 <td class="contextButton" style="display:none;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor"
                                         class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">

@@ -332,6 +332,45 @@ $(document).ready(function () {
         }
     });
 
+    function reportNowPlaying(songRow) {
+        var token = localStorage.getItem("streaming-token");
+        if (!token) return;
+        var artist = $(songRow).find("td.band").text().trim();
+        var title = $(songRow).find("td.songtitle").text().trim();
+        var game = "";
+        var subgroupType = "";
+        if ($(songRow).attr("data-songsubgroup-id") && $(songRow).find("td.artist-group").length === 0) {
+            // game page row
+            game = $(".real-page-content h2").first().text().trim();
+            subgroupType = $(songRow).attr("data-subgroup-type") || "";
+            if (subgroupType) {
+                var songId = $(songRow).attr("data-song_id");
+                var hasOfficialOccurrence = $("tr[data-song_id='" + songId + "']").toArray().some(function(row) {
+                    var t = $(row).attr("data-subgroup-type");
+                    return !t || t === "";
+                });
+                if (hasOfficialOccurrence) {
+                    subgroupType = "";
+                }
+            }
+        } else if ($(songRow).find("td.artist-group").length > 0) {
+            // artist page subgroup row — game is in the td right after td.artist-group
+            game = $(songRow).find("td.artist-group").next("td").find("a").first().text().trim();
+        } else if ($(songRow).attr("data-el_id")) {
+            // song page row — game is the first non-external table_link in the row
+            game = $(songRow).find("a.table_link:not(.externalYT)").first().text().trim();
+        } else {
+            // search page row — game name is in the td right after td.songtitle
+            game = $(songRow).find("td.songtitle").next().find("a").first().text().trim();
+        }
+        $.ajax({
+            url: "/streaming/now-playing/" + token,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ artist: artist, title: title, game: game, subgroupType: subgroupType })
+        });
+    }
+
     /**
      * method to handle clicking on 'play' button
      */
@@ -367,12 +406,13 @@ $(document).ready(function () {
                 var lyricsHtmlElem = $(this).next().next();
                 var songSubgroupId = lyricsHtmlElem.attr("data-songsubgroup-id");
                 var parentTr = $(this).parent().parent().parent();
-                
+                reportNowPlaying(parentTr);
+
                 // Load lyrics via AJAX if not already loaded
-                if (lyricsHtmlElem.text() === "" && lyricsHtmlElem.attr("data-lyricsState") !== "instrumental") {
+                if (songSubgroupId && lyricsHtmlElem.text() === "" && lyricsHtmlElem.attr("data-lyricsState") !== "instrumental") {
                     // Show video immediately with loading indicator
                     createVideoRow(videoToUse, '<i style="color: #888;">Loading lyrics...</i>', lyricsHtmlElem, parentTr);
-                    
+
                     loadLyrics(songSubgroupId, lyricsHtmlElem, function(lyricsText) {
                         // Update lyrics in existing row
                         updateLyricsInRow(lyricsText, lyricsHtmlElem);
@@ -388,17 +428,18 @@ $(document).ready(function () {
             }
         } else {
             //otherwise we render modal with video and show lyrics if there are any
+            reportNowPlaying($(this).parent().parent().parent());
             $("#lyricsCollapse").empty();
             var lyricsHtmlElem = $(this).next().next();
             var songSubgroupId = lyricsHtmlElem.attr("data-songsubgroup-id");
             var lyricsTxt = lyricsHtmlElem.text();
             
             // Load lyrics via AJAX if not already loaded
-            if (lyricsTxt === "" && lyricsHtmlElem.attr("data-lyricsState") !== "instrumental") {
+            if (songSubgroupId && lyricsTxt === "" && lyricsHtmlElem.attr("data-lyricsState") !== "instrumental") {
                 // Show loading indicator immediately
                 $("#showLyrics").text("Loading lyrics...");
                 $("#showLyrics").prop("disabled", true);
-                
+
                 loadLyrics(songSubgroupId, lyricsHtmlElem, function(lyrics) {
                     handleModalLyrics(lyrics, lyricsHtmlElem);
                 });
@@ -644,7 +685,7 @@ $(document).ready(function () {
      */
     function onPlayerStateChange(event) {
         if (event.data === 0) {
-            initPlayer(current_id + 1);
+            setTimeout(function() { initPlayer(current_id + 1); }, 2500);
         }
     }
 
@@ -671,7 +712,31 @@ $(document).ready(function () {
                 if (youtubePlayIcon.length > 0) {
                     var youtubeLink = youtubePlayIcon.attr("data-tagvideo")
                         .replace("https://www.youtube.com/embed/", "");
+                    var origRow = $(this);
+                    var plainBand = origRow.find("td.band").text().trim();
+                    var plainTitle = origRow.find("td.songtitle").text().trim();
+                    var gameText = "";
+                    if (origRow.attr("data-songsubgroup-id") && origRow.find("td.artist-group").length === 0) {
+                        gameText = $(".real-page-content h2").first().text().trim();
+                    } else if (origRow.find("td.artist-group").length > 0) {
+                        gameText = origRow.find("td.artist-group").next("td").find("a").first().text().trim();
+                    } else if (origRow.attr("data-el_id")) {
+                        gameText = origRow.find("a.table_link:not(.externalYT)").first().text().trim();
+                    }
+                    var subgroupTypeText = origRow.attr("data-subgroup-type") || "";
+                    if (subgroupTypeText) {
+                        var origSongId = origRow.attr("data-song_id");
+                        var hasOfficial = $("tr[data-song_id='" + origSongId + "']").toArray().some(function(r) {
+                            var t = $(r).attr("data-subgroup-type");
+                            return !t || t === "";
+                        });
+                        if (hasOfficial) subgroupTypeText = "";
+                    }
                     var trElem = $('<tr id="' + localI + '" rel="' + youtubeLink + '"></tr>');
+                    trElem.attr("data-band", plainBand);
+                    trElem.attr("data-title", plainTitle);
+                    trElem.attr("data-game", gameText);
+                    trElem.attr("data-subgroup-type", subgroupTypeText);
                     trElem.append('<td class="playlist_play_it"><img class="img-responsive-playlist-modal-icon pointable" src="/images/znakwodny.webp"></td>');
                     trElem.append('<td class="playlist_row">' + bandText + ' - ' + titleText + '</td>');
                     trElem.append('<td class="playlist_disable_song"><img class="img-responsive-playlist-modal-icon pointable" src="/images/fullres/trashcan_big.webp"></td>');
@@ -704,7 +769,8 @@ $(document).ready(function () {
             var player = new YT.Player('player', {
                 events: {
                     'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange
+                    'onStateChange': onPlayerStateChange,
+                    'onError': function() { setTimeout(function() { initPlayer(current_id + 1); }, 2500); }
                 }
             });
             var el = $('#playlist_progress tr:nth-child(' + (current_id + 1) + ')');
@@ -722,6 +788,24 @@ $(document).ready(function () {
             currentTr.find("td.playlist_disable_song").hide();
             currentTr.find("td.playlist_play_it").hide();
             currentTr.find("td.playlist_row").attr("colspan", 3);
+            var streamToken = localStorage.getItem("streaming-token");
+            if (streamToken) {
+                var plBand = currentTr.attr("data-band") || "";
+                var plTitle = currentTr.attr("data-title") || "";
+                if (plBand || plTitle) {
+                    $.ajax({
+                        url: "/streaming/now-playing/" + streamToken,
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            artist: plBand,
+                            title: plTitle,
+                            game: currentTr.attr("data-game") || "",
+                            subgroupType: currentTr.attr("data-subgroup-type") || ""
+                        })
+                    });
+                }
+            }
         }
     }
 

@@ -23,6 +23,8 @@
     <tbody>
         <tr th:each="songSubgroup, iter1 : ${songUsages}"
             th:attr="data-el_id='songSubgroup'+${songSubgroup.subgroup.id},data-song_id=${songSubgroup.song.id}">
+            <td class="band" style="display:none;" th:text="${songToCheck.officialDisplayBand}"></td>
+            <td class="songtitle" style="display:none;" th:text="${songToCheck.officialDisplayTitle}"></td>
             <td class="contextButton" style="display:none;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="5vw" height="9vw" fill="currentColor"
                     class="bi bi-three-dots-vertical context_menu_thing" viewBox="0 0 16 16">
