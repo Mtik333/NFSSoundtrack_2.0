@@ -90,12 +90,32 @@ public class SongSubgroupService {
         return songSubgroupRepository.findRandomFromSeriesAndGenres(excludeIds, serieIds, genreIds);
     }
 
-    public long countAll() { return songSubgroupRepository.countAll(); }
-    public long countFromGames(Collection<Long> gameIds) { return songSubgroupRepository.countFromGames(gameIds); }
-    public long countFromSeries(Collection<Long> serieIds) { return songSubgroupRepository.countFromSeries(serieIds); }
-    public long countFromGenres(Collection<Long> genreIds) { return songSubgroupRepository.countFromGenres(genreIds); }
-    public long countFromGamesAndGenres(Collection<Long> gameIds, Collection<Long> genreIds) { return songSubgroupRepository.countFromGamesAndGenres(gameIds, genreIds); }
-    public long countFromSeriesAndGenres(Collection<Long> serieIds, Collection<Long> genreIds) { return songSubgroupRepository.countFromSeriesAndGenres(serieIds, genreIds); }
+    public Optional<SongSubgroup> findRandomFromAuthors(Collection<Long> excludeIds, Collection<Long> authorIds) {
+        return songSubgroupRepository.findRandomFromAuthors(excludeIds, authorIds);
+    }
+
+    public Optional<SongSubgroup> findRandomFromGamesAndAuthors(Collection<Long> excludeIds, Collection<Long> gameIds, Collection<Long> authorIds) {
+        return songSubgroupRepository.findRandomFromGamesAndAuthors(excludeIds, gameIds, authorIds);
+    }
+
+    public Optional<SongSubgroup> findRandomFromSeriesAndAuthors(Collection<Long> excludeIds, Collection<Long> serieIds, Collection<Long> authorIds) {
+        return songSubgroupRepository.findRandomFromSeriesAndAuthors(excludeIds, serieIds, authorIds);
+    }
+
+    public List<Long> findIdsBySeries(Collection<Long> serieIds) { return songSubgroupRepository.findIdsBySeries(serieIds); }
+    public List<Long> findIdsByGames(Collection<Long> gameIds) { return songSubgroupRepository.findIdsByGames(gameIds); }
+    public List<Long> findIdsByGenres(Collection<Long> genreIds) { return songSubgroupRepository.findIdsByGenres(genreIds); }
+    public List<Long> findIdsByAuthors(Collection<Long> authorIds) { return songSubgroupRepository.findIdsByAuthors(authorIds); }
+
+    public long countAll(Collection<Long> excludeIds) { return songSubgroupRepository.countAll(excludeIds); }
+    public long countFromGames(Collection<Long> gameIds, Collection<Long> excludeIds) { return songSubgroupRepository.countFromGames(gameIds, excludeIds); }
+    public long countFromSeries(Collection<Long> serieIds, Collection<Long> excludeIds) { return songSubgroupRepository.countFromSeries(serieIds, excludeIds); }
+    public long countFromGenres(Collection<Long> genreIds, Collection<Long> excludeIds) { return songSubgroupRepository.countFromGenres(genreIds, excludeIds); }
+    public long countFromGamesAndGenres(Collection<Long> gameIds, Collection<Long> genreIds, Collection<Long> excludeIds) { return songSubgroupRepository.countFromGamesAndGenres(gameIds, genreIds, excludeIds); }
+    public long countFromSeriesAndGenres(Collection<Long> serieIds, Collection<Long> genreIds, Collection<Long> excludeIds) { return songSubgroupRepository.countFromSeriesAndGenres(serieIds, genreIds, excludeIds); }
+    public long countFromAuthors(Collection<Long> authorIds, Collection<Long> excludeIds) { return songSubgroupRepository.countFromAuthors(authorIds, excludeIds); }
+    public long countFromGamesAndAuthors(Collection<Long> gameIds, Collection<Long> authorIds, Collection<Long> excludeIds) { return songSubgroupRepository.countFromGamesAndAuthors(gameIds, authorIds, excludeIds); }
+    public long countFromSeriesAndAuthors(Collection<Long> serieIds, Collection<Long> authorIds, Collection<Long> excludeIds) { return songSubgroupRepository.countFromSeriesAndAuthors(serieIds, authorIds, excludeIds); }
 
     public List<SongSubgroup> searchByBandAndTitle(String band, String title) {
         return songSubgroupRepository.searchByBandAndTitle(band, title, PageRequest.of(0, 15));

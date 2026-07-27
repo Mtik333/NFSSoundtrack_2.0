@@ -3,7 +3,9 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Serie;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.SubgroupType;
 import com.nfssoundtrack.racingsoundtracks.radioserializers.RadioSerieSerializer;
+import com.nfssoundtrack.racingsoundtracks.services.SongSubgroupService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -48,6 +50,19 @@ public class RadioController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping(value = "/authors/search")
+    public List<Map<String, Object>> searchAuthors(@RequestParam(defaultValue = "") String query) {
+        if (query.isBlank()) return List.of();
+        return baseController.getAuthorService().searchByName(query).stream()
+                .map(a -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("id", a.getId());
+                    m.put("name", a.getName());
+                    return m;
+                })
+                .collect(Collectors.toList());
+    }
+
     @GetMapping(value = "/series-with-games")
     public List<Map<String, Object>> getSeriesWithGames() {
         List<Serie> series = baseController.getSerieService().findAllSortedByPositionAsc();
@@ -74,31 +89,46 @@ public class RadioController {
             @RequestParam(defaultValue = "") String preferredSeries,
             @RequestParam(defaultValue = "") String preferredGames,
             @RequestParam(defaultValue = "") String preferredGenres,
+            @RequestParam(defaultValue = "") String preferredAuthors,
             @RequestParam(defaultValue = "70") int preferredRatio,
-            @RequestParam(defaultValue = "") String exclude) {
+            @RequestParam(defaultValue = "") String exclude,
+            @RequestParam(defaultValue = "") String blockedSeries,
+            @RequestParam(defaultValue = "") String blockedGames,
+            @RequestParam(defaultValue = "") String blockedGenres,
+            @RequestParam(defaultValue = "") String blockedAuthors,
+            @RequestParam(defaultValue = "") String blockedSongs,
+            @RequestParam(defaultValue = "true") boolean preferOfficialTrailerMusic) {
 
-        List<Long> excludeIds = parseIds(exclude);
         List<Long> serieIds = parseIds(preferredSeries);
         List<Long> gameIds = parseIds(preferredGames);
         List<Long> genreIds = parseIds(preferredGenres);
+        List<Long> authorIds = parseIds(preferredAuthors);
 
-        // Sentinel so NOT IN clause never sees empty list
-        if (excludeIds.isEmpty()) excludeIds = List.of(-1L);
+        var svc = baseController.getSongSubgroupService();
+        List<Long> excludeIds = resolveExcludeIds(svc, exclude, blockedSeries, blockedGames, blockedGenres, blockedAuthors, blockedSongs);
 
         boolean hasGames = !gameIds.isEmpty();
         boolean hasSeries = !serieIds.isEmpty();
         boolean hasGenres = !genreIds.isEmpty();
-        boolean hasPreferred = hasGames || hasSeries || hasGenres;
+        boolean hasAuthors = !authorIds.isEmpty();
+        boolean hasPreferred = hasGames || hasSeries || hasGenres || hasAuthors;
 
         Optional<SongSubgroup> result = Optional.empty();
-        var svc = baseController.getSongSubgroupService();
 
         if (hasPreferred && random.nextInt(100) < preferredRatio) {
-            if (hasGames && hasGenres) {
+            if (hasGames && hasAuthors) {
                 // Try intersection first, then relax each constraint
+                result = svc.findRandomFromGamesAndAuthors(excludeIds, gameIds, authorIds);
+                if (result.isEmpty()) result = svc.findRandomFromGames(excludeIds, gameIds);
+                if (result.isEmpty()) result = svc.findRandomFromAuthors(excludeIds, authorIds);
+            } else if (hasGames && hasGenres) {
                 result = svc.findRandomFromGamesAndGenres(excludeIds, gameIds, genreIds);
                 if (result.isEmpty()) result = svc.findRandomFromGames(excludeIds, gameIds);
                 if (result.isEmpty()) result = svc.findRandomFromGenres(excludeIds, genreIds);
+            } else if (hasSeries && hasAuthors) {
+                result = svc.findRandomFromSeriesAndAuthors(excludeIds, serieIds, authorIds);
+                if (result.isEmpty()) result = svc.findRandomFromSeries(excludeIds, serieIds);
+                if (result.isEmpty()) result = svc.findRandomFromAuthors(excludeIds, authorIds);
             } else if (hasSeries && hasGenres) {
                 result = svc.findRandomFromSeriesAndGenres(excludeIds, serieIds, genreIds);
                 if (result.isEmpty()) result = svc.findRandomFromSeries(excludeIds, serieIds);
@@ -107,6 +137,8 @@ public class RadioController {
                 result = svc.findRandomFromGames(excludeIds, gameIds);
             } else if (hasSeries) {
                 result = svc.findRandomFromSeries(excludeIds, serieIds);
+            } else if (hasAuthors) {
+                result = svc.findRandomFromAuthors(excludeIds, authorIds);
             } else {
                 result = svc.findRandomFromGenres(excludeIds, genreIds);
             }
@@ -116,33 +148,47 @@ public class RadioController {
             result = svc.findRandom(excludeIds);
         }
 
-        return result.map(this::toDto).orElse(null);
+        return result.map(ss -> toDto(ss, preferOfficialTrailerMusic)).orElse(null);
     }
 
     @GetMapping(value = "/count")
     public Map<String, Object> getPreferenceCount(
             @RequestParam(defaultValue = "") String preferredSeries,
             @RequestParam(defaultValue = "") String preferredGames,
-            @RequestParam(defaultValue = "") String preferredGenres) {
+            @RequestParam(defaultValue = "") String preferredGenres,
+            @RequestParam(defaultValue = "") String preferredAuthors,
+            @RequestParam(defaultValue = "") String blockedSeries,
+            @RequestParam(defaultValue = "") String blockedGames,
+            @RequestParam(defaultValue = "") String blockedGenres,
+            @RequestParam(defaultValue = "") String blockedAuthors,
+            @RequestParam(defaultValue = "") String blockedSongs) {
 
         List<Long> serieIds = parseIds(preferredSeries);
         List<Long> gameIds = parseIds(preferredGames);
         List<Long> genreIds = parseIds(preferredGenres);
+        List<Long> authorIds = parseIds(preferredAuthors);
         var svc = baseController.getSongSubgroupService();
+        List<Long> excludeIds = resolveExcludeIds(svc, "", blockedSeries, blockedGames, blockedGenres, blockedAuthors, blockedSongs);
 
         long count;
-        if (!gameIds.isEmpty() && !genreIds.isEmpty()) {
-            count = svc.countFromGamesAndGenres(gameIds, genreIds);
+        if (!gameIds.isEmpty() && !authorIds.isEmpty()) {
+            count = svc.countFromGamesAndAuthors(gameIds, authorIds, excludeIds);
+        } else if (!gameIds.isEmpty() && !genreIds.isEmpty()) {
+            count = svc.countFromGamesAndGenres(gameIds, genreIds, excludeIds);
+        } else if (!serieIds.isEmpty() && !authorIds.isEmpty()) {
+            count = svc.countFromSeriesAndAuthors(serieIds, authorIds, excludeIds);
         } else if (!serieIds.isEmpty() && !genreIds.isEmpty()) {
-            count = svc.countFromSeriesAndGenres(serieIds, genreIds);
+            count = svc.countFromSeriesAndGenres(serieIds, genreIds, excludeIds);
         } else if (!gameIds.isEmpty()) {
-            count = svc.countFromGames(gameIds);
+            count = svc.countFromGames(gameIds, excludeIds);
         } else if (!serieIds.isEmpty()) {
-            count = svc.countFromSeries(serieIds);
+            count = svc.countFromSeries(serieIds, excludeIds);
+        } else if (!authorIds.isEmpty()) {
+            count = svc.countFromAuthors(authorIds, excludeIds);
         } else if (!genreIds.isEmpty()) {
-            count = svc.countFromGenres(genreIds);
+            count = svc.countFromGenres(genreIds, excludeIds);
         } else {
-            count = svc.countAll();
+            count = svc.countAll(excludeIds);
         }
 
         return Map.of("count", count);
@@ -151,7 +197,8 @@ public class RadioController {
     @GetMapping(value = "/search")
     public List<Map<String, Object>> searchSongs(
             @RequestParam(defaultValue = "") String band,
-            @RequestParam(defaultValue = "") String title) {
+            @RequestParam(defaultValue = "") String title,
+            @RequestParam(defaultValue = "true") boolean preferOfficialTrailerMusic) {
 
         if (band.isBlank() && title.isBlank()) return List.of();
 
@@ -159,15 +206,21 @@ public class RadioController {
                 ? baseController.getSongSubgroupService().searchByTitle(title)
                 : baseController.getSongSubgroupService().searchByBandAndTitle(band, title);
 
-        return results.stream().map(this::toDto).collect(Collectors.toList());
+        return results.stream().map(ss -> toDto(ss, preferOfficialTrailerMusic)).collect(Collectors.toList());
     }
 
-    private Map<String, Object> toDto(SongSubgroup ss) {
+    private Map<String, Object> toDto(SongSubgroup ss, boolean preferOfficialTrailerMusic) {
         String artist = ss.getIngameDisplayBand() != null
                 ? ss.getIngameDisplayBand() : ss.getSong().getOfficialDisplayBand();
         String title = ss.getIngameDisplayTitle() != null
                 ? ss.getIngameDisplayTitle() : ss.getSong().getOfficialDisplayTitle();
-        String srcId = ss.getSrcId() != null ? ss.getSrcId() : ss.getSong().getSrcId();
+
+        boolean isTrailer = ss.getSubgroup().getSubgroupType() == SubgroupType.TRAILERS;
+        String officialSrcId = ss.getSong().getSrcId();
+        String srcId = (isTrailer && preferOfficialTrailerMusic && officialSrcId != null && !officialSrcId.isBlank())
+                ? officialSrcId
+                : (ss.getSrcId() != null ? ss.getSrcId() : officialSrcId);
+
         String game = ss.getSubgroup().getMainGroup().getGame().getDisplayTitle();
         String gameShort = ss.getSubgroup().getMainGroup().getGame().getGameShort();
         String mainGroup = ss.getSubgroup().getMainGroup().getGroupName();
@@ -191,6 +244,35 @@ public class RadioController {
         dto.put("subgroupName", subgroupName);
         dto.put("subgroupType", subgroupType);
         return dto;
+    }
+
+    /**
+     * Merges recently-played exclusions with all blocked-preference dimensions (series/games/genres/authors are
+     * resolved to their matching song-subgroup ids; blocked songs are already song-subgroup ids) into a single
+     * NOT-IN id set, so blocking works uniformly across every existing find/count query without needing dedicated
+     * "blocked" combo queries.
+     */
+    private List<Long> resolveExcludeIds(SongSubgroupService svc, String exclude, String blockedSeries,
+                                          String blockedGames, String blockedGenres, String blockedAuthors, String blockedSongs) {
+        Set<Long> excludeIds = new LinkedHashSet<>(parseIds(exclude));
+        excludeIds.addAll(parseIds(blockedSongs));
+
+        List<Long> blockedSerieIds = parseIds(blockedSeries);
+        if (!blockedSerieIds.isEmpty()) excludeIds.addAll(svc.findIdsBySeries(blockedSerieIds));
+
+        List<Long> blockedGameIds = parseIds(blockedGames);
+        if (!blockedGameIds.isEmpty()) excludeIds.addAll(svc.findIdsByGames(blockedGameIds));
+
+        List<Long> blockedGenreIds = parseIds(blockedGenres);
+        if (!blockedGenreIds.isEmpty()) excludeIds.addAll(svc.findIdsByGenres(blockedGenreIds));
+
+        List<Long> blockedAuthorIds = parseIds(blockedAuthors);
+        if (!blockedAuthorIds.isEmpty()) excludeIds.addAll(svc.findIdsByAuthors(blockedAuthorIds));
+
+        // Sentinel so NOT IN clause never sees empty list
+        if (excludeIds.isEmpty()) excludeIds.add(-1L);
+
+        return new ArrayList<>(excludeIds);
     }
 
     private List<Long> parseIds(String param) {

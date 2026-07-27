@@ -1,6 +1,7 @@
 package com.nfssoundtrack.racingsoundtracks.repository;
 
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Author;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface AuthorRepository extends JpaRepository<Author, Integer> {
     List<Author> findByNameContains(String name);
 
     List<Author> findByNameStartingWith(String name);
+
+    List<Author> findByNameContainingIgnoreCaseOrderByName(String name, Pageable pageable);
 }

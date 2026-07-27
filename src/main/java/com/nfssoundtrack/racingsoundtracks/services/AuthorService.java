@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -80,6 +81,10 @@ public class AuthorService {
 
     public List<Author> findByNameStartingWith(String name) {
         return authorRepository.findByNameStartingWith(name);
+    }
+
+    public List<Author> searchByName(String name) {
+        return authorRepository.findByNameContainingIgnoreCaseOrderByName(name, PageRequest.of(0, 20));
     }
 
     public void delete(Author author) {
