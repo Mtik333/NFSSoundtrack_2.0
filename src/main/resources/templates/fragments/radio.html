@@ -11,7 +11,9 @@
 
     <!-- Controls -->
     <div class="col-md-4 col-lg-3 d-flex flex-column gap-3">
-        <button id="radio-skip" class="btn btn-primary" disabled>&#9654; Skip</button>
+        <button id="radio-skip" class="btn btn-primary" disabled>
+            <img class="img-responsive-row-icon" th:src="@{/images/znakwodny.webp}"> Skip
+        </button>
 
         <div id="radio-queued-box" class="alert alert-success py-2 px-2 mb-0" style="display:none;"></div>
 
@@ -161,4 +163,5 @@
     </tbody>
 </table>
 
+<th:block th:insert="~{fragments/songInfoModal.html}"></th:block>
 <script th:src="@{/js/radio.js}" type="application/javascript"></script>

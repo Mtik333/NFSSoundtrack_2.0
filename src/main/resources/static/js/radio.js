@@ -264,11 +264,8 @@ function playSong(songData) {
 
     updateMediaSessionMetadata(songData);
 
-    var artistHtml = songData.authorId
-        ? '<a class="table_link" href="/author/' + songData.authorId + '">' + escapeHtml(songData.artist) + '</a>'
-        : escapeHtml(songData.artist);
     var gameHtml = '<a class="table_link" href="/game/' + escapeHtml(songData.gameShort) + '">' + escapeHtml(songData.game) + '</a>';
-    $('#radio-now-playing').html(artistHtml + ' — ' + escapeHtml(songData.title) + ' &nbsp;·&nbsp; ' + gameHtml);
+    $('#radio-now-playing').html(bandHtml(songData) + ' - ' + titleHtml(songData) + ' - ' + gameHtml);
 
     $('#radio-player').html(
         '<iframe id="radio-yt-iframe" allow="autoplay" type="text/html"' +
@@ -308,17 +305,71 @@ function groupLabel(song) {
     return parts.join(' / ');
 }
 
+function authorLink(id, text) {
+    return '<a class="table_link" href="/author/' + id + '">' + escapeHtml(text) + '</a>';
+}
+
+function bandHtml(songData) {
+    var html = '';
+    (songData.composers || []).forEach(function (c) {
+        html += authorLink(c.id, songData.ingameDisplayBand ? songData.ingameDisplayBand : c.alias);
+    });
+
+    if (songData.showSubcomposer) {
+        (songData.subcomposers || []).forEach(function (s) {
+            html += (s.concat ? escapeHtml(s.concat) : '') + ' ' + authorLink(s.id, s.alias);
+        });
+    }
+
+    if (songData.showFeat && songData.featNextToBand) {
+        var feats = songData.feats || [];
+        feats.forEach(function (f, i) {
+            html += (i === 0 ? ' feat. ' : '') + authorLink(f.id, f.alias);
+            if (i < feats.length - 1) html += (f.concat ? escapeHtml(f.concat) : '') + ' ';
+        });
+    }
+
+    return html || escapeHtml(songData.artist);
+}
+
+function titleHtml(songData) {
+    var html = escapeHtml(songData.baseTitle != null ? songData.baseTitle : songData.title);
+
+    if (songData.showFeat && !songData.featNextToBand) {
+        var feats = songData.feats || [];
+        feats.forEach(function (f, i) {
+            html += (i === 0 ? ' (feat. ' : '') + authorLink(f.id, f.alias) + (i === feats.length - 1 ? ')' : '');
+            if (i < feats.length - 1) html += (f.concat ? escapeHtml(f.concat) : '') + ' ';
+        });
+    }
+
+    if (songData.remixAuthors && songData.remixAuthors.length) {
+        var authorsHtml = songData.remixAuthors.map(function (a, i) {
+            var link = authorLink(a.id, a.alias) + (a.concat ? escapeHtml(a.concat) : '');
+            return i < songData.remixAuthors.length - 1 ? link + ' ' : link;
+        }).join('');
+        var remixText = songData.remixText ? ' ' + escapeHtml(songData.remixText) : '';
+        html += ' (' + authorsHtml + remixText + ')';
+    }
+
+    return html;
+}
+
 function prependHistoryRow(songData) {
     var gameLink = '<a class="table_link" href="/game/' + escapeHtml(songData.gameShort) + '">' + escapeHtml(songData.game) + '</a>';
     var badge = songData.subgroupType
         ? ' <span class="badge bg-warning text-dark">' + escapeHtml(songData.subgroupType) + '</span>'
         : '';
     var $row = $(
-        '<tr class="radio-history-row">' +
-        '<td class="band">' + escapeHtml(songData.artist) + '</td>' +
-        '<td class="songtitle">' + escapeHtml(songData.title) + badge + '</td>' +
+        '<tr class="radio-history-row" data-song_id="' + songData.songId + '" data-songSubgroup-id="' + songData.id + '">' +
+        '<td class="info_button">' +
+        '<img class="img-responsive-row-icon add-to-custom-playlist pointable" title="Add to custom playlist" src="/images/fullres/plus_big.webp">' +
+        '<img class="img-responsive-row-icon info-about-song pointable" title="Show info" src="/images/fullres/info_big.webp">' +
+        '</td>' +
+        '<td class="band">' + bandHtml(songData) + '</td>' +
+        '<td class="songtitle">' + titleHtml(songData) + badge + '</td>' +
         '<td>' + gameLink + '</td>' +
-        '<td><button class="btn btn-sm btn-outline-secondary radio-requeue" type="button" title="Play next">▶</button></td>' +
+        '<td><button class="btn btn-sm btn-outline-secondary radio-requeue" type="button" title="Play next"><img class="img-responsive-row-icon" src="/images/znakwodny.webp"></button></td>' +
         '</tr>'
     );
     $row.data('song', songData);
@@ -626,18 +677,25 @@ function buildBlockedSeriesTree(seriesList) {
     var $container = $('#radio-block-series-list').empty();
     seriesList.forEach(function (serie) {
         var serieChecked = blockedSeries.indexOf(Number(serie.id)) >= 0;
+        var hasGames = serie.games && serie.games.length > 0;
+        var anyGameSelected = hasGames && serie.games.some(function (g) { return blockedGames.indexOf(Number(g.id)) >= 0; });
+
         var $wrapper = $('<div class="mb-1"></div>');
         var $serieRow = $('<div class="form-check"></div>');
         var $serieCb = $('<input type="checkbox" class="form-check-input radio-block-serie-cb">')
             .attr({ id: 'rblockserie-' + serie.id, value: serie.id })
             .prop('checked', serieChecked);
-        var $serieLabel = $('<label class="form-check-label fw-semibold pointable">')
+        var $serieLabel = $('<label class="form-check-label fw-semibold pointable"></label>')
             .attr('for', 'rblockserie-' + serie.id).text(serie.name);
         $serieRow.append($serieCb).append($serieLabel);
+        if (hasGames) {
+            var $toggleBtn = $('<button type="button" class="btn btn-sm btn-link py-0 float-end" title="Show games in this series">&#9662;</button>')
+                .attr({ 'data-bs-toggle': 'collapse', 'data-bs-target': '#rblockgames-' + serie.id });
+            $serieRow.append($toggleBtn);
+        }
         $wrapper.append($serieRow);
 
-        if (serie.games && serie.games.length > 0) {
-            var anyGameSelected = serie.games.some(function (g) { return blockedGames.indexOf(Number(g.id)) >= 0; });
+        if (hasGames) {
             var $games = $('<div class="ms-3 collapse' + (anyGameSelected ? ' show' : '') + '" id="rblockgames-' + serie.id + '"></div>');
             serie.games.forEach(function (game) {
                 var gameChecked = blockedGames.indexOf(Number(game.id)) >= 0;
@@ -684,18 +742,13 @@ $(document).on('change', '.radio-block-genre-cb', function () {
 
 $(document).on('change', '.radio-block-serie-cb', function () {
     var serieId = Number($(this).val());
-    var $gamesDiv = $('#rblockgames-' + serieId);
     if ($(this).is(':checked')) {
         if (blockedSeries.indexOf(serieId) < 0) blockedSeries.push(serieId);
-        $gamesDiv.collapse('show');
     } else {
         blockedSeries = blockedSeries.filter(function (id) { return id !== serieId; });
-        $gamesDiv.collapse('hide');
-        $gamesDiv.find('.radio-block-game-cb').prop('checked', false).each(function () {
-            var gid = Number($(this).val());
-            blockedGames = blockedGames.filter(function (id) { return id !== gid; });
-        });
     }
+    // Individually-blocked games within this series (if any) are left untouched —
+    // blocking/unblocking the whole series is independent of per-game blocks.
     savePrefs();
     updatePrefsSummary();
 });

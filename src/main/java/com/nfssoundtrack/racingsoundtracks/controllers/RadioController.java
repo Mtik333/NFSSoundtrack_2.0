@@ -1,7 +1,12 @@
 package com.nfssoundtrack.racingsoundtracks.controllers;
 
+import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorAlias;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.AuthorSong;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Remix;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Role;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Serie;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.Song;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SongSubgroup;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.SubgroupType;
 import com.nfssoundtrack.racingsoundtracks.radioserializers.RadioSerieSerializer;
@@ -209,11 +214,58 @@ public class RadioController {
         return results.stream().map(ss -> toDto(ss, preferOfficialTrailerMusic)).collect(Collectors.toList());
     }
 
+    private List<AuthorSong> remixers(SongSubgroup ss) {
+        if (ss.getRemix() != Remix.YES) return List.of();
+        return ss.getSong().getAuthorSongList().stream()
+                .filter(as -> as.getRole() == Role.REMIX)
+                .collect(Collectors.toList());
+    }
+
+    private String remixSuffix(SongSubgroup ss) {
+        List<AuthorSong> remixers = remixers(ss);
+        if (remixers.isEmpty()) return "";
+
+        StringBuilder sb = new StringBuilder(" (");
+        for (AuthorSong authorSong : remixers) {
+            sb.append(authorSong.getAuthorAlias().getAlias());
+            if (authorSong.getRemixConcat() != null) sb.append(authorSong.getRemixConcat());
+        }
+        String remixText = ss.getRemixText() != null ? ss.getRemixText().trim() : "";
+        if (!remixText.isEmpty()) sb.append(' ').append(remixText);
+        sb.append(')');
+        return sb.toString();
+    }
+
+    private List<Map<String, Object>> remixAuthorsDto(SongSubgroup ss) {
+        return remixers(ss).stream().map(as -> authorDto(as.getAuthorAlias(), as.getRemixConcat()))
+                .collect(Collectors.toList());
+    }
+
+    private Map<String, Object> authorDto(AuthorAlias alias, String concat) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id", alias.getAuthor().getId());
+        m.put("alias", alias.getAlias());
+        m.put("concat", concat);
+        return m;
+    }
+
+    private List<Map<String, Object>> authorsByRole(Song song, Role role, boolean withConcat) {
+        return song.getAuthorSongList().stream()
+                .filter(as -> as.getRole() == role)
+                .map(as -> authorDto(as.getAuthorAlias(), withConcat
+                        ? (role == Role.SUBCOMPOSER ? as.getSubcomposerConcat() : as.getFeatConcat())
+                        : null))
+                .collect(Collectors.toList());
+    }
+
     private Map<String, Object> toDto(SongSubgroup ss, boolean preferOfficialTrailerMusic) {
         String artist = ss.getIngameDisplayBand() != null
                 ? ss.getIngameDisplayBand() : ss.getSong().getOfficialDisplayBand();
-        String title = ss.getIngameDisplayTitle() != null
+        String baseTitle = ss.getIngameDisplayTitle() != null
                 ? ss.getIngameDisplayTitle() : ss.getSong().getOfficialDisplayTitle();
+        String title = baseTitle + remixSuffix(ss);
+        String remixText = ss.getRemix() == Remix.YES && ss.getRemixText() != null
+                ? ss.getRemixText().trim() : "";
 
         boolean isTrailer = ss.getSubgroup().getSubgroupType() == SubgroupType.TRAILERS;
         String officialSrcId = ss.getSong().getSrcId();
@@ -234,9 +286,20 @@ public class RadioController {
 
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("id", ss.getId());
+        dto.put("songId", ss.getSong().getId());
         dto.put("srcId", srcId);
         dto.put("artist", artist);
         dto.put("title", title);
+        dto.put("baseTitle", baseTitle);
+        dto.put("ingameDisplayBand", ss.getIngameDisplayBand());
+        dto.put("composers", authorsByRole(ss.getSong(), Role.COMPOSER, false));
+        dto.put("showSubcomposer", Boolean.TRUE.equals(ss.getShowSubcomposer()));
+        dto.put("subcomposers", authorsByRole(ss.getSong(), Role.SUBCOMPOSER, true));
+        dto.put("showFeat", Boolean.TRUE.equals(ss.getShowFeat()));
+        dto.put("featNextToBand", Boolean.TRUE.equals(ss.getSong().getFeatNextToBand()));
+        dto.put("feats", authorsByRole(ss.getSong(), Role.FEAT, true));
+        dto.put("remixAuthors", remixAuthorsDto(ss));
+        dto.put("remixText", remixText);
         dto.put("game", game);
         dto.put("gameShort", gameShort);
         dto.put("authorId", authorId);
