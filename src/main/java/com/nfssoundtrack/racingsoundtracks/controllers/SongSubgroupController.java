@@ -9,6 +9,7 @@ import com.nfssoundtrack.racingsoundtracks.deserializers.SongSubgroupDeserialize
 import com.nfssoundtrack.racingsoundtracks.others.JustSomeHelper;
 import com.nfssoundtrack.racingsoundtracks.others.ResourceNotFoundException;
 import com.nfssoundtrack.racingsoundtracks.others.lyrics.Lyrics;
+import com.nfssoundtrack.racingsoundtracks.services.MusicLinksService;
 import com.nfssoundtrack.racingsoundtracks.services.YouTubeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +20,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -59,10 +56,14 @@ public class SongSubgroupController {
 
     private final BaseControllerWithErrorHandling baseController;
 
-    public SongSubgroupController(SongSubgroupDeserializer songSubgroupDeserializer, SongDeserializer songDeserializer, BaseControllerWithErrorHandling baseController) {
+    private final MusicLinksService musicLinksService;
+
+    public SongSubgroupController(SongSubgroupDeserializer songSubgroupDeserializer, SongDeserializer songDeserializer,
+                                  BaseControllerWithErrorHandling baseController, MusicLinksService musicLinksService) {
         this.songSubgroupDeserializer = songSubgroupDeserializer;
         this.songDeserializer = songDeserializer;
         this.baseController = baseController;
+        this.musicLinksService = musicLinksService;
     }
 
     private void appendToPendingCsv(long songId, String ytId) {
@@ -954,64 +955,16 @@ public class SongSubgroupController {
     }
 
     private void setLinksFromOdesliCoUsingYt(String youtubeId, SongSubgroup songSubgroup, boolean setSong) {
-        setLinksFromOdesliCo(youtubeId, "https://www.youtube.com/watch?v=", songSubgroup, setSong);
+        musicLinksService.setLinksFromYoutube(youtubeId, songSubgroup);
+        if (setSong) {
+            songSubgroup.getSong().setLinks(songSubgroup);
+        }
     }
 
     private void setLinksFromOdesliCoUsingSpotify(String spotifyId, SongSubgroup songSubgroup, boolean setSong) {
-        setLinksFromOdesliCo(spotifyId, "", songSubgroup, setSong);
-    }
-
-    private void setLinksFromOdesliCo(String srcId, String urlParam, SongSubgroup songSubgroup, boolean setSong) {
-        try {
-            StringBuilder content = new StringBuilder();
-            URL url = new URL("https://odesli.co/embed?url=" + urlParam + srcId);
-            URLConnection urlConnection = url.openConnection();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                content.append(line).append("\n");
-            }
-            bufferedReader.close();
-            String valueToCheck = content.toString();
-            //we just do some stupid substring crap to get necessary links and build them properly
-            int beginPositionITunes = valueToCheck.indexOf("https://geo.music.apple.com");
-            if (beginPositionITunes > -1) {
-                int endPosition = valueToCheck.indexOf("0026mt=1");
-                String iTunesLink = valueToCheck.substring(beginPositionITunes, endPosition - 2) + "&at=11lJZP";
-                songSubgroup.setItunesLink(iTunesLink);
-            }
-            int beginPositionTidal = valueToCheck.indexOf("https://listen.tidal.com");
-            if (beginPositionTidal > -1) {
-                int endPosition = beginPositionTidal + 40;
-                String tidalLink = valueToCheck.substring(beginPositionTidal, endPosition);
-                tidalLink = tidalLink.replace("\"", "").replace("}", "").replace(",", "");
-                songSubgroup.setTidalLink(tidalLink);
-            }
-            int beginPositionDeezer = valueToCheck.indexOf("www.deezer.com");
-            if (beginPositionDeezer > -1) {
-                int endPosition = beginPositionDeezer + 30;
-                String deezerId = "deezer://" + valueToCheck.substring(beginPositionDeezer, endPosition);
-                deezerId = deezerId.replace("\"", "").replace("}", "").replace(",", "");
-                songSubgroup.setDeezerId(deezerId);
-            }
-            int beginPositionSoundcloud = valueToCheck.indexOf("\"https://soundcloud.com");
-            if (beginPositionSoundcloud > -1) {
-                int endPosition = valueToCheck.indexOf("\"", beginPositionSoundcloud + 1);
-                String soundcloudLink = valueToCheck.substring(beginPositionSoundcloud + 1, endPosition);
-                songSubgroup.setSoundcloudLink(soundcloudLink);
-            }
-            int beginPositionSpotify = valueToCheck.indexOf("https://open.spotify.com/track/");
-            if (beginPositionSpotify > -1) {
-                int endPosition = beginPositionSpotify + 53;
-                String spotifyLink = "spotify:track:" + valueToCheck.substring(beginPositionSpotify + 31, endPosition);
-                songSubgroup.setSpotifyId(spotifyLink);
-            }
-            if (setSong) {
-                songSubgroup.getSong().setLinks(songSubgroup);
-            }
-        } catch (IOException e) {
-            logger.error("unknown error, maybe API limit violated? {}", e.getMessage());
-            e.printStackTrace();
+        musicLinksService.setLinksFromSpotify(spotifyId, songSubgroup);
+        if (setSong) {
+            songSubgroup.getSong().setLinks(songSubgroup);
         }
     }
 

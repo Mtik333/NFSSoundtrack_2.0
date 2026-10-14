@@ -41,13 +41,16 @@ out/
 /gradlew
 /gradlew.bat
 
+### Custom project stuff ###
 logs
 discogs
 garbage
 /src/main/resorces/application-docker.properties
+/src/main/resources/application-dev.properties
 /src/main/resources/static/min/
 /flatout2_files/
 /claude_src/
 /node_modules/
 /src/main/resources/client_secret.json
 /src/main/resources/client_secret2.json
+/src/main/resources/keystore/nfssoundtrack_beta.p12
