@@ -131,6 +131,34 @@
                     </a>
                 </div>
             </th:block>
+                <div class="pointable ripSoundtrackLinks">
+                    <th:block th:each="ripSoundtrack : ${ripSoundtracks}">
+                        <th:block th:if="${ripSoundtrack.ripSource.value=='HCS64'}">
+                            <a th:href="${ripSoundtrack.link}" target="_blank">
+                            <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
+                                 th:title="${ripSoundtrack.gamePlatform.game.displayTitle}+' soundtrack download at HCS64 - '
+                                 +${ripSoundtrack.gamePlatform.platform.platform}+' release'"
+                                 th:src="@{/images/fullres/hcs64.webp}">
+                            </a>
+                        </th:block>
+                        <th:block th:if="${ripSoundtrack.ripSource.value=='ZOPHAR'}">
+                            <a th:href="${ripSoundtrack.link}" target="_blank">
+                            <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
+                                 th:title="${ripSoundtrack.gamePlatform.game.displayTitle}+' soundtrack download at Zophar Domain - '
+                                 +${ripSoundtrack.gamePlatform.platform.platform}+' release'"
+                                 th:src="@{/images/fullres/zophar.webp}">
+                            </a>
+                        </th:block>
+                        <th:block th:if="${ripSoundtrack.ripSource.value=='KHINSIDER'}">
+                            <a th:href="${ripSoundtrack.link}" target="_blank">
+                            <img class="img-responsive-row-icon pointable playlist-icon" data-toggle="tooltip" data-placement="top"
+                                 th:title="${ripSoundtrack.gamePlatform.game.displayTitle}+' soundtrack download at KHInsider - '
+                                 +${ripSoundtrack.gamePlatform.platform.platform}+' release'"
+                                 th:src="@{/images/fullres/khinsider.webp}">
+                            </a>
+                        </th:block>
+                    </th:block>
+                </div>
         </div>
         <th:block th:if="${customTheme!=null}">
             <div class="pointable" id="dynamicBackground" data-toggle="tooltip" data-placement="top"

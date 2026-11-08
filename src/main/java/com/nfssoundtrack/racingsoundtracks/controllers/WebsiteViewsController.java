@@ -208,6 +208,7 @@ public class WebsiteViewsController {
         customTheme.ifPresent(theme -> model.addAttribute("customTheme", theme));
         model.addAttribute("songSubgroups", baseController.getSongSubgroupService().hasGameAnySongs(game));
         model.addAttribute("gamePlatforms", gamePlatformService.findByGame(game));
+        model.addAttribute("ripSoundtracks", baseController.getRipSoundtrackService().findByGame(game));
         model.addAttribute("gamePlaylists", gamePlaylistService.findByGame(game));
         return MIN_INDEX;
     }

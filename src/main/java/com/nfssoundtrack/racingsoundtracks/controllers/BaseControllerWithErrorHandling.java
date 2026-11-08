@@ -3,6 +3,7 @@ package com.nfssoundtrack.racingsoundtracks.controllers;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.Changelog;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.EntityType;
 import com.nfssoundtrack.racingsoundtracks.dbmodel.EntityUrl;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.RipSoundtrack;
 import com.nfssoundtrack.racingsoundtracks.services.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -65,6 +66,7 @@ public class BaseControllerWithErrorHandling implements ErrorController {
     private final AuthorMemberService authorMemberService;
     private final ChangelogService changelogService;
     private final SpotifyFetchService spotifyFetchService;
+    private final RipSoundtrackService ripSoundtrackService;
     private final MessageSource messageSource;
 
     public BaseControllerWithErrorHandling(CacheManager cacheManager, SerieService serieService,
@@ -77,7 +79,8 @@ public class BaseControllerWithErrorHandling implements ErrorController {
                                            SubgroupService subgroupService, TodaysSongService todaysSongService,
                                            CorrectionService correctionService, CustomThemeService customThemeService,
                                            AuthorMemberService authorMemberService, ChangelogService changelogService,
-                                           SpotifyFetchService spotifyFetchService, MessageSource messageSource) {
+                                           SpotifyFetchService spotifyFetchService, RipSoundtrackService ripSoundtrackService,
+                                           MessageSource messageSource) {
         this.cacheManager = cacheManager;
         this.serieService = serieService;
         this.contentService = contentService;
@@ -99,6 +102,7 @@ public class BaseControllerWithErrorHandling implements ErrorController {
         this.authorMemberService = authorMemberService;
         this.changelogService = changelogService;
         this.spotifyFetchService = spotifyFetchService;
+        this.ripSoundtrackService = ripSoundtrackService;
         this.messageSource = messageSource;
     }
 
@@ -257,6 +261,10 @@ public class BaseControllerWithErrorHandling implements ErrorController {
 
     public SpotifyFetchService getSpotifyFetchService() {
         return spotifyFetchService;
+    }
+
+    public RipSoundtrackService getRipSoundtrackService() {
+        return ripSoundtrackService;
     }
 
     public MessageSource getMessageSource() {
