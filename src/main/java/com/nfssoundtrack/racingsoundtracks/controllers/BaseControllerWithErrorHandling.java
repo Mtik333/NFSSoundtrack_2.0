@@ -64,6 +64,7 @@ public class BaseControllerWithErrorHandling implements ErrorController {
     private final CustomThemeService customThemeService;
     private final AuthorMemberService authorMemberService;
     private final ChangelogService changelogService;
+    private final SpotifyFetchService spotifyFetchService;
     private final MessageSource messageSource;
 
     public BaseControllerWithErrorHandling(CacheManager cacheManager, SerieService serieService,
@@ -76,7 +77,7 @@ public class BaseControllerWithErrorHandling implements ErrorController {
                                            SubgroupService subgroupService, TodaysSongService todaysSongService,
                                            CorrectionService correctionService, CustomThemeService customThemeService,
                                            AuthorMemberService authorMemberService, ChangelogService changelogService,
-                                           MessageSource messageSource) {
+                                           SpotifyFetchService spotifyFetchService, MessageSource messageSource) {
         this.cacheManager = cacheManager;
         this.serieService = serieService;
         this.contentService = contentService;
@@ -97,6 +98,7 @@ public class BaseControllerWithErrorHandling implements ErrorController {
         this.customThemeService = customThemeService;
         this.authorMemberService = authorMemberService;
         this.changelogService = changelogService;
+        this.spotifyFetchService = spotifyFetchService;
         this.messageSource = messageSource;
     }
 
@@ -251,6 +253,10 @@ public class BaseControllerWithErrorHandling implements ErrorController {
 
     public ChangelogService getChangelogService() {
         return changelogService;
+    }
+
+    public SpotifyFetchService getSpotifyFetchService() {
+        return spotifyFetchService;
     }
 
     public MessageSource getMessageSource() {

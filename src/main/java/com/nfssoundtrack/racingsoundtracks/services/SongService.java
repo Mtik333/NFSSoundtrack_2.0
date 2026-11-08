@@ -56,6 +56,10 @@ public class SongService {
         return songRepository.findByLyricsContains(lyrics);
     }
 
+    public List<Song> findBySpotifyId(String spotifyId) {
+        return songRepository.findBySpotifyId(spotifyId);
+    }
+
     public void delete(Song song) {
         songRepository.delete(song);
     }

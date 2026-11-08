@@ -9,6 +9,8 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 
     List<Song> findByLyrics(String lyrics);
 
+    List<Song> findBySpotifyId(String lyrics);
+
     List<Song> findByLyricsContains(String lyrics);
 
     List<Song> findByOfficialDisplayTitle(String officialDisplayTitle);

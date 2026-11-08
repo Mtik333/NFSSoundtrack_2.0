@@ -54,3 +54,4 @@ garbage
 /src/main/resources/client_secret.json
 /src/main/resources/client_secret2.json
 /src/main/resources/keystore/nfssoundtrack_beta.p12
+/scripts/genre_suggester/work/
