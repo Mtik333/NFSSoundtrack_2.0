@@ -1,9 +1,6 @@
 package com.nfssoundtrack.racingsoundtracks.services;
 
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Game;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.GamePlatform;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.Genre;
-import com.nfssoundtrack.racingsoundtracks.dbmodel.RipSoundtrack;
+import com.nfssoundtrack.racingsoundtracks.dbmodel.*;
 import com.nfssoundtrack.racingsoundtracks.repository.GamePlatformRepository;
 import com.nfssoundtrack.racingsoundtracks.repository.GenreRepository;
 import com.nfssoundtrack.racingsoundtracks.repository.RipSoundtrackRepository;
@@ -34,5 +31,17 @@ public class RipSoundtrackService {
             ripSoundtracks.addAll(ripSoundtrackRepository.findByGamePlatform(gamePlatform));
         }
         return ripSoundtracks;
+    }
+
+    public java.util.Optional<RipSoundtrack> findById(Long id) {
+        return ripSoundtrackRepository.findById(id.intValue());
+    }
+
+    public RipSoundtrack save(RipSoundtrack ripSoundtrack) {
+        return ripSoundtrackRepository.save(ripSoundtrack);
+    }
+
+    public void deleteById(Long id) {
+        ripSoundtrackRepository.deleteById(id.intValue());
     }
 }

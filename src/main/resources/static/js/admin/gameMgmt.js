@@ -1,4 +1,5 @@
 var gameToEdit;
+var gamePlatforms;
 
 var PLAYLIST_PLATFORMS = [
     {value: "SPOTIFY",     label: "Spotify"},
@@ -7,6 +8,13 @@ var PLAYLIST_PLATFORMS = [
     {value: "YOUTUBE",     label: "YouTube"},
     {value: "SOUNDCLOUD",  label: "SoundCloud"},
     {value: "APPLE_MUSIC", label: "Apple Music"}
+];
+
+var SOURCES = [
+    {value: "HCS64",     label: "HCS64"},
+    {value: "KHINSIDER",      label: "KHinsider"},
+    {value: "ZOPHAR",       label: "Zophar"},
+    {value: "CUSTOM",     label: "Other"},
 ];
 
 function extractPlaylistId(platform, value) {
@@ -67,6 +75,52 @@ function buildPlaylistRow(playlist) {
         row.append($('<div class="col-auto">').append('<button type="button" class="btn btn-danger delete-playlist-btn">X</button>'));
     } else {
         row.append($('<div class="col-auto">').append('<button type="button" class="btn btn-success add-playlist-btn">+</button>'));
+    }
+    return row;
+}
+
+function buildSourceSelect(selectedValue) {
+    var sel = $('<select class="form-select d-inline-block w-auto rip-soundtrack-source-select">');
+    SOURCES.forEach(function (p) {
+        var opt = $('<option>').val(p.value).text(p.label);
+        if (p.value === selectedValue) {
+            opt.prop('selected', true);
+        }
+        sel.append(opt);
+    });
+    return sel;
+}
+
+function buildGamePlatformSelect(ripSoundtrack) {
+    var sel = $('<select class="form-select d-inline-block w-auto rip-soundtrack-game-platform-select">');
+    gamePlatforms.forEach(function (p) {
+        var opt = $('<option>').val(p.id).text(p.platformName);
+        if (ripSoundtrack && p.id === ripSoundtrack.gamePlatformId) {
+            opt.prop('selected', true);
+        }
+        sel.append(opt);
+    });
+    return sel;
+}
+
+function buildRipSoundtrackRow(ripSoundtrack){
+    var row = $('<div class="row g-2 align-items-center mb-1 rip-soundtrack-entry-row">')
+        .attr('data-rip-soundtrack-id', ripSoundtrack ? ripSoundtrack.id : '');
+    row.append($('<div class="col-auto">').append(buildSourceSelect(ripSoundtrack ? ripSoundtrack.source : 'HCS64')));
+    row.append($('<div class="col-auto">').append(buildGamePlatformSelect(ripSoundtrack)));
+    row.append($('<div class="col-3">').append(
+        $('<input class="form-control rip-soundtrack-link-input" placeholder="Link">')
+            .val(ripSoundtrack ? ripSoundtrack.link : '')
+    ));
+    row.append($('<div class="col">').append(
+        $('<input class="form-control rip-soundtrack-title-input" placeholder="Alt title (optional)">')
+            .val(ripSoundtrack ? ripSoundtrack.altTitle : '')
+    ));
+    if (ripSoundtrack) {
+        row.append($('<div class="col-auto">').append('<button type="button" class="btn btn-primary save-rip-soundtrack-btn">Save</button>'));
+        row.append($('<div class="col-auto">').append('<button type="button" class="btn btn-danger delete-rip-soundtrack-btn">X</button>'));
+    } else {
+        row.append($('<div class="col-auto">').append('<button type="button" class="btn btn-success add-rip-soundtrack-btn">+</button>'));
     }
     return row;
 }
@@ -179,6 +233,24 @@ $(document).ready(function () {
                 playlistsSection.append(buildPlaylistRow(null));
                 newGameDiv.append(playlistsSection);
 
+                var ripSoundtrackSection = $('<div class="mt-3">');
+                ripSoundtrackSection.append('<h5>Ripped soundtrack links</h5>');
+                $.ajax({
+                    async: false,
+                    type: "GET",
+                    url: "/ripSoundtrack/byGame/" + Number(gameId),
+                    success: function (data) {
+                        let parsedData = JSON.parse(data);
+                        gamePlatforms = parsedData["gamePlatforms"];
+                        let ripSoundtracks = parsedData["ripSoundtracks"];
+                        ripSoundtracks.forEach(function (pl) {
+                            ripSoundtrackSection.append(buildRipSoundtrackRow(pl));
+                        });
+                    }
+                });
+                ripSoundtrackSection.append(buildRipSoundtrackRow(null));
+                newGameDiv.append(ripSoundtrackSection);
+
                 divToAppend.append('<button id="saveEditGame" type="submit" class="btn btn-primary">Save changes</button>');
                 divToAppend.append(newGameDiv);
 
@@ -274,6 +346,33 @@ $(document).ready(function () {
         });
     });
 
+    $(document).on('click', '.save-rip-soundtrack-btn', function () {
+        var row = $(this).closest('.rip-soundtrack-entry-row');
+        var id = row.attr('data-rip-soundtrack-id');
+        var ripLink = row.find('.rip-soundtrack-link-input').val();
+        var gamePlatformId = row.find('.rip-soundtrack-game-platform-select').val();
+        if (!ripLink) return;
+        var body = {
+            link: ripLink,
+            altTitle: row.find('.rip-soundtrack-title-input').val(),
+            source: row.find('.rip-soundtrack-source-select').val(),
+            gamePlatformId: row.find('.rip-soundtrack-game-platform-select').val()
+        };
+        $.ajax({
+            async: false, type: "PUT",
+            url: "/ripSoundtrack/update/" + id,
+            data: JSON.stringify(body),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function () {
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(successAlertHtml).slideUp(500); });
+            },
+            error: function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(failureAlertHtml).slideUp(500); });
+            }
+        });
+    });
+
     $(document).on('click', '.delete-playlist-btn', function () {
         if (!confirm("Delete this playlist?")) return;
         var row = $(this).closest('.playlist-entry-row');
@@ -282,6 +381,50 @@ $(document).ready(function () {
             async: false, type: "DELETE",
             url: "/gamePlaylist/delete/" + id,
             success: function () { row.remove(); },
+            error: function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(failureAlertHtml).slideUp(500); });
+            }
+        });
+    });
+
+    $(document).on('click', '.delete-rip-soundtrack-btn', function () {
+        if (!confirm("Delete this rip soundtrack?")) return;
+        var row = $(this).closest('.rip-soundtrack-entry-row');
+        var id = row.attr('data-rip-soundtrack-id');
+        $.ajax({
+            async: false, type: "DELETE",
+            url: "/ripSoundtrack/delete/" + id,
+            success: function () { row.remove(); },
+            error: function () {
+                $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(failureAlertHtml).slideUp(500); });
+            }
+        });
+    });
+
+    $(document).on('click', '.add-rip-soundtrack-btn', function () {
+        var row = $(this).closest('.rip-soundtrack-entry-row');
+        var ripLink = row.find('.rip-soundtrack-link-input').val();
+        var gamePlatformId = row.find('.rip-soundtrack-game-platform-select').val();
+        if (!ripLink) return;
+        var body = {
+            link: ripLink,
+            altTitle: row.find('.rip-soundtrack-title-input').val(),
+            source: row.find('.rip-soundtrack-source-select').val()
+        };
+        $.ajax({
+            async: false, type: "POST",
+            url: "/ripSoundtrack/save/" + Number(gamePlatformId),
+            data: JSON.stringify(body),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (resp) {
+                var saved = {id: resp.id, link: body.link, altTitle: body.altTitle, source: body.source,
+                gamePlatformId: resp.gamePlatformId, platformId: resp.platformId, platformName: resp.platformName};
+                row.before(buildRipSoundtrackRow(saved));
+                row.find('.rip-soundtrack-link-input, .rip-soundtrack-title-input').val('');
+                row.find('.rip-soundtrack-source-select').val('HCS64');
+                $(successAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(successAlertHtml).slideUp(500); });
+            },
             error: function () {
                 $(failureAlertHtml).fadeTo(500, 500).slideUp(500, function () { $(failureAlertHtml).slideUp(500); });
             }

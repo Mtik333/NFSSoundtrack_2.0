@@ -93,7 +93,7 @@ $(document).ready(function () {
                     let authorName = dataToAdd[i].authorName;
                     let songTitle = dataToAdd[i].songTitle;
                     let spotifyId = dataToAdd[i].spotifyId;
-                    let youtubeId = dataToAdd[i].ytId;
+                    let youtubeId = dataToAdd[i].srcId;
                     var trElem = $('<tr data-songId="' + songId + '">');
                     trElem.append('<td class="col-sm-1"><input style="width: 80%" class="form-control song-id" type="text" value="' + songId + '"></td>');
                     trElem.append('<td class="col-sm-1"><input style="width: 80%" class="form-control author-id" type="text" value="' + authorId + '"></td>');

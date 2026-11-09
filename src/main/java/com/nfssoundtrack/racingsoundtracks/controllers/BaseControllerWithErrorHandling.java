@@ -67,6 +67,7 @@ public class BaseControllerWithErrorHandling implements ErrorController {
     private final ChangelogService changelogService;
     private final SpotifyFetchService spotifyFetchService;
     private final RipSoundtrackService ripSoundtrackService;
+    private final GamePlatformService gamePlatformService;
     private final MessageSource messageSource;
 
     public BaseControllerWithErrorHandling(CacheManager cacheManager, SerieService serieService,
@@ -80,6 +81,7 @@ public class BaseControllerWithErrorHandling implements ErrorController {
                                            CorrectionService correctionService, CustomThemeService customThemeService,
                                            AuthorMemberService authorMemberService, ChangelogService changelogService,
                                            SpotifyFetchService spotifyFetchService, RipSoundtrackService ripSoundtrackService,
+                                           GamePlatformService gamePlatformService,
                                            MessageSource messageSource) {
         this.cacheManager = cacheManager;
         this.serieService = serieService;
@@ -103,6 +105,7 @@ public class BaseControllerWithErrorHandling implements ErrorController {
         this.changelogService = changelogService;
         this.spotifyFetchService = spotifyFetchService;
         this.ripSoundtrackService = ripSoundtrackService;
+        this.gamePlatformService = gamePlatformService;
         this.messageSource = messageSource;
     }
 
@@ -265,6 +268,10 @@ public class BaseControllerWithErrorHandling implements ErrorController {
 
     public RipSoundtrackService getRipSoundtrackService() {
         return ripSoundtrackService;
+    }
+
+    public GamePlatformService getGamePlatformService() {
+        return gamePlatformService;
     }
 
     public MessageSource getMessageSource() {
