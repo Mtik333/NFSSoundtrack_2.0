@@ -19,6 +19,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -55,6 +60,9 @@ public class AuthorService {
 
     @Value("${bot.token}")
     private String botSecret;
+
+    @Value("${blockBotAuthorLookup}")
+    private boolean blockBots;
 
     public AuthorService(AuthorRepository authorRepository, Map<Long, DiscoGSObj> discoGSObjMap) {
         this.authorRepository = authorRepository;
@@ -139,7 +147,9 @@ public class AuthorService {
 //                                .sendMessage("discoGSObj " + finalDiscoGSObj).queue()));
                         discoGSObjMap.remove(author.getId());
                     } else {
-                        discoGSObj = handleApiOveruse(discoGSObj, author);
+                        if (!blockBots){
+                            discoGSObj = handleApiOveruse(discoGSObj, author);
+                        }
                     }
                 } else {
                     discoGSObj.setWebsite(null);
@@ -343,6 +353,18 @@ public class AuthorService {
      * @throws LoginException
      */
     public DiscoGSObj obtainArtistLinkAndProfile(String authorName, Integer id) throws InterruptedException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAuth=false;
+        if (!auth.getAuthorities().isEmpty()){
+            GrantedAuthority grantedAuthority = auth.getAuthorities().iterator().next();
+            if ("ADMIN".equals(grantedAuthority.getAuthority())){
+                isAuth=true;
+            }
+        }
+        if (!isAuth && blockBots){
+            logger.error("bots scrapping discogs");
+            return null;
+        }
         try {
             RestTemplate restTemplate = new RestTemplate();
             String uri2 = "https://api.discogs.com/artists/" + id;
